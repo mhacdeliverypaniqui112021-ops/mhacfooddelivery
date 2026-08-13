@@ -1,25 +1,9 @@
-MHAC DELIVERY CLEAN V1 - CUSTOMER APP
+MHAC DELIVERY V1.1 — CUSTOMER STORE/MENU/CART
 
-Upload the CONTENTS of this ZIP directly into the ROOT of your NEW GitHub repository.
+Upload index.html and README.txt directly to the ROOT of the new repository.
+Do not upload the ZIP itself and do not place them inside another folder.
 
-Only one application file is needed:
-index.html
+Flow:
+Choose Store -> Jollibee/McDo/Mang Inasal/KFC -> Category -> Food -> Add -> Optional Drink -> Cart -> Checkout.
 
-This is the clean starting Customer App.
-Customer flow:
-Choose Store -> Category -> Food -> Optional Drink/Add-on -> Cart -> Checkout.
-
-Stores:
-JOLLIBEE
-MCDO
-MANG INASAL
-KFC
-
-Checkout asks for:
-Name
-Contact Number
-Municipality
-Barangay
-
-Do not mix this with any previous MHAC files.
-Admin/Rider/GPS/Firebase will be added only after this V1 is confirmed working.
+This version is intentionally Customer App only. GPS, accurate delivery fee, Admin, Rider and Firebase come later after this flow is confirmed.
