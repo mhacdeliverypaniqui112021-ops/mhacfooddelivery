@@ -1,9 +1,12 @@
-MHAC DELIVERY V1.1 — CUSTOMER STORE/MENU/CART
+MHAC DELIVERY V1.2 — CLICKABLE MENU
 
-Upload index.html and README.txt directly to the ROOT of the new repository.
-Do not upload the ZIP itself and do not place them inside another folder.
+Upload index.html and README.txt to the ROOT of the new repository.
+
+This version keeps the current interface and changes menu/add-on selection to clickable choices. Customers do NOT type numbers.
 
 Flow:
-Choose Store -> Jollibee/McDo/Mang Inasal/KFC -> Category -> Food -> Add -> Optional Drink -> Cart -> Checkout.
+Store -> Category -> Food -> click NO DRINK/COKE/SPRITE/ROYAL -> ADD TO CART -> Checkout.
 
-This version is intentionally Customer App only. GPS, accurate delivery fee, Admin, Rider and Firebase come later after this flow is confirmed.
+Logo is intentionally left as the current text placeholder. We will add the user's actual logo later.
+
+Do not mix this with old MHAC files.

@@ -1,46 +1,38 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MHAC DELIVERY</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}
-header{padding:18px 16px 12px;text-align:center;border-bottom:1px solid #ddd}.logo{font-size:28px;font-weight:900;letter-spacing:1px}.tag{font-size:12px;font-weight:700;margin-top:3px}
+header{padding:18px 16px 12px;text-align:center;border-bottom:1px solid #ddd}.logo{font-size:28px;font-weight:900}.tag{font-size:12px;font-weight:700}
 .rate{margin:14px;border:2px solid #111;border-radius:12px;padding:12px}.rate h3{margin:0 0 8px;text-align:center;font-size:16px}.formula{text-align:center;font-weight:800;font-size:13px;line-height:1.7}
-.container{padding:0 14px 30px}.title{font-size:20px;font-weight:900;margin:18px 0 10px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.store{border:2px solid #111;border-radius:12px;background:#fff;padding:18px 8px;font-size:16px;font-weight:900;cursor:pointer}
+.container{padding:0 14px 30px}.title{font-size:20px;font-weight:900;margin:18px 0 10px}.stores,.cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.store,.cat,.choice{border:2px solid #111;border-radius:12px;background:#fff;padding:16px 8px;font-size:15px;font-weight:900;cursor:pointer}
 .panel{margin-top:14px;border-top:2px solid #111;padding-top:12px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.back{border:1px solid #111;background:#111;color:#fff;border-radius:8px;padding:8px 12px;font-weight:800}
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.cat{padding:14px 8px;border:2px solid #111;border-radius:10px;background:#fff;font-weight:900}
-.food{display:flex;align-items:center;gap:10px;border:1px solid #ccc;border-radius:10px;padding:10px;margin:9px 0}.food .pic{width:62px;height:62px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:25px}.food .info{flex:1}.food b{display:block}.price{font-weight:900;margin-top:4px}.add{background:#d71920;color:#fff;border:0;border-radius:8px;padding:10px 14px;font-weight:900}
-.cart{margin-top:18px;border:2px solid #111;border-radius:12px;padding:13px}.cartline{padding:9px 0;border-bottom:1px solid #ddd}.total{font-size:18px;font-weight:900;margin-top:10px}.checkout{width:100%;margin-top:12px;padding:13px;border:0;border-radius:10px;background:#111;color:#fff;font-weight:900}.notice{font-size:13px;color:#555}footer{text-align:center;font-size:11px;padding:20px;color:#666}
-</style>
-</head>
-<body>
+.food{border:1px solid #ccc;border-radius:10px;padding:12px;margin:9px 0}.foodtop{display:flex;align-items:center;gap:10px}.pic{width:58px;height:58px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:25px}.info{flex:1}.price{font-weight:900;margin-top:4px}.add{background:#d71920;color:#fff;border:0;border-radius:8px;padding:10px 14px;font-weight:900}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.choice{padding:12px 7px;font-size:13px}.selected{background:#111;color:#fff}
+.cart{margin-top:18px;border:2px solid #111;border-radius:12px;padding:13px}.cartline{padding:9px 0;border-bottom:1px solid #ddd}.total{font-size:18px;font-weight:900;margin-top:10px}.checkout{width:100%;margin-top:12px;padding:13px;border:0;border-radius:10px;background:#111;color:#fff;font-weight:900}.notice{font-size:13px;color:#555}
+</style></head><body>
 <header><div class="logo">MHAC DELIVERY</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h3>DELIVERY RATE</h3><div class="formula">1 KM = ₱40 • SUCCEEDING KM +₱10<br>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</div></section>
-<main class="container">
-<div class="title">CHOOSE STORE</div>
-<div id="stores" class="stores"></div>
-<section id="menu" class="panel" style="display:none"></section>
+<main class="container"><div class="title">CHOOSE STORE</div><div id="stores" class="stores"></div><section id="menu" class="panel" style="display:none"></section>
 <section class="cart"><div class="row"><b>🛒 YOUR CART</b><b id="count">0</b></div><div id="cartItems" class="notice" style="margin-top:10px">No items yet.</div><div id="summary" style="display:none">
-<div class="cartline row"><span>Food Order</span><b id="foodTotal">₱0.00</b></div><div class="cartline row"><span>10% Service Fee</span><b id="service">₱0.00</b></div><div class="cartline row"><span>Delivery Fee</span><b id="delivery">₱40.00</b></div><div class="cartline row"><span>2nd Store Fee</span><b id="storeFee">₱0.00</b></div>
-<div class="total row"><span>TOTAL</span><span id="grand">₱0.00</span></div><button class="checkout" onclick="checkout()">CHECKOUT / PLACE ORDER</button></div></section>
-</main><footer>MHAC DELIVERY • Customer App V1.1</footer>
+<div class="cartline row"><span>Food Order</span><b id="foodTotal">₱0.00</b></div><div class="cartline row"><span>10% Service Fee</span><b id="service">₱0.00</b></div><div class="cartline row"><span>Delivery Fee</span><b id="delivery">₱40.00</b></div><div class="cartline row"><span>2nd Store Fee</span><b id="storeFee">₱0.00</b></div><div class="total row"><span>TOTAL</span><span id="grand">₱0.00</span></div><button class="checkout" onclick="checkout()">CHECKOUT / PLACE ORDER</button>
+</div></section></main>
 <script>
 const menus={
 "JOLLIBEE":{"CHICKEN":[["1pc Chickenjoy Solo",99,"🍗"],["2pc Chickenjoy Solo",159,"🍗"],["1pc Chickenjoy with Rice",129,"🍗"]],"BURGERS":[["Yumburger Solo",99,"🍔"]],"SPAGHETTI":[["Jolly Spaghetti Solo",79,"🍝"]]},
 "MCDO":{"CHICKEN":[["1pc Chicken McDo",99,"🍗"],["2pc Chicken McDo",159,"🍗"]],"BURGERS":[["Cheeseburger",99,"🍔"]]},
 "MANG INASAL":{"CHICKEN":[["Paa Large Meal",145,"🍗"],["Pecho Large Meal",165,"🍗"]]},
-"KFC":{"CHICKEN":[["1pc Chicken Meal",115,"🍗"],["2pc Chicken Meal",169,"🍗"]],"BURGERS":[["KFC Burger",95,"🍔"]]}}
+"KFC":{"CHICKEN":[["1pc Chicken Meal",115,"🍗"],["2pc Chicken Meal",169,"🍗"]],"BURGERS":[["KFC Burger",95,"🍔"]]}};
+const addons=[["NO DRINK",0],["COKE",25],["SPRITE",25],["ROYAL",25]];
 let cart=[],store="";
 const money=n=>"₱"+Number(n).toFixed(2);
 document.getElementById("stores").innerHTML=Object.keys(menus).map(s=>`<button class="store" onclick="openStore('${s}')">${s==="MCDO"?"🍟":"🍗"} ${s}</button>`).join("");
-function openStore(s){store=s;const cats=Object.keys(menus[s]);document.getElementById("menu").style.display="block";document.getElementById("menu").innerHTML=`<div class="row"><div><b style="font-size:20px">${s}</b><div class="notice">MENU CATEGORIES</div></div><button class="back" onclick="closeMenu()">CLOSE</button></div><div class="cats">${cats.map(c=>`<button class="cat" onclick="openCat('${c}')">${c}</button>`).join("")}</div>`;document.getElementById("menu").scrollIntoView({behavior:"smooth"})}
+function openStore(s){store=s;let cats=Object.keys(menus[s]);document.getElementById("menu").style.display="block";document.getElementById("menu").innerHTML=`<div class="row"><div><b style="font-size:20px">${s}</b><div class="notice">MENU CATEGORIES</div></div><button class="back" onclick="closeMenu()">CLOSE</button></div><div class="cats">${cats.map(c=>`<button class="cat" onclick="openCat('${c}')">${c}</button>`).join("")}</div>`}
 function closeMenu(){document.getElementById("menu").style.display="none"}
-function openCat(c){document.getElementById("menu").innerHTML=`<div class="row"><div><b style="font-size:19px">${store}</b><div class="notice">${c}</div></div><button class="back" onclick="openStore('${store}')">BACK</button></div>`+menus[store][c].map((p,i)=>`<div class="food"><div class="pic">${p[2]}</div><div class="info"><b>${p[0]}</b><div class="price">${money(p[1])}</div></div><button class="add" onclick="addFood('${c}',${i})">ADD</button></div>`).join("")}
-function addFood(c,i){const p=menus[store][c][i];let choice="",extra=0;const drinks=[["Coke",25],["Sprite",25],["Royal",25]];if(confirm("Add a drink/add-on?")){const text=drinks.map((d,n)=>`${n+1}. ${d[0]} +${money(d[1])}`).join("\n");const a=prompt(text,"1");if(a!==null){const n=parseInt(a)-1;if(n>=0&&n<drinks.length){choice=drinks[n][0];extra=drinks[n][1]}}}cart.push({store,name:p[0],choice,price:p[1]+extra});renderCart()}
-function renderCart(){document.getElementById("count").textContent=cart.length;if(!cart.length){document.getElementById("cartItems").textContent="No items yet.";document.getElementById("summary").style.display="none";return}document.getElementById("cartItems").innerHTML=cart.map((x,i)=>`<div class="cartline row"><span>${x.name}${x.choice?" • "+x.choice:""}<br><small>${x.store}</small></span><span>${money(x.price)} <button onclick="cart.splice(${i},1);renderCart()">×</button></span></div>`).join("");const food=cart.reduce((a,x)=>a+x.price,0),service=food*.1,stores=[...new Set(cart.map(x=>x.store))],sf=stores.length>1?5:0,grand=food+service+40+sf;document.getElementById("foodTotal").textContent=money(food);document.getElementById("service").textContent=money(service);document.getElementById("storeFee").textContent=money(sf);document.getElementById("grand").textContent=money(grand);document.getElementById("summary").style.display="block"}
-function checkout(){if(!cart.length)return;const name=prompt("NAME");if(!name)return;const contact=prompt("CONTACT NUMBER");if(!contact)return;const municipality=prompt("MUNICIPALITY");if(!municipality)return;const barangay=prompt("BARANGAY");if(!barangay)return;alert("ORDER RECEIVED!\n\n"+name+"\n"+contact+"\n"+municipality+" - "+barangay+"\n\nTOTAL: "+document.getElementById("grand").textContent)}
-</script>
-</body></html>
+function openCat(c){let list=menus[store][c];document.getElementById("menu").innerHTML=`<div class="row"><div><b style="font-size:19px">${store}</b><div class="notice">${c}</div></div><button class="back" onclick="openStore('${store}')">BACK</button></div>`+list.map((p,i)=>`<div class="food"><div class="foodtop"><div class="pic">${p[2]}</div><div class="info"><b>${p[0]}</b><div class="price">${money(p[1])}</div></div></div><div class="choices">${addons.map((a,n)=>`<button class="choice" onclick="selectAddon('${c}',${i},${n})">${a[0]}${a[1]?" +"+money(a[1]):""}</button>`).join("")}</div><button class="add" style="width:100%;margin-top:9px" id="add-${c}-${i}" disabled>SELECT DRINK / ADD-ON</button></div>`).join("")}
+function selectAddon(c,i,n){let p=menus[store][c][i],a=addons[n];let btn=document.getElementById("add-"+c+"-"+i);document.querySelectorAll(".choice").forEach(x=>{});btn.disabled=false;btn.textContent="ADD TO CART • "+money(p[1]+a[1]);btn.onclick=()=>{cart.push({store,name:p[0],choice:a[0],price:p[1]+a[1]});renderCart();btn.textContent="ADDED ✓";setTimeout(()=>btn.textContent="ADD TO CART • "+money(p[1]+a[1]),700)}}
+function renderCart(){document.getElementById("count").textContent=cart.length;if(!cart.length){document.getElementById("cartItems").textContent="No items yet.";document.getElementById("summary").style.display="none";return}document.getElementById("cartItems").innerHTML=cart.map((x,i)=>`<div class="cartline row"><span>${x.name}<br><small>${x.store} • ${x.choice}</small></span><span>${money(x.price)} <button onclick="cart.splice(${i},1);renderCart()">×</button></span></div>`).join("");let food=cart.reduce((a,x)=>a+x.price,0),service=food*.1,stores=[...new Set(cart.map(x=>x.store))],sf=stores.length>1?5:0,grand=food+service+40+sf;document.getElementById("foodTotal").textContent=money(food);document.getElementById("service").textContent=money(service);document.getElementById("storeFee").textContent=money(sf);document.getElementById("grand").textContent=money(grand);document.getElementById("summary").style.display="block"}
+function checkout(){if(!cart.length)return;let n=prompt("NAME");if(!n)return;let p=prompt("CONTACT NUMBER");if(!p)return;let m=prompt("MUNICIPALITY");if(!m)return;let b=prompt("BARANGAY");if(!b)return;alert("ORDER RECEIVED!\\n\\n"+n+"\\n"+p+"\\n"+m+" - "+b+"\\n\\nTOTAL: "+document.getElementById("grand").textContent)}
+</script></body></html>
