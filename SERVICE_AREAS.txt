@@ -1,0 +1,17 @@
+SERVICE AREAS
+PANIQUI - MONCADA - RAMOS - GERONA - PURA - ANAO - NAMPICUAN
+
+The barangay lists in this package are based on Philippine Statistics Authority PSGC pages
+(currently published through 31 July 2025).
+
+LOCATION:
+Customer can select Municipality + Barangay, enter house/street/landmark, and press
+USE MY LOCATION. The browser GPS is used to get coordinates and a driving route is
+requested from Paniqui Public Plaza. Delivery fee:
+1st km = ₱40
+Every succeeding km = +₱10
+Distance is rounded up to the next whole kilometer for the fee calculation.
+
+NOTE:
+GPS permission is required. The route service is a public OSRM endpoint for testing.
+If unavailable, the package falls back to straight-line distance.

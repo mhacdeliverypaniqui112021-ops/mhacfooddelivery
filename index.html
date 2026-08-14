@@ -2,9 +2,13 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial;color:#111;background:#fff}header{text-align:center;padding:26px 10px;border-bottom:4px solid #e21d25}.logo{font-size:34px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:18px}.rate{margin:25px 22px;padding:22px;border:3px solid #222;border-radius:24px;text-align:center}.rate h2{color:#c9232a}.rate p{font-size:18px;font-weight:700}.wrap{padding:0 22px 40px}.title{font-size:30px;font-weight:900;margin:28px 0 18px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:14px}.store{padding:24px 8px;border:3px solid #222;border-radius:20px;background:white;font-size:19px;font-weight:900}.cart{margin-top:28px;padding:20px;border:3px solid #222;border-radius:20px}.row{padding:14px 0;border-bottom:1px solid #ddd}.qty{display:flex;gap:10px;align-items:center;margin-top:8px}.qty button,.choice button{padding:8px 13px;border:2px solid #222;border-radius:9px;background:#fff;font-weight:700}.choice{display:flex;justify-content:space-between;align-items:center;padding:8px 0}.modal{display:none;position:fixed;inset:0;background:#0008;padding:18px;overflow:auto}.panel{background:#fff;border-radius:20px;padding:20px;max-width:600px;margin:auto}.close,.add{background:#e21d25;color:white;border:0;border-radius:10px;padding:11px 15px;font-weight:900}.close{float:right}.food{border:2px solid #ddd;border-radius:15px;padding:14px;margin:12px 0}.back{padding:8px;border-radius:9px;border:2px solid #222;background:white}
 .checkout{display:none;position:fixed;inset:0;background:#0008;padding:18px;overflow:auto}.checkout-panel{background:#fff;border-radius:20px;padding:20px;max-width:600px;margin:auto}.checkout-panel input,.checkout-panel textarea,.checkout-panel select{width:100%;padding:12px;margin:7px 0;border:2px solid #ddd;border-radius:10px;font-size:16px}.order-summary{background:#f7f7f7;border-radius:14px;padding:14px;margin:12px 0}.store-head{font-size:19px;color:#e21d25;border-bottom:2px solid #eee;padding-bottom:7px;margin-bottom:8px}.empty{color:#777}
-</style></head><body>
+.service-area{margin:8px 16px 12px;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;background:#fff}.service-title{font-weight:900;font-size:14px;margin-bottom:3px}.service-list{font-size:12px;font-weight:800;line-height:1.35}.checkout-panel{max-width:560px}.checkout-panel h2{font-size:24px}.checkout-panel input,.checkout-panel textarea,.checkout-panel select{padding:10px;font-size:15px;margin:5px 0}.gps{display:flex;gap:8px;align-items:center}.gps button{flex:0 0 auto;padding:10px;border:0;border-radius:10px;background:#111;color:#fff;font-weight:800}.location-status{font-size:13px;color:#555;margin:5px 0}.rate-live{font-weight:900;font-size:17px;margin-top:8px}.wrap{max-width:680px}.title{font-size:28px}.cart{padding:16px}.row{padding:8px 0}.store-head{font-size:17px}.add{padding:11px 14px} </style></head><body>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <div class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p></div>
+<div class="service-area">
+  <div class="service-title">📍 SERVICE AREAS</div>
+  <div class="service-list">PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
+</div>
 <div class="wrap">
 <div class="title">CHOOSE STORE</div>
 <div id="stores" class="stores"></div>
@@ -24,7 +28,17 @@
     <h3>Customer Information</h3>
     <input id="custName" placeholder="Customer Name">
     <input id="custContact" placeholder="Contact Number" inputmode="tel">
-    <textarea id="custAddress" rows="3" placeholder="Complete Delivery Address"></textarea>
+    <select id="municipality" onchange="loadBarangays()">
+      <option value="">Select Municipality / City</option>
+      <option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option>
+    </select>
+    <select id="barangay" onchange="updateLocationText()"><option value="">Select Barangay</option></select>
+    <input id="custAddress" placeholder="House No. / Street / Landmark">
+    <div class="gps">
+      <button type="button" onclick="locateCustomer()">📍 USE MY LOCATION</button>
+      <span id="locationStatus" class="location-status">GPS not yet selected</span>
+    </div>
+    <div id="liveRate" class="rate-live"></div>
     <select id="payment">
       <option>Cash on Delivery</option>
       <option>GCash</option>
@@ -84,14 +98,87 @@ function buildCheckoutSummary(){
       cart.filter(x=>x.store===s).map(x=>`<div>${x.qty} × ${x.name} — ${x.choice} — ₱${(x.price*x.qty).toFixed(2)}</div>`).join('')).join('')+
     `<hr><b>Grand Total: ₱${total.toFixed(2)}</b>`;
 }
+const SERVICE_AREAS = {"PANIQUI": ["Abogado", "Acocolao", "Aduas", "Apulid", "Balaoang", "Barang", "Brillante", "Burgos", "Cabayaoasan", "Canan", "Carino", "Cayanga", "Colibangbang", "Coral", "Dapdap", "Estacion", "Mabilang", "Manaois", "Matalapitap", "Nagmisaan", "Nancamarinan", "Nipaco", "Patalan", "Poblacion Norte", "Poblacion Sur", "Rang-ayan", "Salumague", "Samput", "San Carlos", "San Isidro", "San Juan de Milla", "Santa Ines", "Sinigpit", "Tablang", "Ventenilla"], "MONCADA": ["Ablang-Sapang", "Aringin", "Atencio", "Banaoang East", "Banaoang West", "Baquero Norte", "Baquero Sur", "Burgos", "Calamay", "Calapan", "Camangaan East", "Camangaan West", "Camposanto 1 - Norte", "Camposanto 1 - Sur", "Camposanto 2", "Capaoayan", "Lapsing", "Mabini", "Maluac", "Poblacion 1", "Poblacion 2", "Poblacion 3", "Poblacion 4", "Rizal", "San Juan", "San Julian", "San Leon", "San Pedro", "San Roque", "Santa Lucia East", "Santa Lucia West", "Santa Maria", "Santa Monica", "Tubectubang", "Tolega Norte", "Tolega Sur", "Villa"], "RAMOS": ["Coral-Iloco", "Guiteb", "Pance", "Poblacion Center", "Poblacion North", "Poblacion South", "San Juan", "San Raymundo", "Toledo"], "GERONA": ["Abagon", "Amacalan", "Apsayan", "Ayson", "Bawa", "Buenlag", "Bularit", "Calayaan", "Carbonel", "Cardona", "Caturay", "Danzo", "Dicolor", "Don Basilio", "Luna", "Mabini", "Magaspac", "Malayep", "Matapitap", "Matayuncab", "New Salem", "Oloybuaya", "Padapada", "Parsolingan", "Pinasling", "Plastado", "Poblacion 1", "Poblacion 2", "Poblacion 3", "Quezon", "Rizal", "Salapungan", "San Agustin", "San Antonio", "San Bartolome", "San Jose", "Santa Lucia", "Santiago", "Sembrano", "Singat", "Sulipa", "Tagumbao", "Tangcaran", "Villa Paz"], "PURA": ["Balite", "Buenavista", "Cadanglaan", "Estipona", "Linao", "Maasin", "Matindeg", "Maungib", "Naya", "Nilasin 1st", "Nilasin 2nd", "Poblacion 1", "Poblacion 2", "Poblacion 3", "Poroc", "Singat"], "ANAO": ["Baguindoc", "Bantog", "Campos", "Carmen", "Casili", "Don Ramon", "Hernando", "Poblacion", "Rizal", "San Francisco East", "San Francisco West", "San Jose North", "San Jose South", "San Juan", "San Roque", "Santo Domingo", "Sinense", "Suaverdez"], "NAMPICUAN": ["Alemania", "Ambasador Alzate Village", "Cabaducan East", "Cabaducan West", "Cabawangan", "East Central Poblacion", "Edy", "Maeling", "Mayantoc", "Medico", "Monic", "North Poblacion", "Northwest Poblacion", "Estacion", "West Poblacion", "Recuerdo", "South Central Poblacion", "Southeast Poblacion", "Southwest Poblacion", "Tony", "West Central Poblacion"]};
+
+let customerGPS=null;
+function loadBarangays(){
+  const m=document.getElementById('municipality').value;
+  const b=document.getElementById('barangay');
+  b.innerHTML='<option value="">Select Barangay</option>';
+  (SERVICE_AREAS[m]||[]).forEach(x=>{let o=document.createElement('option');o.value=x;o.textContent=x;b.appendChild(o)});
+  updateLocationText();
+}
+function updateLocationText(){
+  const m=document.getElementById('municipality').value;
+  const b=document.getElementById('barangay').value;
+  const a=document.getElementById('custAddress');
+  if(m&&b && !a.value) a.placeholder='House No. / Street / Landmark — '+b+', '+m;
+}
+function deliveryFeeFromKm(km){
+  if(!isFinite(km)||km<=0) return 40;
+  const whole=Math.max(1,Math.ceil(km));
+  return 40+(whole-1)*10;
+}
+function showLiveRate(km,source){
+  const fee=deliveryFeeFromKm(km);
+  document.getElementById('liveRate').textContent=`Estimated distance: ${km.toFixed(2)} km • Delivery Fee: ₱${fee.toFixed(2)}${source?' • '+source:''}`;
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371, p=Math.PI/180;
+  const a=.5-Math.cos((lat2-lat1)*p)/2+Math.cos(lat1*p)*Math.cos(lat2*p)*(1-Math.cos((lon2-lon1)*p))/2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+async function routeDistance(lat,lon){
+  // Paniqui Public Plaza: 15.66795, 120.57894
+  const url=`https://router.project-osrm.org/route/v1/driving/120.57894,15.66795;${lon},${lat}?overview=false`;
+  try{
+    const r=await fetch(url); const j=await r.json();
+    if(j.code==='Ok'&&j.routes&&j.routes[0]) return j.routes[0].distance/1000;
+  }catch(e){}
+  return haversine(15.66795,120.57894,lat,lon);
+}
+async function reverseAddress(lat,lon){
+  try{
+    const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+    const r=await fetch(u,{headers:{'Accept':'application/json'}});
+    const j=await r.json();
+    return j.display_name||'';
+  }catch(e){return ''}
+}
+async function locateCustomer(){
+  const s=document.getElementById('locationStatus');
+  if(!navigator.geolocation){s.textContent='GPS is not supported on this device.';return}
+  s.textContent='Locating… please allow GPS.';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude, lon=pos.coords.longitude;
+    customerGPS={lat,lon};
+    s.textContent='GPS location found. Calculating distance…';
+    const km=await routeDistance(lat,lon);
+    showLiveRate(km,'GPS');
+    const addr=await reverseAddress(lat,lon);
+    if(addr && !document.getElementById('custAddress').value) document.getElementById('custAddress').value=addr;
+    s.textContent=`📍 Location found • ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+  },err=>{
+    s.textContent='Unable to get GPS. Please enable Location permission.';
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+}
 function placeOrder(){
   let name=document.getElementById('custName').value.trim();
   let contact=document.getElementById('custContact').value.trim();
+  let municipality=document.getElementById('municipality').value;
+  let barangay=document.getElementById('barangay').value;
   let address=document.getElementById('custAddress').value.trim();
-  if(!name||!contact||!address){alert('Please complete Name, Contact Number and Delivery Address.');return;}
-  let order={id:'MHAC-'+Date.now(),customer:{name,contact,address},items:cart.map(x=>({...x})),createdAt:new Date().toISOString(),status:'NEW'};
+  if(!name||!contact||!municipality||!barangay||!address){alert('Please complete Name, Contact, Municipality, Barangay and Address.');return;}
+  let sub=cart.reduce((a,x)=>a+x.price*x.qty,0);
+  let stores=[...new Set(cart.map(x=>x.store))];
+  let service=sub*.1, second=stores.length>1?5:0;
+  let distanceKm=null, deliveryFee=40;
+  const rateText=document.getElementById('liveRate').textContent;
+  const match=rateText.match(/Estimated distance:\s*([\d.]+)\s*km/);
+  if(match){distanceKm=parseFloat(match[1]); deliveryFee=deliveryFeeFromKm(distanceKm);}
+  let order={id:'MHAC-'+Date.now(),customer:{name,contact,municipality,barangay,address,gps:customerGPS},items:cart.map(x=>({...x})),fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,additionalStoreFee:second,total:sub+service+deliveryFee+second},payment:document.getElementById('payment').value,createdAt:new Date().toISOString(),status:'NEW'};
   let orders=JSON.parse(localStorage.mhacOrders||'[]'); orders.push(order); localStorage.mhacOrders=JSON.stringify(orders);
-  alert('ORDER PLACED!\\nOrder No: '+order.id);
+  alert('ORDER PLACED!\nOrder No: '+order.id+'\nDelivery Fee: ₱'+deliveryFee.toFixed(2));
   cart=[]; render(); closeCheckout();
 }
 function chg(i,d){cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);render()}function closeM(){modal.style.display="none"}const modal=document.getElementById("modal"),body=document.getElementById("body"),cartEl=document.getElementById("cart"),count=document.getElementById("count"),totals=document.getElementById("totals"),checkoutBtn=document.getElementById("checkoutBtn");stores();render();
