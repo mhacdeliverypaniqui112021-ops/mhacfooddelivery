@@ -1,27 +1,22 @@
-MHAC DELIVERY MASTER V2.1 — ACCURATE DELIVERY UPDATE
+MHAC DELIVERY MASTER V2.3 — LOCKED DELIVERY ADDRESS BUILD
 
-This package starts from the confirmed MASTER V2.0 and only updates delivery calculation.
+BASE: MHAC DELIVERY MASTER V2.0/V2.2
 
-CHANGES:
-- Preserves the V2.0 customer interface.
-- Delivery fee is blank until customer calculates.
-- Uses Municipality + exact Barangay + customer address for geocoding.
-- Uses driving-route distance from Paniqui Public Plaza as MHAC origin.
-- Nampicuan is correctly treated as Nueva Ecija; the other six areas are Tarlac.
-- Delivery fee: first 1 km = PHP 40; each succeeding started km = +PHP 10.
-- No customer GPS button.
-- If address cannot be found, no delivery fee is accepted.
-- Exact barangay lists in V2.0 are retained; they are based on PSA/PSGC.
+LOCKED WORKING FEATURES:
+- Existing customer interface and menu/cart flow preserved.
+- Maximum 2 stores per order.
+- 2nd store fee +P5.
+- 10% service fee.
+- Delivery: first 1 km = P40; every succeeding started km = +P10.
+- Municipalities: Paniqui, Moncada, Ramos, Gerona, Pura, Anao, Nampicuan.
+- Barangay dropdown per municipality.
+
+ADDRESS LOCATION FIX V2.3:
+- Exact address lookup tries Nominatim and Photon.
+- If a street/house number is not mapped, the selected barangay is used as fallback.
+- If barangay lookup is unavailable, the municipality center is used as final fallback so checkout does not get stuck on “Address not found”.
+- Old delivery fee is cleared whenever the customer recalculates.
+- GPS/current-device location is not used.
 
 IMPORTANT:
-This uses public OpenStreetMap Nominatim and OSRM routing services from the browser. Public services can occasionally rate-limit requests. For production, we should move geocoding/routing to a backend/Firebase function.
-
-UPLOAD:
-Upload all files from this ZIP to the root of the GitHub Pages repository, replacing the current V2.0 files.
-
-
-V2.2 ADDRESS FIX
-- Improved Philippine address/barangay geocoding with multiple query formats.
-- Clears previous delivery result before every calculation.
-- Uses exact address when mapped; otherwise uses selected barangay location as an estimate instead of showing a false error with an old fee.
-- Keeps existing V2.1 interface and delivery formula unchanged.
+This build is the LOCKED BASE for the next Admin/Customer/Rider work. Do not replace index.html with older versions.
