@@ -13,12 +13,12 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p></section>
 <div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
-<main class="wrap"><section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small" style="font-weight:900"></div><div id="cart">No items yet.</div><div id="cartFee" style="margin:10px 0;padding:11px;border:2px solid #222;border-radius:10px;background:#fff;font-weight:900">🚚 DELIVERY FEE: ₱40.00<br><span id="cartDistance" style="font-size:12px;font-weight:600;color:#555">Enter delivery address and calculate the actual fee at checkout.</span></div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button>
+<main class="wrap"><div class="title" style="margin-top:18px">CHOOSE FOOD STORE</div>
+<div id="thirdStoreWarning" class="status" style="display:none;margin-bottom:8px"></div><div id="storeLimitNote" class="area" style="margin-bottom:10px">🍽️ You may order from a maximum of 2 stores per order.</div>
+<div id="stores" class="stores"></div><section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small" style="font-weight:900"></div><div id="cart">No items yet.</div><div id="cartFee" style="margin:10px 0;padding:11px;border:2px solid #222;border-radius:10px;background:#fff;font-weight:900">🚚 DELIVERY FEE: <span id="cartFeeAmount">—</span><br><span id="cartDistance" style="font-size:12px;font-weight:600;color:#555">Customer will calculate the actual fee from the delivery address.</span></div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button>
 <div style="font-size:12px;text-align:center;margin-top:6px;color:#555">Actual delivery fee is displayed in YOUR CART after address calculation.</div>
 </section>
-<div class="title" style="margin-top:18px">CHOOSE FOOD STORE</div>
-<div id="storeLimitNote" class="area" style="margin-bottom:10px">🍽️ You may order from a maximum of 2 stores per order.</div>
-<div id="stores" class="stores"></div>
+
 </main>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
@@ -32,7 +32,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <select id="municipality" onchange="loadBarangays()"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
 <select id="barangay"><option value="">Select Barangay</option></select>
 <input id="custAddress" placeholder="House No. / Street / Landmark">
-<div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button><button onclick="useGPS()">USE GPS</button></div>
+<div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button></div>
 <div id="locStatus" class="status">Customer must calculate the delivery fee from the delivery address.</div>
 <div id="feeView" class="small"></div>
 <div id="finalReview" style="margin-top:10px"></div>
@@ -65,14 +65,26 @@ function addFood(si,ci,fi,xi){
 let f=data.stores[si].cats[ci].foods[fi],ch=f.choices[xi],key=si+"-"+ci+"-"+fi+"-"+xi;
 let currentStores=[...new Set(cart.map(x=>x.store))],storeName=data.stores[si].name;
 if(!cart.some(x=>x.store===storeName) && currentStores.length>=2){
-alert("2 STORES MAXIMUM. You can only order from 2 stores per order.");
+document.getElementById("storeLimitNote").innerHTML="⚠️ <b>2 STORES MAXIMUM</b> — You already selected 2 stores. Remove one store from your cart before choosing another.";document.getElementById("storeLimitNote").scrollIntoView({behavior:"smooth",block:"center"});
 return;
 }
 let q=cart.find(x=>x.key===key);
 q?q.qty++:cart.push({key,store:storeName,name:f.name,choice:ch[0],price:Number(f.price)+Number(ch[1]),qty:1});
 renderCart();closeMenu()
 }
-function renderCart(){countEl.textContent=cart.reduce((a,x)=>a+x.qty,0);let selectedStoreCount=[...new Set(cart.map(x=>x.store))].length;document.getElementById("storeCount").textContent=selectedStoreCount?`Stores selected: ${selectedStoreCount}/2`:"Stores selected: 0/2";if(!cart.length){cartEl.innerHTML="No items yet.";document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: ₱${deliveryFee.toFixed(2)}<br><span style="font-size:12px;font-weight:600;color:#555">Actual fee appears here after address calculation.</span>`;totalsEl.innerHTML="";checkoutBtn.disabled=true;return}checkoutBtn.disabled=false;let sub=0,names=[...new Set(cart.map(x=>x.store))];let groups={};names.forEach(n=>groups[n]=[]);cart.forEach((x,i)=>groups[x.store].push({...x,i}));cartEl.innerHTML=names.map(n=>`<div class=store-head>${n.toUpperCase()}</div>`+groups[n].map(x=>`<div class=row><b>${x.qty} × ${x.name}</b><br><small>${x.choice}</small><div class=qty><button onclick="changeQty(${x.i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${x.i},1)">+</button><span>₱${(x.price*x.qty).toFixed(2)}</span></div></div>`).join("")).join("");sub=cart.reduce((a,x)=>a+x.price*x.qty,0);let service=sub*.1,second=names.length>1?5:0,grand=sub+service+deliveryFee+second;document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: ₱${deliveryFee.toFixed(2)}<br><span id="cartDistance" style="font-size:12px;font-weight:600;color:#555">${distanceKm===null?"⚠️ Actual fee pending — calculate delivery fee at checkout.":`📍 Actual route distance: ${distanceKm.toFixed(2)} km`}</span>`;totalsEl.innerHTML=`<p>Food Order: <b>₱${sub.toFixed(2)}</b></p><p>10% Service Fee: <b>₱${service.toFixed(2)}</b></p><p>Delivery Fee: <b>₱${deliveryFee.toFixed(2)}</b></p><p>2nd Store Fee: <b>₱${second.toFixed(2)}</b></p><p class=total>GRAND TOTAL: ₱${grand.toFixed(2)}</p>`}
+function updateCartFeeDisplay(){
+  const amount=document.getElementById("cartFeeAmount");
+  const dist=document.getElementById("cartDistance");
+  if(!amount)return;
+  if(distanceKm===null){
+    amount.textContent="—";
+    if(dist)dist.textContent="Customer will calculate the actual fee from the delivery address.";
+  }else{
+    amount.textContent="₱"+deliveryFee.toFixed(2);
+    if(dist)dist.textContent="📍 Actual route distance: "+distanceKm.toFixed(2)+" km";
+  }
+}
+function renderCart(){updateCartFeeDisplay();countEl.textContent=cart.reduce((a,x)=>a+x.qty,0);let selectedStoreCount=[...new Set(cart.map(x=>x.store))].length;document.getElementById("storeCount").textContent=selectedStoreCount?`Stores selected: ${selectedStoreCount}/2`:"Stores selected: 0/2";if(!cart.length){cartEl.innerHTML="No items yet.";document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: ₱${deliveryFee.toFixed(2)}<br><span style="font-size:12px;font-weight:600;color:#555">Delivery fee will appear here after the customer calculates it.</span>`;totalsEl.innerHTML="";checkoutBtn.disabled=true;return}checkoutBtn.disabled=false;let sub=0,names=[...new Set(cart.map(x=>x.store))];let groups={};names.forEach(n=>groups[n]=[]);cart.forEach((x,i)=>groups[x.store].push({...x,i}));cartEl.innerHTML=names.map(n=>`<div class=store-head>${n.toUpperCase()}</div>`+groups[n].map(x=>`<div class=row><b>${x.qty} × ${x.name}</b><br><small>${x.choice}</small><div class=qty><button onclick="changeQty(${x.i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${x.i},1)">+</button><span>₱${(x.price*x.qty).toFixed(2)}</span></div></div>`).join("")).join("");sub=cart.reduce((a,x)=>a+x.price*x.qty,0);let service=sub*.1,second=names.length>1?5:0,grand=sub+service+deliveryFee+second;document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: <span id="cartFeeAmount">—</span><br><span id="cartDistance" style="font-size:12px;font-weight:600;color:#555">${distanceKm===null?"⚠️ Actual fee pending — calculate delivery fee at checkout.":`📍 Actual route distance: ${distanceKm.toFixed(2)} km`}</span>`;totalsEl.innerHTML=`<p>Food Order: <b>₱${sub.toFixed(2)}</b></p><p>10% Service Fee: <b>₱${service.toFixed(2)}</b></p><p>Delivery Fee: <b>${distanceKm===null?"—":"₱"+deliveryFee.toFixed(2)}</b></p><p>2nd Store Fee: <b>₱${second.toFixed(2)}</b></p><p class=total>GRAND TOTAL: ₱${grand.toFixed(2)}</p>`}
 function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
 function closeMenu(){document.getElementById("menuModal").style.display="none"}
 function loadBarangays(){let m=document.getElementById("municipality").value,b=document.getElementById("barangay");b.innerHTML='<option value="">Select Barangay</option>';(AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`)}
@@ -87,7 +99,7 @@ updateCheckoutTotals();
 }
 function updateCheckoutTotals(){
 let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),service=sub*.1,names=[...new Set(cart.map(x=>x.store))],second=names.length>1?5:0,total=sub+service+deliveryFee+second;
-document.getElementById("checkoutTotals").innerHTML=`<div>Food Order: <b>₱${sub.toFixed(2)}</b></div><div>10% Service Fee: <b>₱${service.toFixed(2)}</b></div><div>🚚 Delivery Fee: <b>₱${deliveryFee.toFixed(2)}</b></div><div>2nd Store Fee: <b>₱${second.toFixed(2)}</b></div><div class="total" style="margin-top:7px">GRAND TOTAL: ₱${total.toFixed(2)}</div><div class="small">${distanceKm===null?"⚠️ Delivery fee not yet calculated.":"📍 Actual route distance: "+distanceKm.toFixed(2)+" km"}</div>`;
+document.getElementById("checkoutTotals").innerHTML=`<div>Food Order: <b>₱${sub.toFixed(2)}</b></div><div>10% Service Fee: <b>₱${service.toFixed(2)}</b></div><div>🚚 Delivery Fee: <b>${distanceKm===null?"—":"₱"+deliveryFee.toFixed(2)}</b></div><div>2nd Store Fee: <b>₱${second.toFixed(2)}</b></div><div class="total" style="margin-top:7px">GRAND TOTAL: ₱${total.toFixed(2)}</div><div class="small">${distanceKm===null?"⚠️ Delivery fee not yet calculated.":"📍 Actual route distance: "+distanceKm.toFixed(2)+" km"}</div>`;
 }
 function closeCheckout(){document.getElementById("checkout").style.display="none"}
 function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
