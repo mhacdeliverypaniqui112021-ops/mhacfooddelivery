@@ -1,38 +1,15 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC ADMIN</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<style>body{font-family:Arial;margin:0;background:#f6f6f6;color:#111}header{background:#111;color:#fff;padding:18px;text-align:center}main{max-width:850px;margin:auto;padding:14px}.card{background:#fff;border:2px solid #ddd;border-radius:15px;padding:16px;margin:12px 0}input,textarea,select{width:100%;padding:10px;margin:5px 0;border:1px solid #aaa;border-radius:8px}button{padding:9px 12px;border:0;border-radius:8px;margin:3px;font-weight:800}.red{background:#e21d25;color:#fff}.green{background:#138a36;color:#fff}.item{border:1px solid #ddd;border-radius:10px;padding:10px;margin:8px 0}.off{opacity:.55}.qrbox{display:flex;flex-direction:column;align-items:center;margin:10px}</style></head><body><header><h1>MHAC DELIVERY — ADMIN</h1><div>Store • Food • Price • Choices • Availability • QR Menu</div></header><main>
-<div class=card><h2>STORE MANAGER</h2><input id=newStore placeholder="New store name"><button class=red onclick=addStore()>ADD STORE</button><div id=stores></div></div>
-<div class=card><h2>FOOD MANAGER</h2><select id=storeSel onchange=refreshCats()></select><input id=catName placeholder="Category"><input id=foodName placeholder="Food name"><input id=foodPrice type=number placeholder="Price"><textarea id=foodChoices placeholder="Choices: No Drink:0, Coke Regular:25, Coke Medium:35, Coke Large:45"></textarea><button class=red onclick=addFood()>ADD FOOD</button></div>
-<div class=card><h2>📥 INCOMING ORDERS</h2><div id=orders>No orders yet.</div><button class=red onclick="clearOrders()">CLEAR ORDERS</button></div><div class=card><h2>MENU LIST</h2><div id=list></div></div>
-<div class=card><h2>GENERATE MENU QR</h2><p>QR contains menu names, prices, choices and availability. Photos are optional and are NOT stored inside the QR.</p><select id=qrStore></select><button class=green onclick=makeQR()>GENERATE QR</button><div id=qr class=qrbox></div><button onclick=downloadQR()>DOWNLOAD QR PNG</button></div>
-<div class=card><h2>IMPORT MENU FROM QR DATA</h2><p class=small>For our custom MHAC QR, paste the decoded menu text here. In the next stage we can add camera scanning.</p><textarea id=importText rows=5 placeholder="Paste MHACMENU1..."></textarea><button class=green onclick=importMenu()>IMPORT / REPLACE STORE MENU</button></div>
-</main><script>
-const KEY="mhacMenuV16";let d=JSON.parse(localStorage.getItem(KEY)||"null")||{stores:[]};
-function save(){localStorage.setItem(KEY,JSON.stringify(d));refresh()}
-function refresh(){stores.innerHTML=d.stores.map((s,i)=>`<div class=item><b>${s.name}</b><button onclick="removeStore(${i})">REMOVE</button></div>`).join("");storeSel.innerHTML=d.stores.map((s,i)=>`<option value=${i}>${s.name}</option>`).join("");qrStore.innerHTML=storeSel.innerHTML;refreshCats();renderList()}
-function addStore(){let n=newStore.value.trim();if(!n)return;d.stores.push({name:n,icon:"🍽️",cats:[]});newStore.value="";save()}
-function removeStore(i){if(confirm("Remove "+d.stores[i].name+"?")){d.stores.splice(i,1);save()}}
-function refreshCats(){}
-function addFood(){if(!d.stores.length)return alert("Add a store first.");let s=d.stores[+storeSel.value],cn=catName.value.trim(),fn=foodName.value.trim(),p=+foodPrice.value;if(!cn||!fn||!p)return alert("Complete category, food and price.");let c=s.cats.find(x=>x.name.toLowerCase()==cn.toLowerCase());if(!c){c={name:cn,foods:[]};s.cats.push(c)}let choices=foodChoices.value.split(",").filter(Boolean).map(v=>{let a=v.split(":");return[a[0].trim(),+(a[1]||0)]});c.foods.push({name:fn,price:p,available:true,choices});catName.value=foodName.value=foodPrice.value=foodChoices.value="";save()}
-function toggle(si,ci,fi){d.stores[si].cats[ci].foods[fi].available=!d.stores[si].cats[ci].foods[fi].available;save()}
-function delFood(si,ci,fi){d.stores[si].cats[ci].foods.splice(fi,1);save()}
-function renderList(){list.innerHTML=d.stores.map((s,si)=>`<div class=item><h3>${s.name}</h3>${s.cats.map((c,ci)=>`<div><b>${c.name}</b>${c.foods.map((f,fi)=>`<div class=item ${f.available===false?"off":""}><b>${f.name}</b> — ₱${f.price}<br><small>${f.choices.map(x=>x[0]+" +₱"+x[1]).join(" • ")}</small><br><button onclick="toggle(${si},${ci},${fi})">${f.available===false?"MAKE AVAILABLE":"MARK UNAVAILABLE"}</button><button onclick="delFood(${si},${ci},${fi})">REMOVE</button></div>`).join("")}</div>`).join("")}</div>`).join("")}
-function compact(s){return btoa(unescape(encodeURIComponent(JSON.stringify(s))))}
-function makeQR(){qr.innerHTML="";let s=d.stores[+qrStore.value];new QRCode(qr,{text:"MHACMENU1|"+compact(s),width:280,height:280,correctLevel:QRCode.CorrectLevel.M});let p=document.createElement("div");p.textContent=s.name+" MENU QR";qr.appendChild(p)}
-function downloadQR(){let img=qr.querySelector("img");if(!img)return alert("Generate QR first.");let a=document.createElement("a");a.href=img.src;a.download="MHAC-"+(d.stores[+qrStore.value]?.name||"MENU")+".png";a.click()}
-function importMenu(){try{let t=importText.value.trim();if(!t.startsWith("MHACMENU1|"))throw Error();let s=JSON.parse(decodeURIComponent(escape(atob(t.split("|")[1]))));let i=d.stores.findIndex(x=>x.name.toLowerCase()==s.name.toLowerCase());if(i>=0)d.stores[i]=s;else d.stores.push(s);save();alert("Menu imported.");}catch(e){alert("Invalid MHAC menu QR data.")}}
-function renderOrders(){
-  let os=JSON.parse(localStorage.getItem("mhacOrders")||"[]");
-  orders.innerHTML=os.length?os.slice().reverse().map(x=>`<div class=item>
-  <b>🆕 ${x.id}</b><br><b>${x.customer.name}</b> — ${x.customer.contact}<br>
-  📍 ${x.customer.address}, ${x.customer.barangay}, ${x.customer.municipality}<hr>
-  ${x.items.map(i=>`${i.store.toUpperCase()} — ${i.qty} × ${i.name} (${i.choice})`).join("<br>")}<hr>
-  Food: ₱${x.fees.foodOrder.toFixed(2)}<br>
-  Service: ₱${x.fees.serviceFee.toFixed(2)}<br>
-  Delivery: ₱${x.fees.deliveryFee.toFixed(2)} (${x.fees.distanceKm.toFixed(2)} km)<br>
-  <b>Total: ₱${x.fees.total.toFixed(2)}</b><br>Payment: ${x.payment}
-  </div>`).join(""):"No orders yet.";
-}
-function clearOrders(){if(confirm("Clear all orders?")){localStorage.removeItem("mhacOrders");renderOrders()}}
-refresh();renderOrders();setInterval(renderOrders,1000);
-</script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC ADMIN</title><link rel="stylesheet" href="style.css"></head>
+<body><header class="header"><div class="brand"><div class="logo">MHAC<br><span>ADMIN</span></div><div><h1>MHAC <b>ADMIN APP</b></h1><p>MENU • ORDERS • RIDERS</p></div></div></header>
+<main>
+<div class="tabs"><button onclick="showTab('menu')">MENU MANAGER</button><button onclick="showTab('orders')">ORDERS</button><button onclick="showTab('qr')">MENU QR</button><a class="btn dark" href="index.html">CUSTOMER APP</a><a class="btn dark" href="rider.html">RIDER APP</a></div>
+<section id="menuTab"><h2>STORE / MENU MANAGER</h2><div id="adminMenu"></div></section>
+<section id="ordersTab" class="hidden"><h2>ORDERS</h2><div id="orders"></div></section>
+<section id="qrTab" class="hidden"><h2>MENU QR IMPORT / EXPORT</h2>
+<p>Export a store menu as JSON text, or paste JSON received from a QR workflow.</p>
+<textarea id="jsonBox" rows="12" placeholder="Menu JSON..."></textarea>
+<div class="row"><button onclick="exportMenu()">EXPORT SELECTED STORE</button><button onclick="importMenu()">IMPORT JSON</button></div>
+<div id="qrBox" class="qrbox"></div>
+</section>
+</main><script src="app.js"></script><script src="admin.js"></script></body></html>
