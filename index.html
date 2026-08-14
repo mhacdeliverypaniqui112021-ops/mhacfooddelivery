@@ -105,11 +105,64 @@ function closeCheckout(){document.getElementById("checkout").style.display="none
 function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
 function hav(a,b,c,d){let R=6371,p=Math.PI/180,x=Math.sin((c-a)*p/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
 async function geocode(q){
-  const u="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=3&countrycodes=ph&addressdetails=1&q="+encodeURIComponent(q);
+  const u="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=ph&addressdetails=1&dedupe=1&q="+encodeURIComponent(q);
   const r=await fetch(u,{headers:{Accept:"application/json"}});
   if(!r.ok) throw new Error("Geocoder unavailable");
-  const j=await r.json();
-  return j;
+  return await r.json();
+}
+function scoreGeocodeResult(x,m,b,province){
+  const text=(x.display_name||"").toLowerCase();
+  const ad=x.address||{};
+  const town=(ad.municipality||ad.town||ad.city||ad.county||"").toLowerCase();
+  const prov=(ad.state||ad.province||"").toLowerCase();
+  const barang=(ad.village||ad.suburb||ad.neighbourhood||"").toLowerCase();
+  let score=0;
+  if(text.includes(b.toLowerCase())) score+=8;
+  if(text.includes(m.toLowerCase())) score+=8;
+  if(text.includes(province.toLowerCase())) score+=5;
+  if(town.includes(m.toLowerCase())) score+=10;
+  if(prov.includes(province.toLowerCase())) score+=5;
+  if(barang.includes(b.toLowerCase())) score+=10;
+  // Prefer actual address/road/house results over a generic place.
+  if(ad.house_number) score+=4;
+  if(ad.road) score+=3;
+  return score;
+}
+async function findBestAddress(a,m,b,province){
+  // Try several forms because Philippine barangay/street names are not
+  // consistently indexed in OpenStreetMap.
+  const queries=[
+    `${a}, ${b}, ${m}, ${province}, Philippines`,
+    `${a}, Barangay ${b}, ${m}, ${province}, Philippines`,
+    `${b}, ${m}, ${province}, Philippines`,
+    `Barangay ${b}, ${m}, ${province}, Philippines`,
+    `${b}, ${m}, Philippines`
+  ];
+  let all=[];
+  for(const q of queries){
+    try{
+      const results=await geocode(q);
+      if(results?.length) all.push(...results);
+      // Stop early when we have a strong address match.
+      const strong=(results||[]).find(x=>scoreGeocodeResult(x,m,b,province)>=24 && ((x.address||{}).road||(x.address||{}).house_number));
+      if(strong) return {result:strong, exact:true, query:q};
+    }catch(e){}
+  }
+  if(!all.length) return null;
+  const unique=[];
+  const seen=new Set();
+  for(const x of all){
+    const key=`${x.osm_type||""}/${x.osm_id||""}/${x.lat}/${x.lon}`;
+    if(!seen.has(key)){seen.add(key);unique.push(x)}
+  }
+  unique.sort((a,b2)=>scoreGeocodeResult(b2,m,b,province)-scoreGeocodeResult(a,m,b,province));
+  const best=unique[0];
+  if(best && scoreGeocodeResult(best,m,b,province)>=12){
+    const ad=best.address||{};
+    const isAddress=!!(ad.house_number||ad.road);
+    return {result:best,exact:isAddress,query:"barangay fallback"};
+  }
+  return null;
 }
 async function route(lat,lon){
   // MHAC delivery origin: Paniqui Public Plaza / town center.
@@ -125,33 +178,34 @@ async function route(lat,lon){
 async function calculateByAddress(){
   const m=municipality.value,b=barangay.value,a=custAddress.value.trim(),s=locStatus;
   if(!m||!b||!a){alert("Select Municipality, Barangay and enter House No./Street/Landmark.");return}
-  s.textContent="📍 Finding the exact delivery address…";
+  // Clear any previous result immediately so an old fee cannot remain visible.
+  distanceKm=null;deliveryFee=null;feeView.textContent="";
+  renderCart();updateCheckoutTotals();
+  s.textContent="📍 Finding the delivery address…";
   try{
     const province=m==="NAMPICUAN"?"Nueva Ecija":"Tarlac";
-    const q=`${a}, Barangay ${b}, ${m}, ${province}, Philippines`;
-    let results=await geocode(q);
-    // If the full house/street address is not indexed, retry using the exact barangay + municipality.
-    if(!results.length) results=await geocode(`Barangay ${b}, ${m}, ${province}, Philippines`);
-    if(!results.length){s.textContent="❌ Address not found. Add a clearer house number, street or landmark.";return}
-    // Prefer a result whose municipality/town and province match the customer's selections.
-    const wantedM=m.toLowerCase(), wantedP=province.toLowerCase();
-    let g=results.find(x=>{
-      const ad=x.address||{};
-      const town=(ad.municipality||ad.town||ad.city||"").toLowerCase();
-      const prov=(ad.state||"").toLowerCase();
-      return town.includes(wantedM)&&prov.includes(wantedP);
-    })||results[0];
+    const found=await findBestAddress(a,m,b,province);
+    if(!found){
+      s.textContent="❌ Could not locate this barangay. Try adding a street, house number or nearby landmark.";
+      renderCart();updateCheckoutTotals();return;
+    }
+    const g=found.result;
     const lat=+g.lat,lon=+g.lon;
     if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error("Invalid geocode");
     distanceKm=await route(lat,lon);
     deliveryFee=feeForKm(distanceKm);
-    s.textContent=`✅ Address located: ${g.display_name||q}`;
-    feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    if(found.exact){
+      s.textContent=`✅ Address located: ${g.display_name||a}`;
+      feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    }else{
+      s.textContent=`📍 Address not individually mapped; using ${b}, ${m} barangay location for the delivery estimate.`;
+      feeView.textContent=`📍 Barangay route distance: ${distanceKm.toFixed(2)} km • Estimated Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    }
     renderCart();
     if(document.getElementById("checkout").style.display==="block")updateCheckoutTotals();
   }catch(e){
-    distanceKm=null;deliveryFee=null;renderCart();
-    s.textContent="❌ Could not calculate route right now. Please check the address and try again.";
+    distanceKm=null;deliveryFee=null;renderCart();updateCheckoutTotals();
+    s.textContent="❌ Could not calculate route right now. Please try again.";
   }
 }
 function placeOrder(){let name=custName.value.trim(),contact=custContact.value.trim(),m=municipality.value,b=barangay.value,a=custAddress.value.trim();if(!name||!contact||!m||!b||!a){alert("Complete customer information.");return}if(distanceKm===null){alert("Please click CALCULATE DELIVERY FEE first.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,address:a},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));

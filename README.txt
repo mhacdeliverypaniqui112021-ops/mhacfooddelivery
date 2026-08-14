@@ -18,3 +18,10 @@ This uses public OpenStreetMap Nominatim and OSRM routing services from the brow
 
 UPLOAD:
 Upload all files from this ZIP to the root of the GitHub Pages repository, replacing the current V2.0 files.
+
+
+V2.2 ADDRESS FIX
+- Improved Philippine address/barangay geocoding with multiple query formats.
+- Clears previous delivery result before every calculation.
+- Uses exact address when mapped; otherwise uses selected barangay location as an estimate instead of showing a false error with an old fee.
+- Keeps existing V2.1 interface and delivery formula unchanged.
