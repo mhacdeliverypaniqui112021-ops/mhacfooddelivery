@@ -1,13 +1,20 @@
-MHAC DELIVERY V2.0 — STORE FIRST / NO GPS / NO DEFAULT DELIVERY FEE
+MHAC DELIVERY MASTER V2.1 — ACCURATE DELIVERY UPDATE
 
-Changes:
-1. CHOOSE FOOD STORE is above YOUR CART.
-2. Delivery Fee in YOUR CART is blank (—) until the customer calculates it.
-3. Removed USE GPS from the customer interface.
-4. Customer alone calculates delivery fee from the delivery address.
-5. Maximum 2 stores remains enforced.
-6. Selecting a 3rd store shows an inline warning, not a browser OK/alert popup.
-7. Actual calculated fee and route distance still update the cart and checkout totals.
-8. Existing menu, choices/add-ons, availability and checkout flow retained.
+This package starts from the confirmed MASTER V2.0 and only updates delivery calculation.
 
-Upload all files from this ZIP to a clean/replacement GitHub Pages directory.
+CHANGES:
+- Preserves the V2.0 customer interface.
+- Delivery fee is blank until customer calculates.
+- Uses Municipality + exact Barangay + customer address for geocoding.
+- Uses driving-route distance from Paniqui Public Plaza as MHAC origin.
+- Nampicuan is correctly treated as Nueva Ecija; the other six areas are Tarlac.
+- Delivery fee: first 1 km = PHP 40; each succeeding started km = +PHP 10.
+- No customer GPS button.
+- If address cannot be found, no delivery fee is accepted.
+- Exact barangay lists in V2.0 are retained; they are based on PSA/PSGC.
+
+IMPORTANT:
+This uses public OpenStreetMap Nominatim and OSRM routing services from the browser. Public services can occasionally rate-limit requests. For production, we should move geocoding/routing to a backend/Firebase function.
+
+UPLOAD:
+Upload all files from this ZIP to the root of the GitHub Pages repository, replacing the current V2.0 files.
