@@ -1,15 +1,8 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC ADMIN</title><link rel="stylesheet" href="style.css"></head>
-<body><header class="header"><div class="brand"><div class="logo">MHAC<br><span>ADMIN</span></div><div><h1>MHAC <b>ADMIN APP</b></h1><p>MENU • ORDERS • RIDERS</p></div></div></header>
-<main>
-<div class="tabs"><button onclick="showTab('menu')">MENU MANAGER</button><button onclick="showTab('orders')">ORDERS</button><button onclick="showTab('qr')">MENU QR</button><a class="btn dark" href="index.html">CUSTOMER APP</a><a class="btn dark" href="rider.html">RIDER APP</a></div>
-<section id="menuTab"><h2>STORE / MENU MANAGER</h2><div id="adminMenu"></div></section>
-<section id="ordersTab" class="hidden"><h2>ORDERS</h2><div id="orders"></div></section>
-<section id="qrTab" class="hidden"><h2>MENU QR IMPORT / EXPORT</h2>
-<p>Export a store menu as JSON text, or paste JSON received from a QR workflow.</p>
-<textarea id="jsonBox" rows="12" placeholder="Menu JSON..."></textarea>
-<div class="row"><button onclick="exportMenu()">EXPORT SELECTED STORE</button><button onclick="importMenu()">IMPORT JSON</button></div>
-<div id="qrBox" class="qrbox"></div>
-</section>
-</main><script src="app.js"></script><script src="admin.js"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY - Admin App</title><link rel="stylesheet" href="style.css"></head><body>
+<header><div class="brand">MHAC <span>DELIVERY</span></div><div class="tag">ADMIN APP</div></header><main class="container">
+<div class="appnav"><a class="active" href="admin.html">ADMIN</a><a href="index.html">CUSTOMER</a><a href="rider.html">RIDER</a></div>
+<div class="rate"><h2>DELIVERY SETTINGS</h2><p>First 1 km = ₱40 • succeeding km +₱10 • 2nd store +₱5 • service fee 10%</p><label>Delivery Base Address</label><input id="baseAddress"><p class="small muted">Use your exact dispatch/base location. Customer road distance is calculated from this point.</p></div>
+<div class="card"><div class="between"><h2>📥 MENU MANAGER</h2><div class="row"><button onclick="exportMenu()">EXPORT MENU</button><label style="margin:0"><button class="light" onclick="document.getElementById('menuFile').click()">IMPORT MENU</button><input id="menuFile" type="file" accept=".json" hidden onchange="importMenu(event)"></label></div></div><p class="muted">Edit stores, categories, foods, prices, choices and availability. Unavailable foods cannot be ordered.</p><div id="editor"></div></div>
+<div class="card" style="margin-top:14px"><h2>🔳 MENU QR</h2><p class="muted">Generate a QR for the published menu/app URL after uploading the menu package.</p><input id="menuUrl" placeholder="https://.../index.html"><button class="red" style="margin-top:8px" onclick="qr()">GENERATE QR</button><div id="qr" style="margin-top:12px"></div></div>
+<div class="card" style="margin-top:14px"><div class="between"><h2>📦 ORDERS</h2><button onclick="exportOrders()">EXPORT ORDERS</button></div><div id="orders"></div></div>
+</main><script src="data/menu.js"></script><script src="admin.js"></script></body></html>

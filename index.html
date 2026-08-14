@@ -1,15 +1,14 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY</title><link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="header"><div class="brand"><div class="logo">MHAC<br><span>DELIVERY</span></div><div><h1>MHAC <b>DELIVERY</b></h1><p>FAST • SAFE • ON TIME</p></div></div></header>
-<main>
-<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p></section>
-<section><h2>CHOOSE STORE</h2><div id="stores" class="grid"></div></section>
-<section class="cart"><div class="cart-title"><h2>🛒 YOUR CART</h2><strong id="cartCount">0</strong></div><div id="cart"></div><div id="checkout"></div></section>
-</main>
-<script src="app.js"></script>
-</body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY - Customer App</title><link rel="stylesheet" href="style.css"></head><body>
+<header><div class="brand">MHAC <span>DELIVERY</span></div><div class="tag">FAST • SAFE • ON TIME</div></header>
+<main class="container">
+<div class="rate"><h2>DELIVERY RATE</h2><p><b>First 1 km = ₱40</b> • Every succeeding km = <b>+₱10</b></p><p><b>Maximum 2 stores</b> • 2nd store = <b>+₱5</b></p><p><b>Formula:</b> Food Order + 10% Service Fee + Delivery Fee + Additional Store Fee</p></div>
+<div class="area">PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
+<div class="card"><h2>🍽️ CHOOSE STORE</h2><p class="muted">Select a store, then choose foods and add-ons.</p><div id="stores" class="grid"></div></div>
+<div id="menu" style="margin-top:12px"></div>
+<div class="card" style="margin-top:14px"><div class="between"><h2>🛒 YOUR CART</h2><b id="cartCount"></b></div><div id="cart"></div></div>
+<div class="summary"><h2>📦 CUSTOMER INFORMATION</h2><div class="formgrid"><div><label>Name</label><input id="name"></div><div><label>Contact Number</label><input id="phone" inputmode="tel"></div></div>
+<div class="formgrid"><div><label>Municipality</label><select id="municipality"><option value="">Select Municipality</option><option>Paniqui</option><option>Moncada</option><option>Ramos</option><option>Gerona</option><option>Pura</option><option>Anao</option><option>Nampicuan</option></select></div><div><label>Barangay</label><select id="barangay"><option value="">Select Barangay</option></select></div></div>
+<label>House / Street / Landmark</label><textarea id="address" rows="3"></textarea>
+<div class="row" style="margin-top:10px"><button class="red" onclick="calculateFee()">CALCULATE DELIVERY FEE</button><span class="small">Uses customer location + road routing.</span></div><div id="summary" style="margin-top:14px"></div><div id="orderMsg"></div><button class="red" style="width:100%;margin-top:12px" onclick="placeOrder()">SEND ORDER</button></div>
+<div class="appnav"><a href="admin.html">ADMIN APP</a><a href="rider.html">RIDER APP</a></div>
+</main><script src="data/barangays.js"></script><script src="data/menu.js"></script><script src="customer.js"></script></body></html>
