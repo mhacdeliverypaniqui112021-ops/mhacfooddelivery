@@ -155,39 +155,34 @@ function scoreGeocodeResult(x,m,b,province){
   if(ad.road) score+=6;
   return score;
 }
+function resultMatchesArea(x,m,b,province){
+  const text=normalize(x.display_name); const ad=x.address||{};
+  const mm=normalize(m), bb=normalize(b), pp=normalize(province);
+  const hasM=text.includes(mm)||normalize(ad.municipality||ad.town||ad.city||ad.county).includes(mm);
+  const hasB=text.includes(bb)||normalize(ad.village||ad.suburb||ad.neighbourhood||ad.quarter||ad.locality).includes(bb);
+  const hasP=!pp||text.includes(pp)||normalize(ad.state||ad.province).includes(pp);
+  return hasM&&hasB&&hasP;
+}
+function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
 async function findBestAddress(a,m,b,province){
-  const queries=[
-    `${a}, ${b}, ${m}, ${province}, Philippines`,
-    `${a}, Barangay ${b}, ${m}, ${province}, Philippines`,
-    `${b}, ${m}, ${province}, Philippines`,
-    `Barangay ${b}, ${m}, ${province}, Philippines`,
-    `${b}, ${m}, Philippines`,
-    `${m}, ${province}, Philippines`
-  ];
-  let all=[];
+  const queries=[`${a}, Barangay ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, Philippines`];
+  let candidates=[];
   for(const q of queries){
-    const results=[];
-    try{results.push(...await geocodeNominatim(q));}catch(e){}
-    try{results.push(...await geocodePhoton(q));}catch(e){}
-    if(results.length) all.push(...results);
-    const ranked=[...results].sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));
-    const strong=ranked.find(x=>scoreGeocodeResult(x,m,b,province)>=32 && ((x.address||{}).road||(x.address||{}).house_number));
-    if(strong) return {result:strong,exact:true,level:"address",query:q};
+    let results=[]; try{results=await geocodeNominatim(q)}catch(e){}
+    for(const x of results){if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) candidates.push(x)}
+    const ranked=candidates.filter(addressHasRoad).sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));
+    if(ranked.length)return {result:ranked[0],exact:true,level:"address",query:q};
   }
-  const unique=[];const seen=new Set();
-  for(const x of all){
-    const lat=+x.lat,lon=+x.lon;
-    if(!Number.isFinite(lat)||!Number.isFinite(lon)) continue;
-    const key=`${lat.toFixed(5)},${lon.toFixed(5)}`;
-    if(!seen.has(key)){seen.add(key);unique.push(x)}
+  const barangayQueries=[`Barangay ${b}, ${m}, ${province}, Philippines`,`${b}, ${m}, ${province}, Philippines`];
+  let barangays=[];
+  for(const q of barangayQueries){
+    let results=[]; try{results=await geocodeNominatim(q)}catch(e){}
+    for(const x of results){if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) barangays.push(x)}
+    if(barangays.length)break;
   }
-  unique.sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));
-  const barangayHit=unique.find(x=>scoreGeocodeResult(x,m,b,province)>=20);
-  if(barangayHit) return {result:barangayHit,exact:false,level:"barangay",query:"barangay fallback"};
-  const municipalityHit=unique.find(x=>normalize(x.display_name).includes(normalize(m)));
-  if(municipalityHit) return {result:municipalityHit,exact:false,level:"municipality",query:"municipality fallback"};
+  if(barangays.length){barangays.sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));return {result:barangays[0],exact:false,level:"barangay",query:"selected barangay"};}
   const c=AREA_CENTER[m];
-  if(c) return {result:{lat:c.lat,lon:c.lon,display_name:`${m}, ${province}, Philippines`,address:{municipality:m,state:province}},exact:false,level:"municipality-center",query:"built-in municipality center"};
+  if(c)return {result:{lat:c.lat,lon:c.lon,display_name:`${m}, ${province}, Philippines`,address:{municipality:m,state:province}},exact:false,level:"municipality-center",query:"built-in municipality center"};
   return null;
 }
 async function route(lat,lon){
@@ -215,8 +210,8 @@ async function calculateByAddress(){
       s.textContent=`✅ Address located`;
       feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else if(found.level==="barangay"){
-      s.textContent=`✅ ${b}, ${m} located. Street/house not mapped, so the barangay route point is used.`;
-      feeView.textContent=`📍 Barangay route estimate: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+      s.textContent=`✅ ${b}, ${m} located. Street/house/landmark not mapped, so the selected barangay point is used.`;
+      feeView.textContent=`📍 Barangay route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else{
       s.textContent=`✅ ${m} located. Exact street is not mapped, so the municipality center is used as the fallback.`;
       feeView.textContent=`📍 Municipality route estimate: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
