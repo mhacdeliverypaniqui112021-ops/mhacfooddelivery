@@ -1,5 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY - Rider App</title><link rel="stylesheet" href="style.css"></head><body>
-<header><div class="brand">MHAC <span>DELIVERY</span></div><div class="tag">RIDER APP • ASSIGNED ORDERS ONLY</div></header><main class="container">
-<div class="appnav"><a href="rider.html" class="active">RIDER</a><a href="index.html">CUSTOMER</a><a href="admin.html">ADMIN</a></div>
-<div class="rate"><h2>🛵 MY ASSIGNED ORDERS</h2><p class="muted">This app shows only orders assigned to this rider account.</p></div><div id="assigned"></div>
-</main><script src="rider.js"></script></body></html>
+<!doctype html><html><meta name=viewport content="width=device-width,initial-scale=1"><title>MHAC RIDER</title>
+<body style="font-family:Arial;padding:18px;max-width:700px;margin:auto"><h1>🏍️ MHAC RIDER</h1><h2>ORDERS</h2><div id=o></div><script>
+let a=JSON.parse(localStorage.getItem("mhacOrders")||"[]");o.innerHTML=a.length?a.map(x=>`<div style="border:2px solid #ddd;border-radius:12px;padding:12px;margin:10px 0"><b>${x.id}</b><br>${x.customer.name} — ${x.customer.contact}<br>${x.customer.barangay}, ${x.customer.municipality}<br>${x.customer.address}<hr>${x.items.map(i=>`${i.store.toUpperCase()} — ${i.qty} × ${i.name} (${i.choice})`).join("<br>")}<br><b>Delivery Fee: ₱${x.fees.deliveryFee.toFixed(2)}</b><br><b>Total: ₱${x.fees.total.toFixed(2)}</b></div>`).join(""):"No orders yet.";
+</script></body></html>
