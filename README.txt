@@ -1,12 +1,4 @@
-MHAC DELIVERY V1.2 — CLICKABLE MENU
-
-Upload index.html and README.txt to the ROOT of the new repository.
-
-This version keeps the current interface and changes menu/add-on selection to clickable choices. Customers do NOT type numbers.
-
-Flow:
-Store -> Category -> Food -> click NO DRINK/COKE/SPRITE/ROYAL -> ADD TO CART -> Checkout.
-
-Logo is intentionally left as the current text placeholder. We will add the user's actual logo later.
-
-Do not mix this with old MHAC files.
+MHAC DELIVERY V1.3
+Upload ALL files to the ROOT of your GitHub Pages repository.
+Customer: index.html | Admin: admin.html | Rider: rider.html
+Includes clickable food choices, quantity +/- and Regular/Medium/Large drink prices.
