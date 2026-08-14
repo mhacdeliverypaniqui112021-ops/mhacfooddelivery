@@ -1,16 +1,26 @@
-MHAC DELIVERY V1.6 FULL PACKAGE
+MHAC DELIVERY V1.6 FIXED
+This is a clean rebuild because the previous V1.5 had a runtime error.
 
-NEW:
-- Address-based delivery fee. Customer current GPS is NOT used unless customer explicitly presses USE MY LOCATION.
-- Delivery fee route starts from configurable MHAC base location. Default is Paniqui Town Hall coordinates.
-- Admin can change base latitude/longitude.
-- Add/remove stores.
-- Add/edit/remove foods and prices.
-- Add/remove choices/add-ons and their prices.
-- One-click AVAILABLE/UNAVAILABLE for store, food, and choice. Unavailable items cannot be added to cart.
-- Food photo URL or local photo file preview.
-- Menu JSON export/import.
-- Photo QR generator for public photo URLs.
+Customer:
+- Store -> Category -> Food -> choices
+- Quantity +/- in cart
+- Cart grouped by store
+- Checkout / Place Order restored
+- Municipality -> Barangay -> typed address
+- Delivery fee is calculated from MHAC base to the delivery ADDRESS.
+- GPS is optional, not the primary calculation.
+- 1st km ₱40, succeeding km +₱10.
+
+Admin:
+- Add/remove stores
+- Add foods
+- Add prices
+- Add choices/add-ons
+- Mark food AVAILABLE / UNAVAILABLE with one click
+- Generate a custom MHAC menu QR containing menu data (not photos)
+- Download QR PNG
+- Import MHAC menu data
 
 IMPORTANT:
-This is still a static GitHub Pages testing build. Admin changes are saved in that browser only. To make changes appear automatically on customer and rider phones, we need the shared Firebase database/backend next.
+For your food photos: send them to ChatGPT together with the store/category. I can read the menu photo, extract food names/prices/choices, and prepare the MHAC menu data. The QR should encode the menu data, not the photo itself; a QR normally stores a link/data payload rather than the image file itself.
+Upload ALL four files to the ROOT of a clean GitHub Pages repository.

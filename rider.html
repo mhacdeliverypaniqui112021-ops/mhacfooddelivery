@@ -1,1 +1,4 @@
-<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font-family:Arial;padding:20px"><h1>🏍️ MHAC RIDER</h1><h2>ASSIGNED ORDERS ONLY</h2><p>Rider module will connect to the shared order database in the next stage.</p><a href="index.html">Customer App</a> | <a href="admin.html">Admin App</a></body>
+<!doctype html><html><meta name=viewport content="width=device-width,initial-scale=1"><title>MHAC RIDER</title>
+<body style="font-family:Arial;padding:18px;max-width:700px;margin:auto"><h1>🏍️ MHAC RIDER</h1><h2>ORDERS</h2><div id=o></div><script>
+let a=JSON.parse(localStorage.getItem("mhacOrders")||"[]");o.innerHTML=a.length?a.map(x=>`<div style="border:2px solid #ddd;border-radius:12px;padding:12px;margin:10px 0"><b>${x.id}</b><br>${x.customer.name} — ${x.customer.contact}<br>${x.customer.barangay}, ${x.customer.municipality}<br>${x.customer.address}<hr>${x.items.map(i=>`${i.store.toUpperCase()} — ${i.qty} × ${i.name} (${i.choice})`).join("<br>")}<br><b>Delivery Fee: ₱${x.fees.deliveryFee.toFixed(2)}</b><br><b>Total: ₱${x.fees.total.toFixed(2)}</b></div>`).join(""):"No orders yet.";
+</script></body></html>
