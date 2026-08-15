@@ -1,34 +1,25 @@
-MHAC DELIVERY — CABAYAOASAN TARGETED TEST PATCH
-================================================
-
-This is a LIMITED patch for:
-PANIQUI > CABAYAOASAN
-
-It does NOT change:
-- interface
-- menu
-- stores
-- choices
-- cart
-- checkout
-- 2-store limit
-- service fee
-- delivery fee formula
-- other barangays
+MHAC DELIVERY — CABAYAOASAN GPS FIX
 
 IMPORTANT:
-This patch supplies a Cabayaoasan reference only. It intentionally does not
-replace the existing GPS/routing function because the current working source
-file was not supplied in this turn. Replacing the whole calculator blindly
-could break the barangays that are already testing correctly.
+This is a targeted patch. Keep your current working index.html as backup.
+Do NOT replace index.html with this patch.
 
-Test target:
-- PANIQUI
-- CABAYAOASAN
+INSTALL:
+1. Upload mhac-cabayaoasan-fix.js to the same folder as index.html.
+2. In the CURRENT index.html, add this immediately before </body>:
+   <script src="mhac-cabayaoasan-fix.js"></script>
+3. Commit changes and reload the site.
+4. Test PANIQUI → Cabayaoasan → address "brgy hall".
+5. Allow GPS permission when requested.
 
-Delivery formula remains:
-₱40 first km + ₱10 each succeeding km.
-
-For a true road-distance correction, the current index.html should be patched
-directly once it is available, using the customer's GPS coordinates as the
-endpoint and a configured road-routing service.
+WHAT CHANGES:
+- Cabayaoasan no longer uses the wrong geocoder result that produced the
+  7.62 km / ₱110 result.
+- GPS is used as the Cabayaoasan delivery endpoint when permission is granted.
+- If GPS is unavailable/denied, the verified Cabayaoasan reference point
+  (15.6646, 120.5545) is used.
+- The existing route() and feeForKm() functions are reused.
+- Delivery rate remains exactly:
+  ₱40 first kilometer + ₱10 each succeeding kilometer.
+- Other municipalities/barangays remain on the existing calculator.
+- Adds the English price reminder under DELIVERY RATE.
