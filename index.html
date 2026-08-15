@@ -9,9 +9,12 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 .area{max-width:680px;margin:8px auto;padding:9px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800;line-height:1.45}
 .wrap{max-width:680px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}
 .cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.cart h2{font-size:20px;margin:0 0 8px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0 5px}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px;margin-top:5px}.qty button,.choice button,.back{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:10}.panel{background:#fff;border-radius:17px;padding:16px;max-width:600px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice b{font-size:12px}.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:560px;margin:20px auto 40px}.checkout-panel input,.checkout-panel textarea,.checkout-panel select{width:100%;padding:10px;margin:5px 0;border:1.5px solid #aaa;border-radius:8px;font-size:15px}.gpsrow{display:flex;gap:7px}.gpsrow button{flex:1;padding:9px;border:0;border-radius:8px;background:#111;color:#fff;font-weight:800}.status{font-size:12px;color:#666;margin:5px 0}.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
+.reminder{margin-top:9px;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff8e6;font-size:12px;line-height:1.45;text-align:left}
+.landmarkbox{display:none;margin:5px 0}
+.landmarkbox select{width:100%;padding:10px;border:1.5px solid #aaa;border-radius:8px;font-size:15px;background:#fff}
 </style></head><body>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
-<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><p style="margin-top:9px;font-size:12px;line-height:1.45;border-top:1px solid #ddd;padding-top:8px">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the final amount will be manually checked and computed based on the current store price.</p></section>
+<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
 <div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
 <main class="wrap"><div class="title" style="margin-top:18px">CHOOSE FOOD STORE</div>
 <div id="thirdStoreWarning" class="status" style="display:none;margin-bottom:8px"></div><div id="storeLimitNote" class="area" style="margin-bottom:10px">🍽️ You may order from a maximum of 2 stores per order.</div>
@@ -31,6 +34,20 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
 <select id="municipality" onchange="loadBarangays()"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
 <select id="barangay"><option value="">Select Barangay</option></select>
+<div id="landmarkBox" class="landmarkbox">
+<select id="commonLandmark" onchange="applyCommonLandmark()">
+<option value="">📍 Select a common Cabayaoasan landmark (optional)</option>
+<option value="Barangay Hall">Barangay Hall / Multi-Purpose Hall</option>
+<option value="7-Eleven">7-Eleven Cabayaoasan</option>
+<option value="RUSI">RUSI</option>
+<option value="Iglesia ni Cristo">Iglesia ni Cristo – Cabayaoasan</option>
+<option value="I&T Cabayaoasan">I&T Cabayaoasan</option>
+<option value="Cabayaoasan Elementary School">Cabayaoasan Elementary School</option>
+<option value="Mormons / LDS">Mormons / LDS</option>
+<option value="Lam Asia">Lam Asia Subdivision</option>
+<option value="Malempec">Malempec</option>
+<option value="Other / Specific Landmark">Other / Specific Landmark</option>
+</select></div>
 <input id="custAddress" placeholder="House No. / Street / Landmark">
 <div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button></div>
 <div id="locStatus" class="status">Customer must calculate the delivery fee from the delivery address.</div>
@@ -41,6 +58,17 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 </div></div>
 
 <script>
+/* MHAC DELIVERY — LOCKED STABLE CORE
+   V2.5 changes only Cabayaoasan landmark lookup + customer reminder.
+   Do not modify the delivery formula, cart, checkout, store limit, or existing interface.
+*/
+const MHAC_CORE_LOCKED=Object.freeze({
+  version:"V2.5-CABAYAOASAN-LANDMARK-FIX",
+  deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
+  maxStores:2,
+  secondStoreFee:5,
+  serviceFeeRate:0.10
+});
 const AREAS={
 PANIQUI:["Abogado","Acocolao","Aduas","Apulid","Balaoang","Barang","Brillante","Burgos","Cabayaoasan","Canan","Carino","Cayanga","Colibangbang","Coral","Dapdap","Estacion","Mabilang","Manaois","Matalapitap","Nagmisaan","Nancamarinan","Nipaco","Patalan","Poblacion Norte","Poblacion Sur","Rang-ayan","Salumague","Samput","San Carlos","San Isidro","San Juan de Milla","Santa Ines","Sinigpit","Tablang","Ventenilla"],
 MONCADA:["Ablang-Sapang","Aringin","Atencio","Banaoang East","Banaoang West","Baquero Norte","Baquero Sur","Burgos","Calamay","Calapan","Camangaan East","Camangaan West","Camposanto 1 - Norte","Camposanto 1 - Sur","Camposanto 2","Capaoayan","Lapsing","Mabini","Maluac","Poblacion 1","Poblacion 2","Poblacion 3","Poblacion 4","Rizal","San Juan","San Julian","San Leon","San Pedro","San Roque","Santa Lucia East","Santa Lucia West","Santa Maria","Santa Monica","Tubectubang","Tolega Norte","Tolega Sur","Villa"],
@@ -87,7 +115,34 @@ function updateCartFeeDisplay(){
 function renderCart(){updateCartFeeDisplay();countEl.textContent=cart.reduce((a,x)=>a+x.qty,0);let selectedStoreCount=[...new Set(cart.map(x=>x.store))].length;document.getElementById("storeCount").textContent=selectedStoreCount?`Stores selected: ${selectedStoreCount}/2`:"Stores selected: 0/2";if(!cart.length){cartEl.innerHTML="No items yet.";document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: —<br><span style="font-size:12px;font-weight:600;color:#555">Delivery fee will appear here after the customer calculates it.</span>`;totalsEl.innerHTML="";checkoutBtn.disabled=true;return}checkoutBtn.disabled=false;let sub=0,names=[...new Set(cart.map(x=>x.store))];let groups={};names.forEach(n=>groups[n]=[]);cart.forEach((x,i)=>groups[x.store].push({...x,i}));cartEl.innerHTML=names.map(n=>`<div class=store-head>${n.toUpperCase()}</div>`+groups[n].map(x=>`<div class=row><b>${x.qty} × ${x.name}</b><br><small>${x.choice}</small><div class=qty><button onclick="changeQty(${x.i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${x.i},1)">+</button><span>₱${(x.price*x.qty).toFixed(2)}</span></div></div>`).join("")).join("");sub=cart.reduce((a,x)=>a+x.price*x.qty,0);let service=sub*.1,second=names.length>1?5:0,grand=sub+service+(deliveryFee??0)+second;document.getElementById("cartFee").innerHTML=`🚚 DELIVERY FEE: <span id="cartFeeAmount">—</span><br><span id="cartDistance" style="font-size:12px;font-weight:600;color:#555">${distanceKm===null?"⚠️ Actual fee pending — calculate delivery fee at checkout.":`📍 Actual route distance: ${distanceKm.toFixed(2)} km`}</span>`;totalsEl.innerHTML=`<p>Food Order: <b>₱${sub.toFixed(2)}</b></p><p>10% Service Fee: <b>₱${service.toFixed(2)}</b></p><p>Delivery Fee: <b>${distanceKm===null?"—":"₱"+deliveryFee.toFixed(2)}</b></p><p>2nd Store Fee: <b>₱${second.toFixed(2)}</b></p><p class=total>GRAND TOTAL: ₱${grand.toFixed(2)}</p>`}
 function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
 function closeMenu(){document.getElementById("menuModal").style.display="none"}
-function loadBarangays(){let m=document.getElementById("municipality").value,b=document.getElementById("barangay");b.innerHTML='<option value="">Select Barangay</option>';(AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`)}
+function loadBarangays(){
+  let m=document.getElementById("municipality").value,
+      b=document.getElementById("barangay"),
+      box=document.getElementById("landmarkBox"),
+      lm=document.getElementById("commonLandmark");
+  b.innerHTML='<option value="">Select Barangay</option>';
+  (AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`);
+  if(box)box.style.display="none";
+  if(lm)lm.value="";
+  if(m==="PANIQUI"){
+    b.onchange=toggleCabayaoasanLandmarks;
+  }else{
+    b.onchange=null;
+  }
+}
+function toggleCabayaoasanLandmarks(){
+  const m=document.getElementById("municipality").value,
+        b=document.getElementById("barangay").value,
+        box=document.getElementById("landmarkBox");
+  if(box)box.style.display=(m==="PANIQUI"&&b==="Cabayaoasan")?"block":"none";
+}
+function applyCommonLandmark(){
+  const lm=document.getElementById("commonLandmark").value,
+        a=document.getElementById("custAddress");
+  if(!a)return;
+  if(lm && lm!=="Other / Specific Landmark") a.value=lm;
+  else if(lm==="Other / Specific Landmark") a.value="";
+}
 function openCheckout(){
 if(!cart.length)return;
 document.getElementById("checkout").style.display="block";
@@ -164,9 +219,87 @@ function resultMatchesArea(x,m,b,province){
   return hasM&&hasB&&hasP;
 }
 function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
+const CABAYAOASAN_LANDMARK_QUERIES={
+  "Barangay Hall":[
+    "Barangay Cabayaoasan Multi Purpose Hall, Paniqui, Tarlac, Philippines",
+    "Cabayaoasan Barangay Hall, Paniqui, Tarlac, Philippines"
+  ],
+  "7-Eleven":[
+    "7-Eleven CABAYAOASAN, Camiling Paniqui Road, Brgy Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "7-Eleven Cabayaoasan Paniqui Tarlac, Philippines"
+  ],
+  "RUSI":[
+    "RUSI Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Rusi Motorcycle Shop, Cabayaoasan, Paniqui, Tarlac, Philippines"
+  ],
+  "Iglesia ni Cristo":[
+    "Iglesia Ni Cristo Local Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Iglesia Ni Cristo Cabayaoasan, Paniqui, Tarlac, Philippines"
+  ],
+  "I&T Cabayaoasan":[
+    "I&T Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "I and T Cabayaoasan Paniqui Tarlac, Philippines"
+  ],
+  "Cabayaoasan Elementary School":[
+    "Cabayaoasan Elementary School, Purok 2, Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Cabayaoasan ES, Paniqui, Tarlac, Philippines"
+  ],
+  "Mormons / LDS":[
+    "LDS Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Mormons Cabayaoasan, Paniqui, Tarlac, Philippines"
+  ],
+  "Lam Asia":[
+    "Lam Asia Subdivision, Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Lam Asia, Cabayaoasan, Paniqui, Tarlac, Philippines"
+  ],
+  "Malempec":[
+    "Malempec, Cabayaoasan, Paniqui, Tarlac, Philippines",
+    "Malempec Paniqui Tarlac, Philippines"
+  ]
+};
+
+function landmarkMatchesArea(x,m,b,province){
+  const text=normalize(x.display_name);
+  const ad=x.address||{};
+  const mm=normalize(m),bb=normalize(b),pp=normalize(province);
+  const hasM=text.includes(mm)||normalize(ad.municipality||ad.town||ad.city||ad.county).includes(mm);
+  const hasB=text.includes(bb)||normalize(ad.village||ad.suburb||ad.neighbourhood||ad.quarter||ad.locality).includes(bb);
+  const hasP=!pp||text.includes(pp)||normalize(ad.state||ad.province).includes(pp);
+  return hasM&&hasB&&hasP;
+}
+
+async function findNamedLandmark(landmark,m,b,province){
+  if(m!=="PANIQUI"||b!=="Cabayaoasan"||!CABAYAOASAN_LANDMARK_QUERIES[landmark]) return null;
+  let candidates=[];
+  for(const q of CABAYAOASAN_LANDMARK_QUERIES[landmark]){
+    let results=[];
+    try{results=await geocodeNominatim(q)}catch(e){}
+    for(const x of results){
+      if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&landmarkMatchesArea(x,m,b,province)){
+        candidates.push(x);
+      }
+    }
+    if(candidates.length)break;
+  }
+  if(!candidates.length){
+    for(const q of CABAYAOASAN_LANDMARK_QUERIES[landmark]){
+      let results=[];
+      try{results=await geocodePhoton(q)}catch(e){}
+      for(const x of results){
+        if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&landmarkMatchesArea(x,m,b,province)){
+          candidates.push(x);
+        }
+      }
+      if(candidates.length)break;
+    }
+  }
+  if(!candidates.length)return null;
+  candidates.sort((x,y)=>(addressHasRoad(y)?1:0)-(addressHasRoad(x)?1:0));
+  return {result:candidates[0],exact:true,level:"landmark",query:landmark};
+}
+
 async function findBestAddress(a,m,b,province){
-  const genericHall=/^(?:brgy\.?\s+|barangay\s+)?hall(?:\s+.*)?$/i.test(String(a||"").trim());
-  const queries=genericHall?[]:[`${a}, Barangay ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, Philippines`];
+  const queries=[`${a}, Barangay ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, Philippines`];
   let candidates=[];
   for(const q of queries){
     let results=[]; try{results=await geocodeNominatim(q)}catch(e){}
@@ -178,23 +311,10 @@ async function findBestAddress(a,m,b,province){
   let barangays=[];
   for(const q of barangayQueries){
     let results=[]; try{results=await geocodeNominatim(q)}catch(e){}
-    for(const x of results){
-      if(!Number.isFinite(+x.lat)||!Number.isFinite(+x.lon)||!resultMatchesArea(x,m,b,province)) continue;
-      const t=normalize(x.display_name);
-      const ad=x.address||{};
-      const isHallPoi=/\b(brgy|barangay)?\s*hall\b|\bhall\b/i.test(t)||/hall/i.test(String(ad.amenity||ad.building||ad.shop||""));
-      if(genericHall && isHallPoi) continue;
-      barangays.push(x);
-    }
+    for(const x of results){if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) barangays.push(x)}
     if(barangays.length)break;
   }
-  if(barangays.length){
-    barangays.sort((x,y)=>{
-      const score=(z)=>{const ad=z.address||{};let v=scoreGeocodeResult(z,m,b,province);if(ad.road)v-=5; if(/\b(hall)\b/i.test(normalize(z.display_name)))v-=30; return v};
-      return score(y)-score(x);
-    });
-    return {result:barangays[0],exact:false,level:"barangay",query:genericHall?"generic barangay hall landmark":"selected barangay"};
-  }
+  if(barangays.length){barangays.sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));return {result:barangays[0],exact:false,level:"barangay",query:"selected barangay"};}
   const c=AREA_CENTER[m];
   if(c)return {result:{lat:c.lat,lon:c.lon,display_name:`${m}, ${province}, Philippines`,address:{municipality:m,state:province}},exact:false,level:"municipality-center",query:"built-in municipality center"};
   return null;
@@ -209,22 +329,41 @@ async function route(lat,lon){
   return hav(baseLat,baseLon,lat,lon);
 }
 async function calculateByAddress(){
-  const m=municipality.value,b=barangay.value,a=custAddress.value.trim(),s=locStatus;
+  const m=municipality.value,b=barangay.value,a=custAddress.value.trim(),
+        landmark=document.getElementById("commonLandmark")?.value||"",
+        s=locStatus;
   if(!m||!b||!a){s.textContent="⚠️ Select Municipality, Barangay and enter House No./Street/Landmark.";return}
   distanceKm=null;deliveryFee=null;feeView.textContent="";renderCart();updateCheckoutTotals();
   s.textContent="📍 Locating delivery address…";
   try{
     const province=m==="NAMPICUAN"?"Nueva Ecija":"Tarlac";
-    const found=await findBestAddress(a,m,b,province);
+    let found=null;
+
+    // LOCKED CORE: only the Cabayaoasan landmark lookup is changed here.
+    // Other municipalities, stores, cart, checkout and fee formula remain untouched.
+    if(m==="PANIQUI"&&b==="Cabayaoasan"&&landmark&&landmark!=="Other / Specific Landmark"){
+      found=await findNamedLandmark(landmark,m,b,province);
+      if(!found){
+        s.textContent=`⚠️ ${landmark} could not be verified on the map. Please choose another landmark or type a more specific address.`;
+        return;
+      }
+    }else{
+      found=await findBestAddress(a,m,b,province);
+    }
+
     if(!found) throw new Error("No location available");
     const g=found.result,lat=+g.lat,lon=+g.lon;
     if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error("Invalid location");
     distanceKm=await route(lat,lon);deliveryFee=feeForKm(distanceKm);
-    if(found.level==="address"){
+
+    if(found.level==="landmark"){
+      s.textContent=`✅ ${landmark} located in Cabayaoasan`;
+      feeView.textContent=`📍 Landmark route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    }else if(found.level==="address"){
       s.textContent=`✅ Address located`;
       feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else if(found.level==="barangay"){
-      s.textContent=found.query==="generic barangay hall landmark"?`✅ ${b}, ${m} located. Generic “Barangay Hall” landmark uses the selected barangay point.`:`✅ ${b}, ${m} located. Street/house/landmark not mapped, so the selected barangay point is used.`;
+      s.textContent=`✅ ${b}, ${m} located. Street/house/landmark not mapped, so the selected barangay point is used.`;
       feeView.textContent=`📍 Barangay route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else{
       s.textContent=`✅ ${m} located. Exact street is not mapped, so the municipality center is used as the fallback.`;
@@ -236,7 +375,11 @@ async function calculateByAddress(){
     s.textContent="❌ Location service is temporarily unavailable. Please try CALCULATE again.";
   }
 }
-function placeOrder(){let name=custName.value.trim(),contact=custContact.value.trim(),m=municipality.value,b=barangay.value,a=custAddress.value.trim();if(!name||!contact||!m||!b||!a){alert("Complete customer information.");return}if(distanceKm===null){alert("Please click CALCULATE DELIVERY FEE first.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,address:a},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
+function placeOrder(){
+let name=custName.value.trim(),contact=custContact.value.trim(),m=municipality.value,b=barangay.value,
+    a=custAddress.value.trim(),landmark=document.getElementById("commonLandmark")?.value||"";
+if(landmark&&landmark!=="Other / Specific Landmark"&&m==="PANIQUI"&&b==="Cabayaoasan"&&!a.toLowerCase().includes(landmark.toLowerCase())) a=a+" | Landmark: "+landmark;
+if(!name||!contact||!m||!b||!a){alert("Complete customer information.");return}if(distanceKm===null){alert("Please click CALCULATE DELIVERY FEE first.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,address:a},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
 let btn=document.getElementById("sendOrderBtn"),st=document.getElementById("sendStatus");
 btn.disabled=true;btn.textContent="📤 SENDING ORDER…";st.textContent="Sending order to MHAC Admin…";
 setTimeout(()=>{
@@ -246,4 +389,8 @@ setTimeout(()=>{
   setTimeout(()=>closeCheckout(),900);
 },700)}
 renderStores();renderCart();
+document.getElementById("municipality").addEventListener("change",function(){
+  const box=document.getElementById("landmarkBox");
+  if(box&&this.value!=="PANIQUI")box.style.display="none";
+});
 </script></body></html>

@@ -1,12 +1,33 @@
-MHAC DELIVERY — GPS DELIVERY FIX V3
+MHAC DELIVERY — LOCKED STABLE V2.5
+================================
 
-This package keeps the locked customer interface and existing delivery-rate formula.
+This package keeps the existing customer interface and core order flow locked.
 
-FIX:
-- Generic "brgy hall" / "barangay hall" landmark searches no longer select a random Barangay Hall POI.
-- Generic Barangay Hall uses the selected barangay point as the delivery reference.
-- Specific landmarks such as J&T, J&T Express, streets, schools, stores and other mapped places can still be geocoded normally.
-- Delivery rate remains: first 1 km = P40, every succeeding km = +P10.
-- Added customer price reminder under DELIVERY RATE.
+ONLY CHANGES IN THIS VERSION
+1. Added a clear English food-price reminder under DELIVERY RATE.
+2. Added common Cabayaoasan landmarks:
+   - Barangay Hall / Multi-Purpose Hall
+   - 7-Eleven Cabayaoasan
+   - RUSI
+   - Iglesia ni Cristo – Cabayaoasan
+   - I&T Cabayaoasan
+   - Cabayaoasan Elementary School
+   - Mormons / LDS
+   - Lam Asia Subdivision
+   - Malempec
+   - Other / Specific Landmark
+3. Cabayaoasan landmark searches use a specific landmark query first, instead of allowing a generic
+   "711" or similar text to accidentally resolve to the wrong place.
+4. If a named landmark cannot be verified, the system does NOT invent a location or fee; it asks
+   the customer to choose another landmark or enter a more specific address.
+5. Delivery rate remains unchanged:
+   1 KM = PHP 40
+   Succeeding KM = +PHP 10
+6. Existing 10% service fee, maximum 2 stores, and PHP 5 second-store fee remain unchanged.
 
-Upload the files to the same GitHub Pages location, replacing the existing index.html, admin.html and rider.html.
+UPLOAD
+-------
+Use the index.html in the root of this ZIP for GitHub Pages.
+GitHub Pages requires index.html at the top level of the publishing source.
+
+DO NOT replace or edit the core calculation/interface code unless specifically planned.
