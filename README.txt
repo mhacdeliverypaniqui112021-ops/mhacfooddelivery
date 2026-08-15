@@ -1,25 +1,12 @@
-MHAC DELIVERY — CABAYAOASAN GPS FIX
+MHAC DELIVERY — GPS DELIVERY FIX V3
 
-IMPORTANT:
-This is a targeted patch. Keep your current working index.html as backup.
-Do NOT replace index.html with this patch.
+This package keeps the locked customer interface and existing delivery-rate formula.
 
-INSTALL:
-1. Upload mhac-cabayaoasan-fix.js to the same folder as index.html.
-2. In the CURRENT index.html, add this immediately before </body>:
-   <script src="mhac-cabayaoasan-fix.js"></script>
-3. Commit changes and reload the site.
-4. Test PANIQUI → Cabayaoasan → address "brgy hall".
-5. Allow GPS permission when requested.
+FIX:
+- Generic "brgy hall" / "barangay hall" landmark searches no longer select a random Barangay Hall POI.
+- Generic Barangay Hall uses the selected barangay point as the delivery reference.
+- Specific landmarks such as J&T, J&T Express, streets, schools, stores and other mapped places can still be geocoded normally.
+- Delivery rate remains: first 1 km = P40, every succeeding km = +P10.
+- Added customer price reminder under DELIVERY RATE.
 
-WHAT CHANGES:
-- Cabayaoasan no longer uses the wrong geocoder result that produced the
-  7.62 km / ₱110 result.
-- GPS is used as the Cabayaoasan delivery endpoint when permission is granted.
-- If GPS is unavailable/denied, the verified Cabayaoasan reference point
-  (15.6646, 120.5545) is used.
-- The existing route() and feeForKm() functions are reused.
-- Delivery rate remains exactly:
-  ₱40 first kilometer + ₱10 each succeeding kilometer.
-- Other municipalities/barangays remain on the existing calculator.
-- Adds the English price reminder under DELIVERY RATE.
+Upload the files to the same GitHub Pages location, replacing the existing index.html, admin.html and rider.html.
