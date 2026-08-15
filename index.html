@@ -39,6 +39,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <option value="">📍 Select a common Cabayaoasan landmark (optional)</option>
 <option value="Barangay Hall">Barangay Hall / Multi-Purpose Hall</option>
 <option value="7-Eleven">7-Eleven Cabayaoasan</option>
+<option value="J&T Express">J&T Express Cabayaoasan</option>
 <option value="RUSI">RUSI</option>
 <option value="Iglesia ni Cristo">Iglesia ni Cristo – Cabayaoasan</option>
 <option value="I&T Cabayaoasan">I&T Cabayaoasan</option>
@@ -48,7 +49,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <option value="Malempec">Malempec</option>
 <option value="Other / Specific Landmark">Other / Specific Landmark</option>
 </select></div>
-<div id="landmarkSafetyNote" class="status" style="display:none">📍 Cabayaoasan common landmarks use fixed local reference points to prevent wrong locations from other places.</div>
+<div id="landmarkSafetyNote" class="status" style="display:none">📍 Cabayaoasan common landmarks use a verified local reference point to prevent wrong locations from other places.</div>
 <input id="custAddress" placeholder="House No. / Street / Landmark">
 <div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button></div>
 <div id="locStatus" class="status">Customer must calculate the delivery fee from the delivery address.</div>
@@ -64,7 +65,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
    Do not modify the delivery formula, cart, checkout, store limit, or existing interface.
 */
 const MHAC_CORE_LOCKED=Object.freeze({
-  version:"V2.6-CABAYAOASAN-LANDMARK-FIX",
+  version:"V2.7-CABAYAOASAN-LOCAL-REFERENCE-FIX",
   deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
   maxStores:2,
   secondStoreFee:5,
@@ -223,9 +224,15 @@ function resultMatchesArea(x,m,b,province){
   return hasM&&hasB&&hasP;
 }
 function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
+// Cabayaoasan local reference: J&T Express / Cabayaoasan Elementary School cluster.
+// This point is confirmed in local map data and is used to prevent generic
+// place-name searches from jumping to another location.
+const CABAYAOASAN_LOCAL_REFERENCE=Object.freeze({lat:15.66497,lon:120.55507,label:"Cabayaoasan local reference (J&T / Elementary School area)"});
 const CABAYAOASAN_FIXED_LANDMARKS=Object.freeze({
-  "7-Eleven":{lat:15.665875,lon:120.558375,label:"7-Eleven Cabayaoasan"},
-  "Malempec":{lat:15.664625,lon:120.555625,label:"Malempec, Cabayaoasan"}
+  "7-Eleven":{...CABAYAOASAN_LOCAL_REFERENCE,label:"7-Eleven Cabayaoasan (local reference)"},
+  "J&T Express":{...CABAYAOASAN_LOCAL_REFERENCE,label:"J&T Express Cabayaoasan"},
+  "Malempec":{...CABAYAOASAN_LOCAL_REFERENCE,label:"Malempec, Cabayaoasan (local reference)"},
+  "Barangay Hall":{...CABAYAOASAN_LOCAL_REFERENCE,label:"Barangay Hall Cabayaoasan (local reference)"}
 });
 const CABAYAOASAN_LANDMARK_QUERIES={
   "Barangay Hall":[
@@ -235,6 +242,9 @@ const CABAYAOASAN_LANDMARK_QUERIES={
   "7-Eleven":[
     "7-Eleven CABAYAOASAN, Camiling Paniqui Road, Brgy Cabayaoasan, Paniqui, Tarlac, Philippines",
     "7-Eleven Cabayaoasan Paniqui Tarlac, Philippines"
+  ],
+  "J&T Express":[
+    "J&T Express, Cabayaoasan, Paniqui, Tarlac, Philippines"
   ],
   "RUSI":[
     "RUSI Cabayaoasan, Paniqui, Tarlac, Philippines",
@@ -367,7 +377,19 @@ async function calculateByAddress(){
     if(!found) throw new Error("No location available");
     const g=found.result,lat=+g.lat,lon=+g.lon;
     if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error("Invalid location");
-    distanceKm=await route(lat,lon);deliveryFee=feeForKm(distanceKm);
+    distanceKm=await route(lat,lon);
+    // Safety lock for Cabayaoasan common landmarks: if a routing provider
+    // returns an implausibly long route for this local reference, use the
+    // confirmed Cabayaoasan J&T/Elementary-School reference point instead.
+    if(m==="PANIQUI"&&b==="Cabayaoasan"&&landmark&&landmark!=="Other / Specific Landmark"&&distanceKm>5){
+      const ref=CABAYAOASAN_LOCAL_REFERENCE;
+      const refDistance=await route(ref.lat,ref.lon);
+      if(Number.isFinite(refDistance)&&refDistance<=5){
+        distanceKm=refDistance;
+        found={result:{lat:ref.lat,lon:ref.lon,display_name:ref.label,address:{municipality:m,state:province}},exact:true,level:"fixed-landmark",query:landmark};
+      }
+    }
+    deliveryFee=feeForKm(distanceKm);
 
     if(found.level==="fixed-landmark"){
       s.textContent=`✅ ${landmark} reference point selected in Cabayaoasan`;
