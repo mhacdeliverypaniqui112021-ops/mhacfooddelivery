@@ -48,6 +48,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <option value="Malempec">Malempec</option>
 <option value="Other / Specific Landmark">Other / Specific Landmark</option>
 </select></div>
+<div id="landmarkSafetyNote" class="status" style="display:none">📍 Cabayaoasan common landmarks use fixed local reference points to prevent wrong locations from other places.</div>
 <input id="custAddress" placeholder="House No. / Street / Landmark">
 <div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button></div>
 <div id="locStatus" class="status">Customer must calculate the delivery fee from the delivery address.</div>
@@ -63,7 +64,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
    Do not modify the delivery formula, cart, checkout, store limit, or existing interface.
 */
 const MHAC_CORE_LOCKED=Object.freeze({
-  version:"V2.5-CABAYAOASAN-LANDMARK-FIX",
+  version:"V2.6-CABAYAOASAN-LANDMARK-FIX",
   deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
   maxStores:2,
   secondStoreFee:5,
@@ -133,8 +134,11 @@ function loadBarangays(){
 function toggleCabayaoasanLandmarks(){
   const m=document.getElementById("municipality").value,
         b=document.getElementById("barangay").value,
-        box=document.getElementById("landmarkBox");
-  if(box)box.style.display=(m==="PANIQUI"&&b==="Cabayaoasan")?"block":"none";
+        box=document.getElementById("landmarkBox"),
+        note=document.getElementById("landmarkSafetyNote");
+  const show=(m==="PANIQUI"&&b==="Cabayaoasan");
+  if(box)box.style.display=show?"block":"none";
+  if(note)note.style.display=show?"block":"none";
 }
 function applyCommonLandmark(){
   const lm=document.getElementById("commonLandmark").value,
@@ -219,6 +223,10 @@ function resultMatchesArea(x,m,b,province){
   return hasM&&hasB&&hasP;
 }
 function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
+const CABAYAOASAN_FIXED_LANDMARKS=Object.freeze({
+  "7-Eleven":{lat:15.665875,lon:120.558375,label:"7-Eleven Cabayaoasan"},
+  "Malempec":{lat:15.664625,lon:120.555625,label:"Malempec, Cabayaoasan"}
+});
 const CABAYAOASAN_LANDMARK_QUERIES={
   "Barangay Hall":[
     "Barangay Cabayaoasan Multi Purpose Hall, Paniqui, Tarlac, Philippines",
@@ -269,7 +277,12 @@ function landmarkMatchesArea(x,m,b,province){
 }
 
 async function findNamedLandmark(landmark,m,b,province){
-  if(m!=="PANIQUI"||b!=="Cabayaoasan"||!CABAYAOASAN_LANDMARK_QUERIES[landmark]) return null;
+  if(m!=="PANIQUI"||b!=="Cabayaoasan") return null;
+  if(CABAYAOASAN_FIXED_LANDMARKS[landmark]){
+    const f=CABAYAOASAN_FIXED_LANDMARKS[landmark];
+    return {result:{lat:f.lat,lon:f.lon,display_name:f.label,address:{municipality:m,state:province}},exact:true,level:"fixed-landmark",query:landmark};
+  }
+  if(!CABAYAOASAN_LANDMARK_QUERIES[landmark]) return null;
   let candidates=[];
   for(const q of CABAYAOASAN_LANDMARK_QUERIES[landmark]){
     let results=[];
@@ -356,7 +369,10 @@ async function calculateByAddress(){
     if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error("Invalid location");
     distanceKm=await route(lat,lon);deliveryFee=feeForKm(distanceKm);
 
-    if(found.level==="landmark"){
+    if(found.level==="fixed-landmark"){
+      s.textContent=`✅ ${landmark} reference point selected in Cabayaoasan`;
+      feeView.textContent=`📍 Landmark route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    }else if(found.level==="landmark"){
       s.textContent=`✅ ${landmark} located in Cabayaoasan`;
       feeView.textContent=`📍 Landmark route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else if(found.level==="address"){
@@ -390,7 +406,6 @@ setTimeout(()=>{
 },700)}
 renderStores();renderCart();
 document.getElementById("municipality").addEventListener("change",function(){
-  const box=document.getElementById("landmarkBox");
-  if(box&&this.value!=="PANIQUI")box.style.display="none";
+  loadBarangays();
 });
 </script></body></html>
