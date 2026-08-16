@@ -25,7 +25,9 @@ function renderOrders(){
   let os=JSON.parse(localStorage.getItem("mhacOrders")||"[]");
   orders.innerHTML=os.length?os.slice().reverse().map(x=>`<div class=item>
   <b>🆕 ${x.id}</b><br><b>${x.customer.name}</b> — ${x.customer.contact}<br>
-  📍 ${x.customer.address}, ${x.customer.barangay}, ${x.customer.municipality}<hr>
+  📍 ${x.customer.address || x.customer.gps?.display || "GPS location detected"}<br>
+  ${x.customer.municipality || "GPS LOCATION"} • ${x.customer.barangay || "GPS DETECTED"}
+  ${x.customer.gps ? `<br>🛰️ GPS: ${Number(x.customer.gps.lat).toFixed(6)}, ${Number(x.customer.gps.lon).toFixed(6)}${x.customer.gps.accuracy ? ` • ±${Math.round(x.customer.gps.accuracy)}m` : ""}` : ""}<hr>
   ${x.items.map(i=>`${i.store.toUpperCase()} — ${i.qty} × ${i.name} (${i.choice})`).join("<br>")}<hr>
   Food: ₱${x.fees.foodOrder.toFixed(2)}<br>
   Service: ₱${x.fees.serviceFee.toFixed(2)}<br>

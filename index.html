@@ -378,8 +378,16 @@ let name=custName.value.trim(),contact=custContact.value.trim(),m=municipality.v
     purok=document.getElementById("custPurok")?.value.trim()||"",
     street=document.getElementById("custStreet")?.value.trim()||"",
     landmark=document.getElementById("custLandmark")?.value.trim()||"",
-    a=document.getElementById("custAddress")?.value.trim()||"";
-if(!name||!contact){alert("Please complete Customer Name and Contact Number.");return}if(distanceKm===null){alert("Please allow GPS location or use manual location before sending the order.");return}if(!m||!b){alert("Please allow GPS to detect your service area, or select Municipality and Barangay manually.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,purok,street,landmark,address:a,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy}},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
+    a=document.getElementById("custAddress")?.value.trim()||"",
+    detected=document.getElementById("gpsLocationDisplay")?.textContent||"GPS location detected";
+if(!name||!contact){alert("Please complete Customer Name and Contact Number.");return}
+if(!Number.isFinite(gpsLat)||!Number.isFinite(gpsLon)){alert("Please allow GPS location first.");return}
+if(distanceKm===null||deliveryFee===null){alert("Please calculate the delivery fee first.");return}
+// GPS is now the primary location source. Municipality/Barangay are optional reverse-geocode details only.
+let gpsMunicipality=m||"GPS LOCATION",gpsBarangay=b||"GPS DETECTED",gpsAddress=a||detected;
+let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+deliveryFee+second;
+let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:gpsMunicipality,barangay:gpsBarangay,purok,street,landmark,address:gpsAddress,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:detected}},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};
+let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
 let btn=document.getElementById("sendOrderBtn"),st=document.getElementById("sendStatus");
 btn.disabled=true;btn.textContent="📤 SENDING ORDER…";st.textContent="Sending order to MHAC Admin…";
 setTimeout(()=>{

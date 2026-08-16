@@ -1,20 +1,19 @@
-MHAC DELIVERY V3.1 — GPS SIMPLE LOCKED
+MHAC DELIVERY V3.2 — GPS CHECKOUT FIXED / LOCKED
 
-Customer location flow:
-1. Customer enters only Customer Name and Contact Number.
-2. Customer presses ALLOW GPS LOCATION.
-3. The detected location is shown automatically.
-4. Customer presses CALCULATE DELIVERY FEE.
-5. The system calculates actual driving distance and applies the existing MHAC delivery rate.
+FIX:
+- GPS location is now sufficient to send an order.
+- Customer no longer needs Municipality/Barangay validation when GPS is successfully detected.
+- Delivery fee must still be calculated before sending.
+- GPS coordinates, accuracy and detected location are saved in the order.
+- Admin order display now shows GPS location/coordinates when available.
 
-No manual Municipality, Barangay, Purok, Street, Landmark or House Number fields are shown to customers.
-Those values remain hidden for internal order compatibility.
-
-Locked core:
-- Delivery rate: ₱40 first KM + ₱10 each succeeding KM
+LOCKED CORE:
+- 1 KM = PHP 40
+- Succeeding KM + PHP 10
 - 10% service fee
 - Maximum 2 stores
-- ₱5 second-store fee
-- Existing food/cart/checkout/order core unchanged
+- 2nd store + PHP 5
+- Existing menu/cart/GPS flow preserved.
 
-This is a test build. Upload index.html to the existing GitHub Pages site first.
+UPLOAD:
+Upload index.html, admin.html, admin.js and rider.html to the same GitHub Pages repository.
