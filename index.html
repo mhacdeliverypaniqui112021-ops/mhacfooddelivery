@@ -12,6 +12,9 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 .reminder{margin-top:9px;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff8e6;font-size:12px;line-height:1.45;text-align:left}
 .landmarkbox{display:none;margin:5px 0}
 .landmarkbox select{width:100%;padding:10px;border:1.5px solid #aaa;border-radius:8px;font-size:15px;background:#fff}
+.location-note{margin:7px 0;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff;font-size:12px;line-height:1.45}
+.location-note b{font-size:13px}
+#locationHelp{padding:4px 0}
 </style></head><body>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
@@ -34,23 +37,15 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
 <select id="municipality" onchange="loadBarangays()"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
 <select id="barangay"><option value="">Select Barangay</option></select>
-<div id="landmarkBox" class="landmarkbox">
-<select id="commonLandmark" onchange="applyCommonLandmark()">
-<option value="">📍 Select a common Cabayaoasan landmark (optional)</option>
-<option value="Barangay Hall">Barangay Hall / Multi-Purpose Hall</option>
-<option value="7-Eleven">7-Eleven Cabayaoasan</option>
-<option value="J&T Express">J&T Express Cabayaoasan</option>
-<option value="RUSI">RUSI</option>
-<option value="Iglesia ni Cristo">Iglesia ni Cristo – Cabayaoasan</option>
-<option value="I&T Cabayaoasan">I&T Cabayaoasan</option>
-<option value="Cabayaoasan Elementary School">Cabayaoasan Elementary School</option>
-<option value="Mormons / LDS">Mormons / LDS</option>
-<option value="Lam Asia">Lam Asia Subdivision</option>
-<option value="Malempec">Malempec</option>
-<option value="Other / Specific Landmark">Other / Specific Landmark</option>
-</select></div>
-<div id="landmarkSafetyNote" class="status" style="display:none">📍 Cabayaoasan common landmarks use a verified local reference point to prevent wrong locations from other places.</div>
-<input id="custAddress" placeholder="House No. / Street / Landmark">
+<div class="location-note">📍 <b>PLEASE ENTER COMPLETE LOCATION DETAILS</b><br><span>For accurate delivery-fee calculation, enter the customer's <b>Purok/Sitio + Street/Road + Main Landmark</b>. The system will use all details together instead of guessing from a landmark name alone.</span></div>
+<input id="custPurok" list="purokSuggestions" placeholder="Purok / Sitio (e.g. Purok 2, Sitio Malempec)">
+<datalist id="purokSuggestions"></datalist>
+<input id="custStreet" list="streetSuggestions" placeholder="Street / Road (e.g. Paniqui-Camiling Road)">
+<datalist id="streetSuggestions"></datalist>
+<input id="custLandmark" list="landmarkSuggestions" placeholder="Main Landmark / Establishment (e.g. 7-Eleven, J&T, School)">
+<datalist id="landmarkSuggestions"></datalist>
+<input id="custAddress" placeholder="House No. / Additional Address Details">
+<div id="locationHelp" class="status">💡 Tip: If there is no house number, use a nearby store, school, church, barangay hall, bridge, subdivision, or other well-known landmark.</div>
 <div class="gpsrow"><button onclick="calculateByAddress()">📍 CALCULATE DELIVERY FEE</button></div>
 <div id="locStatus" class="status">Customer must calculate the delivery fee from the delivery address.</div>
 <div id="feeView" class="small"></div>
@@ -61,11 +56,11 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 
 <script>
 /* MHAC DELIVERY — LOCKED STABLE CORE
-   V2.5 changes only Cabayaoasan landmark lookup + customer reminder.
-   Do not modify the delivery formula, cart, checkout, store limit, or existing interface.
+   V2.8 adds exact customer location fields and suggestions.
+   Delivery formula, cart, checkout, store limit and food ordering core remain locked.
 */
 const MHAC_CORE_LOCKED=Object.freeze({
-  version:"V2.7-CABAYAOASAN-LOCAL-REFERENCE-FIX",
+  version:"V2.8-EXACT-LOCATION-DETAILS-LOCKED",
   deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
   maxStores:2,
   secondStoreFee:5,
@@ -118,35 +113,27 @@ function renderCart(){updateCartFeeDisplay();countEl.textContent=cart.reduce((a,
 function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
 function closeMenu(){document.getElementById("menuModal").style.display="none"}
 function loadBarangays(){
-  let m=document.getElementById("municipality").value,
-      b=document.getElementById("barangay"),
-      box=document.getElementById("landmarkBox"),
-      lm=document.getElementById("commonLandmark");
+  const m=document.getElementById("municipality").value, b=document.getElementById("barangay");
   b.innerHTML='<option value="">Select Barangay</option>';
   (AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`);
-  if(box)box.style.display="none";
-  if(lm)lm.value="";
-  if(m==="PANIQUI"){
-    b.onchange=toggleCabayaoasanLandmarks;
-  }else{
-    b.onchange=null;
-  }
+  loadLocationSuggestions();
 }
-function toggleCabayaoasanLandmarks(){
-  const m=document.getElementById("municipality").value,
-        b=document.getElementById("barangay").value,
-        box=document.getElementById("landmarkBox"),
-        note=document.getElementById("landmarkSafetyNote");
-  const show=(m==="PANIQUI"&&b==="Cabayaoasan");
-  if(box)box.style.display=show?"block":"none";
-  if(note)note.style.display=show?"block":"none";
-}
-function applyCommonLandmark(){
-  const lm=document.getElementById("commonLandmark").value,
-        a=document.getElementById("custAddress");
-  if(!a)return;
-  if(lm && lm!=="Other / Specific Landmark") a.value=lm;
-  else if(lm==="Other / Specific Landmark") a.value="";
+const STREET_SUGGESTIONS={
+  PANIQUI:["MacArthur Highway","Paniqui-Camiling Road","Paniqui-Anao Road","Ramos-Paniqui Road","Route 242","Zamora Street","Gomez Street","Marcelo H. del Pilar Street","Main Street","Luna Street","Malagayuma Road","Barangay Road","Municipal Road","Purok Road"],
+  MONCADA:["MacArthur Highway","Moncada-Anao Road","De Vera Street","Regidor Street","Santa Lucia East Street","Barangay Road","Municipal Road","Purok Road"],
+  RAMOS:["Ramos-Paniqui Road","Ramos-Anao Road","Pura-Ramos Road","Anao-Ramos Road","Barangay Road","Municipal Road","Purok Road"],
+  GERONA:["MacArthur Highway","Gerona-Pura Road","Santa Ignacia-Gerona-Pura-Guimba Road","Barangay Road","Municipal Road","Purok Road"],
+  PURA:["Gerona-Pura Road","Pura-Ramos Road","Pura-Guimba Road","Gerona-Victoria Road","Victoria-Pura Road","Arellano Street","E. Cortes Street","J.P. Rizal Street","Luna Street","Rizal Street","San Bartolome Street","San Fabian Street","San Isidro Street","San Lazaro Street","Santiago Street","Barangay Road","Municipal Road","Purok Road"],
+  ANAO:["Poblacion Street","Moncada-Anao Road","Anao-Cuyapo Road","Anao-Ramos Road","Paniqui-Anao Road","Barangay Road","Municipal Road","Purok Road"],
+  NAMPICUAN:["Anao-Cuyapo Road","Manglicmot Street","Barangay Road","Municipal Road","Purok Road"]
+};
+const COMMON_LANDMARKS=["Barangay Hall","Multi-Purpose Hall","Barangay Health Center","Elementary School","National High School","Public Market","Municipal Hall","Church / Chapel","Iglesia ni Cristo","Mormons / LDS","7-Eleven","J&T Express","RUSI","Sari-Sari Store","Gas Station","Bridge","Covered Court","Subdivision","Purok Marker","Other Landmark"];
+function loadLocationSuggestions(){
+  const m=document.getElementById("municipality").value, b=document.getElementById("barangay").value;
+  const ss=document.getElementById("streetSuggestions"), ls=document.getElementById("landmarkSuggestions"), ps=document.getElementById("purokSuggestions");
+  if(ss)ss.innerHTML=(STREET_SUGGESTIONS[m]||[]).map(x=>`<option value="${x}"></option>`).join("");
+  if(ls)ls.innerHTML=COMMON_LANDMARKS.map(x=>`<option value="${x}${b?" "+b:""}"></option>`).join("");
+  if(ps)ps.innerHTML=["Purok 1","Purok 2","Purok 3","Purok 4","Purok 5","Purok 6","Purok 7","Purok Centro","Sitio Centro","Sitio Malempec","Sitio Lawak","Sitio Ragsak","Sitio Capaoayan"].map(x=>`<option value="${x}"></option>`).join("");
 }
 function openCheckout(){
 if(!cart.length)return;
@@ -224,109 +211,30 @@ function resultMatchesArea(x,m,b,province){
   return hasM&&hasB&&hasP;
 }
 function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
-// Cabayaoasan local reference: J&T Express / Cabayaoasan Elementary School cluster.
-// This point is confirmed in local map data and is used to prevent generic
-// place-name searches from jumping to another location.
-const CABAYAOASAN_LOCAL_REFERENCE=Object.freeze({lat:15.66497,lon:120.55507,label:"Cabayaoasan local reference (J&T / Elementary School area)"});
-const CABAYAOASAN_FIXED_LANDMARKS=Object.freeze({
-  "7-Eleven":{...CABAYAOASAN_LOCAL_REFERENCE,label:"7-Eleven Cabayaoasan (local reference)"},
-  "J&T Express":{...CABAYAOASAN_LOCAL_REFERENCE,label:"J&T Express Cabayaoasan"},
-  "Malempec":{...CABAYAOASAN_LOCAL_REFERENCE,label:"Malempec, Cabayaoasan (local reference)"},
-  "Barangay Hall":{...CABAYAOASAN_LOCAL_REFERENCE,label:"Barangay Hall Cabayaoasan (local reference)"}
-});
-const CABAYAOASAN_LANDMARK_QUERIES={
-  "Barangay Hall":[
-    "Barangay Cabayaoasan Multi Purpose Hall, Paniqui, Tarlac, Philippines",
-    "Cabayaoasan Barangay Hall, Paniqui, Tarlac, Philippines"
-  ],
-  "7-Eleven":[
-    "7-Eleven CABAYAOASAN, Camiling Paniqui Road, Brgy Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "7-Eleven Cabayaoasan Paniqui Tarlac, Philippines"
-  ],
-  "J&T Express":[
-    "J&T Express, Cabayaoasan, Paniqui, Tarlac, Philippines"
-  ],
-  "RUSI":[
-    "RUSI Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Rusi Motorcycle Shop, Cabayaoasan, Paniqui, Tarlac, Philippines"
-  ],
-  "Iglesia ni Cristo":[
-    "Iglesia Ni Cristo Local Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Iglesia Ni Cristo Cabayaoasan, Paniqui, Tarlac, Philippines"
-  ],
-  "I&T Cabayaoasan":[
-    "I&T Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "I and T Cabayaoasan Paniqui Tarlac, Philippines"
-  ],
-  "Cabayaoasan Elementary School":[
-    "Cabayaoasan Elementary School, Purok 2, Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Cabayaoasan ES, Paniqui, Tarlac, Philippines"
-  ],
-  "Mormons / LDS":[
-    "LDS Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Mormons Cabayaoasan, Paniqui, Tarlac, Philippines"
-  ],
-  "Lam Asia":[
-    "Lam Asia Subdivision, Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Lam Asia, Cabayaoasan, Paniqui, Tarlac, Philippines"
-  ],
-  "Malempec":[
-    "Malempec, Cabayaoasan, Paniqui, Tarlac, Philippines",
-    "Malempec Paniqui Tarlac, Philippines"
-  ]
-};
-
-function landmarkMatchesArea(x,m,b,province){
-  const text=normalize(x.display_name);
-  const ad=x.address||{};
-  const mm=normalize(m),bb=normalize(b),pp=normalize(province);
-  const hasM=text.includes(mm)||normalize(ad.municipality||ad.town||ad.city||ad.county).includes(mm);
-  const hasB=text.includes(bb)||normalize(ad.village||ad.suburb||ad.neighbourhood||ad.quarter||ad.locality).includes(bb);
-  const hasP=!pp||text.includes(pp)||normalize(ad.state||ad.province).includes(pp);
-  return hasM&&hasB&&hasP;
+function buildLocationQueries(m,b,purok,street,landmark,address,province){
+  const parts=[address,purok,street,landmark,b,m,province,"Philippines"].filter(Boolean);
+  const q1=parts.join(", ");
+  const q2=[address,landmark,street,purok,b,m,province,"Philippines"].filter(Boolean).join(", ");
+  const q3=[landmark,street,purok,b,m,province,"Philippines"].filter(Boolean).join(", ");
+  const q4=[street,purok,b,m,province,"Philippines"].filter(Boolean).join(", ");
+  return [...new Set([q1,q2,q3,q4].filter(Boolean))];
 }
-
-async function findNamedLandmark(landmark,m,b,province){
-  if(m!=="PANIQUI"||b!=="Cabayaoasan") return null;
-  if(CABAYAOASAN_FIXED_LANDMARKS[landmark]){
-    const f=CABAYAOASAN_FIXED_LANDMARKS[landmark];
-    return {result:{lat:f.lat,lon:f.lon,display_name:f.label,address:{municipality:m,state:province}},exact:true,level:"fixed-landmark",query:landmark};
-  }
-  if(!CABAYAOASAN_LANDMARK_QUERIES[landmark]) return null;
-  let candidates=[];
-  for(const q of CABAYAOASAN_LANDMARK_QUERIES[landmark]){
-    let results=[];
-    try{results=await geocodeNominatim(q)}catch(e){}
-    for(const x of results){
-      if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&landmarkMatchesArea(x,m,b,province)){
-        candidates.push(x);
-      }
-    }
-    if(candidates.length)break;
-  }
-  if(!candidates.length){
-    for(const q of CABAYAOASAN_LANDMARK_QUERIES[landmark]){
-      let results=[];
-      try{results=await geocodePhoton(q)}catch(e){}
-      for(const x of results){
-        if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&landmarkMatchesArea(x,m,b,province)){
-          candidates.push(x);
-        }
-      }
-      if(candidates.length)break;
-    }
-  }
-  if(!candidates.length)return null;
-  candidates.sort((x,y)=>(addressHasRoad(y)?1:0)-(addressHasRoad(x)?1:0));
-  return {result:candidates[0],exact:true,level:"landmark",query:landmark};
-}
-
-async function findBestAddress(a,m,b,province){
-  const queries=[`${a}, Barangay ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, ${province}, Philippines`,`${a}, ${b}, ${m}, Philippines`];
+async function findBestAddress(a,m,b,province,purok="",street="",landmark=""){
+  const queries=buildLocationQueries(m,b,purok,street,landmark,a,province);
   let candidates=[];
   for(const q of queries){
     let results=[]; try{results=await geocodeNominatim(q)}catch(e){}
-    for(const x of results){if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) candidates.push(x)}
+    for(const x of results){
+      if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) candidates.push(x);
+    }
+    const ranked=candidates.filter(addressHasRoad).sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));
+    if(ranked.length)return {result:ranked[0],exact:true,level:"address",query:q};
+  }
+  for(const q of queries){
+    let results=[]; try{results=await geocodePhoton(q)}catch(e){}
+    for(const x of results){
+      if(Number.isFinite(+x.lat)&&Number.isFinite(+x.lon)&&resultMatchesArea(x,m,b,province)) candidates.push(x);
+    }
     const ranked=candidates.filter(addressHasRoad).sort((x,y)=>scoreGeocodeResult(y,m,b,province)-scoreGeocodeResult(x,m,b,province));
     if(ranked.length)return {result:ranked[0],exact:true,level:"address",query:q};
   }
@@ -352,72 +260,48 @@ async function route(lat,lon){
   return hav(baseLat,baseLon,lat,lon);
 }
 async function calculateByAddress(){
-  const m=municipality.value,b=barangay.value,a=custAddress.value.trim(),
-        landmark=document.getElementById("commonLandmark")?.value||"",
+  const m=municipality.value,b=barangay.value,
+        purok=document.getElementById("custPurok")?.value.trim()||"",
+        street=document.getElementById("custStreet")?.value.trim()||"",
+        landmark=document.getElementById("custLandmark")?.value.trim()||"",
+        a=document.getElementById("custAddress")?.value.trim()||"",
         s=locStatus;
-  if(!m||!b||!a){s.textContent="⚠️ Select Municipality, Barangay and enter House No./Street/Landmark.";return}
+  if(!m||!b){s.textContent="⚠️ Select Municipality and Barangay first.";return}
+  if(!purok&&!street&&!landmark&&!a){s.textContent="⚠️ Please enter at least a Purok/Sitio, Street/Road, Landmark, or address detail.";return}
   distanceKm=null;deliveryFee=null;feeView.textContent="";renderCart();updateCheckoutTotals();
-  s.textContent="📍 Locating delivery address…";
+  s.textContent="📍 Locating the complete delivery details…";
   try{
     const province=m==="NAMPICUAN"?"Nueva Ecija":"Tarlac";
-    let found=null;
-
-    // LOCKED CORE: only the Cabayaoasan landmark lookup is changed here.
-    // Other municipalities, stores, cart, checkout and fee formula remain untouched.
-    if(m==="PANIQUI"&&b==="Cabayaoasan"&&landmark&&landmark!=="Other / Specific Landmark"){
-      found=await findNamedLandmark(landmark,m,b,province);
-      if(!found){
-        s.textContent=`⚠️ ${landmark} could not be verified on the map. Please choose another landmark or type a more specific address.`;
-        return;
-      }
-    }else{
-      found=await findBestAddress(a,m,b,province);
-    }
-
+    const found=await findBestAddress(a,m,b,province,purok,street,landmark);
     if(!found) throw new Error("No location available");
     const g=found.result,lat=+g.lat,lon=+g.lon;
     if(!Number.isFinite(lat)||!Number.isFinite(lon)) throw new Error("Invalid location");
     distanceKm=await route(lat,lon);
-    // Safety lock for Cabayaoasan common landmarks: if a routing provider
-    // returns an implausibly long route for this local reference, use the
-    // confirmed Cabayaoasan J&T/Elementary-School reference point instead.
-    if(m==="PANIQUI"&&b==="Cabayaoasan"&&landmark&&landmark!=="Other / Specific Landmark"&&distanceKm>5){
-      const ref=CABAYAOASAN_LOCAL_REFERENCE;
-      const refDistance=await route(ref.lat,ref.lon);
-      if(Number.isFinite(refDistance)&&refDistance<=5){
-        distanceKm=refDistance;
-        found={result:{lat:ref.lat,lon:ref.lon,display_name:ref.label,address:{municipality:m,state:province}},exact:true,level:"fixed-landmark",query:landmark};
-      }
-    }
+    if(!Number.isFinite(distanceKm)) throw new Error("Route unavailable");
     deliveryFee=feeForKm(distanceKm);
-
-    if(found.level==="fixed-landmark"){
-      s.textContent=`✅ ${landmark} reference point selected in Cabayaoasan`;
-      feeView.textContent=`📍 Landmark route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
-    }else if(found.level==="landmark"){
-      s.textContent=`✅ ${landmark} located in Cabayaoasan`;
-      feeView.textContent=`📍 Landmark route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
-    }else if(found.level==="address"){
-      s.textContent=`✅ Address located`;
+    if(found.level==="address"){
+      s.textContent="✅ Complete location located";
       feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else if(found.level==="barangay"){
-      s.textContent=`✅ ${b}, ${m} located. Street/house/landmark not mapped, so the selected barangay point is used.`;
-      feeView.textContent=`📍 Barangay route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+      s.textContent=`⚠️ Exact street/landmark could not be mapped; the selected barangay point was used. Add more location details for better accuracy.`;
+      feeView.textContent=`📍 Barangay route estimate: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else{
-      s.textContent=`✅ ${m} located. Exact street is not mapped, so the municipality center is used as the fallback.`;
+      s.textContent=`⚠️ Exact location could not be mapped; municipality estimate used. Add more details for better accuracy.`;
       feeView.textContent=`📍 Municipality route estimate: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }
     renderCart();updateCheckoutTotals();
   }catch(e){
     distanceKm=null;deliveryFee=null;renderCart();updateCheckoutTotals();
-    s.textContent="❌ Location service is temporarily unavailable. Please try CALCULATE again.";
+    s.textContent="❌ Exact location could not be calculated. Please add the Purok/Sitio, Street/Road and a recognizable landmark, then try again.";
   }
 }
 function placeOrder(){
 let name=custName.value.trim(),contact=custContact.value.trim(),m=municipality.value,b=barangay.value,
-    a=custAddress.value.trim(),landmark=document.getElementById("commonLandmark")?.value||"";
-if(landmark&&landmark!=="Other / Specific Landmark"&&m==="PANIQUI"&&b==="Cabayaoasan"&&!a.toLowerCase().includes(landmark.toLowerCase())) a=a+" | Landmark: "+landmark;
-if(!name||!contact||!m||!b||!a){alert("Complete customer information.");return}if(distanceKm===null){alert("Please click CALCULATE DELIVERY FEE first.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,address:a},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
+    purok=document.getElementById("custPurok")?.value.trim()||"",
+    street=document.getElementById("custStreet")?.value.trim()||"",
+    landmark=document.getElementById("custLandmark")?.value.trim()||"",
+    a=document.getElementById("custAddress")?.value.trim()||"";
+if(!name||!contact||!m||!b||(!purok&&!street&&!landmark&&!a)){alert("Complete the customer location details: Purok/Sitio, Street/Road, Landmark, or address detail.");return}if(distanceKm===null){alert("Please click CALCULATE DELIVERY FEE first.");return}let sub=cart.reduce((x,y)=>x+y.price*y.qty,0),names=[...new Set(cart.map(x=>x.store))],service=sub*.1,second=names.length>1?5:0,total=sub+service+(deliveryFee??0)+second;let order={id:"MHAC-"+Date.now(),customer:{name,contact,municipality:m,barangay:b,purok,street,landmark,address:a},items:cart,fees:{foodOrder:sub,serviceFee:service,deliveryFee,distanceKm,secondStoreFee:second,total},payment:payment.value,status:"NEW",createdAt:new Date().toISOString()};let orders=JSON.parse(localStorage.getItem("mhacOrders")||"[]");orders.push(order);localStorage.setItem("mhacOrders",JSON.stringify(orders));
 let btn=document.getElementById("sendOrderBtn"),st=document.getElementById("sendStatus");
 btn.disabled=true;btn.textContent="📤 SENDING ORDER…";st.textContent="Sending order to MHAC Admin…";
 setTimeout(()=>{
@@ -427,6 +311,7 @@ setTimeout(()=>{
   setTimeout(()=>closeCheckout(),900);
 },700)}
 renderStores();renderCart();
+loadLocationSuggestions();
 document.getElementById("municipality").addEventListener("change",function(){
   loadBarangays();
 });
