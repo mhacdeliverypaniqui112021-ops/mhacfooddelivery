@@ -1,21 +1,5 @@
-MHAC DELIVERY — V2.6 CABAYAOASAN LANDMARK FIX
+MHAC DELIVERY V2.9 — LOCKED LAM ASIA FIX
 
-Only the Cabayaoasan landmark-routing layer was changed.
-
-FIXED LANDMARKS:
-- 7-Eleven Cabayaoasan — fixed local reference point
-- Malempec, Cabayaoasan — fixed local reference point
-
-WHY:
-Generic geocoding was sometimes matching a different place/branch with the same name, causing an incorrect long route and an excessive delivery fee.
-
-UNCHANGED / LOCKED:
-- Delivery rate: 1 KM = P40; succeeding KM +P10
-- 10% service fee
-- Maximum 2 stores
-- 2nd store +P5
-- Cart and checkout interface
-- Food price reminder
-- admin.html and rider.html
-
-Upload index.html to the same GitHub Pages repository. Do not modify the other files.
+Core ordering, food pricing, 10% service fee, delivery formula, 2-store limit, and checkout flow remain locked.
+Lam Asia Subdivision in Cabayaoasan, Paniqui now uses a verified local reference point when selected as the landmark, preventing generic geocoding from failing or choosing the wrong place.
+Delivery formula remains: ₱40 first km + ₱10 per succeeding km.

@@ -60,7 +60,7 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
    Delivery formula, cart, checkout, store limit and food ordering core remain locked.
 */
 const MHAC_CORE_LOCKED=Object.freeze({
-  version:"V2.8-EXACT-LOCATION-DETAILS-LOCKED",
+  version:"V2.9-LAM-ASIA-FIX-LOCKED",
   deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
   maxStores:2,
   secondStoreFee:5,
@@ -127,7 +127,7 @@ const STREET_SUGGESTIONS={
   ANAO:["Poblacion Street","Moncada-Anao Road","Anao-Cuyapo Road","Anao-Ramos Road","Paniqui-Anao Road","Barangay Road","Municipal Road","Purok Road"],
   NAMPICUAN:["Anao-Cuyapo Road","Manglicmot Street","Barangay Road","Municipal Road","Purok Road"]
 };
-const COMMON_LANDMARKS=["Barangay Hall","Multi-Purpose Hall","Barangay Health Center","Elementary School","National High School","Public Market","Municipal Hall","Church / Chapel","Iglesia ni Cristo","Mormons / LDS","7-Eleven","J&T Express","RUSI","Sari-Sari Store","Gas Station","Bridge","Covered Court","Subdivision","Purok Marker","Other Landmark"];
+const COMMON_LANDMARKS=["Barangay Hall","Multi-Purpose Hall","Barangay Health Center","Elementary School","National High School","Public Market","Municipal Hall","Church / Chapel","Iglesia ni Cristo","Mormons / LDS","7-Eleven","J&T Express","RUSI","Sari-Sari Store","Gas Station","Bridge","Covered Court","Subdivision","Lam Asia Subdivision","Purok Marker","Other Landmark"];
 function loadLocationSuggestions(){
   const m=document.getElementById("municipality").value, b=document.getElementById("barangay").value;
   const ss=document.getElementById("streetSuggestions"), ls=document.getElementById("landmarkSuggestions"), ps=document.getElementById("purokSuggestions");
@@ -211,6 +211,15 @@ function resultMatchesArea(x,m,b,province){
   return hasM&&hasB&&hasP;
 }
 function addressHasRoad(x){const ad=x.address||{};return !!(ad.road||ad.street||ad.house_number||ad.housenumber)}
+const VERIFIED_LOCAL_REFERENCES=Object.freeze({
+  "LAM ASIA SUBDIVISION|CABAYAOASAN|PANIQUI":Object.freeze({lat:15.664625,lon:120.547375,label:"Lam Asia Subdivision, Purok 3, Cabayaoasan, Paniqui"})
+});
+function verifiedLocalReference(m,b,landmark){
+  const key=`${normalize(landmark)}|${normalize(b)}|${normalize(m)}`;
+  if(normalize(landmark).includes("lam asia") && normalize(b)==="cabayaoasan" && normalize(m)==="paniqui") return VERIFIED_LOCAL_REFERENCES["LAM ASIA SUBDIVISION|CABAYAOASAN|PANIQUI"];
+  return null;
+}
+
 function buildLocationQueries(m,b,purok,street,landmark,address,province){
   const parts=[address,purok,street,landmark,b,m,province,"Philippines"].filter(Boolean);
   const q1=parts.join(", ");
@@ -220,6 +229,10 @@ function buildLocationQueries(m,b,purok,street,landmark,address,province){
   return [...new Set([q1,q2,q3,q4].filter(Boolean))];
 }
 async function findBestAddress(a,m,b,province,purok="",street="",landmark=""){
+  const verified=verifiedLocalReference(m,b,landmark);
+  if(verified){
+    return {result:{lat:verified.lat,lon:verified.lon,display_name:verified.label,address:{road:"Lam Asia Subdivision",village:b,municipality:m,state:province}},exact:true,level:"verified-local",query:"verified local reference"};
+  }
   const queries=buildLocationQueries(m,b,purok,street,landmark,a,province);
   let candidates=[];
   for(const q of queries){
@@ -282,6 +295,9 @@ async function calculateByAddress(){
     if(found.level==="address"){
       s.textContent="✅ Complete location located";
       feeView.textContent=`📍 Driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    }else if(found.level==="verified-local"){
+      s.textContent="✅ Lam Asia local reference located";
+      feeView.textContent=`📍 Local reference route distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
     }else if(found.level==="barangay"){
       s.textContent=`⚠️ Exact street/landmark could not be mapped; the selected barangay point was used. Add more location details for better accuracy.`;
       feeView.textContent=`📍 Barangay route estimate: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
