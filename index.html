@@ -35,18 +35,21 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <div id="checkoutTotals" style="margin:10px 0;padding:12px;border:2px solid #222;border-radius:10px"></div>
 <h3 style="margin-bottom:5px">👤 CUSTOMER INFORMATION</h3>
 <input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
-<div class="location-note">📍 <b>USE YOUR CURRENT GPS LOCATION</b><br><span>Allow location access and MHAC Delivery will use your phone's current GPS position to calculate the delivery route and fee. No need to search for a landmark.</span></div>
-<div class="gpsrow"><button id="gpsBtn" onclick="calculateByGPS()">📍 USE MY CURRENT LOCATION</button></div>
+<div class="location-note">📍 <b>ALLOW GPS LOCATION</b><br><span>Allow location access and MHAC Delivery will automatically get your current location. No landmark, street, purok or barangay entry is required.</span></div>
+<div class="gpsrow"><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button></div>
 <div id="gpsAccuracy" class="status"></div>
-<select id="municipality" onchange="loadBarangays()"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
+
+<!-- Location values are kept hidden so the customer has nothing else to fill in. -->
+<div style="display:none">
+<select id="municipality"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
 <select id="barangay"><option value="">Select Barangay</option></select>
-<input id="custPurok" placeholder="Purok / Sitio (optional)">
-<input id="custStreet" placeholder="Street / Road (optional)">
-<input id="custLandmark" placeholder="Main Landmark (optional)">
-<input id="custAddress" placeholder="House No. / Additional Address (optional)">
-<div id="locationHelp" class="status">💡 GPS is the primary location method. Manual location details are only a backup if GPS is unavailable or permission is denied.</div>
-<div class="gpsrow"><button onclick="calculateByAddress()">📝 USE MANUAL LOCATION INSTEAD</button></div>
-<div id="locStatus" class="status">Customer must allow GPS location before the delivery fee can be calculated.</div>
+<input id="custPurok"><input id="custStreet"><input id="custLandmark"><input id="custAddress">
+</div>
+
+<div id="gpsLocationDisplay" class="status" style="display:none;font-size:15px;font-weight:700"></div>
+<div id="locationHelp" class="status">💡 Step 1: Allow GPS. Step 2: Check the detected location. Step 3: Press CALCULATE DELIVERY FEE.</div>
+<div class="gpsrow"><button id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button></div>
+<div id="locStatus" class="status">Please allow GPS location first.</div>
 <div id="feeView" class="small"></div>
 <div id="finalReview" style="margin-top:10px"></div>
 <select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
@@ -55,11 +58,11 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 
 <script>
 /* MHAC DELIVERY — LOCKED STABLE CORE
-   V2.8 adds exact customer location fields and suggestions.
+   V3.1 GPS-SIMPLE: customer only allows GPS, reviews detected location, then calculates fee.
    Delivery formula, cart, checkout, store limit and food ordering core remain locked.
 */
 const MHAC_CORE_LOCKED=Object.freeze({
-  version:"V3.0-GPS-LOCATION-LOCKED",
+  version:"V3.1-GPS-SIMPLE-LOCKED",
   deliveryRate:"1 KM = ₱40; succeeding KM +₱10",
   maxStores:2,
   secondStoreFee:5,
@@ -288,10 +291,17 @@ function findAreaFromGPS(g){
   return {m,b,display:g?.display_name||"GPS location detected",address:ad};
 }
 async function calculateByGPS(){
-  const s=locStatus,btn=document.getElementById("gpsBtn");
-  if(!navigator.geolocation){s.textContent="❌ GPS is not supported by this browser. Use manual location instead.";return}
-  btn.disabled=true;btn.textContent="📍 LOCATING…";s.textContent="📍 Getting your current GPS location…";
-  distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;renderCart();updateCheckoutTotals();
+  const s=locStatus,btn=document.getElementById("gpsBtn"),calc=document.getElementById("calculateFeeBtn");
+  if(!navigator.geolocation){s.textContent="❌ GPS is not supported by this browser.";return}
+  btn.disabled=true;btn.textContent="📍 GETTING LOCATION…";
+  calc.disabled=true;
+  distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;
+  document.getElementById("gpsLocationDisplay").style.display="none";
+  document.getElementById("gpsLocationDisplay").textContent="";
+  document.getElementById("gpsAccuracy").textContent="";
+  feeView.textContent="";
+  renderCart();updateCheckoutTotals();
+  s.textContent="📍 Please wait while we detect your current location…";
   navigator.geolocation.getCurrentPosition(async pos=>{
     try{
       gpsLat=pos.coords.latitude;gpsLon=pos.coords.longitude;gpsAccuracy=pos.coords.accuracy;
@@ -304,22 +314,51 @@ async function calculateByGPS(){
       document.getElementById("custStreet").value=ad.road||ad.street||"";
       document.getElementById("custLandmark").value="";
       document.getElementById("custAddress").value=ad.house_number||"";
-      distanceKm=await route(gpsLat,gpsLon);
-      if(!Number.isFinite(distanceKm)) throw new Error("Route unavailable");
-      deliveryFee=feeForKm(distanceKm);
-      s.textContent=`✅ GPS location detected${area.m?` • ${area.m}`:""}${area.b?` • ${area.b}`:""}`;
-      document.getElementById("gpsAccuracy").textContent=`📍 GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters • ${area.display}`;
-      feeView.textContent=`📍 Actual driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
-      renderCart();updateCheckoutTotals();
+
+      const display=area.display || [ad.road,ad.neighbourhood,area.b,area.m].filter(Boolean).join(", ") || `${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
+      const locBox=document.getElementById("gpsLocationDisplay");
+      locBox.style.display="block";
+      locBox.textContent=`📍 LOCATION DETECTED: ${display}`;
+      document.getElementById("gpsAccuracy").textContent=`GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters`;
+      s.textContent="✅ GPS location detected. Press CALCULATE DELIVERY FEE.";
+      calc.disabled=false;
     }catch(e){
-      distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;renderCart();updateCheckoutTotals();
-      s.textContent="❌ GPS was detected but the delivery route could not be calculated. Please try again or use manual location.";
-    }finally{btn.disabled=false;btn.textContent="📍 USE MY CURRENT LOCATION";}
+      distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;
+      renderCart();updateCheckoutTotals();
+      s.textContent="❌ GPS was detected but the location could not be read. Please try GPS again.";
+    }finally{
+      btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
+    }
   },err=>{
-    btn.disabled=false;btn.textContent="📍 USE MY CURRENT LOCATION";
+    btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
     const msg=err.code===1?"Location permission was denied.":err.code===2?"Your location could not be determined.":"GPS request timed out.";
-    s.textContent=`⚠️ ${msg} You may use manual location instead.`;
+    s.textContent=`⚠️ ${msg} Please allow GPS and try again.`;
   },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+async function calculateGPSFee(){
+  const s=locStatus,calc=document.getElementById("calculateFeeBtn");
+  if(!Number.isFinite(gpsLat)||!Number.isFinite(gpsLon)){
+    s.textContent="⚠️ Please allow GPS location first.";
+    return;
+  }
+  calc.disabled=true;calc.textContent="📍 CALCULATING…";
+  s.textContent="📍 Calculating actual driving distance…";
+  distanceKm=null;deliveryFee=null;feeView.textContent="";
+  renderCart();updateCheckoutTotals();
+  try{
+    distanceKm=await route(gpsLat,gpsLon);
+    if(!Number.isFinite(distanceKm)) throw new Error("Route unavailable");
+    deliveryFee=feeForKm(distanceKm);
+    s.textContent="✅ Delivery fee calculated from your GPS location.";
+    feeView.textContent=`📍 Actual driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ₱${deliveryFee.toFixed(2)}`;
+    renderCart();updateCheckoutTotals();
+  }catch(e){
+    distanceKm=null;deliveryFee=null;
+    renderCart();updateCheckoutTotals();
+    s.textContent="❌ Driving route could not be calculated. Please allow GPS again and retry.";
+  }finally{
+    calc.disabled=false;calc.textContent="📍 CALCULATE DELIVERY FEE";
+  }
 }
 async function calculateByAddress(){
   const m=municipality.value,b=barangay.value,purok=document.getElementById("custPurok")?.value.trim()||"",street=document.getElementById("custStreet")?.value.trim()||"",landmark=document.getElementById("custLandmark")?.value.trim()||"",a=document.getElementById("custAddress")?.value.trim()||"",s=locStatus;
