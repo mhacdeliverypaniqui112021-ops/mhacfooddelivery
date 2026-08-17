@@ -1,4 +1,28 @@
-<!doctype html><html><meta name=viewport content="width=device-width,initial-scale=1"><title>MHAC RIDER</title>
-<body style="font-family:Arial;padding:18px;max-width:700px;margin:auto"><h1>🏍️ MHAC RIDER</h1><h2>ORDERS</h2><div id=o></div><script>
-let a=JSON.parse(localStorage.getItem("mhacOrders")||"[]");o.innerHTML=a.length?a.map(x=>`<div style="border:2px solid #ddd;border-radius:12px;padding:12px;margin:10px 0"><b>${x.id}</b><br>${x.customer.name} — ${x.customer.contact}<br>${x.customer.barangay}, ${x.customer.municipality}<br>${x.customer.address}<hr>${x.items.map(i=>`${i.store.toUpperCase()} — ${i.qty} × ${i.name} (${i.choice})`).join("<br>")}<br><b>Delivery Fee: ₱${x.fees.deliveryFee.toFixed(2)}</b><br><b>Total: ₱${x.fees.total.toFixed(2)}</b></div>`).join(""):"No orders yet.";
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC RIDER</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f4f4f4;color:#111}header{background:#111;color:#fff;text-align:center;padding:17px;border-bottom:4px solid #e21d25}header h1{margin:0;font-size:25px}header p{margin:5px 0;font-size:12px}main{max-width:760px;margin:auto;padding:12px}.card,.order{background:#fff;border:2px solid #ddd;border-radius:14px;padding:13px;margin:12px 0}.order.ready{border-color:#e21d25}.row{padding:7px 0;border-bottom:1px solid #eee}.small{font-size:12px;color:#666}button,.nav{border:0;border-radius:9px;padding:11px 13px;font-weight:900}.dark{background:#111;color:#fff}.green{background:#138a36;color:#fff}.nav{display:block;text-align:center;background:#111;color:#fff;text-decoration:none;margin-top:9px}.badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#eee;font-size:11px;font-weight:900}.total{font-size:20px;font-weight:900}
+</style></head><body>
+<header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header>
+<main><div class="card"><button class="dark" onclick="refresh()">🔄 REFRESH</button><div class="small">Only active rider orders are shown.</div></div><div id="orders">Loading…</div></main>
+<script>
+const KEY="mhacOrders";
+function get(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}}
+function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function money(v){return "₱"+Number(v||0).toFixed(2)}
+function setStatus(i,s){let a=get();if(!a[i])return;a[i].status=s;a[i].updatedAt=new Date().toISOString();save(a);refresh()}
+function card(o,i){
+ const c=o.customer||{},f=o.fees||{},gps=c.latitude!=null&&c.longitude!=null;
+ const nav=gps?"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(c.latitude+","+c.longitude):"";
+ const items=(o.items||[]).map(x=>`<div class="row"><b>${esc(x.qty)} × ${esc(x.name)}</b><br><span class="small">${esc(x.store)} • ${esc(x.choice||"")}</span></div>`).join("");
+ let action=o.status==="PICKED UP"?`<button class="green" onclick="setStatus(${i},'DELIVERED')">✅ DELIVERED</button>`:`<button class="green" onclick="setStatus(${i},'PICKED UP')">🛵 PICKED UP</button>`;
+ return `<div class="order ${o.status==="READY"?"ready":""}"><b>${esc(o.id)}</b> <span class="badge">${esc(o.status||"NEW")}</span>
+ <div class="card"><b>👤 CUSTOMER</b><br>${esc(c.name)}<br>${esc(c.contact)}<br>${esc(c.address||"")}</div>
+ <div class="card"><b>📍 CUSTOMER GPS</b><br>${gps?`<span class="small">${esc(c.latitude)}, ${esc(c.longitude)}${c.accuracy?" • ±"+esc(c.accuracy)+"m":""}</span><a class="nav" target="_blank" rel="noopener" href="${nav}">🗺️ NAVIGATE TO CUSTOMER</a>`:"⚠️ GPS unavailable"}</div>
+ <div class="card"><b>🍔 ORDER</b><br>${items}<br>Food: <b>${money(f.foodOrder)}</b><br>Service: <b>${money(f.serviceFee)}</b><br>Delivery: <b>${money(f.deliveryFee)}</b><br>Distance: <b>${Number(f.distanceKm||0).toFixed(2)} km</b><br>Payment: <b>${esc(o.payment||"")}</b><br><span class="total">TOTAL: ${money(f.total)}</span></div>${action}</div>`;
+}
+function refresh(){let a=get(),active=a.filter(o=>["ACCEPTED","PREPARING","READY","PICKED UP"].includes(o.status||"NEW"));document.getElementById("orders").innerHTML=active.length?active.slice().reverse().map(o=>card(o,a.indexOf(o))).join(""):"No active rider orders."}
+refresh();setInterval(refresh,1500);
 </script></body></html>
