@@ -90,6 +90,45 @@ if(r.user.uid!==RIDER_UID){await signOut(auth);$("loginStatus").textContent="Thi
 $("loginStatus").textContent="Login successful.";
 }catch(e){$("loginStatus").textContent="Login failed: "+e.message}
 finally{$("loginBtn").disabled=false}
+async function login(){
+  const email=$("email").value.trim();
+  const password=$("password").value;
+
+  if(!email || !password){
+    $("loginStatus").textContent="Please enter your Firebase email and password.";
+    $("loginStatus").className="status error";
+    return;
+  }
+
+  $("loginBtn").disabled=true;
+  $("loginStatus").textContent="Connecting to Firebase Authentication...";
+  $("loginStatus").className="status";
+
+  try{
+    const r=await signInWithEmailAndPassword(auth,email,password);
+
+    if(r.user.uid!==RIDER_UID){
+      await signOut(auth);
+      $("loginStatus").textContent=
+        "Login successful, but this account is not assigned to this rider.";
+      $("loginStatus").className="status error";
+      return;
+    }
+
+    $("loginStatus").textContent="✅ Login successful. Loading Rider App...";
+    $("loginStatus").className="status success";
+
+  }catch(e){
+    console.error("Firebase Login Error:",e);
+
+    $("loginStatus").textContent=
+      "❌ Firebase Login Error: " + e.code + " — " + e.message;
+
+    $("loginStatus").className="status error";
+
+  }finally{
+    $("loginBtn").disabled=false;
+  }
 }
 async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}
 onAuthStateChanged(auth,u=>{
