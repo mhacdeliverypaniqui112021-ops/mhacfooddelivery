@@ -1,16 +1,99 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — RIDER APP</title>
-<style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0;font-size:26px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:12px;font-size:16px}button{border:0;border-radius:12px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}button.green{background:#138a36}.row{display:flex;gap:8px;flex-wrap:wrap}.row button{flex:1}.status{color:#666;font-size:13px}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.hidden{display:none}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}</style></head>
-<body><header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header><main>
-<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><input id="id" placeholder="Rider ID"><input id="pw" type="password" placeholder="Password"><button style="width:100%" onclick="login()">🔐 LOGIN</button><p class="status">RIDER01 is the active rider account.</p></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="flex:1">🏍️ RIDER01</h2><button onclick="logout()">LOG OUT</button></div><p id="conn" class="status">Connecting…</p></div><div id="orders"></div></div>
-</main><script src="mhac-firebase-config.js"></script><script src="mhac-connection.js"></script><script>
-const RIDER="RIDER01",PASS="mhacrider";let stop=null;
-function login(){if(document.getElementById("id").value.trim().toUpperCase()!==RIDER||document.getElementById("pw").value!==PASS){alert("Invalid Rider ID or password.");return}sessionStorage.setItem("mhac_rider","1");show()}
-function logout(){sessionStorage.removeItem("mhac_rider");if(stop)stop();document.getElementById("app").classList.add("hidden");document.getElementById("login").classList.remove("hidden")}
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function maps(o){const g=o.customer?.gps;const d=g&&isFinite(Number(g.lat))&&isFinite(Number(g.lon))?g.lat+","+g.lon:[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
-function render(a){const el=document.getElementById("orders");const x=a.filter(o=>String(o.assignedRider||"").toUpperCase()===RIDER&&o.status!=="COMPLETED");el.innerHTML=x.length?x.map(o=>`<div class="card"><div class="row"><b>${esc(o.id)}</b><span class="pill">${esc(o.status)}</span></div><h2>${esc(o.customer?.name)}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p><p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><p>${(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food)} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>")}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row" style="margin-top:8px"><button onclick="status('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button><button onclick="status('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button><button class="green" onclick="status('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`).join(""):"<div class='card'><h3>No assigned rider orders.</h3><p class='status'>Wait for Admin to assign an order to RIDER01.</p></div>"}
-async function status(id,s){try{await MHACShared.updateOrder(id,{status:s,updatedAt:new Date().toISOString()})}catch(e){alert(e.message)}}
-function show(){document.getElementById("login").classList.add("hidden");document.getElementById("app").classList.remove("hidden");stop=MHACShared.watchOrders((a,e)=>{document.getElementById("conn").textContent=e?"❌ "+e.message:"🟢 LIVE — assigned orders update automatically";if(!e)render(a)})}
-if(sessionStorage.getItem("mhac_rider")==="1")show();
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC DELIVERY — RIDER APP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}
+header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}
+header h1{margin:0;font-size:26px}main{max-width:720px;margin:auto;padding:18px}
+.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}
+input{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:12px;font-size:16px}
+button{border:0;border-radius:12px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}
+button.green{background:#138a36}button:disabled{opacity:.55}.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{flex:1}.status{color:#666;font-size:13px}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}
+.hidden{display:none}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}
+hr{border:0;border-top:1px solid #ddd}.error{color:#b00020;font-weight:800}.success{color:#138a36;font-weight:800}
+</style></head><body>
+<header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header>
+<main>
+<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2>
+<input id="email" type="email" placeholder="Rider Email">
+<input id="password" type="password" placeholder="Password">
+<button id="loginBtn" style="width:100%" onclick="login()">🔐 LOGIN</button>
+<p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></div>
+<div id="app" class="hidden">
+<div class="card"><div class="row"><h2 style="flex:1;margin:0">🏍️ RIDER APP</h2><button onclick="logout()">LOG OUT</button></div>
+<p id="conn" class="status">Connecting…</p><p id="riderInfo" class="status"></p></div>
+<div id="orders"></div></div>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,doc,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
+authDomain:"mhac-delivery-53099.firebaseapp.com",
+projectId:"mhac-delivery-53099",
+storageBucket:"mhac-delivery-53099.firebasestorage.app",
+messagingSenderId:"878081137607",
+appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
+measurementId:"G-7NZEK618YC"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93";
+let unsub=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const peso=n=>"₱"+Number(n||0).toFixed(2);
+
+function maps(o){
+const g=o.customer?.gps||o.customerLocation||o.gps;
+const ok=g&&Number.isFinite(Number(g.lat))&&Number.isFinite(Number(g.lon));
+const d=ok?Number(g.lat)+","+Number(g.lon):
+[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");
+return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving";
+}
+function render(arr){
+const x=arr.filter(o=>String(o.assignedRiderUid||"").trim()===RIDER_UID&&String(o.status||"").toUpperCase()!=="COMPLETED");
+$("orders").innerHTML=x.length?x.map(o=>{
+const items=(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>");
+return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
+<h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p>
+<p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><hr>
+<p>${items||"No items listed."}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p>
+<a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a>
+<div class="row" style="margin-top:8px"><button onclick="changeStatus('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button>
+<button onclick="changeStatus('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button>
+<button class="green" onclick="changeStatus('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`}).join(""):
+`<div class="card"><h3>No assigned rider orders.</h3><p class="status">Wait for Admin to assign an order to this rider.</p></div>`;
+}
+async function changeStatus(id,status){
+try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}
+catch(e){alert("Unable to update order: "+e.message)}
+}
+window.changeStatus=changeStatus;
+function listen(){
+if(unsub)unsub();
+$("conn").textContent="🟡 Connecting to Firebase orders…";
+const q=query(collection(db,"orders"),where("assignedRiderUid","==",RIDER_UID));
+unsub=onSnapshot(q,snap=>{
+$("conn").textContent="🟢 LIVE — assigned orders update automatically";
+render(snap.docs.map(d=>({id:d.id,...d.data()})));
+},err=>{$("conn").textContent="❌ Firebase error: "+err.message});
+}
+async function login(){
+const email=$("email").value.trim(),password=$("password").value;
+if(!email||!password){$("loginStatus").textContent="Enter rider email and password.";return}
+$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";
+try{
+const r=await signInWithEmailAndPassword(auth,email,password);
+if(r.user.uid!==RIDER_UID){await signOut(auth);$("loginStatus").textContent="This account is not registered as the active MHAC rider.";return}
+$("loginStatus").textContent="Login successful.";
+}catch(e){$("loginStatus").textContent="Login failed: "+e.message}
+finally{$("loginBtn").disabled=false}
+}
+async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}
+onAuthStateChanged(auth,u=>{
+if(u&&u.uid===RIDER_UID){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("riderInfo").textContent="Rider account: "+u.email;listen()}
+else{$("app").classList.add("hidden");$("login").classList.remove("hidden")}
+});
 </script></body></html>
