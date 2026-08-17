@@ -19,7 +19,7 @@ hr{border:0;border-top:1px solid #ddd}.error{color:#b00020;font-weight:800}.succ
 <input id="email" type="email" placeholder="Rider Email">
 <input id="password" type="password" placeholder="Password">
 <button id="loginBtn" style="width:100%" onclick="login()">🔐 LOGIN</button>
-<p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></div>
+<p id="loginStatus" class="status">Enter the Firebase Authentication email and password, then press LOGIN.</p></div>
 <div id="app" class="hidden">
 <div class="card"><div class="row"><h2 style="flex:1;margin:0">🏍️ RIDER APP</h2><button onclick="logout()">LOG OUT</button></div>
 <p id="conn" class="status">Connecting…</p><p id="riderInfo" class="status"></p></div>
@@ -29,110 +29,16 @@ hr{border:0;border-top:1px solid #ddd}.error{color:#b00020;font-weight:800}.succ
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {getFirestore,collection,query,where,onSnapshot,doc,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
-authDomain:"mhac-delivery-53099.firebaseapp.com",
-projectId:"mhac-delivery-53099",
-storageBucket:"mhac-delivery-53099.firebasestorage.app",
-messagingSenderId:"878081137607",
-appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
-measurementId:"G-7NZEK618YC"};
+const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93";
-let unsub=null;
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const peso=n=>"₱"+Number(n||0).toFixed(2);
-
-function maps(o){
-const g=o.customer?.gps||o.customerLocation||o.gps;
-const ok=g&&Number.isFinite(Number(g.lat))&&Number.isFinite(Number(g.lon));
-const d=ok?Number(g.lat)+","+Number(g.lon):
-[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");
-return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving";
-}
-function render(arr){
-const x=arr.filter(o=>String(o.assignedRiderUid||"").trim()===RIDER_UID&&String(o.status||"").toUpperCase()!=="COMPLETED");
-$("orders").innerHTML=x.length?x.map(o=>{
-const items=(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>");
-return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
-<h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p>
-<p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><hr>
-<p>${items||"No items listed."}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p>
-<a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a>
-<div class="row" style="margin-top:8px"><button onclick="changeStatus('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button>
-<button onclick="changeStatus('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button>
-<button class="green" onclick="changeStatus('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`}).join(""):
-`<div class="card"><h3>No assigned rider orders.</h3><p class="status">Wait for Admin to assign an order to this rider.</p></div>`;
-}
-async function changeStatus(id,status){
-try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}
-catch(e){alert("Unable to update order: "+e.message)}
-}
+const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93";let unsub=null;
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
+function maps(o){const g=o.customer?.gps||o.customerLocation||o.gps,ok=g&&Number.isFinite(Number(g.lat))&&Number.isFinite(Number(g.lon));const d=ok?Number(g.lat)+","+Number(g.lon):[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
+function render(arr){const x=arr.filter(o=>String(o.assignedRiderUid||"").trim()===RIDER_UID&&String(o.status||"").toUpperCase()!=="COMPLETED");$("orders").innerHTML=x.length?x.map(o=>{const items=(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>");return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p><p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><hr><p>${items||"No items listed."}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row" style="margin-top:8px"><button onclick="changeStatus('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button><button onclick="changeStatus('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button><button class="green" onclick="changeStatus('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`}).join(""):`<div class="card"><h3>No assigned rider orders.</h3><p class="status">Wait for Admin to assign an order to this rider.</p></div>`}
+async function changeStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}catch(e){alert("Unable to update order: "+e.message)}}
 window.changeStatus=changeStatus;
-function listen(){
-if(unsub)unsub();
-$("conn").textContent="🟡 Connecting to Firebase orders…";
-const q=query(collection(db,"orders"),where("assignedRiderUid","==",RIDER_UID));
-unsub=onSnapshot(q,snap=>{
-$("conn").textContent="🟢 LIVE — assigned orders update automatically";
-render(snap.docs.map(d=>({id:d.id,...d.data()})));
-},err=>{$("conn").textContent="❌ Firebase error: "+err.message});
-}
-async function login(){
-const email=$("email").value.trim(),password=$("password").value;
-if(!email||!password){$("loginStatus").textContent="Enter rider email and password.";return}
-$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";
-try{
-const r=await signInWithEmailAndPassword(auth,email,password);
-if(r.user.uid!==RIDER_UID){await signOut(auth);$("loginStatus").textContent="This account is not registered as the active MHAC rider.";return}
-$("loginStatus").textContent="Login successful.";
-}catch(e){$("loginStatus").textContent="Login failed: "+e.message}
-finally{$("loginBtn").disabled=false}
-async function login(){
-  const email=$("email").value.trim();
-  const password=$("password").value;
-
-  if(!email || !password){
-    $("loginStatus").textContent="Please enter your Firebase email and password.";
-    $("loginStatus").className="status error";
-    return;
-  }
-
-  $("loginBtn").disabled=true;
-  $("loginStatus").textContent="Connecting to Firebase Authentication...";
-  $("loginStatus").className="status";
-
-  try{
-    const r=await signInWithEmailAndPassword(auth,email,password);
-
-    if(r.user.uid!==RIDER_UID){
-      await signOut(auth);
-      $("loginStatus").textContent=
-        "Login successful, but this account is not assigned to this rider.";
-      $("loginStatus").className="status error";
-      return;
-    }
-
-    $("loginStatus").textContent="✅ Login successful. Loading Rider App...";
-    $("loginStatus").className="status success";
-
-  }catch(e){
-    console.error("Firebase Login Error:",e);
-
-    $("loginStatus").textContent=
-      "❌ Firebase Login Error: " + e.code + " — " + e.message;
-
-    $("loginStatus").className="status error";
-
-  }finally{
-    $("loginBtn").disabled=false;
-  }
-}
+function listen(){if(unsub)unsub();$("conn").textContent="🟡 Connecting to Firebase orders…";const q=query(collection(db,"orders"),where("assignedRiderUid","==",RIDER_UID));unsub=onSnapshot(q,snap=>{$("conn").textContent="🟢 LIVE — assigned orders update automatically";render(snap.docs.map(d=>({id:d.id,...d.data()})))},err=>{$("conn").textContent="❌ Firebase error: "+err.message})}
+async function login(){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){$("loginStatus").textContent="❌ Please enter your Firebase email and password.";return}$("loginBtn").disabled=true;$("loginStatus").textContent="🟡 Connecting to Firebase Authentication...";try{const r=await signInWithEmailAndPassword(auth,email,password);if(r.user.uid!==RIDER_UID){await signOut(auth);$("loginStatus").textContent="❌ Login succeeded, but this is not the assigned Rider account.";return}$("loginStatus").textContent="✅ Login successful. Loading Rider App..."}catch(e){console.error("Firebase Login Error:",e);$("loginStatus").textContent="❌ Firebase Login Error: "+e.code+" — "+e.message;$("loginStatus").className="status error"}finally{$("loginBtn").disabled=false}}
 async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}
-onAuthStateChanged(auth,u=>{
-if(u&&u.uid===RIDER_UID){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("riderInfo").textContent="Rider account: "+u.email;listen()}
-else{$("app").classList.add("hidden");$("login").classList.remove("hidden")}
-});
+onAuthStateChanged(auth,u=>{if(u&&u.uid===RIDER_UID){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("riderInfo").textContent="Rider account: "+u.email;listen()}else{$("app").classList.add("hidden");$("login").classList.remove("hidden")}});
 </script></body></html>
