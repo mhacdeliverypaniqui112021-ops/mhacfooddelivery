@@ -1,108 +1,16 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC RIDER</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f4f4f4;color:#111}header{background:#111;color:#fff;text-align:center;padding:17px;border-bottom:4px solid #e21d25}header h1{margin:0;font-size:25px}header p{margin:5px 0;font-size:12px}main{max-width:760px;margin:auto;padding:12px}.card,.order{background:#fff;border:2px solid #ddd;border-radius:14px;padding:13px;margin:12px 0}.order.ready{border-color:#e21d25}.row{padding:7px 0;border-bottom:1px solid #eee}.small{font-size:12px;color:#666}button,.nav{border:0;border-radius:9px;padding:11px 13px;font-weight:900}.dark{background:#111;color:#fff}.green{background:#138a36;color:#fff}.nav{display:block;text-align:center;background:#111;color:#fff;text-decoration:none;margin-top:9px}.badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#eee;font-size:11px;font-weight:900}.total{font-size:20px;font-weight:900}
-</style></head><body>
-<header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header>
-
-<main>
-  <div id="loginScreen" class="card" style="max-width:520px;margin:30px auto">
-    <h2 style="margin-top:0">🔐 RIDER LOGIN</h2>
-    <p class="small">Enter your Rider ID and password to access assigned delivery orders.</p>
-    <label style="font-weight:900;display:block;margin:12px 0 6px">Rider ID</label>
-    <input id="loginId" autocomplete="username" placeholder="Rider ID"
-      style="width:100%;padding:13px;border:2px solid #ccc;border-radius:9px;font-size:16px">
-    <label style="font-weight:900;display:block;margin:12px 0 6px">Password</label>
-    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Password"
-      style="width:100%;padding:13px;border:2px solid #ccc;border-radius:9px;font-size:16px">
-    <button class="dark" style="width:100%;margin-top:15px" onclick="login()">🔐 LOGIN</button>
-    <div id="loginMsg" class="small" style="margin-top:10px"></div>
-  </div>
-
-  <div id="appScreen" style="display:none">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
-        <div><b id="riderWelcome">RIDER</b><div class="small">Only active rider orders are shown.</div></div>
-        <div>
-          <button class="dark" onclick="refresh()">🔄 REFRESH</button>
-          <button class="dark" onclick="logout()">LOG OUT</button>
-        </div>
-      </div>
-    </div>
-    <div id="orders">Loading…</div>
-  </div>
-</main>
-
-<script>
-const RIDER_SESSION_KEY="mhacRiderLoggedIn";
-const RIDER_ID_KEY="mhacRiderId";
-
-/* Temporary local login for V2.
-   This will be replaced by real shared authentication in the Firebase connection step. */
-const RIDER_ACCOUNTS = {
-  "rider01": "mhacrider",
-  "rider02": "mhacrider"
-};
-
-function login(){
-  const id=(document.getElementById("loginId").value||"").trim().toLowerCase();
-  const pass=document.getElementById("loginPass").value||"";
-  const msg=document.getElementById("loginMsg");
-  if(RIDER_ACCOUNTS[id] && RIDER_ACCOUNTS[id]===pass){
-    localStorage.setItem(RIDER_SESSION_KEY,"1");
-    localStorage.setItem(RIDER_ID_KEY,id);
-    showApp();
-  }else{
-    msg.textContent="⚠️ Invalid Rider ID or password.";
-  }
-}
-function logout(){
-  localStorage.removeItem(RIDER_SESSION_KEY);
-  localStorage.removeItem(RIDER_ID_KEY);
-  document.getElementById("loginPass").value="";
-  showLogin();
-}
-function showLogin(){
-  document.getElementById("loginScreen").style.display="";
-  document.getElementById("appScreen").style.display="none";
-}
-function showApp(){
-  document.getElementById("loginScreen").style.display="none";
-  document.getElementById("appScreen").style.display="";
-  const id=localStorage.getItem(RIDER_ID_KEY)||"rider";
-  document.getElementById("riderWelcome").textContent="🛵 "+id.toUpperCase();
-  refresh();
-}
-function initRiderAuth(){
-  if(localStorage.getItem(RIDER_SESSION_KEY)==="1") showApp();
-  else showLogin();
-}
-</script>
-
-<script>
-const KEY="mhacOrders";
-function get(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}}
-function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function money(v){return "₱"+Number(v||0).toFixed(2)}
-function setStatus(i,s){let a=get();if(!a[i])return;a[i].status=s;a[i].updatedAt=new Date().toISOString();save(a);refresh()}
-function card(o,i){
- const c=o.customer||{},f=o.fees||{},gps=c.latitude!=null&&c.longitude!=null;
- const nav=gps?"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(c.latitude+","+c.longitude):"";
- const items=(o.items||[]).map(x=>`<div class="row"><b>${esc(x.qty)} × ${esc(x.name)}</b><br><span class="small">${esc(x.store)} • ${esc(x.choice||"")}</span></div>`).join("");
- let action=o.status==="PICKED UP"?`<button class="green" onclick="setStatus(${i},'DELIVERED')">✅ DELIVERED</button>`:`<button class="green" onclick="setStatus(${i},'PICKED UP')">🛵 PICKED UP</button>`;
- return `<div class="order ${o.status==="READY"?"ready":""}"><b>${esc(o.id)}</b> <span class="badge">${esc(o.status||"NEW")}</span>
- <div class="card"><b>👤 CUSTOMER</b><br>${esc(c.name)}<br>${esc(c.contact)}<br>${esc(c.address||"")}</div>
- <div class="card"><b>📍 CUSTOMER GPS</b><br>${gps?`<span class="small">${esc(c.latitude)}, ${esc(c.longitude)}${c.accuracy?" • ±"+esc(c.accuracy)+"m":""}</span><a class="nav" target="_blank" rel="noopener" href="${nav}">🗺️ NAVIGATE TO CUSTOMER</a>`:"⚠️ GPS unavailable"}</div>
- <div class="card"><b>🍔 ORDER</b><br>${items}<br>Food: <b>${money(f.foodOrder)}</b><br>Service: <b>${money(f.serviceFee)}</b><br>Delivery: <b>${money(f.deliveryFee)}</b><br>Distance: <b>${Number(f.distanceKm||0).toFixed(2)} km</b><br>Payment: <b>${esc(o.payment||"")}</b><br><span class="total">TOTAL: ${money(f.total)}</span></div>${action}</div>`;
-}
-function refresh(){let a=get(),active=a.filter(o=>["ACCEPTED","PREPARING","READY","PICKED UP"].includes(o.status||"NEW"));document.getElementById("orders").innerHTML=active.length?active.slice().reverse().map(o=>card(o,a.indexOf(o))).join(""):"No active rider orders."}
-initRiderAuth();setInterval(()=>{if(localStorage.getItem(RIDER_SESSION_KEY)==="1") refresh()},1500);
-</script>
-<script>
-document.addEventListener("keydown",e=>{
-  if(e.key==="Enter" && document.getElementById("loginScreen").style.display!=="none") login();
-});
-</script>
-</body></html>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — RIDER APP</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0;font-size:26px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:12px;font-size:16px}button{border:0;border-radius:12px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}button.green{background:#138a36}.row{display:flex;gap:8px;flex-wrap:wrap}.row button{flex:1}.status{color:#666;font-size:13px}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.hidden{display:none}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}</style></head>
+<body><header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header><main>
+<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><input id="id" placeholder="Rider ID"><input id="pw" type="password" placeholder="Password"><button style="width:100%" onclick="login()">🔐 LOGIN</button><p class="status">RIDER01 is the active rider account.</p></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="flex:1">🏍️ RIDER01</h2><button onclick="logout()">LOG OUT</button></div><p id="conn" class="status">Connecting…</p></div><div id="orders"></div></div>
+</main><script src="mhac-firebase-config.js"></script><script src="mhac-connection.js"></script><script>
+const RIDER="RIDER01",PASS="mhacrider";let stop=null;
+function login(){if(document.getElementById("id").value.trim().toUpperCase()!==RIDER||document.getElementById("pw").value!==PASS){alert("Invalid Rider ID or password.");return}sessionStorage.setItem("mhac_rider","1");show()}
+function logout(){sessionStorage.removeItem("mhac_rider");if(stop)stop();document.getElementById("app").classList.add("hidden");document.getElementById("login").classList.remove("hidden")}
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
+function maps(o){const g=o.customer?.gps;const d=g&&isFinite(Number(g.lat))&&isFinite(Number(g.lon))?g.lat+","+g.lon:[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
+function render(a){const el=document.getElementById("orders");const x=a.filter(o=>String(o.assignedRider||"").toUpperCase()===RIDER&&o.status!=="COMPLETED");el.innerHTML=x.length?x.map(o=>`<div class="card"><div class="row"><b>${esc(o.id)}</b><span class="pill">${esc(o.status)}</span></div><h2>${esc(o.customer?.name)}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p><p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><p>${(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food)} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>")}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row" style="margin-top:8px"><button onclick="status('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button><button onclick="status('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button><button class="green" onclick="status('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`).join(""):"<div class='card'><h3>No assigned rider orders.</h3><p class='status'>Wait for Admin to assign an order to RIDER01.</p></div>"}
+async function status(id,s){try{await MHACShared.updateOrder(id,{status:s,updatedAt:new Date().toISOString()})}catch(e){alert(e.message)}}
+function show(){document.getElementById("login").classList.add("hidden");document.getElementById("app").classList.remove("hidden");stop=MHACShared.watchOrders((a,e)=>{document.getElementById("conn").textContent=e?"❌ "+e.message:"🟢 LIVE — assigned orders update automatically";if(!e)render(a)})}
+if(sessionStorage.getItem("mhac_rider")==="1")show();
+</script></body></html>

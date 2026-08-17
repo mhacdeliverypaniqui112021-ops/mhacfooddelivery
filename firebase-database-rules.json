@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "mhac": {
+      "orders": {
+        ".read": "auth != null",
+        "$orderId": {
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+}

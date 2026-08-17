@@ -1,0 +1,31 @@
+MHAC CUSTOMER CONNECTION PATCH V1
+
+Keep the locked customer GPS/delivery-fee system unchanged.
+
+1. Upload these files to the same GitHub Pages root:
+   mhac-firebase-config.js
+   mhac-connection.js
+
+2. In index.html add these BEFORE the customer code:
+<script src="mhac-firebase-config.js"></script>
+<script src="mhac-connection.js"></script>
+
+3. In the existing placeOrder(), after:
+localStorage.setItem("mhacOrders",JSON.stringify(orders));
+
+add:
+MHACShared.createOrder(order).then(()=>{
+  st.textContent=`Order ${order.id} sent to MHAC Admin.`;
+}).catch(err=>{
+  console.error(err);
+  st.textContent=`Order ${order.id} saved locally. Shared connection is not configured.`;
+});
+
+Do NOT remove the localStorage line. It remains the local safety copy.
+
+Flow:
+CUSTOMER SEND ORDER
+ -> Firebase mhac/orders
+ -> ADMIN receives it
+ -> ADMIN assigns RIDER01
+ -> RIDER01 receives it live
