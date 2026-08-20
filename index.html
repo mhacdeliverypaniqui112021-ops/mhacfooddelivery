@@ -1,56 +1,80 @@
-<!doctype html><html lang="en"><head>
+<!doctype html>
+<html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — ADMIN APP</title>
+<title>MHAC DELIVERY — GPS</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}
-header{background:#111;color:#fff;text-align:center;padding:20px 12px;border-bottom:5px solid #e21d25}
-header h1{margin:0;font-size:25px}header p{margin:8px 0 0}
-main{max-width:920px;margin:auto;padding:15px}.card{background:#fff;border:2px solid #ddd;border-radius:17px;padding:16px;margin:12px 0}
-input,select{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:11px;font-size:16px}
-button{border:0;border-radius:11px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}
-button.red{background:#e21d25}button.blue{background:#1769aa}button:disabled{opacity:.55}
-.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none}
-.status{font-size:13px;color:#666;line-height:1.4}.error{color:#b00020;font-weight:800}.success{color:#138a36;font-weight:800}
-.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900;font-size:12px}
-.items{background:#f7f7f7;border-radius:10px;padding:11px}hr{border:0;border-top:1px solid #ddd}
-.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}
+header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}
+.rate,.area,.card{max-width:680px;margin:12px auto;padding:13px;border:2px solid #222;border-radius:15px}
+.rate{text-align:center}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:4px;font-size:13px;font-weight:800}
+.area{text-align:center;font-size:12px;font-weight:800}.wrap{max-width:680px;margin:auto;padding:0 14px 35px}
+.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}
+.cart{border:2px solid #222;border-radius:15px;padding:14px;margin-top:18px}.store-head{font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}
+.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px;margin-top:5px}
+button{border:1.5px solid #222;background:#fff;border-radius:9px;padding:9px 11px;font-weight:800}button.red,.add{background:#e21d25;color:#fff;border:0}
+.add{width:100%;border-radius:10px;padding:12px;font-size:15px}.modal{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:10}
+.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:600px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0}
+.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;gap:7px;padding:6px 0}
+.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}
+input,select{width:100%;padding:11px;margin:6px 0;border:1.5px solid #aaa;border-radius:9px;font-size:15px}
+.gpsbox{border:2px solid #222;border-radius:12px;padding:12px;margin:10px 0}.gpsok{color:#138a36;font-weight:900}.error{color:#b00020;font-weight:800}.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
 </style></head><body>
-<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • RIDER ASSIGNMENT • LIVE STATUS</p></header>
-<main>
-<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2>
-<input id="email" type="email" autocomplete="username" placeholder="Admin Email">
-<input id="password" type="password" autocomplete="current-password" placeholder="Password">
-<button id="loginBtn" class="red" style="width:100%" onclick="login()">🔐 LOGIN</button>
-<p id="loginStatus" class="status">Use the email and password created in Firebase Authentication.</p></div>
-<div id="app" class="hidden"><div class="card"><div class="row">
-<h2 style="margin:0;flex:2">📋 MHAC ORDERS</h2><button onclick="logout()">LOG OUT</button></div>
-<p id="connection" class="status">Connecting…</p><p id="adminInfo" class="small"></p></div><div id="orders"></div></div>
-</main>
+<header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
+<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p></section>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
+<main class="wrap"><h2>CHOOSE FOOD STORE</h2><div id="stores" class="stores"></div>
+<section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="cart">No items yet.</div><div id="totals"></div>
+<button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section></main>
+
+<div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button class="close" onclick="closeCheckout()">CLOSE</button>
+<h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="card"></div>
+<h3>👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
+<div class="gpsbox"><b>📍 GPS DELIVERY LOCATION</b><p class="small">Your phone location is used to calculate the actual driving distance from Paniqui Plaza to your current location.</p>
+<button id="gpsBtn" class="add" onclick="getGPS()">📍 ALLOW GPS LOCATION</button><p id="gpsStatus" class="small">GPS not yet allowed.</p><p id="gpsDetected" class="small"></p>
+<button id="feeBtn" class="add" onclick="calculateFee()" disabled>📍 CALCULATE DELIVERY FEE</button><p id="feeStatus" class="small"></p></div>
+<select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button id="sendBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><p id="sendStatus" class="small" style="text-align:center"></p>
+</div></div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import{getFirestore,collection,onSnapshot,doc,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import{getFirestore,collection,doc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93",RIDER_EMAIL="mhacdeliverypaniqui112021@gmail.com";let unsub=null;
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function msg(t,k="status"){$("loginStatus").className=k;$("loginStatus").textContent=t}
-function render(a){const x=a.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");if(!x.length){$("orders").innerHTML="<div class='card'><h3>📭 NO ACTIVE ORDERS</h3><p class='status'>Orders in Firestore will appear here automatically.</p></div>";return}
-$("orders").innerHTML=x.map(o=>{const c=o.customer||{},assigned=String(o.assignedRiderUid||"")===RIDER_UID;
-const items=(o.items||[]).map(i=>`<div><b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}</div>`).join("");
-return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
-<h2>👤 ${esc(c.name||"Customer")}</h2><p>📞 ${esc(c.contact||c.phone||"")}</p><p>📍 ${esc(c.address||c.gps?.display||"")}<br>${esc(c.barangay||"")}, ${esc(c.municipality||"")}</p>
-<div class="items">${items||"No items listed."}</div>
-<p>Food Order: <b>${peso(o.fees?.foodOrder)}</b><br>10% Service Fee: <b>${peso(o.fees?.serviceFee)}</b><br>Delivery Fee: <b>${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br>2nd Store Fee: <b>${peso(o.fees?.secondStoreFee)}</b><br><span class="total">GRAND TOTAL: ${peso(o.fees?.total??o.total)}</span></p>
-<p class="small">Payment: ${esc(o.payment||"Not specified")}</p><hr><h3>🏍️ RIDER</h3>
-<select id="rider_${esc(o.id)}"><option value="">${assigned?"RIDER01 is assigned":"Select rider"}</option><option value="${RIDER_UID}">RIDER01 — ${RIDER_EMAIL}</option></select>
-<div class="row"><button class="blue" onclick="assignRider('${esc(o.id)}')">🏍️ ASSIGN RIDER</button><button onclick="changeStatus('${esc(o.id)}','PREPARING')">🍽️ PREPARING</button><button onclick="changeStatus('${esc(o.id)}','READY')">✅ READY</button></div>
-<p class="${assigned?"success":"small"}">${assigned?"🟢 Assigned to RIDER01":"No rider assigned yet."}</p></div>`}).join("")}
-async function assignRider(id){const uid=$("rider_"+id)?.value;if(!uid){alert("Please select RIDER01 first.");return}try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:uid,assignedRider:"RIDER01",assignedRiderEmail:RIDER_EMAIL,status:"ASSIGNED",updatedAt:serverTimestamp()})}catch(e){alert("Rider assignment failed: "+e.message)}}
-async function changeStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}catch(e){alert("Status update failed: "+e.message)}}
-window.assignRider=assignRider;window.changeStatus=changeStatus;
-function listen(){if(unsub)unsub();$("connection").textContent="🟡 Connecting to Firestore orders…";unsub=onSnapshot(collection(db,"orders"),s=>{$("connection").textContent="🟢 LIVE — Firestore orders connected";render(s.docs.map(d=>({id:d.id,...d.data()})))},e=>$("connection").textContent="❌ Firestore error: "+e.message)}
-async function login(){const e=$("email").value.trim(),p=$("password").value;if(!e||!p){msg("Enter your Firebase Authentication email and password.","error");return}$("loginBtn").disabled=true;msg("🔄 Signing in to Firebase…");try{await signInWithEmailAndPassword(auth,e,p);msg("✅ Login successful. Opening Admin Dashboard…","success")}catch(x){let m=x.code||x.message;if(x.code==="auth/invalid-credential")m="Incorrect email or password. Check Firebase Authentication.";else if(x.code==="auth/user-not-found")m="This email is not registered in Firebase Authentication.";else if(x.code==="auth/wrong-password")m="Incorrect password.";else if(x.code==="auth/invalid-email")m="The email address is invalid.";else if(x.code==="auth/too-many-requests")m="Too many attempts. Please wait and try again.";msg("❌ Login failed: "+m,"error")}finally{$("loginBtn").disabled=false}}
-async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}window.login=login;window.logout=logout;
-onAuthStateChanged(auth,u=>{if(u){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminInfo").textContent="Signed in: "+(u.email||u.uid);listen()}else{$("app").classList.add("hidden");$("login").classList.remove("hidden");$("adminInfo").textContent=""}});
+const db=getFirestore(initializeApp(firebaseConfig));
+const ORIGIN={lat:15.66789,lon:120.57765,label:"Paniqui Plaza, Paniqui, Tarlac"};
+const STORES=[
+{name:"Jollibee",icon:"🍗",foods:[["Chickenjoy 1pc",99],["Chickenjoy 2pc",159],["Chickenjoy with Rice",129]]},
+{name:"McDo",icon:"🍟",foods:[["1pc Chicken McDo",99],["Burger Solo",89]]},
+{name:"Mang Inasal",icon:"🍗",foods:[["PM1 Chicken",109]]},
+{name:"KFC",icon:"🍗",foods:[["1pc Chicken Meal",109]]}];
+let cart=[],gps=null,distanceKm=null,deliveryFee=null;
+
+const $=id=>document.getElementById(id),peso=n=>"₱"+Number(n||0).toFixed(2),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+function renderStores(){$("stores").innerHTML=STORES.map((s,i)=>`<button class="store" onclick="openStore(${i})">${s.icon} ${s.name}</button>`).join("")}
+function openStore(i){const s=STORES[i];$("menuBody").innerHTML=`<h2>${s.icon} ${s.name}</h2>`+s.foods.map((f,j)=>`<div class="food"><h3>${f[0]}</h3><b>${peso(f[1])}</b><div class="choice"><span>No Drink</span><button onclick="addFood(${i},${j})">SELECT & ADD</button></div></div>`).join("");$("menuModal").style.display="block"}
+function closeMenu(){$("menuModal").style.display="none"}
+function addFood(si,fi){const store=STORES[si].name,selected=[...new Set(cart.map(x=>x.store))];if(!selected.includes(store)&&selected.length>=2){alert("Maximum 2 stores per order.");return}let key=si+"-"+fi,x=cart.find(x=>x.key===key);x?x.qty++:cart.push({key,store,name:STORES[si].foods[fi][0],choice:"No Drink",price:STORES[si].foods[fi][1],qty:1});renderCart();closeMenu()}
+function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
+function renderCart(){let n=cart.reduce((a,x)=>a+x.qty,0);$("count").textContent=n;$("checkoutBtn").disabled=!cart.length;if(!cart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";return}
+const names=[...new Set(cart.map(x=>x.store))],sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0;
+$("cart").innerHTML=names.map(s=>`<div class="store-head">${s.toUpperCase()}</div>`+cart.map((x,i)=>x.store===s?`<div class="row"><b>${x.qty} × ${esc(x.name)}</b><br><small>${esc(x.choice)}</small><div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`:"").join("")).join("");
+$("totals").innerHTML=`<p>Food Order: <b>${peso(sub)}</b></p><p>10% Service Fee: <b>${peso(sf)}</b></p><p>Delivery Fee: <b>${distanceKm===null?"—":peso(deliveryFee)}</b></p><p>2nd Store Fee: <b>${peso(second)}</b></p><p class="total">GRAND TOTAL: ${peso(sub+sf+second+(deliveryFee||0))}</p>`}
+function openCheckout(){if(!cart.length)return;$("checkout").style.display="block";$("orderSummary").innerHTML=cart.map(x=>`<div class="row"><b>${x.store}</b> — ${x.qty} × ${x.name}<br>${x.choice} — ${peso(x.price*x.qty)}</div>`).join("");updateCheckoutTotals()}
+function closeCheckout(){$("checkout").style.display="none"}
+function updateCheckoutTotals(){const sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=[...new Set(cart.map(x=>x.store))].length>1?5:0;$("checkoutTotals").innerHTML=`Food Order: <b>${peso(sub)}</b><br>10% Service Fee: <b>${peso(sf)}</b><br>Delivery Fee: <b>${distanceKm===null?"—":peso(deliveryFee)}</b><br>2nd Store Fee: <b>${peso(second)}</b><br><span class="total">GRAND TOTAL: ${peso(sub+sf+second+(deliveryFee||0))}</span>`}
+function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
+async function route(lat,lon){const u=`https://router.project-osrm.org/route/v1/driving/${ORIGIN.lon},${ORIGIN.lat};${lon},${lat}?overview=false`;const r=await fetch(u);const j=await r.json();if(j.code!=="Ok"||!j.routes?.[0])throw Error("Route unavailable");return j.routes[0].distance/1000}
+async function reverse(lat,lon){const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;const r=await fetch(u,{headers:{Accept:"application/json"}});if(!r.ok)throw Error("Location lookup failed");return r.json()}
+window.getGPS=()=>{if(!navigator.geolocation){$("gpsStatus").textContent="❌ GPS is not supported.";return}$("gpsBtn").disabled=true;$("gpsStatus").textContent="📍 Getting your exact phone location…";navigator.geolocation.getCurrentPosition(async p=>{try{gps={lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy};const g=await reverse(gps.lat,gps.lon);$("gpsDetected").innerHTML=`<span class="gpsok">✅ LOCATION DETECTED</span><br>${esc(g.display_name||gps.lat+","+gps.lon)}<br>Accuracy: approximately ${Math.round(gps.accuracy)} meters`;$("gpsStatus").textContent="GPS ready. Now calculate the delivery fee.";$("feeBtn").disabled=false}catch(e){$("gpsStatus").textContent="❌ GPS found your position but the address could not be read. You can still retry GPS."}finally{$("gpsBtn").disabled=false}},e=>{$("gpsBtn").disabled=false;$("gpsStatus").textContent=e.code===1?"❌ Location permission was denied. Allow location in browser settings.":"⚠️ Could not get GPS. Please try again."},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
+window.calculateFee=async()=>{if(!gps){$("feeStatus").textContent="⚠️ Allow GPS first.";return}$("feeBtn").disabled=true;$("feeStatus").textContent="📍 Calculating actual driving distance from Paniqui Plaza…";try{distanceKm=await route(gps.lat,gps.lon);deliveryFee=feeForKm(distanceKm);$("feeStatus").innerHTML=`<span class="gpsok">✅ ACTUAL GPS ROUTE</span><br>${distanceKm.toFixed(2)} km driving distance<br>Delivery Fee: <b>${peso(deliveryFee)}</b>`;renderCart();updateCheckoutTotals()}catch(e){distanceKm=null;deliveryFee=null;$("feeStatus").textContent="❌ Driving route unavailable. Please try again."}finally{$("feeBtn").disabled=false}}
+window.placeOrder=async()=>{const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact){alert("Please enter Customer Name and Contact Number.");return}if(!gps){alert("Please allow GPS location first.");return}if(distanceKm===null||deliveryFee===null){alert("Please calculate the delivery fee first.");return}
+const sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+second+deliveryFee,id="MHAC-"+Date.now();
+$("sendBtn").disabled=true;$("sendStatus").textContent="📤 Sending order to Firebase…";
+try{let g={};try{g=await reverse(gps.lat,gps.lon)}catch(e){}
+const order={id,customer:{name,contact,address:g.display_name||"GPS LOCATION",gps:{lat:gps.lat,lon:gps.lon,accuracy:gps.accuracy,display:g.display_name||"GPS LOCATION"}},items:cart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value,status:"NEW",createdAt:serverTimestamp()};
+await setDoc(doc(collection(db,"orders"),id),order);$("sendStatus").innerHTML=`<span class="gpsok">✅ ORDER SENT TO MHAC ADMIN</span><br>${id}`;cart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,1200)}catch(e){$("sendStatus").textContent="❌ Order failed: "+e.message;$("sendBtn").disabled=false}}
+renderStores();renderCart();
 </script></body></html>
