@@ -2,38 +2,55 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MHAC DELIVERY — ADMIN APP</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}
 header{background:#111;color:#fff;text-align:center;padding:20px 12px;border-bottom:5px solid #e21d25}
-header h1{margin:0;font-size:25px}main{max-width:900px;margin:auto;padding:15px}
-.card{background:#fff;border:2px solid #ddd;border-radius:16px;padding:15px;margin:12px 0}
-input,select{width:100%;padding:12px;margin:5px 0;border:1.5px solid #bbb;border-radius:9px;font-size:15px}
-button{border:0;border-radius:10px;padding:12px 15px;background:#111;color:#fff;font-weight:900}
-.red{background:#e21d25}.green{background:#138a36}.blue{background:#1769aa}
+header h1{margin:0;font-size:25px}header p{margin:8px 0 0}
+main{max-width:920px;margin:auto;padding:15px}.card{background:#fff;border:2px solid #ddd;border-radius:17px;padding:16px;margin:12px 0}
+input,select{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:11px;font-size:16px}
+button{border:0;border-radius:11px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}
+button.red{background:#e21d25}button.blue{background:#1769aa}button:disabled{opacity:.55}
 .row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none}
-.status{font-size:13px;color:#666}.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#eee;font-weight:900;font-size:12px}
-.items{background:#f7f7f7;padding:10px;border-radius:10px}.success{color:#138a36;font-weight:800}
+.status{font-size:13px;color:#666;line-height:1.4}.error{color:#b00020;font-weight:800}.success{color:#138a36;font-weight:800}
+.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900;font-size:12px}
+.items{background:#f7f7f7;border-radius:10px;padding:11px}hr{border:0;border-top:1px solid #ddd}
+.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
 </style></head><body>
-<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • RIDER ASSIGNMENT • LIVE STATUS</p></header><main>
+<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • RIDER ASSIGNMENT • LIVE STATUS</p></header>
+<main>
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2>
-<input id="email" type="email" placeholder="Admin Email"><input id="password" type="password" placeholder="Password">
-<button id="loginBtn" class="red" style="width:100%" onclick="login()">LOGIN</button>
-<p id="loginStatus" class="status">Use an account created in Firebase Authentication.</p></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0;flex:2">📋 MHAC ORDERS</h2><button onclick="logout()">LOG OUT</button></div>
-<p id="connection" class="status">Connecting to Firebase…</p></div><div id="orders"></div></div>
+<input id="email" type="email" autocomplete="username" placeholder="Admin Email">
+<input id="password" type="password" autocomplete="current-password" placeholder="Password">
+<button id="loginBtn" class="red" style="width:100%" onclick="login()">🔐 LOGIN</button>
+<p id="loginStatus" class="status">Use the email and password created in Firebase Authentication.</p></div>
+<div id="app" class="hidden"><div class="card"><div class="row">
+<h2 style="margin:0;flex:2">📋 MHAC ORDERS</h2><button onclick="logout()">LOG OUT</button></div>
+<p id="connection" class="status">Connecting…</p><p id="adminInfo" class="small"></p></div><div id="orders"></div></div>
 </main>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import{getFirestore,collection,query,orderBy,onSnapshot,doc,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot,doc,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93",RIDER_EMAIL="mhacdeliverypaniqui112021@gmail.com";let unsub=null;
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function renderOrders(arr){const x=arr.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");$("orders").innerHTML=x.length?x.map(o=>{const c=o.customer||{},items=(o.items||[]).map(i=>`<div><b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}</div>`).join(""),assigned=String(o.assignedRiderUid||"")===RIDER_UID;return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div><h2>👤 ${esc(c.name||"No name")}</h2><p>📞 ${esc(c.contact||c.phone||"")}</p><p>📍 ${esc(c.address||c.gps?.display||"")}<br>${esc(c.barangay||"")}, ${esc(c.municipality||"")}</p><div class="items">${items||"No items listed."}</div><p>Food Order: <b>${peso(o.fees?.foodOrder)}</b><br>Service Fee: <b>${peso(o.fees?.serviceFee)}</b><br>Delivery Fee: <b>${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br>2nd Store Fee: <b>${peso(o.fees?.secondStoreFee)}</b><br><strong>GRAND TOTAL: ${peso(o.fees?.total??o.total)}</strong></p><p class="status">${o.payment?"Payment: "+esc(o.payment):""}</p><hr><h3>🏍️ RIDER ASSIGNMENT</h3><select id="rider-${esc(o.id)}"><option value="">${assigned?"RIDER01 ASSIGNED":"Select Rider"}</option><option value="${RIDER_UID}">RIDER01 — ${RIDER_EMAIL}</option></select><div class="row"><button class="blue" onclick="assignRider('${esc(o.id)}')">${assigned?"🔄 RE-ASSIGN RIDER":"🏍️ ASSIGN RIDER"}</button><button onclick="changeStatus('${esc(o.id)}','PREPARING')">🍽️ PREPARING</button><button onclick="changeStatus('${esc(o.id)}','READY')">✅ READY</button></div>${o.assignedRiderUid?`<p class="success">🟢 Assigned Rider UID: ${esc(o.assignedRiderUid)}</p>`:"<p class='status'>No rider assigned yet.</p>"}</div>`}).join(""):"<div class='card'><h3>📭 No active orders</h3><p class='status'>New customer orders will appear here automatically.</p></div>"}
-async function assignRider(id){const uid=$("rider-"+id)?.value;if(!uid){alert("Please select a rider first.");return}try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:uid,assignedRider:"RIDER01",assignedRiderEmail:RIDER_EMAIL,status:"ASSIGNED",updatedAt:serverTimestamp()})}catch(e){alert("Unable to assign rider: "+e.message)}}
-async function changeStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}catch(e){alert("Unable to update order: "+e.message)}}window.assignRider=assignRider;window.changeStatus=changeStatus;
-function listen(){if(unsub)unsub();$("connection").textContent="🟡 Connecting to Firebase orders…";const q=query(collection(db,"orders"),orderBy("createdAt","desc"));unsub=onSnapshot(q,s=>{$("connection").textContent="🟢 LIVE — customer orders are updating automatically";renderOrders(s.docs.map(d=>({id:d.id,...d.data()})))},e=>$("connection").textContent="❌ Firebase error: "+e.message)}
-async function login(){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){$("loginStatus").textContent="Enter admin email and password.";return}$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{await signInWithEmailAndPassword(auth,email,password)}catch(e){$("loginStatus").textContent="Login failed: "+e.message}finally{$("loginBtn").disabled=false}}
-async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}
-onAuthStateChanged(auth,u=>{if(u){$("login").classList.add("hidden");$("app").classList.remove("hidden");listen()}else{$("app").classList.add("hidden");$("login").classList.remove("hidden")}})
+function msg(t,k="status"){$("loginStatus").className=k;$("loginStatus").textContent=t}
+function render(a){const x=a.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");if(!x.length){$("orders").innerHTML="<div class='card'><h3>📭 NO ACTIVE ORDERS</h3><p class='status'>Orders in Firestore will appear here automatically.</p></div>";return}
+$("orders").innerHTML=x.map(o=>{const c=o.customer||{},assigned=String(o.assignedRiderUid||"")===RIDER_UID;
+const items=(o.items||[]).map(i=>`<div><b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}</div>`).join("");
+return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
+<h2>👤 ${esc(c.name||"Customer")}</h2><p>📞 ${esc(c.contact||c.phone||"")}</p><p>📍 ${esc(c.address||c.gps?.display||"")}<br>${esc(c.barangay||"")}, ${esc(c.municipality||"")}</p>
+<div class="items">${items||"No items listed."}</div>
+<p>Food Order: <b>${peso(o.fees?.foodOrder)}</b><br>10% Service Fee: <b>${peso(o.fees?.serviceFee)}</b><br>Delivery Fee: <b>${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br>2nd Store Fee: <b>${peso(o.fees?.secondStoreFee)}</b><br><span class="total">GRAND TOTAL: ${peso(o.fees?.total??o.total)}</span></p>
+<p class="small">Payment: ${esc(o.payment||"Not specified")}</p><hr><h3>🏍️ RIDER</h3>
+<select id="rider_${esc(o.id)}"><option value="">${assigned?"RIDER01 is assigned":"Select rider"}</option><option value="${RIDER_UID}">RIDER01 — ${RIDER_EMAIL}</option></select>
+<div class="row"><button class="blue" onclick="assignRider('${esc(o.id)}')">🏍️ ASSIGN RIDER</button><button onclick="changeStatus('${esc(o.id)}','PREPARING')">🍽️ PREPARING</button><button onclick="changeStatus('${esc(o.id)}','READY')">✅ READY</button></div>
+<p class="${assigned?"success":"small"}">${assigned?"🟢 Assigned to RIDER01":"No rider assigned yet."}</p></div>`}).join("")}
+async function assignRider(id){const uid=$("rider_"+id)?.value;if(!uid){alert("Please select RIDER01 first.");return}try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:uid,assignedRider:"RIDER01",assignedRiderEmail:RIDER_EMAIL,status:"ASSIGNED",updatedAt:serverTimestamp()})}catch(e){alert("Rider assignment failed: "+e.message)}}
+async function changeStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}catch(e){alert("Status update failed: "+e.message)}}
+window.assignRider=assignRider;window.changeStatus=changeStatus;
+function listen(){if(unsub)unsub();$("connection").textContent="🟡 Connecting to Firestore orders…";unsub=onSnapshot(collection(db,"orders"),s=>{$("connection").textContent="🟢 LIVE — Firestore orders connected";render(s.docs.map(d=>({id:d.id,...d.data()})))},e=>$("connection").textContent="❌ Firestore error: "+e.message)}
+async function login(){const e=$("email").value.trim(),p=$("password").value;if(!e||!p){msg("Enter your Firebase Authentication email and password.","error");return}$("loginBtn").disabled=true;msg("🔄 Signing in to Firebase…");try{await signInWithEmailAndPassword(auth,e,p);msg("✅ Login successful. Opening Admin Dashboard…","success")}catch(x){let m=x.code||x.message;if(x.code==="auth/invalid-credential")m="Incorrect email or password. Check Firebase Authentication.";else if(x.code==="auth/user-not-found")m="This email is not registered in Firebase Authentication.";else if(x.code==="auth/wrong-password")m="Incorrect password.";else if(x.code==="auth/invalid-email")m="The email address is invalid.";else if(x.code==="auth/too-many-requests")m="Too many attempts. Please wait and try again.";msg("❌ Login failed: "+m,"error")}finally{$("loginBtn").disabled=false}}
+async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}window.login=login;window.logout=logout;
+onAuthStateChanged(auth,u=>{if(u){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminInfo").textContent="Signed in: "+(u.email||u.uid);listen()}else{$("app").classList.add("hidden");$("login").classList.remove("hidden");$("adminInfo").textContent=""}});
 </script></body></html>
