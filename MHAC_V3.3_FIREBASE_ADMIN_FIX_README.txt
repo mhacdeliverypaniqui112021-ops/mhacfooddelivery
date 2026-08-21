@@ -1,0 +1,18 @@
+MHAC DELIVERY V3.3 — ADMIN FIREBASE ORDER FIX
+
+Replace ONLY the current admin.html with MHAC_ADMIN_V3.3_FIREBASE_FIXED.html.
+
+This version keeps the current Admin interface, login, business hours, rider manager,
+and menu manager, but starts the Firestore orders listener immediately after successful
+admin authentication and displays the actual Firebase error instead of staying on
+"Loading…" forever.
+
+Customer GPS/order code is NOT changed.
+Rider app is NOT changed.
+
+After upload:
+1. Open the Admin app.
+2. Login with the existing admin account.
+3. Go to INCOMING ORDERS.
+4. It should show the order already present in Firestore.
+5. Send another customer test order to verify live updates.
