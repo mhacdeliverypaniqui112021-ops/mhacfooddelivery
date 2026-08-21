@@ -1,22 +1,21 @@
-MHAC DELIVERY V3.4
+MHAC DELIVERY V3.4 RIDER REPLACEMENT
+======================================
 
-APPS
-- Customer: /customer/
-- Admin: /admin/
-- Rider: /rider/
-- Root / redirects to /customer/ so GitHub Pages opens the customer app by default.
+Replace ONLY the existing:
+rider/index.html
 
-V3.4 CHANGES
-- Stronger, longer Admin new-order ringtone and Rider assignment ringtone. Tap ENABLE SOUND once on each device/browser.
-- New rider flow: Google/Gmail sign-in -> PENDING -> Admin APPROVE/REJECT -> approved rider can receive assignments.
-- Admin can set the rider nickname during approval.
-- Existing email/password rider accounts remain supported if they already have an approved rider profile.
-- Customer GPS, delivery fee, Google customer login, ordering hours, menu manager, and existing Firebase order flow are preserved.
+Do not delete Customer, Admin, or Firebase rules.
 
-FIREBASE
-Project: mhac-delivery-53099
-Admin: mhacdeliverypaniqui112021@gmail.com
-Firestore rules include riderApplications/{uid}. Publish firestore.rules before testing new rider approval.
+This rider page adds:
+- Google/Gmail sign-in for new riders
+- Pending approval through riderApplications/{uid}
+- Admin-approved rider access through riders/{uid}
+- Existing email/password legacy login retained
+- Stronger/longer assignment ringtone
+- Existing assigned-order Firebase flow
+- Existing nickname lookup
+- Existing business-hours lock
+- Existing order status updates and navigation
 
-IMPORTANT
-Browser audio requires a user tap to enable sound. Web pages cannot guarantee ringtone when the browser/app is completely closed or the device is muted.
+After upload, hard-refresh the Rider App and test:
+Google Gmail -> PENDING APPROVAL -> Admin approves -> Rider reload/login -> assigned order.
