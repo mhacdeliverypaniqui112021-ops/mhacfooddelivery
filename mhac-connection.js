@@ -1,29 +1,98 @@
+/* MHAC DELIVERY V3.3 — Firebase shared order bridge
+   Keeps the existing customer/GPS/localStorage system intact.
+   Requires Firebase Web SDK compat scripts OR an existing Firebase config script.
+*/
 (function(){
-const V="https://www.gstatic.com/firebasejs/10.14.1/";
-function load(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>no(Error("Firebase SDK load failed"));document.head.appendChild(s)})}
-let ready=null;
-async function ensureReady(){
- if(ready)return ready;
- ready=(async()=>{
-  if(!window.firebase){await load(V+"firebase-app-compat.js");await load(V+"firebase-auth-compat.js");await load(V+"firebase-database-compat.js")}
-  const c=window.MHAC_FIREBASE_CONFIG;
-  if(!c||String(c.apiKey||"").startsWith("PASTE_"))throw Error("Firebase config is not filled in.");
-  if(!firebase.apps.length)firebase.initializeApp(c);
-  if(!firebase.auth().currentUser)await firebase.auth().signInAnonymously();
-  return {db:firebase.database(),auth:firebase.auth()};
- })();
- return ready;
-}
-function path(){return window.MHAC_CONNECTION?.ordersPath||"mhac/orders"}
-function copy(x){return JSON.parse(JSON.stringify(x??null))}
-async function createOrder(order){const {db}=await ensureReady();const o=copy(order);o.id=o.id||("MHAC-"+Date.now());o.createdAt=o.createdAt||new Date().toISOString();o.status=o.status||"NEW";o.assignedRider=o.assignedRider||"";await db.ref(path()+"/"+o.id).set(o);return o}
-async function updateOrder(id,patch){const {db}=await ensureReady();if(!id)throw Error("Missing order id.");await db.ref(path()+"/"+id).update(copy(patch)||{})}
-async function getOrder(id){const {db}=await ensureReady();const s=await db.ref(path()+"/"+id).once("value");return s.exists()?s.val():null}
-function watchOrders(cb){
- let stopped=false,ref=null;
- ensureReady().then(({db})=>{if(stopped)return;ref=db.ref(path());ref.on("value",s=>{const d=s.val()||{};const a=Object.values(d).filter(x=>x&&x.id).sort((x,y)=>String(y.createdAt).localeCompare(String(x.createdAt)));cb(a,null)})}).catch(e=>cb([],e));
- return ()=>{stopped=true;if(ref)ref.off()};
-}
-async function testConnection(){const {db,auth}=await ensureReady();const p={ok:true,at:new Date().toISOString(),uid:auth.currentUser?.uid||null};await db.ref(path()+"/_connection_test").set(p);return p}
-window.MHACShared=Object.freeze({ensureReady,createOrder,updateOrder,getOrder,watchOrders,testConnection});
+  "use strict";
+  const PROJECT_ID = "mhac-delivery-53099";
+  let appReady = null;
+
+  function cfg(){
+    return window.MHAC_FIREBASE_CONFIG ||
+           window.firebaseConfig ||
+           window.mhacFirebaseConfig ||
+           null;
+  }
+
+  function loadScript(src){
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement("script");
+      s.src=src; s.async=true;
+      s.onload=resolve; s.onerror=()=>reject(new Error("Failed to load "+src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureFirebase(){
+    if(appReady) return appReady;
+    appReady=(async()=>{
+      if(!window.firebase) {
+        await loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+        await loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js");
+        await loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js");
+      } else if(!firebase.firestore) {
+        await loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js");
+      }
+      if(!firebase.apps.length){
+        const c=cfg();
+        if(!c) throw new Error("MHAC Firebase config not found. Upload mhac-firebase-config.js and load it before this file.");
+        firebase.initializeApp(c);
+      }
+      const app=firebase.app();
+      if(app.options.projectId && app.options.projectId!==PROJECT_ID){
+        console.warn("MHAC V3.3: Firebase project is "+app.options.projectId+", expected "+PROJECT_ID);
+      }
+      return app;
+    })();
+    return appReady;
+  }
+
+  async function currentUser(){
+    await ensureFirebase();
+    return new Promise(resolve=>{
+      const u=firebase.auth().currentUser;
+      if(u) return resolve(u);
+      const off=firebase.auth().onAuthStateChanged(x=>{off();resolve(x||null)});
+      setTimeout(()=>{try{off()}catch(e){};resolve(firebase.auth().currentUser||null)},4000);
+    });
+  }
+
+  async function createOrder(order){
+    await ensureFirebase();
+    const user=await currentUser();
+    const enriched=JSON.parse(JSON.stringify(order||{}));
+    enriched.customer = enriched.customer || {};
+    if(user){
+      enriched.customer.uid=user.uid;
+      enriched.customer.email=user.email||"";
+      enriched.customer.displayName=user.displayName||"";
+    }
+    enriched.source="CUSTOMER";
+    enriched.status=enriched.status||"NEW";
+    enriched.assignedRider=enriched.assignedRider||"";
+    enriched.updatedAt=new Date().toISOString();
+    enriched.createdAt=enriched.createdAt||new Date().toISOString();
+    const ref=firebase.firestore().collection("orders").doc(enriched.id || ("MHAC-"+Date.now()));
+    await ref.set(enriched,{merge:true});
+    return ref;
+  }
+
+  async function watchOrders(callback){
+    await ensureFirebase();
+    return firebase.firestore().collection("orders")
+      .orderBy("createdAt","desc")
+      .onSnapshot(snap=>{
+        callback(snap.docs.map(d=>({id:d.id,...d.data()})));
+      },err=>{
+        console.error("MHAC V3.3 order listener:",err);
+        if(callback) callback([],err);
+      });
+  }
+
+  window.MHACShared = window.MHACShared || {};
+  window.MHACShared.ensureFirebase=ensureFirebase;
+  window.MHACShared.createOrder=createOrder;
+  window.MHACShared.watchOrders=watchOrders;
+  window.MHACShared.currentUser=currentUser;
+  window.MHACShared.projectId=PROJECT_ID;
 })();

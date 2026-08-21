@@ -1,0 +1,60 @@
+MHAC DELIVERY V3.3 — FIREBASE ORDER CONNECTION PATCH
+
+GOAL
+Customer order -> Firebase orders -> Admin live order list -> existing Rider app.
+
+WHAT IS FIXED
+The current customer index.html saves orders only to localStorage.
+The current admin reads only localStorage.
+This patch keeps that local safety copy but also sends the same order to Firestore.
+
+DO NOT REPLACE YOUR LOCKED CUSTOMER INDEX.HTML.
+DO NOT TOUCH THE GPS / DELIVERY-FEE CODE.
+
+FILES
+1. mhac-firebase-config.js
+2. mhac-connection.js
+3. mhac-admin-firebase.js
+
+STEP 1 — FIREBASE CONFIG
+Use the SAME Firebase Web App config that your working Customer/Rider app already uses.
+Put it into mhac-firebase-config.js.
+
+STEP 2 — CUSTOMER index.html
+Inside <head>, BEFORE the existing customer code, add:
+<script src="mhac-firebase-config.js"></script>
+<script src="mhac-connection.js"></script>
+
+No other customer code needs to be replaced.
+The bridge detects placeOrder() and sends the order to Firestore while preserving localStorage.
+
+STEP 3 — ADMIN page
+Inside admin/index.html (or the actual admin HTML you are using), BEFORE the admin code, add:
+<script src="mhac-firebase-config.js"></script>
+<script src="mhac-connection.js"></script>
+<script src="mhac-admin-firebase.js"></script>
+
+The bridge writes Firebase orders into the admin's existing mhacOrders local cache and calls the existing renderOrders().
+
+STEP 4 — FIRESTORE
+Collection must be:
+orders
+
+The document ID is the MHAC order ID, e.g. MHAC-123456789.
+
+STEP 5 — TEST
+1. Open Customer on phone A.
+2. Open Admin on phone B.
+3. Keep both pages open.
+4. Customer signs in with Google.
+5. Add one food.
+6. Allow GPS.
+7. Calculate delivery fee.
+8. Send order.
+9. Admin Incoming Orders should update automatically within a few seconds.
+10. Then assign the order to the rider.
+
+IMPORTANT
+If Admin stays at "Loading..." after this patch, the most likely remaining issue is Firestore Rules or the Firebase config file being different from the working Customer/Rider project.
+
+The existing Rider app is already designed around the Firestore orders collection, so this patch does not replace the rider interface.
