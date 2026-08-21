@@ -1,77 +1,23 @@
-MHAC DELIVERY V3.2
-===================
+MHAC DELIVERY V3.3 — CUSTOMER LOGIN + BUSINESS HOURS
 
-Built from the working V3.1 GPS-only core.
+APPS INCLUDED
+1. customer/index.html — Google/Gmail customer login, live menu, GPS delivery fee, ordering hours.
+2. admin/index.html — Admin login, live orders, menu manager, rider nickname manager, ringtone, business hours.
+3. rider/index.html — Rider Firebase login, nickname, assigned orders, ringtone, business-hours lock.
+4. firestore.rules — security rules for customer/admin/rider access.
 
-INCLUDED
---------
-customer/index.html
-admin/index.html
-rider/index.html
-firestore.rules
-README.txt
+DEFAULT BUSINESS HOURS
+09:00 AM to 08:00 PM (Philippine time/device local time). Admin can change this before closing.
 
-V3.2 FEATURES
---------------
-1. Customer GPS-only checkout:
-   - Customer Name + Contact Number
-   - Allow GPS
-   - Calculate actual driving distance
-   - Existing fee formula: first KM ₱40, succeeding KM +₱10
-   - 10% service fee
-   - Maximum 2 stores
-   - Second store +₱5
+CUSTOMER SECURITY
+Customer must use Google sign-in before ordering. The order stores the authenticated Google UID and email.
 
-2. Admin Menu Manager:
-   - Add/remove stores
-   - Edit store name/icon
-   - Edit categories
-   - Add/remove foods
-   - Edit food prices
-   - Available / Unavailable toggle
-   - Add/remove drinks and add-ons
-   - Changes are stored in Firestore settings/menu and customer reads the live menu
+RINGTONES
+Admin and Rider must tap ENABLE SOUND once on the device/browser. Browser audio cannot be guaranteed when the webpage is completely closed.
 
-3. Admin order ringtone:
-   - Tap ENABLE SOUND once while Admin app is open
-   - New orders beep
-   - Rider assignment beep
+IMPORTANT
+This version intentionally locks customer ordering at closing time. Admin/Rider screens also lock at closing as requested. If riders are still delivering after closing, change the closing time later than the expected last delivery so an active delivery is not interrupted.
 
-4. Rider ringtone:
-   - Tap ENABLE SOUND once while Rider app is open
-   - New assigned orders beep
-   - Rider nickname is displayed instead of Gmail in the Admin assignment dropdown
-
-5. Rider profile:
-   Firestore collection: riders
-   Document ID = Firebase Authentication UID
-   Fields:
-     nickname
-     email
-
-IMPORTANT FIREBASE SETUP
--------------------------
-A. Firebase Authentication:
-   - Email/Password must be enabled for Admin and Rider.
-   - Anonymous Authentication must be enabled for the Customer App.
-B. Firestore:
-   - Use the included firestore.rules as a starting point.
-   - These rules are intentionally simple for testing. Before public production use, tighten admin/rider write permissions.
-C. Rider UID currently used:
-   qDZyQxBwWsQi32jSo0EpFwct0z93
-
-D. Menu document:
-   settings/menu
-
-UPLOAD
-------
-Upload each app's index.html to its corresponding GitHub Pages location.
-Do not overwrite the working V3.1 backup.
-
-AUDIO NOTE
-----------
-Browser ringtone works while the app page is open and after the user has tapped ENABLE SOUND. A normal browser page cannot guarantee sound when the app is completely closed/backgrounded. For true background push notifications, Firebase Cloud Messaging/service-worker setup is needed.
-
-LOCKING
--------
-Keep the existing V3.1 LOCKED ZIP as the rollback copy. Test V3.2 first before replacing the live working build.
+FIREBASE
+Project: mhac-delivery-53099
+Admin email used in security rules: mhacdeliverypaniqui112021@gmail.com
