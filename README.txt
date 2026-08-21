@@ -1,46 +1,22 @@
-MHAC DELIVERY V3.3 — STRONG RINGTONE PATCH
+MHAC DELIVERY V3.4
 
-PURPOSE
-- Strong repeating notification sound for Admin when a NEW order arrives.
-- Strong repeating notification sound for Rider when a NEW order is assigned.
-- Sound stops automatically after the notification cycle.
-- Existing customer GPS, customer login, Admin orders, and Rider login are not changed.
+APPS
+- Customer: /customer/
+- Admin: /admin/
+- Rider: /rider/
+- Root / redirects to /customer/ so GitHub Pages opens the customer app by default.
 
-FILES
-1. mhac-ringtone-v33.js
-2. ADMIN-RING-HOOK.txt
-3. RIDER-RING-HOOK.txt
+V3.4 CHANGES
+- Stronger, longer Admin new-order ringtone and Rider assignment ringtone. Tap ENABLE SOUND once on each device/browser.
+- New rider flow: Google/Gmail sign-in -> PENDING -> Admin APPROVE/REJECT -> approved rider can receive assignments.
+- Admin can set the rider nickname during approval.
+- Existing email/password rider accounts remain supported if they already have an approved rider profile.
+- Customer GPS, delivery fee, Google customer login, ordering hours, menu manager, and existing Firebase order flow are preserved.
 
-INSTALL
-A. Upload mhac-ringtone-v33.js to the same GitHub Pages root used by the app.
-B. In ADMIN HTML, add:
-   <script src="mhac-ringtone-v33.js"></script>
-   after the existing Firebase/admin scripts.
-C. In RIDER HTML, add:
-   <script src="mhac-ringtone-v33.js"></script>
-   after the existing Firebase/rider scripts.
-D. Add an ENABLE SOUND button to both apps:
-   <button onclick="MHACSound.enable()">🔔 ENABLE SOUND</button>
+FIREBASE
+Project: mhac-delivery-53099
+Admin: mhacdeliverypaniqui112021@gmail.com
+Firestore rules include riderApplications/{uid}. Publish firestore.rules before testing new rider approval.
 
-FIREBASE LISTENER
-The existing app already receives orders/assignments. The ringtone must be
-called only when a genuinely new order/assignment is detected:
-   MHACSound.ring("admin");
-or
-   MHACSound.ring("rider");
-
-BROWSER LIMIT
-The Admin/Rider device must tap ENABLE SOUND once because mobile browsers
-block automatic audio before a user gesture. The page also needs to remain
-open/active enough for the browser to execute JavaScript. This patch does
-not attempt to bypass browser security restrictions.
-
-TEST
-1. Open Admin.
-2. Tap ENABLE SOUND.
-3. Leave Admin open.
-4. Place a customer order.
-5. Admin should ring strongly.
-6. Open Rider and tap ENABLE SOUND.
-7. Assign that order to the rider.
-8. Rider should ring strongly.
+IMPORTANT
+Browser audio requires a user tap to enable sound. Web pages cannot guarantee ringtone when the browser/app is completely closed or the device is muted.

@@ -1,2 +1,2 @@
-MHAC DELIVERY V3.3
-Customer Google Login + Business Hours + Menu Manager + Ringtones + Rider Nicknames + GPS
+MHAC DELIVERY V3.4 — LOUD RINGTONES + ADMIN RIDER APPROVAL + GOOGLE RIDER LOGIN
+Business hours default: 09:00–19:00 device local time.
