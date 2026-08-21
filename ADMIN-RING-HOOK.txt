@@ -1,0 +1,10 @@
+/* ADMIN HOOK
+   1. Include mhac-ringtone-v33.js after your Firebase/admin scripts.
+   2. Put an ENABLE SOUND button somewhere in Admin:
+      <button onclick="MHACSound.enable()">🔔 ENABLE SOUND</button>
+   3. In the existing Firebase incoming-order listener, after detecting a
+      genuinely NEW order, call:
+         MHACSound.ring("admin");
+
+   IMPORTANT: only call ring for a new document/order, not every snapshot.
+*/

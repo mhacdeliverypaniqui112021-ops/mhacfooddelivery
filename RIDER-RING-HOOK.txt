@@ -1,0 +1,10 @@
+/* RIDER HOOK
+   1. Include mhac-ringtone-v33.js after your Firebase/rider scripts.
+   2. Put an ENABLE SOUND button somewhere in Rider:
+      <button onclick="MHACSound.enable()">🔔 ENABLE SOUND</button>
+   3. In the existing assigned-order listener, when a NEW assignment is
+      detected for this rider, call:
+         MHACSound.ring("rider");
+
+   IMPORTANT: only call ring when the assignment changes to a new order.
+*/
