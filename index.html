@@ -1,27 +1,102 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY</title><style>
-body{font-family:Arial;margin:0;background:#f5f5f5}header{background:#111;color:#fff;text-align:center;padding:20px;border-bottom:4px solid #e21d25}main{max-width:700px;margin:auto;padding:15px}.card,.food{background:#fff;padding:15px;border-radius:15px;margin:10px 0;border:2px solid #ddd}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{padding:11px;border:0;border-radius:9px;background:#111;color:#fff;font-weight:800}.store,.red{width:100%}.red{background:#e21d25}.modal{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto}.panel{background:#fff;border-radius:15px;padding:15px;max-width:600px;margin:auto}input,select{width:100%;padding:11px;margin:5px 0;box-sizing:border-box;border-radius:8px;border:1px solid #aaa}.row{display:flex;gap:7px;align-items:center}.row>*{flex:1}.ok{color:#138a36;font-weight:900}.total{font-size:20px;font-weight:900}</style></head><body>
-<header><h1>MHAC DELIVERY</h1><b>FAST • SAFE • ON TIME</b></header><main>
-<div class=card><b>DELIVERY RATE</b><br>1 KM = ₱40 • SUCCEEDING KM +₱10<br><small>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</small></div>
-<h2>CHOOSE FOOD STORE</h2><div id=stores class=stores></div><div class=card><h2>🛒 CART <span id=count>0</span></h2><div id=cart>No items yet.</div><div id=totals></div><button id=checkout class=red disabled>CHECKOUT / PLACE ORDER</button></div></main>
-<div id=modal class=modal><div class=panel><button onclick="modal.style.display='none'">CLOSE</button><div id=menu></div></div></div>
-<div id=check class=modal><div class=panel><button onclick="check.style.display='none'">CLOSE</button><h2>CHECKOUT</h2><div id=summary></div><input id=name placeholder="Customer Name"><input id=contact placeholder="Contact Number">
-<div class=card><b>📍 GPS DELIVERY LOCATION</b><p id=gpsmsg>GPS not yet allowed.</p><button id=gps class=red>📍 ALLOW GPS LOCATION</button><button id=fee class=red disabled>📍 CALCULATE DELIVERY FEE</button><p id=feemsg></p></div>
-<select id=payment><option>Cash on Delivery</option><option>GCash</option></select><button id=send class=red>📤 SEND ORDER</button><p id=sendmsg></p></div></div>
-<script type=module>
-import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";import{getFirestore,collection,doc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2"};
-const db=getFirestore(initializeApp(firebaseConfig)),origin={lat:15.66789,lon:120.57765},S=[["Jollibee","🍗",[["Chickenjoy 1pc",99],["Chickenjoy 2pc",159],["Chickenjoy with Rice",129]]],["McDo","🍟",[["1pc Chicken McDo",99],["Burger Solo",89]]],["Mang Inasal","🍗",[["PM1 Chicken",109]]],["KFC","🍗",[["1pc Chicken Meal",109]]]];
-let cart=[],gpsData=null,km=null,df=null;const $=x=>document.getElementById(x),peso=n=>"₱"+Number(n||0).toFixed(2);
-S.forEach((s,i)=>stores.innerHTML+=`<button class=store onclick="openStore(${i})">${s[1]} ${s[0]}</button>`);
-window.openStore=i=>{modal.style.display="block";menu.innerHTML="<h2>"+S[i][1]+" "+S[i][0]+"</h2>"+S[i][2].map((f,j)=>`<div class=food><b>${f[0]}</b> — ${peso(f[1])}<br><button onclick="add(${i},${j})">SELECT & ADD</button></div>`).join("")};
-window.add=(si,fi)=>{let sn=S[si][0],used=[...new Set(cart.map(x=>x.store))];if(!used.includes(sn)&&used.length>=2)return alert("Maximum 2 stores per order.");let f=S[si][2][fi],x=cart.find(x=>x.store==sn&&x.name==f[0]);x?x.qty++:cart.push({store:sn,name:f[0],price:f[1],qty:1});render();modal.style.display="none"};
-window.change=(i,d)=>{cart[i].qty+=d;if(cart[i].qty<1)cart.splice(i,1);render()};
-function render(){count.textContent=cart.reduce((a,x)=>a+x.qty,0);checkout.disabled=!cart.length;cart.innerHTML=cart.map((x,i)=>`<div class=food><b>${x.store}</b><br>${x.name} ×${x.qty}<div class=row><button onclick="change(${i},-1)">−</button><button onclick="change(${i},1)">+</button><b>${peso(x.price*x.qty)}</b></div></div>`).join("")||"No items yet.";let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0;totals.innerHTML=`Food: ${peso(sub)}<br>Service: ${peso(sf)}<br>Delivery: ${df==null?"—":peso(df)}<br>2nd Store: ${peso(sec)}<br><span class=total>Total: ${peso(sub+sf+sec+(df||0))}</span>`}
-checkout.onclick=()=>{check.style.display="block";summary.innerHTML=cart.map(x=>`${x.store} — ${x.name} ×${x.qty}`).join("<br>")};
-function feeFor(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
-async function route(lat,lon){let r=await fetch(`https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${lon},${lat}?overview=false`),j=await r.json();if(j.code!="Ok")throw Error("Route unavailable");return j.routes[0].distance/1000}
-gps.onclick=()=>navigator.geolocation.getCurrentPosition(p=>{gpsData={lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy};gpsmsg.innerHTML="<span class=ok>✅ GPS LOCATION DETECTED</span><br>Accuracy: "+Math.round(p.coords.accuracy)+"m";fee.disabled=false},()=>gpsmsg.textContent="❌ Allow location permission and retry.",{enableHighAccuracy:true,timeout:20000,maximumAge:0});
-fee.onclick=async()=>{fee.disabled=true;feemsg.textContent="📍 Calculating actual driving distance…";try{km=await route(gpsData.lat,gpsData.lon);df=feeFor(km);feemsg.innerHTML=`<span class=ok>✅ ${km.toFixed(2)} km • Delivery Fee ${peso(df)}</span>`;render()}catch(e){feemsg.textContent="❌ Route unavailable. Retry."}fee.disabled=false};
-send.onclick=async()=>{if(!name.value.trim()||!contact.value.trim())return alert("Complete name and contact.");if(!gpsData||km==null)return alert("Allow GPS and calculate delivery fee first.");let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0,id="MHAC-"+Date.now();send.disabled=true;sendmsg.textContent="Sending to Firebase…";try{await setDoc(doc(collection(db,"orders"),id),{id,customer:{name:name.value.trim(),contact:contact.value.trim(),address:"GPS LOCATION",gps:gpsData},items:cart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee:df,distanceKm:km,secondStoreFee:sec,total:sub+sf+df+sec},payment:payment.value,status:"NEW",assignedRiderUid:"",createdAt:serverTimestamp()});sendmsg.innerHTML="<span class=ok>✅ ORDER SENT TO ADMIN</span>";cart=[];km=df=null;render()}catch(e){sendmsg.textContent="❌ "+e.message;send.disabled=false}};
-render();
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC DELIVERY</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}
+header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}
+.rate{margin:14px auto 8px;max-width:680px;padding:13px;border:2px solid #222;border-radius:15px;text-align:center}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px;font-size:13px;font-weight:800}
+.reminder{margin-top:9px;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff8e6;font-size:12px;line-height:1.45;text-align:left}
+.area{max-width:680px;margin:8px auto;padding:9px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800;line-height:1.45}
+.wrap{max-width:680px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}
+.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}
+.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.cart h2{font-size:20px;margin:0 0 8px}
+.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0 5px}.row{padding:8px 0;border-bottom:1px solid #eee}
+.qty{display:flex;align-items:center;gap:8px;margin-top:5px}.qty button,.choice button,.back{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}
+.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}
+.modal{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:10}.panel{background:#fff;border-radius:17px;padding:16px;max-width:600px;margin:auto}
+.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}
+.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
+.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}
+.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:560px;margin:20px auto 40px}
+.checkout-panel input,.checkout-panel textarea,.checkout-panel select{width:100%;padding:10px;margin:5px 0;border:1.5px solid #aaa;border-radius:8px;font-size:15px}
+.gpsrow{display:flex;gap:7px}.gpsrow button{flex:1;padding:9px;border:0;border-radius:8px;background:#111;color:#fff;font-weight:800}
+.status{font-size:12px;color:#666;margin:5px 0}.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
+.location-note{margin:7px 0;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff;font-size:12px;line-height:1.45}
+.location-note b{font-size:13px}.success{color:#138a36;font-weight:900}.error{color:#b00020;font-weight:900}
+</style></head><body>
+<header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
+<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p>
+<div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div>
+<main class="wrap"><div class="title">CHOOSE FOOD STORE</div>
+<div id="storeLimitNote" class="area" style="margin-bottom:10px">🍽️ You may order from a maximum of 2 stores per order.</div>
+<div id="stores" class="stores"></div>
+<section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2>
+<div id="storeCount" class="small" style="font-weight:900"></div><div id="cart">No items yet.</div>
+<div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button>
+<div style="font-size:12px;text-align:center;margin-top:6px;color:#555">Actual delivery fee is displayed in YOUR CART after address calculation.</div></section></main>
+
+<div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button class="close" onclick="closeCheckout()">CLOSE</button>
+<h2>CHECK / REVIEW ORDER</h2><div style="font-weight:900;margin:8px 0">🛒 ORDERED FOODS</div><div id="orderSummary" style="background:#f7f7f7;padding:10px;border-radius:10px"></div>
+<div id="checkoutTotals" style="margin:10px 0;padding:12px;border:2px solid #222;border-radius:10px"></div>
+<h3 style="margin-bottom:5px">👤 CUSTOMER INFORMATION</h3>
+<input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
+<select id="municipality"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
+<select id="barangay"><option value="">Select Barangay</option></select>
+<div class="location-note">📍 <b>GPS LOCATION</b><br>Allow GPS to automatically detect the customer location. Municipality and Barangay can be checked before sending.</div>
+<div class="gpsrow"><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button></div>
+<div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status" style="display:none;font-size:14px;font-weight:700"></div>
+<div id="locationHelp" class="status">💡 Step 1: Allow GPS. Step 2: Check the detected location. Step 3: Calculate delivery fee.</div>
+<div class="gpsrow"><button id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button></div>
+<div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div>
+<select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status" style="text-align:center"></div>
+</div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {getFirestore,collection,doc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+const firebaseConfig={
+apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
+authDomain:"mhac-delivery-53099.firebaseapp.com",
+projectId:"mhac-delivery-53099",
+storageBucket:"mhac-delivery-53099.firebasestorage.app",
+messagingSenderId:"878081137607",
+appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
+measurementId:"G-7NZEK618YC"};
+const db=getFirestore(initializeApp(firebaseConfig));
+const AREAS={
+PANIQUI:["Abogado","Acocolao","Aduas","Apulid","Balaoang","Barang","Brillante","Burgos","Cabayaoasan","Canan","Carino","Cayanga","Colibangbang","Coral","Dapdap","Estacion","Mabilang","Manaois","Matalapitap","Nagmisaan","Nancamarinan","Nipaco","Patalan","Poblacion Norte","Poblacion Sur","Rang-ayan","Salumague","Samput","San Carlos","San Isidro","San Juan de Milla","Santa Ines","Sinigpit","Tablang","Ventenilla"],
+MONCADA:["Ablang-Sapang","Aringin","Atencio","Banaoang East","Banaoang West","Baquero Norte","Baquero Sur","Burgos","Calamay","Calapan","Camangaan East","Camangaan West","Camposanto 1 - Norte","Camposanto 1 - Sur","Camposanto 2","Capaoayan","Lapsing","Mabini","Maluac","Poblacion 1","Poblacion 2","Poblacion 3","Poblacion 4","Rizal","San Juan","San Julian","San Leon","San Pedro","San Roque","Santa Lucia East","Santa Lucia West","Santa Maria","Santa Monica","Tubectubang","Tolega Norte","Tolega Sur","Villa"],
+RAMOS:["Coral-Iloco","Guiteb","Pance","Poblacion Center","Poblacion North","Poblacion South","San Juan","San Raymundo","Toledo"],
+GERONA:["Abagon","Amacalan","Apsayan","Ayson","Bawa","Buenlag","Bularit","Calayaan","Carbonel","Cardona","Caturay","Danzo","Dicolor","Don Basilio","Luna","Mabini","Magaspac","Malayep","Matapitap","Matayuncab","New Salem","Oloybuaya","Padapada","Parsolingan","Pinasling","Plastado","Poblacion 1","Poblacion 2","Poblacion 3","Quezon","Rizal","Salapungan","San Agustin","San Antonio","San Bartolome","San Jose","Santa Lucia","Santiago","Sembrano","Singat","Sulipa","Tagumbao","Tangcaran","Villa Paz"],
+PURA:["Balite","Buenavista","Cadanglaan","Estipona","Linao","Maasin","Matindeg","Maungib","Naya","Nilasin 1st","Nilasin 2nd","Poblacion 1","Poblacion 2","Poblacion 3","Poroc","Singat"],
+ANAO:["Baguindoc","Bantog","Campos","Carmen","Casili","Don Ramon","Hernando","Poblacion","Rizal","San Francisco East","San Francisco West","San Jose North","San Jose South","San Juan","San Roque","Santo Domingo","Sinense","Suaverdez"],
+NAMPICUAN:["Alemania","Ambasador Alzate Village","Cabaducan East","Cabaducan West","Cabawangan","East Central Poblacion","Edy","Maeling","Mayantoc","Medico","Monic","North Poblacion","Northwest Poblacion","Estacion","West Poblacion","Recuerdo","South Central Poblacion","Southeast Poblacion","Southwest Poblacion","Tony","West Central Poblacion"]};
+const STORES=[
+["Jollibee","🍗",[["Chickenjoy 1pc",99],["Chickenjoy 2pc",159],["Chickenjoy with Rice",129]]],
+["McDo","🍟",[["1pc Chicken McDo",99],["Burger Solo",89]]],
+["Mang Inasal","🍗",[["PM1 Chicken",109]]],
+["KFC","🍗",[["1pc Chicken Meal",109]]]];
+let cart=[],gpsLat=null,gpsLon=null,gpsAccuracy=null,distanceKm=null,deliveryFee=null;
+const $=id=>document.getElementById(id),peso=n=>"₱"+Number(n||0).toFixed(2);
+function renderStores(){$("stores").innerHTML=STORES.map((s,i)=>`<button class="store" onclick="openStore(${i})">${s[1]} ${s[0]}</button>`).join("")}
+window.openStore=i=>{$("menuBody").innerHTML=`<button class="back" onclick="closeMenu()">← Stores</button><h2>${STORES[i][1]} ${STORES[i][0]}</h2>`+STORES[i][2].map((f,j)=>`<div class="food"><h3>${f[0]}</h3><b>${peso(f[1])}</b><div class="choice"><span>No Drink</span><button onclick="addFood(${i},${j})">SELECT & ADD</button></div></div>`).join("");$("menuModal").style.display="block"};
+window.addFood=(si,fi)=>{let store=STORES[si][0],used=[...new Set(cart.map(x=>x.store))];if(!used.includes(store)&&used.length>=2){$("storeLimitNote").innerHTML="⚠️ <b>2 STORES MAXIMUM</b> — Remove one store before choosing another.";return}let f=STORES[si][2][fi],x=cart.find(x=>x.store===store&&x.name===f[0]);x?x.qty++:cart.push({store,name:f[0],choice:"No Drink",price:f[1],qty:1});renderCart();closeMenu()};
+window.changeQty=(i,d)=>{cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()};
+function renderCart(){let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),stores=[...new Set(cart.map(x=>x.store))],sf=sub*.1,sec=stores.length>1?5:0,total=sub+sf+(deliveryFee||0)+sec;$("count").textContent=cart.reduce((a,x)=>a+x.qty,0);$("storeCount").textContent=`Stores selected: ${stores.length}/2`;$("cart").innerHTML=cart.length?stores.map(s=>`<div class="store-head">${s.toUpperCase()}</div>`+cart.map((x,i)=>x.store===s?`<div class="row"><b>${x.qty} × ${x.name}</b><br><small>${x.choice}</small><div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`:"").join("")).join(""):"No items yet.";$("totals").innerHTML=`<p>Food Order: <b>${peso(sub)}</b></p><p>10% Service Fee: <b>${peso(sf)}</b></p><p>Delivery Fee: <b>${deliveryFee==null?"—":peso(deliveryFee)}</b></p><p>2nd Store Fee: <b>${peso(sec)}</b></p><p class="total">GRAND TOTAL: ${peso(total)}</p>`;$("checkoutBtn").disabled=!cart.length}
+function loadBarangays(){let m=$("municipality").value,b=$("barangay");b.innerHTML='<option value="">Select Barangay</option>';(AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`)}
+$("municipality").addEventListener("change",loadBarangays);
+window.closeMenu=()=>$("menuModal").style.display="none";
+window.openCheckout=()=>{if(!cart.length)return;$("checkout").style.display="block";$("orderSummary").innerHTML=cart.map(x=>`<div style="padding:5px;border-bottom:1px solid #ddd"><b>${x.store.toUpperCase()}</b><br>${x.qty} × ${x.name} — ${peso(x.price*x.qty)}</div>`).join("");updateCheckoutTotals()};
+function updateCheckoutTotals(){let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+(deliveryFee||0)+sec;$("checkoutTotals").innerHTML=`Food Order: <b>${peso(sub)}</b><br>10% Service Fee: <b>${peso(sf)}</b><br>🚚 Delivery Fee: <b>${deliveryFee==null?"—":peso(deliveryFee)}</b><br>2nd Store Fee: <b>${peso(sec)}</b><br><span class="total">GRAND TOTAL: ${peso(total)}</span>`}
+window.closeCheckout=()=>$("checkout").style.display="none";
+function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
+async function route(lat,lon){const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${lon},${lat}?overview=false`);const j=await r.json();if(j.code!=="Ok")throw Error("Route unavailable");return j.routes[0].distance/1000}
+window.calculateByGPS=()=>{if(!navigator.geolocation)return alert("GPS is not supported.");$("gpsBtn").disabled=true;$("gpsBtn").textContent="📍 GETTING LOCATION…";navigator.geolocation.getCurrentPosition(p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;$("gpsLocationDisplay").style.display="block";$("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;$("gpsAccuracy").textContent=`GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters`;$("locStatus").textContent="✅ GPS location detected. Press CALCULATE DELIVERY FEE.";$("calculateFeeBtn").disabled=false;$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},e=>{$("locStatus").textContent="⚠️ Location permission was denied or unavailable. Please allow GPS and retry.";$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},{enableHighAccuracy:true,timeout:20000,maximumAge:0})};
+window.calculateGPSFee=async()=>{if(gpsLat==null)return;$("calculateFeeBtn").disabled=true;$("locStatus").textContent="📍 Calculating actual driving distance…";try{distanceKm=await route(gpsLat,gpsLon);deliveryFee=feeForKm(distanceKm);$("locStatus").innerHTML='<span class="success">✅ Delivery fee calculated from GPS.</span>';$("feeView").textContent=`📍 Actual driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ${peso(deliveryFee)}`;renderCart();updateCheckoutTotals()}catch(e){$("locStatus").innerHTML='<span class="error">❌ Driving route could not be calculated. Please retry.</span>'}$("calculateFeeBtn").disabled=false};
+window.placeOrder=async()=>{let name=$("custName").value.trim(),contact=$("custContact").value.trim(),m=$("municipality").value,b=$("barangay").value;if(!name||!contact)return alert("Please complete Customer Name and Contact Number.");if(gpsLat==null||distanceKm==null||deliveryFee==null)return alert("Please allow GPS and calculate delivery fee first.");let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+deliveryFee+sec,id="MHAC-"+Date.now();let order={id,customer:{name,contact,municipality:m,barangay:b,address:"GPS LOCATION",gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy}},items:cart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:sec,total},payment:$("payment").value,status:"NEW",assignedRiderUid:"",createdAt:serverTimestamp()};$("sendOrderBtn").disabled=true;$("sendStatus").textContent="📤 Sending order to MHAC Admin…";try{await setDoc(doc(db,"orders",id),order);$("sendStatus").innerHTML='<span class="success">✅ ORDER SENT SUCCESSFULLY TO MHAC ADMIN</span>';cart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,1200)}catch(e){$("sendOrderBtn").disabled=false;$("sendStatus").innerHTML=`<span class="error">❌ ORDER NOT SENT: ${e.message}</span><br><small>Firebase Rules may be blocking customer order creation.</small>`}};
+renderStores();renderCart();
 </script></body></html>
