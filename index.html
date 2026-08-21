@@ -43,9 +43,10 @@ header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo
 <div id="checkoutTotals" style="margin:10px 0;padding:12px;border:2px solid #222;border-radius:10px"></div>
 <h3 style="margin-bottom:5px">👤 CUSTOMER INFORMATION</h3>
 <input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
-<select id="municipality"><option value="">Select Municipality</option><option>PANIQUI</option><option>MONCADA</option><option>RAMOS</option><option>GERONA</option><option>PURA</option><option>ANAO</option><option>NAMPICUAN</option></select>
-<select id="barangay"><option value="">Select Barangay</option></select>
-<div class="location-note">📍 <b>GPS LOCATION</b><br>Allow GPS to automatically detect the customer location. Municipality and Barangay can be checked before sending.</div>
+<div id="autoLocation" class="location-note">📍 <b>CUSTOMER LOCATION</b><br>Municipality and Barangay will be detected automatically from GPS. No manual location selection is needed.</div>
+<select id="municipality" style="display:none"><option value=""></option></select>
+<select id="barangay" style="display:none"><option value=""></option></select>
+<div class="location-note">📍 <b>GPS LOCATION</b><br>Allow GPS to automatically detect the customer location. Municipality and Barangay will be detected automatically from GPS.</div>
 <div class="gpsrow"><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button></div>
 <div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status" style="display:none;font-size:14px;font-weight:700"></div>
 <div id="locationHelp" class="status">💡 Step 1: Allow GPS. Step 2: Check the detected location. Step 3: Calculate delivery fee.</div>
@@ -88,14 +89,45 @@ window.addFood=(si,fi)=>{let store=STORES[si][0],used=[...new Set(cart.map(x=>x.
 window.changeQty=(i,d)=>{cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()};
 function renderCart(){let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),stores=[...new Set(cart.map(x=>x.store))],sf=sub*.1,sec=stores.length>1?5:0,total=sub+sf+(deliveryFee||0)+sec;$("count").textContent=cart.reduce((a,x)=>a+x.qty,0);$("storeCount").textContent=`Stores selected: ${stores.length}/2`;$("cart").innerHTML=cart.length?stores.map(s=>`<div class="store-head">${s.toUpperCase()}</div>`+cart.map((x,i)=>x.store===s?`<div class="row"><b>${x.qty} × ${x.name}</b><br><small>${x.choice}</small><div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`:"").join("")).join(""):"No items yet.";$("totals").innerHTML=`<p>Food Order: <b>${peso(sub)}</b></p><p>10% Service Fee: <b>${peso(sf)}</b></p><p>Delivery Fee: <b>${deliveryFee==null?"—":peso(deliveryFee)}</b></p><p>2nd Store Fee: <b>${peso(sec)}</b></p><p class="total">GRAND TOTAL: ${peso(total)}</p>`;$("checkoutBtn").disabled=!cart.length}
 function loadBarangays(){let m=$("municipality").value,b=$("barangay");b.innerHTML='<option value="">Select Barangay</option>';(AREAS[m]||[]).forEach(x=>b.innerHTML+=`<option>${x}</option>`)}
-$("municipality").addEventListener("change",loadBarangays);
+
 window.closeMenu=()=>$("menuModal").style.display="none";
 window.openCheckout=()=>{if(!cart.length)return;$("checkout").style.display="block";$("orderSummary").innerHTML=cart.map(x=>`<div style="padding:5px;border-bottom:1px solid #ddd"><b>${x.store.toUpperCase()}</b><br>${x.qty} × ${x.name} — ${peso(x.price*x.qty)}</div>`).join("");updateCheckoutTotals()};
 function updateCheckoutTotals(){let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+(deliveryFee||0)+sec;$("checkoutTotals").innerHTML=`Food Order: <b>${peso(sub)}</b><br>10% Service Fee: <b>${peso(sf)}</b><br>🚚 Delivery Fee: <b>${deliveryFee==null?"—":peso(deliveryFee)}</b><br>2nd Store Fee: <b>${peso(sec)}</b><br><span class="total">GRAND TOTAL: ${peso(total)}</span>`}
 window.closeCheckout=()=>$("checkout").style.display="none";
 function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
 async function route(lat,lon){const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${lon},${lat}?overview=false`);const j=await r.json();if(j.code!=="Ok")throw Error("Route unavailable");return j.routes[0].distance/1000}
-window.calculateByGPS=()=>{if(!navigator.geolocation)return alert("GPS is not supported.");$("gpsBtn").disabled=true;$("gpsBtn").textContent="📍 GETTING LOCATION…";navigator.geolocation.getCurrentPosition(p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;$("gpsLocationDisplay").style.display="block";$("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;$("gpsAccuracy").textContent=`GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters`;$("locStatus").textContent="✅ GPS location detected. Press CALCULATE DELIVERY FEE.";$("calculateFeeBtn").disabled=false;$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},e=>{$("locStatus").textContent="⚠️ Location permission was denied or unavailable. Please allow GPS and retry.";$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},{enableHighAccuracy:true,timeout:20000,maximumAge:0})};
+
+async function reverseGPS(lat,lon){
+  try{
+    const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=en`;
+    const r=await fetch(u,{headers:{Accept:"application/json"}});
+    if(!r.ok) throw Error("Reverse geocode failed");
+    return await r.json();
+  }catch(e){ return null; }
+}
+function autoLocationFromGPS(g){
+  if(!g) return;
+  const ad=g.address||{};
+  const text=String(g.display_name||"").toUpperCase();
+  const towns=["PANIQUI","MONCADA","RAMOS","GERONA","PURA","ANAO","NAMPICUAN"];
+  let m="";
+  for(const t of towns){
+    if(text.includes(t) || String(ad.municipality||ad.town||ad.city||"").toUpperCase().includes(t)){m=t;break}
+  }
+  if(m){
+    $("municipality").innerHTML=`<option value="${m}" selected>${m}</option>`;
+  }
+  const b=String(ad.village||ad.suburb||ad.neighbourhood||ad.quarter||"").trim();
+  if(b){
+    $("barangay").innerHTML=`<option value="${b}" selected>${b}</option>`;
+  }
+  const box=$("gpsLocationDisplay");
+  if(box){
+    box.textContent=`📍 LOCATION DETECTED: ${g.display_name||"GPS location detected"}`;
+  }
+}
+
+window.calculateByGPS=()=>{if(!navigator.geolocation)return alert("GPS is not supported.");$("gpsBtn").disabled=true;$("gpsBtn").textContent="📍 GETTING LOCATION…";navigator.geolocation.getCurrentPosition(p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;$("gpsLocationDisplay").style.display="block";$("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`; reverseGPS(gpsLat,gpsLon).then(autoLocationFromGPS);$("gpsAccuracy").textContent=`GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters`;$("locStatus").textContent="✅ GPS location detected. Press CALCULATE DELIVERY FEE.";$("calculateFeeBtn").disabled=false;$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},e=>{$("locStatus").textContent="⚠️ Location permission was denied or unavailable. Please allow GPS and retry.";$("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 ALLOW GPS LOCATION"},{enableHighAccuracy:true,timeout:20000,maximumAge:0})};
 window.calculateGPSFee=async()=>{if(gpsLat==null)return;$("calculateFeeBtn").disabled=true;$("locStatus").textContent="📍 Calculating actual driving distance…";try{distanceKm=await route(gpsLat,gpsLon);deliveryFee=feeForKm(distanceKm);$("locStatus").innerHTML='<span class="success">✅ Delivery fee calculated from GPS.</span>';$("feeView").textContent=`📍 Actual driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ${peso(deliveryFee)}`;renderCart();updateCheckoutTotals()}catch(e){$("locStatus").innerHTML='<span class="error">❌ Driving route could not be calculated. Please retry.</span>'}$("calculateFeeBtn").disabled=false};
 window.placeOrder=async()=>{let name=$("custName").value.trim(),contact=$("custContact").value.trim(),m=$("municipality").value,b=$("barangay").value;if(!name||!contact)return alert("Please complete Customer Name and Contact Number.");if(gpsLat==null||distanceKm==null||deliveryFee==null)return alert("Please allow GPS and calculate delivery fee first.");let sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,sec=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+deliveryFee+sec,id="MHAC-"+Date.now();let order={id,customer:{name,contact,municipality:m,barangay:b,address:"GPS LOCATION",gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy}},items:cart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:sec,total},payment:$("payment").value,status:"NEW",assignedRiderUid:"",createdAt:serverTimestamp()};$("sendOrderBtn").disabled=true;$("sendStatus").textContent="📤 Sending order to MHAC Admin…";try{await setDoc(doc(db,"orders",id),order);$("sendStatus").innerHTML='<span class="success">✅ ORDER SENT SUCCESSFULLY TO MHAC ADMIN</span>';cart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,1200)}catch(e){$("sendOrderBtn").disabled=false;$("sendStatus").innerHTML=`<span class="error">❌ ORDER NOT SENT: ${e.message}</span><br><small>Firebase Rules may be blocking customer order creation.</small>`}};
 renderStores();renderCart();
