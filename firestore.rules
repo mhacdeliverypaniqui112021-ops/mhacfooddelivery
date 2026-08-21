@@ -1,22 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() { return request.auth != null && request.auth.token.email == "mhacdeliverypaniqui112021@gmail.com"; }
+    function isRider() { return request.auth != null && exists(/databases/$(database)/documents/riders/$(request.auth.uid)); }
+
     match /settings/menu {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    match /settings/businessHours {
+      allow read: if true;
+      allow write: if isAdmin();
     }
     match /orders/{orderId} {
-      allow create: if request.auth != null;
-      allow read: if request.auth != null;
-      allow update: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.customer.uid == request.auth.uid;
+      allow read: if isAdmin() || isRider() || (request.auth != null && resource.data.customer.uid == request.auth.uid);
+      allow update: if isAdmin() || (isRider() && resource.data.assignedRiderUid == request.auth.uid);
     }
     match /riders/{uid} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     match /menuSeedLogs/{id} {
-      allow create: if request.auth != null;
-      allow read: if request.auth != null;
+      allow create: if isAdmin();
+      allow read: if isAdmin();
     }
   }
 }

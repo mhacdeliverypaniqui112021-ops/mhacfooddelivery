@@ -57,7 +57,7 @@ const firebaseConfig={
   measurementId:"G-7NZEK618YC"
 };
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-let data=null,cart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,currentUser=null,businessHours={openTime:"09:00",closeTime:"20:00",enabled:true},scheduleTimer=null;
+let data=null,cart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,currentUser=null,businessHours={openTime:"09:00",closeTime:"19:00",enabled:true},scheduleTimer=null;
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 const peso=n=>"₱"+Number(n||0).toFixed(2);
 function minutes(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}
