@@ -1,0 +1,12 @@
+MHAC DELIVERY V3.3 WEB FIX
+
+GitHub Pages URLs after uploading the extracted files:
+/mhacfooddelivery/          = Customer
+/mhacfooddelivery/admin/    = Admin
+/mhacfooddelivery/rider/    = Rider
+
+Fallback URLs:
+/mhacfooddelivery/admin.html
+/mhacfooddelivery/rider.html
+
+IMPORTANT: GitHub's web uploader does not unpack a ZIP automatically. Upload the extracted files/folders so admin/index.html and rider/index.html exist in the repository.

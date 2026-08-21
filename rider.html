@@ -1,44 +1,37 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER APP</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}
-header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}
-header h1{margin:0;font-size:26px}main{max-width:720px;margin:auto;padding:18px}
-.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}
-input{width:100%;padding:13px;margin:6px 0;border:2px solid #ccc;border-radius:12px;font-size:16px}
-button{border:0;border-radius:12px;padding:13px 16px;background:#111;color:#fff;font-weight:900;font-size:15px}
-button.green{background:#138a36}button:disabled{opacity:.55}.row{display:flex;gap:8px;flex-wrap:wrap}
-.row button{flex:1}.status{color:#666;font-size:13px}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}
-.hidden{display:none}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}
-hr{border:0;border-top:1px solid #ddd}.error{color:#b00020;font-weight:800}.success{color:#138a36;font-weight:800}
-</style></head><body>
-<header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header>
-<main>
-<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2>
-<input id="email" type="email" placeholder="Rider Email">
-<input id="password" type="password" placeholder="Password">
-<button id="loginBtn" style="width:100%" onclick="login()">🔐 LOGIN</button>
-<p id="loginStatus" class="status">Enter the Firebase Authentication email and password, then press LOGIN.</p></div>
-<div id="app" class="hidden">
-<div class="card"><div class="row"><h2 style="flex:1;margin:0">🏍️ RIDER APP</h2><button onclick="logout()">LOG OUT</button></div>
-<p id="conn" class="status">Connecting…</p><p id="riderInfo" class="status"></p></div>
-<div id="orders"></div></div>
-</main>
-<script type="module">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC DELIVERY — RIDER V3.2</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}
+main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.status{color:#666;font-size:13px}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.hidden{display:none}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}
+</style></head><body><header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header><main>
+<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><input id="email" type=email placeholder="Rider Email"><input id="password" type=password placeholder="Password"><button id="loginBtn" class=red>LOGIN</button><p id="loginStatus" class=status>Use the rider account created in Firebase Authentication.</p></div>
+<div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p>The rider app is locked at the configured closing time.</p></div><div id="app" class=hidden><div class=card><div class=row><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id=logout>LOG OUT</button></div><p id=conn class=status>Connecting…</p>
+<div class=sound>🔔 <b>ASSIGNMENT RINGTONE</b><br><span class=status>Tap ENABLE SOUND once on this device.</span><button id=soundBtn class=blue>🔊 ENABLE SOUND</button><span id=soundState class=status></span></div></div><div id=orders></div></div></main>
+<script type=module>
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import {getFirestore,collection,query,where,onSnapshot,doc,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const RIDER_UID="qDZyQxBwWsQi32jSo0EpFwct0z93";let unsub=null;
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function maps(o){const g=o.customer?.gps||o.customerLocation||o.gps,ok=g&&Number.isFinite(Number(g.lat))&&Number.isFinite(Number(g.lon));const d=ok?Number(g.lat)+","+Number(g.lon):[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
-function render(arr){const x=arr.filter(o=>String(o.assignedRiderUid||"").trim()===RIDER_UID&&String(o.status||"").toUpperCase()!=="COMPLETED");$("orders").innerHTML=x.length?x.map(o=>{const items=(o.items||[]).map(i=>`<b>${esc(i.store||i.storeName||"STORE")}</b> — ${esc(i.name||i.food||"")} ×${i.qty||1}${i.choice?" • "+esc(i.choice):""}`).join("<br>");return `<div class="card"><div class="row"><b>${esc(o.id||"ORDER")}</b><span class="pill">${esc(o.status||"NEW")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||o.customer?.phone||"")}</p><p>📍 ${esc(o.customer?.address||"")}<br>${esc(o.customer?.barangay||"")}, ${esc(o.customer?.municipality||"")}</p><hr><p>${items||"No items listed."}</p><p><b>Delivery Fee: ${peso(o.fees?.deliveryFee??o.deliveryFee)}</b><br><b>Collect: ${peso(o.fees?.total??o.total)}</b></p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row" style="margin-top:8px"><button onclick="changeStatus('${esc(o.id)}','PICKED UP')">📦 PICKED UP</button><button onclick="changeStatus('${esc(o.id)}','ON THE WAY')">🏍️ ON THE WAY</button><button class="green" onclick="changeStatus('${esc(o.id)}','COMPLETED')">✅ DELIVERED</button></div></div>`}).join(""):`<div class="card"><h3>No assigned rider orders.</h3><p class="status">Wait for Admin to assign an order to this rider.</p></div>`}
-async function changeStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()})}catch(e){alert("Unable to update order: "+e.message)}}
-window.changeStatus=changeStatus;
-function listen(){if(unsub)unsub();$("conn").textContent="🟡 Connecting to Firebase orders…";const q=query(collection(db,"orders"),where("assignedRiderUid","==",RIDER_UID));unsub=onSnapshot(q,snap=>{$("conn").textContent="🟢 LIVE — assigned orders update automatically";render(snap.docs.map(d=>({id:d.id,...d.data()})))},err=>{$("conn").textContent="❌ Firebase error: "+err.message})}
-async function login(){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){$("loginStatus").textContent="❌ Please enter your Firebase email and password.";return}$("loginBtn").disabled=true;$("loginStatus").textContent="🟡 Connecting to Firebase Authentication...";try{const r=await signInWithEmailAndPassword(auth,email,password);if(r.user.uid!==RIDER_UID){await signOut(auth);$("loginStatus").textContent="❌ Login succeeded, but this is not the assigned Rider account.";return}$("loginStatus").textContent="✅ Login successful. Loading Rider App..."}catch(e){console.error("Firebase Login Error:",e);$("loginStatus").textContent="❌ Firebase Login Error: "+e.code+" — "+e.message;$("loginStatus").className="status error"}finally{$("loginBtn").disabled=false}}
-async function logout(){if(unsub)unsub();unsub=null;await signOut(auth)}
-onAuthStateChanged(auth,u=>{if(u&&u.uid===RIDER_UID){$("login").classList.add("hidden");$("app").classList.remove("hidden");$("riderInfo").textContent="Rider account: "+u.email;listen()}else{$("app").classList.add("hidden");$("login").classList.remove("hidden")}});
+import {getFirestore,doc,getDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+const firebaseConfig={
+  apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
+  authDomain:"mhac-delivery-53099.firebaseapp.com",
+  projectId:"mhac-delivery-53099",
+  storageBucket:"mhac-delivery-53099.firebasestorage.app",
+  messagingSenderId:"878081137607",
+  appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
+  measurementId:"G-7NZEK618YC"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);let uid="",unsub=null,audioCtx=null,soundReady=false,seenAssigned=new Set(),businessHours={openTime:"09:00",closeTime:"19:00",enabled:true},hoursTimer=null;
+function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}
+function riderOpen(){if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
+async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...businessHours,...s.data()}}catch(e){}}
+async function lockRider(){if(unsub)unsub();unsub=null;$("app").classList.add("hidden");$("closed").classList.remove("hidden");await signOut(auth)}
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));const peso=n=>"₱"+Number(n||0).toFixed(2);
+function beep(){if(!soundReady||!audioCtx)return;const now=audioCtx.currentTime;[660,880,660].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=now+i*.3;o.frequency.value=f;g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.22,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.25)})}
+$("soundBtn").onclick=async()=>{audioCtx=new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();soundReady=true;$("soundState").textContent=" 🔊 Sound enabled";beep()}
+function maps(o){const g=o.customer?.gps;const d=g?.lat&&g?.lon?g.lat+","+g.lon:[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
+async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||"RIDER"}
+function render(arr){$("orders").innerHTML=arr.length?arr.map(o=>`<div class=order><div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"GPS location")}</p><p>${(o.items||[]).map(i=>`<b>${esc(i.store)}</b> — ${esc(i.name)} ×${i.qty} • ${esc(i.choice||"")}`).join("<br>")}</p><p><b>Delivery Fee:</b> ${peso(o.fees?.deliveryFee)}<br><b>Collect:</b> ${peso(o.fees?.total)}</p><a class=nav target=_blank href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class=row><button data-status="PICKED UP" data-id="${o.id}">📦 PICKED UP</button><button data-status="ON THE WAY" data-id="${o.id}">🏍️ ON THE WAY</button><button class=green data-status="COMPLETED" data-id="${o.id}">✅ DELIVERED</button></div></div>`).join(""):"<div class=card><h3>No assigned orders.</h3></div>"}
+$("orders").addEventListener("click",async e=>{const b=e.target.closest("[data-status]");if(!b)return;try{await updateDoc(doc(db,"orders",b.dataset.id),{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update: "+x.message)}})
+async function start(){try{const r=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);await loadHours();if(!riderOpen()){await signOut(auth);$("loginStatus").textContent="🔒 Rider app is closed now.";return}uid=r.user.uid;await loadProfile();$("login").classList.add("hidden");$("closed").classList.add("hidden");$("app").classList.remove("hidden");$("conn").textContent="🟢 LIVE — waiting for assigned orders";const q=query(collection(db,"orders"),where("assignedRiderUid","==",uid));unsub=onSnapshot(q,s=>{const arr=s.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.status!=="COMPLETED");for(const o of arr){if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);beep()}}render(arr)},e=>$("conn").textContent="❌ Firebase error: "+e.message);hoursTimer=setInterval(()=>{if(!riderOpen())lockRider()},30000)}catch(e){$("loginStatus").textContent="❌ "+e.message}}
+$("loginBtn").onclick=start;$("logout").onclick=()=>{if(unsub)unsub();signOut(auth)};onAuthStateChanged(auth,u=>{if(!u){$("app").classList.add("hidden");$("closed").classList.add("hidden");$("login").classList.remove("hidden")}})
 </script></body></html>
