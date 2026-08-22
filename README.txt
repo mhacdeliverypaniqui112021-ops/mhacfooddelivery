@@ -1,11 +1,9 @@
-MHAC RIDER V4 TEST REPLACEMENT
+MHAC DELIVERY ADMIN V4
 
-Replace ONLY the existing root rider.html.
+Replace ONLY admin.html in your GitHub repository.
+Do not delete customer files, rider files, or Firebase configuration/rules.
 
-Do NOT delete:
-- admin.html
-- customer.html
-- Firebase rules
+Admin login is Google-only and accepts:
+mhacdeliverypaniqui112021@gmail.com
 
-TEST MODE is enabled temporarily so the Rider App can be tested outside business hours.
-After testing, we will create the final production version with TEST MODE disabled.
+This version includes live Firestore orders, rider assignment, rider list, and the existing local menu manager key mhac_v2_stable.
