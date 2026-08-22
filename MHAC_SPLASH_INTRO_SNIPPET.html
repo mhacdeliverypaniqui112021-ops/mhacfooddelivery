@@ -1,0 +1,37 @@
+<!-- MHAC DELIVERY SPLASH INTRO -->
+<div id="mhacSplash" class="mhac-splash">
+  <div class="mhac-splash-inner">
+    <img src="mhac-logo.png" alt="MHAC Delivery" class="mhac-splash-logo">
+    <div class="mhac-splash-title">MHAC DELIVERY</div>
+    <div class="mhac-splash-subtitle">FAST • SAFE • ON TIME</div>
+    <div class="mhac-splash-loader"><span></span></div>
+  </div>
+</div>
+
+<style>
+.mhac-splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;opacity:1;transition:opacity .55s ease}
+.mhac-splash.mhac-hide{opacity:0;pointer-events:none}
+.mhac-splash-inner{text-align:center;width:min(88vw,430px)}
+.mhac-splash-logo{display:block;width:min(72vw,330px);height:auto;margin:0 auto;animation:mhacLogoIn .8s ease both}
+.mhac-splash-title{margin-top:18px;color:#fff;font-weight:900;font-size:30px;letter-spacing:2px;animation:mhacTextIn .7s .25s ease both}
+.mhac-splash-subtitle{margin-top:7px;color:#e21d25;font-weight:800;font-size:14px;letter-spacing:2px;animation:mhacTextIn .7s .4s ease both}
+.mhac-splash-loader{width:150px;height:4px;margin:24px auto 0;background:#333;border-radius:10px;overflow:hidden}
+.mhac-splash-loader span{display:block;width:45%;height:100%;background:#e21d25;animation:mhacLoad 1.5s ease-in-out infinite}
+@keyframes mhacLogoIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes mhacTextIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
+@media(prefers-reduced-motion:reduce){.mhac-splash{transition:none}.mhac-splash-logo,.mhac-splash-title,.mhac-splash-subtitle{animation:none}}
+</style>
+
+<script>
+(function(){
+  function hideMHACSplash(){
+    var s=document.getElementById("mhacSplash");
+    if(!s)return;
+    s.classList.add("mhac-hide");
+    setTimeout(function(){s.remove()},650);
+  }
+  window.addEventListener("load",function(){setTimeout(hideMHACSplash,2200)});
+  setTimeout(hideMHACSplash,4500);
+})();
+</script>
