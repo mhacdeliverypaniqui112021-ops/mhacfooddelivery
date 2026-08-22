@@ -1,9 +1,13 @@
-MHAC DELIVERY ADMIN V4
+MHAC DELIVERY ADMIN V4 - FIXED
 
-Replace ONLY admin.html in your GitHub repository.
-Do not delete customer files, rider files, or Firebase configuration/rules.
+Replace ONLY admin.html in the existing GitHub repository.
 
-Admin login is Google-only and accepts:
-mhacdeliverypaniqui112021@gmail.com
+This keeps the V4 Google-only admin login and live Firestore orders/riders.
+Changes:
+- Better mobile Google sign-in with redirect fallback.
+- Clear Firebase/Auth error messages.
+- No orderBy index requirement; orders are sorted in the browser.
+- Uses serverTimestamp for admin updates.
+- Does not alter customer, rider, Firebase config, or rules files.
 
-This version includes live Firestore orders, rider assignment, rider list, and the existing local menu manager key mhac_v2_stable.
+After upload, wait for GitHub Pages to finish building, then hard-refresh the Admin page.
