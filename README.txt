@@ -1,13 +1,20 @@
-MHAC DELIVERY ADMIN V4 - FIXED
+MHAC DELIVERY V4 - RIDER + ADMIN FIX
 
-Replace ONLY admin.html in the existing GitHub repository.
+Upload:
+- Replace rider.html with the fixed rider.html.
+- Replace admin.html with the fixed admin.html.
+Do NOT delete customer app, Firebase files, or other repository files.
 
-This keeps the V4 Google-only admin login and live Firestore orders/riders.
-Changes:
-- Better mobile Google sign-in with redirect fallback.
-- Clear Firebase/Auth error messages.
-- No orderBy index requirement; orders are sorted in the browser.
-- Uses serverTimestamp for admin updates.
-- Does not alter customer, rider, Firebase config, or rules files.
+Rider changes:
+- Google login has mobile redirect fallback.
+- First-time Google rider automatically creates riders/{uid} with approved:false.
+- Rider remains pending until MHAC Admin approves.
+- Existing approved riders continue to receive assigned orders.
 
-After upload, wait for GitHub Pages to finish building, then hard-refresh the Admin page.
+Admin changes:
+- Rider list shows pending riders.
+- Pending riders get an APPROVE RIDER button.
+- Approval writes approved:true to the rider profile.
+- Existing live orders and rider assignment remain.
+
+If rider profile creation reports Firestore permission-denied, the Firestore Rules must allow an authenticated user to create/read only their own riders/{uid} document. The exact rule should be reviewed before changing production rules.

@@ -111,8 +111,20 @@ function start(){
     $("riders").innerHTML=riders.length
       ?riders.map(r=>'<div class=item>🏍️ <b>'+esc(r.nickname||r.name||"RIDER")+'</b><br>'+
         esc(r.email||r.uid||"")+'<br><span class=pill>'+
-        (r.approved===false?"PENDING":"APPROVED")+"</span></div>").join("")
+        (r.approved===false?"PENDING":"APPROVED")+"</span>"+(r.approved===false?' <button class="green" data-approve="'+esc(r.uid||r.id)+'">APPROVE RIDER</button>':'')+"</div>").join("")
       :"<div class=status>No rider profiles found.</div>";
+    $("riders").onclick=async e=>{
+      const b=e.target.closest("[data-approve]");
+      if(!b)return;
+      b.disabled=true;
+      try{
+        await updateDoc(doc(db,"riders",b.dataset.approve),{
+          approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email
+        });
+        alert("✅ Rider approved.");
+      }catch(x){alert("Unable to approve rider: "+friendlyFirebaseError(x))}
+      finally{b.disabled=false}
+    };
     if(ou)ou();
     /*
       Deliberately do NOT use orderBy("createdAt","desc") here.
