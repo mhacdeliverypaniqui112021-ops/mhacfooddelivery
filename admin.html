@@ -74,6 +74,35 @@
 .smallBtn{flex:1;font-size:13px!important;padding:11px 5px!important}
 .saveDirectFood{margin-top:16px}
 .deleteDirectFood{margin-top:8px}
+
+<style>
+/* V2.4: drinks need readable names such as "Coke Regular" */
+.oneFoodBox .drinkRows .editorRow{
+  grid-template-columns:minmax(0,1fr) 78px 42px;
+  gap:6px;
+}
+.oneFoodBox .drinkRows .editorRow .drinkName{
+  min-width:0;
+  width:100%;
+  font-size:16px;
+}
+.oneFoodBox .drinkRows .editorRow .drinkPrice{
+  width:78px;
+  padding:12px 7px;
+  font-size:15px;
+  text-align:center;
+}
+.oneFoodBox .drinkRows .editorRow button{
+  width:42px;
+  padding:0;
+}
+@media (max-width:420px){
+  .oneFoodBox .drinkRows .editorRow{
+    grid-template-columns:minmax(0,1fr) 72px 40px;
+  }
+  .oneFoodBox .drinkRows .editorRow .drinkPrice{width:72px}
+}
+</style>
 </style>
 </style>
 <style>
@@ -396,7 +425,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  };
  const addDrinkRow=(name="",price=0)=>{
    const r=document.createElement("div");r.className="editorRow";
-   r.innerHTML=`<input class=drinkName placeholder="Drink name" value="${esc(typeof name==="string"?name:(name.name||""))}"><input class=drinkPrice type=number min=0 step=.01 placeholder="Add price" value="${Number(typeof name==="string"?price:(name.price||price||0))}"><button type=button class=danger>✕</button>`;
+   r.innerHTML=`<input class=drinkName placeholder="Drink name (e.g. Coke Regular)" value="${esc(typeof name==="string"?name:(name.name||""))}"><input class=drinkPrice type=number min=0 step=.01 placeholder="Add price" value="${Number(typeof name==="string"?price:(name.price||price||0))}"><button type=button class=danger>✕</button>`;
    r.querySelector("button").onclick=()=>r.remove(); drinkRows.appendChild(r);
  };
  const addAddonRow=(name="",price=0)=>{

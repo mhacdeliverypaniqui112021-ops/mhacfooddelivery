@@ -1,1 +1,1 @@
-V2.3: Direct food editor. Category opens directly to food list. No OPEN FOODS category editor. Each food has one editor containing Store Name, Food Name, Price, Parts, Drinks, Add-ons, Save. No Standard/Chicken/Bucket type selector. Copy/Paste for Parts, Drinks, Add-ons.
+V2.4: Drink editor spacing improved. Drink name gets most of the row width; add-price field is narrower so names like Coke Regular remain readable.
