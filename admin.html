@@ -43,6 +43,12 @@
 .smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important}
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
+
+.categoryCard{cursor:pointer}
+.categoryCard>button{margin-top:8px}
+.categoryPanel{margin-top:10px}
+.categoryPanel.hidden{display:none!important}
+.categoryCard .foodTitle{font-size:19px}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -216,71 +222,71 @@ function renderEditor(){
  <h2>✏️ EDIT ${esc(s.name)}</h2>
  <label class=label>STORE NAME</label><input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
  <button class=red id="saveStoreName">SAVE STORE NAME</button>
- <h3>📂 CATEGORIES & FOODS</h3>
- <p class=hint>Tap <b>EDIT FOOD</b> beside any food to change its price, drinks, add-ons, chicken parts, Original/Spicy or bucket pieces.</p>
- <div id="cats">${s.categories.map((c,i)=>`
-   <div class=item>
+ <h3>📂 CATEGORIES</h3>
+ <p class=hint>Tap a category, then all foods for that category will appear. Each food has ONE complete editor box.</p>
+ <div id="cats">${(s.categories||[]).map((c,i)=>`
+   <div class="item categoryCard" data-open-cat="${i}">
     <div class=foodTitle>🍽️ ${esc(c.name)}</div>
     <div class=small>${(c.items||[]).length} food item(s)</div>
-    <button class=gray data-cat="${i}">OPEN / EDIT CATEGORY</button>
-    <div id="cat-${i}"></div>
+    <button type="button" class=gray data-open-cat="${i}">OPEN FOODS</button>
+    <div id="cat-${i}" class="categoryPanel hidden"></div>
    </div>`).join("")}</div>
  <input id="newCat" placeholder="New category name"><button class=blue id="addCat">ADD CATEGORY</button>
  <div class=publishBar><button class=green id="publish">📢 PUBLISH THIS STORE TO CUSTOMER APP</button><p class=small>Only the selected store will be updated. Other stores stay unchanged.</p></div>`;
  $("saveStoreName").onclick=()=>{s.name=$("editStoreName").value.trim()||s.name;renderStores();renderEditor()};
  $("addCat").onclick=()=>{const n=$("newCat").value.trim();if(!n)return;s.categories.push({name:n,items:[]});renderEditor()};
- $("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
+ $("cats").onclick=e=>{
+   const b=e.target.closest("[data-open-cat]");
+   if(!b)return;
+   e.stopPropagation();
+   const ci=+b.dataset.openCat;
+   document.querySelectorAll(".categoryPanel").forEach(p=>p.classList.add("hidden"));
+   const panel=$("cat-"+ci);
+   if(panel){panel.classList.remove("hidden");renderCategory(ci);}
+ };
  $("publish").onclick=publishMenu;
 }
 let foodClipboard={parts:[],choices:[],addOns:[]};
+
 function renderCategory(ci){
  const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);
  if(!c||!box)return;
+ box.classList.remove("hidden");
  box.innerHTML=`
  <div class="editorBox storeFoodBox">
-   <h3>📂 ${esc(c.name)}</h3>
-   <div class="hint"><b>Food editor</b> — bawat pagkain may sariling complete box. Store, category, food, parts, drinks at add-ons ay dito na lahat.</div>
+   <div class="foodTitle">📂 ${esc(c.name)}</div>
+   <div class=hint>All foods in this category are edited below. No separate category editor is needed.</div>
    <div id="foodList-${ci}">
      ${(c.items||[]).map((it,i)=>`
        <div class="foodEditorWrap">
-         <div class="foodBoxHeader">
-           <b>🍽️ FOOD ${i+1}</b>
-           <button type="button" class="danger miniBtn" data-delete-food="${i}">🗑️ DELETE</button>
-         </div>
          <div id="food-${ci}-${i}"></div>
        </div>`).join("")}
    </div>
    <hr>
-   <h3>➕ ADD NEW FOOD</h3>
+   <h3>➕ ADD FOOD TO ${esc(c.name)}</h3>
    <input id="newFood-${ci}" placeholder="Food name">
    <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
    <button class="red" id="addFood-${ci}">➕ ADD FOOD</button>
  </div>`;
-
- box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{
-   const i=+b.dataset.deleteFood;
-   if(confirm("Delete this food from the draft?")){
-     c.items.splice(i,1); renderEditor(); setTimeout(()=>renderCategory(ci),0);
-   }
- });
  $("addFood-"+ci).onclick=()=>{
    const n=$("newFood-"+ci).value.trim();
    const p=Number($("newPrice-"+ci).value);
    if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
-   renderEditor(); setTimeout(()=>renderCategory(ci),0);
+   renderEditor();
+   setTimeout(()=>{const p=$("cat-"+ci);if(p){p.classList.remove("hidden");renderCategory(ci);}},0);
  };
  (c.items||[]).forEach((_,i)=>renderFood(ci,i));
 }
+
 function renderFood(ci,fi){
- const s=draft.stores[selectedStore],c=s.categories[ci],it=c.items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
+ const s=draft.stores[selectedStore],c=s.categories[ci],it=c.items[fi],box=$("food-"+ci+"-"+fi);
+ if(!it||!box)return;
  const choices=it.choices||[], addons=it.addOns||[], parts=(it.chickenParts||[]).map(x=>typeof x==="string"?x:(x.name||""));
  box.innerHTML=`<div class="editorBox foodEditorWrapInner">
+  <h3>🍽️ FOOD ${fi+1}</h3>
   <label class="label">🏪 STORE NAME</label>
   <input value="${esc(s.name)}" disabled>
-
-  <label class="label">📂 FOOD CATEGORY</label>
-  <input id="fc-${ci}-${fi}" value="${esc(c.name)}" placeholder="Chicken / Burger / etc.">
 
   <label class="label">🍽️ FOOD NAME</label>
   <input id="fn-${ci}-${fi}" value="${esc(it.name)}" placeholder="Food name">
@@ -289,7 +295,7 @@ function renderFood(ci,fi){
   <input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}" placeholder="Price">
 
   <h4>🍗 PARTS</h4>
-  <div class="hint">Mag-add ng kahit ilang parts. Customer ang pipili ng available part.</div>
+  <div class="hint">Optional. If you add parts, customer can select the available parts. Leave empty for solo/no part choices.</div>
   <div id="parts-${ci}-${fi}"></div>
   <div class="copyPasteRow">
     <button type="button" class="blue smallBtn" id="copyParts-${ci}-${fi}">📋 COPY PARTS</button>
@@ -298,7 +304,7 @@ function renderFood(ci,fi){
   <button type="button" class="blue" id="addPart-${ci}-${fi}">➕ ADD PART</button>
 
   <h4>🥤 DRINKS / CHOICES</h4>
-  <div class="hint">Bawat drink ay may sariling additional price. Halimbawa: Regular ₱0, Medium ₱35, Large ₱45.</div>
+  <div class="hint">Optional. Add the drink name and its additional price. Regular/free can be ₱0; Medium/Large can have an add price.</div>
   <div id="choices-${ci}-${fi}"></div>
   <div class="copyPasteRow">
     <button type="button" class="blue smallBtn" id="copyChoice-${ci}-${fi}">📋 COPY DRINKS</button>
@@ -307,7 +313,7 @@ function renderFood(ci,fi){
   <button type="button" class="blue" id="addChoice-${ci}-${fi}">➕ ADD DRINK</button>
 
   <h4>➕ ADD-ONS</h4>
-  <div class="hint">Optional add-ons na may sariling additional price.</div>
+  <div class="hint">Optional add-ons. Add the name and additional price.</div>
   <div id="addons-${ci}-${fi}"></div>
   <div class="copyPasteRow">
     <button type="button" class="blue smallBtn" id="copyAddon-${ci}-${fi}">📋 COPY ADD-ONS</button>
@@ -326,24 +332,26 @@ function renderFood(ci,fi){
  const addRow=(containerId,nameCls,priceCls,name="",price=0)=>{
    const row=document.createElement("div");row.className="choiceRow";
    row.innerHTML=`<input class="${nameCls}" placeholder="Name" value="${esc(name)}"><input class="${priceCls}" type="number" min="0" step="0.01" placeholder="Add price" value="${Number(price||0)}"><button type="button" class="danger">✕</button>`;
-   row.querySelector("button").onclick=()=>row.remove(); $(containerId).appendChild(row);
+   row.querySelector("button").onclick=()=>row.remove();
+   $(containerId).appendChild(row);
  };
  const addPartRow=(name="")=>{
    const row=document.createElement("div");row.className="choiceRow partRow";
    row.innerHTML=`<input class="partName" placeholder="Chicken part (Leg / Thigh / Breast / Wings)" value="${esc(name)}"><span></span><button type="button" class="danger">✕</button>`;
-   row.querySelector("button").onclick=()=>row.remove(); $("parts-"+ci+"-"+fi).appendChild(row);
+   row.querySelector("button").onclick=()=>row.remove();
+   $("parts-"+ci+"-"+fi).appendChild(row);
  };
  parts.forEach(addPartRow);
- choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0],x[1]));
- addons.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0],x[1]));
+ choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0]??x.name??"",x[1]??x.price??0));
+ addons.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0]??x.name??"",x[1]??x.price??0));
 
  $("addPart-"+ci+"-"+fi).onclick=()=>addPartRow();
  $("addChoice-"+ci+"-"+fi).onclick=()=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice");
  $("addAddon-"+ci+"-"+fi).onclick=()=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice");
 
- $("copyParts-"+ci+"-"+fi).onclick=()=>{foodClipboard.parts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")].map(x=>x.value.trim()).filter(Boolean);};
- $("copyChoice-"+ci+"-"+fi).onclick=()=>{foodClipboard.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)]).filter(x=>x[0]);};
- $("copyAddon-"+ci+"-"+fi).onclick=()=>{foodClipboard.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)]).filter(x=>x[0]);};
+ $("copyParts-"+ci+"-"+fi).onclick=()=>{foodClipboard.parts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")].map(x=>x.value.trim()).filter(Boolean);alert("✅ Parts copied. Paste them into another food.")};
+ $("copyChoice-"+ci+"-"+fi).onclick=()=>{foodClipboard.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)]).filter(x=>x[0]);alert("✅ Drinks copied. Paste them into another food.")};
+ $("copyAddon-"+ci+"-"+fi).onclick=()=>{foodClipboard.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)]).filter(x=>x[0]);alert("✅ Add-ons copied. Paste them into another food.")};
  $("pasteParts-"+ci+"-"+fi).onclick=()=>{foodClipboard.parts.forEach(addPartRow);};
  $("pasteChoice-"+ci+"-"+fi).onclick=()=>{foodClipboard.choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0],x[1]));};
  $("pasteAddon-"+ci+"-"+fi).onclick=()=>{foodClipboard.addOns.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0],x[1]));};
@@ -352,18 +360,24 @@ function renderFood(ci,fi){
    it.name=$("fn-"+ci+"-"+fi).value.trim();
    it.price=Number($("fp-"+ci+"-"+fi).value);
    it.available=$("fa-"+ci+"-"+fi).value==="true";
-   c.name=$("fc-"+ci+"-"+fi).value.trim()||c.name;
    it.chickenParts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
    it.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)]).filter(x=>x[0]);
    it.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)]).filter(x=>x[0]);
+   it.type=it.chickenParts.length?"chicken":"standard";
  }
  $("saveFood-"+ci+"-"+fi).onclick=()=>{
    const name=$("fn-"+ci+"-"+fi).value.trim(), price=Number($("fp-"+ci+"-"+fi).value);
    if(!name||!Number.isFinite(price)||price<0)return alert("Please enter a food name and valid base price.");
-   collect(); renderEditor(); setTimeout(()=>renderCategory(ci),0);
+   collect();
+   renderEditor();
+   setTimeout(()=>{const p=$("cat-"+ci);if(p){p.classList.remove("hidden");renderCategory(ci);}},0);
  };
  $("deleteFood2-"+ci+"-"+fi).onclick=()=>{
-   if(confirm("Delete this food from the draft?")){c.items.splice(fi,1);renderEditor();setTimeout(()=>renderCategory(ci),0);}
+   if(confirm("Delete this food from the draft?")){
+     c.items.splice(fi,1);
+     renderEditor();
+     setTimeout(()=>{const p=$("cat-"+ci);if(p){p.classList.remove("hidden");renderCategory(ci);}},0);
+   }
  };
 }
 async function publishMenu(){

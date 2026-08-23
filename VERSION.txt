@@ -1,10 +1,1 @@
-MHAC DELIVERY FINAL BUILD
-Locked requirements included:
-- Store-to-store menu publishing.
-- Store > Category > Food editor.
-- Food base price, selectable chicken parts, optional drinks/choices with add prices, optional add-ons, spicy/bucket fields.
-- Admin active orders only; COMPLETED orders disappear from active Admin list but remain in Firebase.
-- Customer active orders remain until COMPLETED (existing customer build).
-- Rider active orders disappear on COMPLETED (existing rider build).
-- Admin/Rider daily delivery and earnings totals reset by business day; historical records remain.
-- Existing Google login, rider approval, assignment, GPS, delivery fee and Firebase files preserved from V1.5 baseline.
+V2.1

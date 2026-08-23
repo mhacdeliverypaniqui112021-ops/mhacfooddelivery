@@ -1,5 +1,1 @@
-ONE-BUILD TEST
-This package contains admin.html, customer.html, rider.html and mhac-logo.png.
-For the first test, the apps can be tested starting with Admin while Customer/Rider are closed.
-Do not change Firestore Rules.
-Admin menu publishing is store-to-store: publishing Jollibee updates only Jollibee in settings/menu.
+V2.1: Category click now opens foods. Each food uses one unified editor: Store Name, Food Name, Base Price, Parts, Drinks/Choices, Add-ons, Save. Copy/Paste Parts, Drinks and Add-ons included. Customer app shows Parts whenever Parts are attached.
