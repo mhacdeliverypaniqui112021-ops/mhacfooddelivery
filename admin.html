@@ -14,6 +14,15 @@
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
+<script>
+// Independent splash fallback: this runs even if Firebase/module code has an error.
+window.setTimeout(function(){
+  var splash=document.getElementById("mhacSplash");
+  if(!splash) return;
+  splash.classList.add("hide");
+  window.setTimeout(function(){ if(splash.parentNode) splash.parentNode.removeChild(splash); },650);
+},2200);
+</script>
 <header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><main>
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
@@ -82,14 +91,4 @@ function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.d
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 
-<script>
-// MHAC introduction: show briefly, then reveal the Admin app/login.
-window.addEventListener("load",()=>{
-  const splash=document.getElementById("mhacSplash");
-  if(!splash) return;
-  setTimeout(()=>{
-    splash.classList.add("hide");
-    setTimeout(()=>splash.remove(),650);
-  },2200);
-});
-</script></script></body></html>
+</body></html>
