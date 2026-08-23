@@ -384,6 +384,31 @@
 @media(max-width:600px){.chatPanel{right:7px;bottom:7px;width:calc(100vw - 14px)}.chatMessages{height:260px}}
 </style>
 
+
+<style>
+/* V3 FINAL: compact store-first menu manager */
+.storeBox{border:2px solid #222;border-radius:16px;padding:10px;margin:8px 0;background:#fff}
+.storeBoxHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 2px 9px}
+.storeBoxHeader b{font-size:19px}
+.storeDelete{width:auto!important;margin:0!important;padding:8px 11px!important;font-size:12px!important}
+.storeInner{border-top:1px solid #ddd;padding-top:7px}
+.storeCategory{border:1px solid #ccc;border-radius:11px;margin:6px 0;overflow:hidden;background:#fafafa}
+.storeCategoryHeader{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:9px 10px}
+.storeCategoryHeader b{font-size:16px}
+.storeCategoryHeader .categoryBtns{display:flex;gap:5px}
+.storeCategoryHeader button{width:auto!important;margin:0!important;padding:7px 9px!important;font-size:11px!important}
+.storeFoodList{padding:0 7px 7px}
+.storeFoodList.hidden{display:none!important}
+.storeFoodItem{background:#fff;border:1px solid #ddd;border-radius:10px;padding:8px;margin:5px 0}
+.storeFoodItem .foodLine{margin:0!important;border:0!important;padding:0!important}
+.storeFoodItem .foodLineMain{font-size:15px!important;margin-bottom:5px!important}
+.storeFoodItem .editDirectFood{width:auto!important;margin:0!important;padding:7px 9px!important;font-size:11px!important}
+.storeAddCategory{display:flex;gap:6px;padding:7px 0}
+.storeAddCategory input{flex:1!important;margin:0!important;min-height:44px!important}
+.storeAddCategory button{width:auto!important;margin:0!important;padding:8px 10px!important;font-size:12px!important}
+.storeEditorActions{margin-top:8px;padding-top:8px;border-top:1px solid #ddd}
+.storeEditorActions input{margin:4px 0!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -539,27 +564,119 @@ function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div
 $("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
 
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
-function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><button class="storeDeleteBtn" data-delete-store="${i}" type="button">DELETE</button><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
-$("stores").onclick=e=>{
- const del=e.target.closest("[data-delete-store]");
- if(del){
-   e.stopPropagation();
-   const i=+del.dataset.deleteStore;
-   const s=draft.stores[i];
-   if(!s)return;
-   if(confirm("Delete store "+s.name+" and all its categories/foods?")){
-     draft.stores.splice(i,1);
+function renderStores(){
+ const host=$("stores");
+ host.innerHTML=(draft.stores||[]).map((s,si)=>`
+  <div class="storeBox">
+   <div class="storeBoxHeader">
+    <b>🏪 ${esc(s.name)}</b>
+    <button class="danger storeDelete" data-store-delete="${si}">🗑️ DELETE STORE</button>
+   </div>
+   <div class="storeInner">
+    <div class="storeEditorActions">
+      <label class="label">STORE NAME</label>
+      <input class="storeNameInline" data-store="${si}" value="${esc(s.name)}" placeholder="Store name">
+      <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
+    </div>
+    <div class="storeCategories">
+     ${(s.categories||[]).map((c,ci)=>`
+      <div class="storeCategory">
+       <div class="storeCategoryHeader">
+        <b>📂 ${esc(c.name)}</b>
+        <div class="categoryBtns">
+         <button class="gray" data-cat-open="${si}-${ci}">FOODS</button>
+         <button class="gray" data-cat-edit="${si}-${ci}">EDIT</button>
+         <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
+        </div>
+       </div>
+       <div id="store-food-${si}-${ci}" class="storeFoodList hidden"></div>
+      </div>`).join("")}
+    </div>
+    <div class="storeAddCategory">
+      <input data-new-cat="${si}" placeholder="New category name">
+      <button class="blue" data-add-cat="${si}">➕ CATEGORY</button>
+    </div>
+   </div>
+  </div>`).join("");
+
+ host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
+   const si=+b.dataset.storeSave;
+   const inp=host.querySelector(`[data-store="${si}"]`);
+   const n=inp.value.trim();
+   if(n)draft.stores[si].name=n;
+   renderStores();
+   if(selectedStore===si) renderEditor();
+ });
+ host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=()=>{
+   const si=+b.dataset.storeDelete;
+   if(confirm("Delete this entire store and all its foods?")){
+     draft.stores.splice(si,1);
      selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
-     renderStores();renderEditor();
+     renderStores(); renderEditor();
    }
-   return;
- }
- const b=e.target.closest("[data-store]");
- if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}
+ });
+ host.querySelectorAll("[data-add-cat]").forEach(b=>b.onclick=()=>{
+   const si=+b.dataset.addCat,inp=host.querySelector(`[data-new-cat="${si}"]`),n=inp.value.trim();
+   if(!n)return;
+   draft.stores[si].categories=draft.stores[si].categories||[];
+   draft.stores[si].categories.push({name:n,items:[]});
+   renderStores();
+ });
+ host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catEdit.split("-").map(Number);
+   const c=draft.stores[si].categories[ci];
+   const n=prompt("Edit category name:",c.name);
+   if(n&&n.trim()){c.name=n.trim();renderStores();}
+ });
+ host.querySelectorAll("[data-cat-delete]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catDelete.split("-").map(Number);
+   if(confirm("Delete this category and its foods?")){
+     draft.stores[si].categories.splice(ci,1);renderStores();
+   }
+ });
+ host.querySelectorAll("[data-cat-open]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catOpen.split("-").map(Number);
+   const list=$("store-food-"+si+"-"+ci);
+   list.classList.toggle("hidden");
+   if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
+ });
 };
 $("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
 function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
 function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
+
+function renderNestedFoods(si,ci,list){
+ const s=draft.stores[si],c=s.categories[ci];
+ list.innerHTML=(c.items||[]).map((f,fi)=>`
+  <div class="storeFoodItem">
+   <div class="foodLine">
+    <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
+    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
+    <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
+   </div>
+  </div>`).join("")+
+  `<div class="addFoodInline">
+    <input class="nestedFoodName" placeholder="Food name">
+    <input class="nestedFoodPrice" type="number" min="0" step="0.01" placeholder="Base price">
+    <button class="red nestedAddFood">➕ ADD FOOD</button>
+   </div>`;
+ list.querySelector(".nestedAddFood").onclick=()=>{
+   const n=list.querySelector(".nestedFoodName").value.trim();
+   const p=Number(list.querySelector(".nestedFoodPrice").value);
+   if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
+   c.items=c.items||[];
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
+   renderNestedFoods(si,ci,list);
+ };
+ list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
+   const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
+   const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
+   ed.classList.toggle("hidden");
+   if(!ed.classList.contains("hidden") && typeof renderDirectFoodEditor==="function"){
+     renderDirectFoodEditor(y,z,ed,list);
+   }
+ });
+}
 function renderEditor(){
  const s=draft.stores[selectedStore];
  if(!s){$("editor").classList.add("hidden");return}

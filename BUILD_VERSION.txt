@@ -1,1 +1,2 @@
-MHAC DELIVERY V2.9 FINAL - ONE BOX MENU + CHAT + ACCEPT/WAITING TIMER + CUSTOMER CANCEL
+MHAC DELIVERY V3 FINAL - COMPACT STORE-FIRST MENU
+Store is the main box. Categories and foods are nested inside each store. Store/category/food edit/delete remain available. Existing chat/order/time logic preserved.
