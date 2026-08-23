@@ -1,6 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}
+
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
+.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -11,6 +14,9 @@
 .mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
 .mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
 @keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
+
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
+.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -174,35 +180,112 @@ function renderCategory(ci){
 }
 function renderFood(ci,fi){
  const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
+ const choices=it.choices||[], addons=it.addOns||[], parts=(it.chickenParts||[]).map(x=>typeof x==="string"?x:(x.name||""));
  box.innerHTML=`<div class=editorBox>
-  <h4>✏️ EDIT FOOD</h4>
-  <label class=label>FOOD NAME</label><input id="fn-${ci}-${fi}" value="${esc(it.name)}">
-  <div class=two><div><label class=label>BASE PRICE</label><input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}"></div>
-  <div><label class=label>TYPE</label><select id="ft-${ci}-${fi}"><option value="standard">Standard</option><option value="chicken">Chicken</option><option value="bucket">Bucket Chicken</option></select></div></div>
-  <label class=label>AVAILABILITY</label><select id="fa-${ci}-${fi}"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
-  <label class=label>🥤 DRINKS / CHOICES</label><textarea id="ch-${ci}-${fi}" placeholder="One per line: Coke Regular|0\nCoke Medium|10\nCoke Large|20">${esc(pairsText(it.choices))}</textarea>
-  <div class=hint>Format: <b>Name|additional price</b>. Example: Coke Medium|10</div>
-  <label class=label>➕ OPTIONAL ADD-ONS</label><textarea id="ao-${ci}-${fi}" placeholder="One per line: Extra Rice|20\nSpicy|10">${esc(pairsText(it.addOns))}</textarea>
-  <div class=hint>Customers can select or skip these add-ons.</div>
-  <label class=label>🍗 CHICKEN PARTS</label><input id="cp-${ci}-${fi}" placeholder="Example: Leg, Thigh, Breast, Wing" value="${esc((it.chickenParts||[]).map(x=>x.name||x).join(", "))}">
-  <div class=hint>For Chicken type, customer quantity selection must match the selected parts.</div>
-  <div class=two><div><label class=label>🌶️ SPICY ADD-ON / PIECE</label><input id="sp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.spicyPrice||5)}"></div>
-  <div><label class=label>🍗 BUCKET PIECES</label><input id="bp-${ci}-${fi}" type="number" min="0" step="1" value="${Number(it.bucketPieces||0)}"></div></div>
+  <h4>✏️ COMPLETE FOOD BOX</h4>
+
+  <label class=label>🏪 STORE</label>
+  <input value="${esc(draft.stores[selectedStore].name)}" disabled>
+
+  <label class=label>📂 CATEGORY</label>
+  <input value="${esc(draft.stores[selectedStore].categories[ci].name)}" disabled>
+
+  <label class=label>🍽️ FOOD NAME</label>
+  <input id="fn-${ci}-${fi}" value="${esc(it.name)}">
+
+  <label class=label>💰 BASE PRICE</label>
+  <input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}">
+
+  <label class=label>TYPE</label>
+  <select id="ft-${ci}-${fi}">
+    <option value="standard">Standard</option>
+    <option value="chicken">Chicken</option>
+    <option value="bucket">Bucket Chicken</option>
+  </select>
+
+  <label class=label>AVAILABILITY</label>
+  <select id="fa-${ci}-${fi}">
+    <option value="true">AVAILABLE</option>
+    <option value="false">UNAVAILABLE</option>
+  </select>
+
+  <h4>🍗 CHICKEN PARTS — CUSTOMER SELECTABLE</h4>
+  <div class=hint>Kung chicken food ito, idagdag dito ang available parts. Puwedeng piliin ng customer ang part.</div>
+  <div id="parts-${ci}-${fi}"></div>
+  <button type=button class=blue id="addPart-${ci}-${fi}">➕ ADD CHICKEN PART</button>
+
+  <h4>🥤 DRINKS / CHOICES</h4>
+  <div class=hint>Kung SOLO: iwanang walang choices. Kung may drinks: idagdag dito ang bawat drink at additional price.</div>
+  <div id="choices-${ci}-${fi}"></div>
+  <button type=button class=blue id="addChoice-${ci}-${fi}">➕ ADD DRINK / CHOICE</button>
+
+  <h4>➕ OPTIONAL ADD-ONS</h4>
+  <div class=hint>Customer puwedeng piliin o hindi. Halimbawa: Extra Rice +₱25.</div>
+  <div id="addons-${ci}-${fi}"></div>
+  <button type=button class=blue id="addAddon-${ci}-${fi}">➕ ADD ADD-ON</button>
+
+  <label class=label>DESCRIPTION (OPTIONAL)</label>
+  <textarea id="fd-${ci}-${fi}" placeholder="Short food description">${esc(it.description||"")}</textarea>
+
   <button class=green id="saveFood-${ci}-${fi}">💾 SAVE FOOD TO DRAFT</button>
+  <div class=hint>After saving, click <b>PUBLISH THIS STORE TO CUSTOMER APP</b>. Only this store will be updated.</div>
  </div>`;
+
  $("ft-"+ci+"-"+fi).value=it.type||"standard";
  $("fa-"+ci+"-"+fi).value=String(it.available!==false);
+
+ const addRow=(containerId,clsName,clsPrice,name="",price=0)=>{
+   const row=document.createElement("div");row.className="choiceRow";
+   row.innerHTML=`<input class="${clsName}" placeholder="Name" value="${esc(name)}">
+     <input class="${clsPrice}" type="number" min="0" step="0.01" placeholder="+ ₱" value="${Number(price||0)}">
+     <button type=button class=danger>✕</button>`;
+   row.querySelector("button").onclick=()=>row.remove();
+   $(containerId).appendChild(row);
+ };
+ const addPart=()=>{
+   const row=document.createElement("div");row.className="choiceRow";
+   row.innerHTML=`<input class="partName" placeholder="Chicken part e.g. Leg / Thigh / Breast">
+     <span></span><button type=button class=danger>✕</button>`;
+   row.querySelector("button").onclick=()=>row.remove();
+   $("parts-"+ci+"-"+fi).appendChild(row);
+ };
+ parts.forEach(x=>addPartRow());
+ function addPartRow(name=""){
+   const row=document.createElement("div");row.className="choiceRow";
+   row.innerHTML=`<input class="partName" placeholder="Chicken part e.g. Leg / Thigh / Breast" value="${esc(name)}">
+     <span></span><button type=button class=danger>✕</button>`;
+   row.querySelector("button").onclick=()=>row.remove();
+   $("parts-"+ci+"-"+fi).appendChild(row);
+ }
+
+ choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0],x[1]));
+ addons.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0],x[1]));
+ $("addChoice-"+ci+"-"+fi).onclick=()=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice","","0");
+ $("addAddon-"+ci+"-"+fi).onclick=()=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice","","0");
+ $("addPart-"+ci+"-"+fi).onclick=()=>addPartRow("");
+
  $("saveFood-"+ci+"-"+fi).onclick=()=>{
-   it.name=$("fn-"+ci+"-"+fi).value.trim()||it.name;
-   it.price=Number($("fp-"+ci+"-"+fi).value)||0;
+   const name=$("fn-"+ci+"-"+fi).value.trim();
+   const price=Number($("fp-"+ci+"-"+fi).value);
+   if(!name||!Number.isFinite(price)||price<0)return alert("Please enter a food name and valid base price.");
+
+   it.name=name;it.price=price;
    it.type=$("ft-"+ci+"-"+fi).value;
    it.available=$("fa-"+ci+"-"+fi).value==="true";
-   it.choices=parsePairs($("ch-"+ci+"-"+fi).value);
-   it.addOns=parsePairs($("ao-"+ci+"-"+fi).value);
-   it.chickenParts=$("cp-"+ci+"-"+fi).value.split(",").map(x=>x.trim()).filter(Boolean).map(name=>({name}));
-   it.spicyPrice=Number($("sp-"+ci+"-"+fi).value)||0;
-   it.bucketPieces=Number($("bp-"+ci+"-"+fi).value)||0;
-   alert("✅ Food saved in DRAFT. Click PUBLISH TO CUSTOMER APP when all changes are ready.");
+   it.description=$("fd-"+ci+"-"+fi).value.trim();
+
+   it.chickenParts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")]
+     .map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
+
+   it.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")]
+     .map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)])
+     .filter(x=>x[0]);
+
+   it.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")]
+     .map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)])
+     .filter(x=>x[0]);
+
+   alert("✅ FOOD SAVED TO DRAFT. Review it, then PUBLISH THIS STORE TO CUSTOMER APP.");
    renderEditor();setTimeout(()=>renderCategory(ci),0);
  };
 }
