@@ -91,4 +91,5 @@ function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.d
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 
+</script>
 </body></html>
