@@ -1,7 +1,1 @@
-V2.5 changes:
-- Category name can be edited and deleted.
-- Drink name field is wider; add-price field is narrower and text smaller.
-- COPY ALL / PASTE ALL for parts, drinks, add-ons, plus bucket choices.
-- Added FOOD TYPE: Regular Food / Chicken / Bucket.
-- Bucket choices can be added with optional additional prices.
-- Customer app displays bucket choices and includes the selected bucket choice in cart pricing.
+V2.6: Parts, Drinks, Add-ons and Bucket rows now use wide name + compact add-price + delete columns. Added bucket quick choices for Original, Spicy and Original+Spicy combinations. Added missing Food Base Price editor field.
