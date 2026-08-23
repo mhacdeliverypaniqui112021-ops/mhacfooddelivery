@@ -13,6 +13,24 @@
 .choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
 .choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
 @media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
+
+/* V1.9 mobile food editor readability */
+.foodBoxHeader{display:block!important}
+.foodBoxHeader .miniBtn{display:block!important;width:100%!important;margin-top:8px!important}
+.storeFoodBox input,.storeFoodBox textarea,.storeFoodBox select,
+.foodEditorWrap input,.foodEditorWrap textarea,.foodEditorWrap select{
+  width:100%!important; min-height:54px!important; font-size:19px!important;
+  padding:13px 15px!important; border-radius:12px!important;
+}
+.storeFoodBox label,.foodEditorWrap label,.storeFoodBox .label{font-size:17px!important;font-weight:900!important}
+.choiceRow{display:grid!important;grid-template-columns:minmax(0,1fr) 120px 52px!important;gap:8px!important}
+.choiceRow input{min-height:54px!important;font-size:18px!important}
+.choiceRow button{min-height:54px!important;font-size:22px!important}
+@media(max-width:600px){
+ .choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}
+ .choiceRow input{font-size:17px!important}
+ .foodEditorWrap{padding:14px!important}
+}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -35,6 +53,24 @@
 .choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
 .choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
 @media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
+
+/* V1.9 mobile food editor readability */
+.foodBoxHeader{display:block!important}
+.foodBoxHeader .miniBtn{display:block!important;width:100%!important;margin-top:8px!important}
+.storeFoodBox input,.storeFoodBox textarea,.storeFoodBox select,
+.foodEditorWrap input,.foodEditorWrap textarea,.foodEditorWrap select{
+  width:100%!important; min-height:54px!important; font-size:19px!important;
+  padding:13px 15px!important; border-radius:12px!important;
+}
+.storeFoodBox label,.foodEditorWrap label,.storeFoodBox .label{font-size:17px!important;font-weight:900!important}
+.choiceRow{display:grid!important;grid-template-columns:minmax(0,1fr) 120px 52px!important;gap:8px!important}
+.choiceRow input{min-height:54px!important;font-size:18px!important}
+.choiceRow button{min-height:54px!important;font-size:22px!important}
+@media(max-width:600px){
+ .choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}
+ .choiceRow input{font-size:17px!important}
+ .foodEditorWrap{padding:14px!important}
+}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -252,13 +288,6 @@ function renderFood(ci,fi){
   <label class=label>💰 BASE PRICE</label>
   <input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}">
 
-  <label class=label>TYPE</label>
-  <select id="ft-${ci}-${fi}">
-    <option value="standard">Standard</option>
-    <option value="chicken">Chicken</option>
-    <option value="bucket">Bucket Chicken</option>
-  </select>
-
   <label class=label>AVAILABILITY</label>
   <select id="fa-${ci}-${fi}">
     <option value="true">AVAILABLE</option>
@@ -341,7 +370,7 @@ function renderFood(ci,fi){
      .map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)])
      .filter(x=>x[0]);
 
-   alert("✅ FOOD SAVED TO DRAFT. Review it, then PUBLISH THIS STORE TO CUSTOMER APP.");
+   
    renderEditor();setTimeout(()=>renderCategory(ci),0);
  };
 }

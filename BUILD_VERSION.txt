@@ -1,4 +1,2 @@
-MHAC DELIVERY FINAL BUILD V1.8
-Admin food editor redesign: each category shows every food in its own complete editable box.
-Each food box contains food name, base price, chicken parts, drinks/choices with size/additional price, optional add-ons, description, availability, and save.
-Solo items can leave drinks/choices empty. Publish remains store-to-store.
+MHAC DELIVERY FINAL BUILD V1.9
+Clean mobile food editor: larger editable fields, clearer drink/part/add-on rows, removed confusing Standard/Chicken/Bucket selector, and removed food-save confirmation popup.
