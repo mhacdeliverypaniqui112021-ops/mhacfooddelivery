@@ -1,326 +1,71 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — CUSTOMER</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER FINAL</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}
-header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}
-.rate{margin:14px auto 8px;max-width:680px;padding:13px;border:2px solid #222;border-radius:15px;text-align:center}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px;font-size:13px;font-weight:800}
-.reminder{margin-top:9px;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff8e6;font-size:12px;line-height:1.45;text-align:left}
-.area{max-width:680px;margin:8px auto;padding:9px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800;line-height:1.45}
-.wrap{max-width:680px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}
-.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.cart h2{font-size:20px;margin:0 0 8px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0 5px}.row{padding:8px 0;border-bottom:1px solid #eee}
-.qty{display:flex;align-items:center;gap:8px;margin-top:5px}.qty button,.choice button,.back{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}
-.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}
-.modal{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:10}.panel{background:#fff;border-radius:17px;padding:16px;max-width:600px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}
-.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice b{font-size:12px}.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}
-.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:560px;margin:20px auto 40px}.checkout-panel input,.checkout-panel select{width:100%;padding:10px;margin:5px 0;border:1.5px solid #aaa;border-radius:8px;font-size:15px}
-.gpsrow{display:flex;gap:7px}.gpsrow button{flex:1;padding:9px;border:0;border-radius:8px;background:#111;color:#fff;font-weight:800}.status{font-size:12px;color:#666;margin:5px 0}.small{font-size:12px;color:#666}.total{font-size:21px;font-weight:900}
-.location-note{margin:7px 0;padding:10px;border:1.5px solid #222;border-radius:10px;background:#fff;font-size:12px;line-height:1.45}
-.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.account{font-size:12px;color:#555;margin:5px 0} .schedule{margin:8px auto;max-width:680px;padding:9px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-weight:800;font-size:12px}</style></head><body>
-<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><p>Sign in with your Gmail/Google account before placing an order. This helps protect MHAC Delivery from fake bookings.</p><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
-<div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText">Please return during our operating hours.</p><p class="status">Your account will remain protected. Ordering automatically opens again at the next opening time.</p></div></div>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
+</style>
+<style>
+.mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
+.mhacSplash.hide{opacity:0;pointer-events:none}
+.mhacSplash img{width:min(72vw,330px);height:auto;animation:mhacIn .8s ease both}
+.mhacSplash h1{color:#fff;margin:16px 0 5px;font-size:30px;letter-spacing:2px}
+.mhacSplash p{color:#e21d25;font-weight:900;letter-spacing:2px}
+.mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
+.mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
+@keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
+</style>
+</head><body>
+<div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
+<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
+<div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
-<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p>
-<div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
-<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">🕘 Checking ordering hours…</div><div id="customerAccount" class="account" style="text-align:center"></div>
-<main class="wrap"><div class="title">CHOOSE FOOD STORE</div>
-<div id="menuStatus" class="status">Loading latest menu…</div><div id="storeLimitNote" class="area">🍽️ You may order from a maximum of 2 stores per order.</div>
-<div id="stores" class="stores"></div>
-<section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small" style="font-weight:900"></div>
-<div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section></main>
+<section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ Food prices are based on the latest menu published by MHAC Admin.</div></section>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div>
+<main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
+<section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
+<section class="cart"><h2>📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="accountLine" class="account"></div>
-<div style="font-weight:900;margin:8px 0">🛒 ORDERED FOODS</div><div id="orderSummary" style="background:#f7f7f7;padding:10px;border-radius:10px"></div>
-<div id="checkoutTotals" style="margin:10px 0;padding:12px;border:2px solid #222;border-radius:10px"></div>
-<h3>👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel">
-<div class="location-note">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div>
-<div class="gpsrow"><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button></div><div id="gpsAccuracy" class="status"></div>
-<div id="gpsLocationDisplay" class="status" style="display:none;font-size:15px;font-weight:700"></div>
-<div class="gpsrow"><button id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button></div>
-<div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div>
-<select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
-<button id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status" style="text-align:center"></div>
-</div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to detect current location.</div><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
+<script>
+function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}}window.addEventListener("load",()=>setTimeout(hideSplash,2200));
+</script>
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,addDoc,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-const firebaseConfig={
-  apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
-  authDomain:"mhac-delivery-53099.firebaseapp.com",
-  projectId:"mhac-delivery-53099",
-  storageBucket:"mhac-delivery-53099.firebasestorage.app",
-  messagingSenderId:"878081137607",
-  appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
-  measurementId:"G-7NZEK618YC"
-};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-let data=null,cart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,currentUser=null,businessHours={openTime:"09:00",closeTime:"19:00",enabled:true},scheduleTimer=null;
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const peso=n=>"₱"+Number(n||0).toFixed(2);
-function minutes(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}
-function isOpenNow(){if(businessHours.enabled===false)return false;const n=new Date();const cur=n.getHours()*60+n.getMinutes(),op=minutes(businessHours.openTime),cl=minutes(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
-function scheduleLabel(){return `🕘 Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}`+(businessHours.enabled===false?" • TEMPORARILY OFF":"")}
-function applySchedule(){const open=isOpenNow();$("scheduleBar").textContent=scheduleLabel();if(currentUser&&open){$("authGate").style.display="none";$("closedScreen").style.display="none";document.body.style.overflow="auto"}else if(currentUser&&!open){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=`Today’s ordering window is ${businessHours.openTime} – ${businessHours.closeTime}.`;cart=[];renderCart()}else{$("authGate").style.display="flex";$('closedScreen').style.display="none"}}
-async function loadBusinessHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...businessHours,...s.data()}}catch(e){}applySchedule()}
-async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));data=s.exists()?s.data():null;if(!data||!Array.isArray(data.stores))data=__SEED__;renderStores();renderCart();$("menuStatus").textContent="🟢 LIVE MENU READY"}
-async function boot(){try{await loadBusinessHours();await loadMenu()}catch(e){$("menuStatus").textContent="❌ Menu/Firebase error: "+e.message;data=__SEED__;renderStores();renderCart()}}
-async function finishGoogleRedirect(){try{const r=await getRedirectResult(auth);if(r&&r.user){currentUser=r.user;$("authStatus").textContent="Signed in: "+(currentUser.email||"");await boot();}}catch(e){$("authStatus").textContent="❌ Google sign-in failed: "+e.message}}
-finishGoogleRedirect();
-$("googleLogin").onclick=async()=>{const btn=$("googleLogin");btn.disabled=true;$("authStatus").textContent="Opening Google sign-in…";try{const provider=new GoogleAuthProvider();try{const r=await signInWithPopup(auth,provider);currentUser=r.user;$("authStatus").textContent="Signed in: "+(currentUser.email||"");await boot();}catch(popupErr){await signInWithRedirect(auth,provider);}}catch(e){$("authStatus").textContent="❌ Google sign-in failed: "+e.message;btn.disabled=false}};
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(u){$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id="logoutCustomer" style="margin-left:6px;padding:5px 8px;border:1px solid #222;border-radius:7px;background:#fff;font-weight:800">LOG OUT</button>`;$("logoutCustomer").onclick=()=>signOut(auth);await boot();$("accountLine").textContent="🔐 Signed in: "+(u.email||"")}else{clearInterval(scheduleTimer);$("customerAccount").textContent="";applySchedule()}});
-scheduleTimer=setInterval(async()=>{if(currentUser){await loadBusinessHours();if(!isOpenNow()){await signOut(auth)}}},30000);
-function renderStores(){$("stores").innerHTML=(data?.stores||[]).map((s,i)=>`<button class="store" onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("")}
-function openStore(si){const s=data.stores[si];$("menuBody").innerHTML=`<button class=back onclick="closeMenu()">← Stores</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`+(s.categories||[]).map((c,ci)=>`<div class=food onclick="openCat(${si},${ci})"><b>🍽️ ${esc(c.name)}</b><br><span class=small>${(c.items||[]).filter(f=>f.available!==false).length} available food choices</span></div>`).join("");$("menuModal").style.display="block"}
-function openCat(si,ci){const c=data.stores[si].categories[ci],foods=(c.items||[]).filter(f=>f.available!==false);$("menuBody").innerHTML=`<button class=back onclick="openStore(${si})">← ${esc(data.stores[si].name)}</button><h2>${esc(c.name)}</h2>`+foods.map(f=>{const fi=c.items.indexOf(f);return `<div class=food><h3>${esc(f.name)}</h3><b>${peso(f.price)}</b>`+(f.choices||[]).map((x,xi)=>`<div class=choice><span>${esc(x[0])} <b>+${peso(x[1])}</b></span><button onclick="addFood(${si},${ci},${fi},${xi})">SELECT & ADD</button></div>`).join("")+"</div>"}).join("")}
-function addFood(si,ci,fi,xi){const f=data.stores[si].categories[ci].items[fi],ch=(f.choices||[])[xi]||["No Drink",0],store=data.stores[si].name;const used=[...new Set(cart.map(x=>x.store))];if(!used.includes(store)&&used.length>=2){$("storeLimitNote").textContent="⚠️ 2 STORES MAXIMUM — Remove one store before choosing another.";return}const key=si+"-"+ci+"-"+fi+"-"+xi,q=cart.find(x=>x.key===key);q?q.qty++:cart.push({key,store,name:f.name,choice:ch[0],price:Number(f.price)+Number(ch[1]),qty:1});renderCart();closeMenu()}
-function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
-function renderCart(){let n=cart.reduce((a,x)=>a+x.qty,0);$("count").textContent=n;const names=[...new Set(cart.map(x=>x.store))];$("storeCount").textContent=names.length?`Stores selected: ${names.length}/2`:"Stores selected: 0/2";if(!cart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return}$("checkoutBtn").disabled=false;let groups={};names.forEach(n=>groups[n]=[]);cart.forEach((x,i)=>groups[x.store].push({...x,i}));$("cart").innerHTML=names.map(n=>`<div class=store-head>${n.toUpperCase()}</div>`+groups[n].map(x=>`<div class=row><b>${x.qty} × ${esc(x.name)}</b><br><small>${esc(x.choice)}</small><div class=qty><button onclick="changeQty(${x.i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${x.i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`).join("")).join("");const sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("totals").innerHTML=`<p>Food Order: <b>${peso(sub)}</b></p><p>10% Service Fee: <b>${peso(sf)}</b></p><p>Delivery Fee: <b>${distanceKm===null?"—":peso(deliveryFee)}</b></p><p>2nd Store Fee: <b>${peso(second)}</b></p><p class=total>GRAND TOTAL: ${peso(total)}</p>`}
-function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=cart.map(x=>`<div style="padding:5px 0;border-bottom:1px solid #ddd"><b>${esc(x.store.toUpperCase())}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)} — ${peso(x.price*x.qty)}</small></div>`).join("");updateCheckoutTotals()}
-function updateCheckoutTotals(){const sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=[...new Set(cart.map(x=>x.store))].length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("checkoutTotals").innerHTML=`Food Order: <b>${peso(sub)}</b><br>10% Service Fee: <b>${peso(sf)}</b><br>🚚 Delivery Fee: <b>${distanceKm===null?"—":peso(deliveryFee)}</b><br>2nd Store Fee: <b>${peso(second)}</b><br><div class=total>GRAND TOTAL: ${peso(total)}</div>`}
-function closeMenu(){$("menuModal").style.display="none"} function closeCheckout(){$("checkout").style.display="none"}
-function feeForKm(km){return 40+Math.max(0,Math.ceil(km)-1)*10}
-async function calculateByGPS(){if(!navigator.geolocation){$("locStatus").textContent="❌ GPS not supported.";return}$("gpsBtn").disabled=true;$("calculateFeeBtn").disabled=true;$("locStatus").textContent="📍 Detecting location…";navigator.geolocation.getCurrentPosition(async p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1&accept-language=en`);const g=await r.json();$("gpsLocationDisplay").style.display="block";$("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+(g.display_name||`${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`);$("gpsAccuracy").textContent=`GPS accuracy: approximately ${Math.round(gpsAccuracy)} meters`;$("locStatus").textContent="✅ GPS detected. Press CALCULATE DELIVERY FEE.";$("calculateFeeBtn").disabled=false}catch(e){$("locStatus").textContent="⚠️ GPS detected, but address lookup failed. You can still calculate the route."; $("calculateFeeBtn").disabled=false}finally{$("gpsBtn").disabled=false}},e=>{$("gpsBtn").disabled=false;$("locStatus").textContent="⚠️ GPS permission/location failed. Please try again."},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
-async function calculateGPSFee(){if(!Number.isFinite(gpsLat)||!Number.isFinite(gpsLon))return;$("calculateFeeBtn").disabled=true;$("locStatus").textContent="📍 Calculating actual driving distance…";try{const u=`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`;const r=await fetch(u),j=await r.json();if(j.code!=="Ok")throw Error("route");distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`📍 Actual driving distance: ${distanceKm.toFixed(2)} km • Delivery Fee: ${peso(deliveryFee)}`;$("locStatus").textContent="✅ Delivery fee calculated from GPS.";renderCart();updateCheckoutTotals()}catch(e){$("locStatus").textContent="❌ Route could not be calculated. Please retry."}finally{$("calculateFeeBtn").disabled=false}}
-async function placeOrder(){if(!currentUser){alert("Please sign in with Google first.");return}if(!isOpenNow()){alert("MHAC Delivery is currently closed.");await signOut(auth);return}const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact){alert("Please complete Customer Name and Contact Number.");return}if(!Number.isFinite(gpsLat)||!Number.isFinite(gpsLon)||distanceKm===null){alert("Please allow GPS and calculate the delivery fee first.");return}const sub=cart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(cart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;const o={orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",assignedRiderNickname:"",customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},items:cart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value};$("sendOrderBtn").disabled=true;try{const ref=await addDoc(collection(db,"orders"),o);$("sendStatus").textContent="✅ ORDER SENT: "+ref.id;cart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,1000)}catch(e){$("sendStatus").textContent="❌ SEND FAILED: "+e.message}finally{$("sendOrderBtn").disabled=false}}
-window.openStore=openStore;window.openCat=openCat;window.addFood=addFood;window.changeQty=changeQty;window.closeMenu=closeMenu;window.closeCheckout=closeCheckout;window.openCheckout=openCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;window.changeQty=changeQty;
-const __SEED__={
-  "version": "3.2",
-  "stores": [
-    {
-      "id": "jollibee",
-      "name": "Jollibee",
-      "icon": "🍗",
-      "categories": [
-        {
-          "name": "Chicken",
-          "items": [
-            {
-              "name": "Chickenjoy 1pc",
-              "price": 99,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ],
-                [
-                  "Sprite Regular",
-                  25
-                ],
-                [
-                  "Sprite Medium",
-                  35
-                ],
-                [
-                  "Sprite Large",
-                  45
-                ]
-              ]
-            },
-            {
-              "name": "Chickenjoy 2pc",
-              "price": 159,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Meals",
-          "items": [
-            {
-              "name": "Chickenjoy with Rice",
-              "price": 129,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "mcdo",
-      "name": "McDo",
-      "icon": "🍟",
-      "categories": [
-        {
-          "name": "Chicken",
-          "items": [
-            {
-              "name": "1pc Chicken McDo",
-              "price": 99,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Burgers",
-          "items": [
-            {
-              "name": "Burger Solo",
-              "price": 89,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "manginasal",
-      "name": "Mang Inasal",
-      "icon": "🍗",
-      "categories": [
-        {
-          "name": "Chicken",
-          "items": [
-            {
-              "name": "PM1 Chicken",
-              "price": 109,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "kfc",
-      "name": "KFC",
-      "icon": "🍗",
-      "categories": [
-        {
-          "name": "Chicken",
-          "items": [
-            {
-              "name": "1pc Chicken Meal",
-              "price": 109,
-              "available": true,
-              "choices": [
-                [
-                  "No Drink",
-                  0
-                ],
-                [
-                  "Coke Regular",
-                  25
-                ],
-                [
-                  "Coke Medium",
-                  35
-                ],
-                [
-                  "Coke Large",
-                  45
-                ]
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-};
-boot();
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getFirestore,doc,getDoc,addDoc,collection,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
+
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
+const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
+let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null;
+function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function isOpen(){if(businessHours.enabled===false)return false;const n=new Date(),c=n.getHours()*60+n.getMinutes(),o=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return o<=cl?c>=o&&c<cl:(c>=o||c<cl)}
+async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...businessHours,...s.data()}}catch(e){}}function applyHours(){const op=isOpen();$("scheduleBar").textContent=`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
+async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));data=s.exists()?s.data():{stores:[]};$("menuStatus").textContent=data.stores?.length?"🟢 PUBLISHED MENU READY":"⚠️ No menu has been published yet.";renderStores();renderCart()}
+async function boot(){await loadHours();await loadMenu();applyHours()}
+function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
+getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders()});
+function renderStores(){$("stores").innerHTML=(data.stores||[]).map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("")}
+function openStore(si){const s=data.stores[si];$("menuBody").innerHTML=`<button class=back onclick=closeMenu()>← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`+(s.categories||[]).map((c,ci)=>`<div class=food onclick="openCat(${si},${ci})"><b>🍽️ ${esc(c.name)}</b><br><span class=small>${(c.items||[]).length} menu items</span></div>`).join("");$("menuModal").style.display="block"}
+function openCat(si,ci){const c=data.stores[si].categories[ci];$("menuBody").innerHTML=`<button class=back onclick="openStore(${si})">← ${esc(data.stores[si].name)}</button><h2>${esc(c.name)}</h2>`+(c.items||[]).filter(f=>f.available!==false).map((f,fi)=>`<div class=food><h3>${esc(f.name)}</h3><b>${peso(f.price)}</b><br><span class=small>${f.type==="bucket"?"Bucket Chicken":f.type==="chicken"?"Chicken":"Food"}</span><button class=add onclick="customize(${si},${ci},${fi})">CUSTOMIZE & ADD</button></div>`).join("");}
+function customize(si,ci,fi){const f=data.stores[si].categories[ci].items[fi];const existing=draftCart.filter(x=>x.store===data.stores[si].name&&x.name===f.name).reduce((a,x)=>a+x.qty,0);let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(f.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
+if(f.choices?.length)h+=`<div class=field><b>DRINK / CHOICE</b>${f.choices.map((x,i)=>`<label class=choice><span>${esc(x.name)} ${x.price?`(+${peso(x.price)})`:""}</span><input type=radio name=choice value="${i}" ${i===0?"checked":""}></label>`).join("")}</div>`;
+if(f.addOns?.length)h+=`<div class=field><b>OPTIONAL ADD-ONS</b>${f.addOns.map((x,i)=>`<label class=choice><span>${esc(x.name)} ${x.price?`(+${peso(x.price)})`:""}</span><input type=checkbox data-addon="${i}"></label>`).join("")}</div>`;
+if(f.type==="chicken"&&f.chickenParts?.length)h+=`<div class=field><b>CHICKEN PART</b>${f.chickenParts.map((x,i)=>`<div class=counter"><span>${esc(x.name)}</span><button class=mini data-part="${i}" data-d="-1">−</button><b id=part-${i}>0</b><button class=mini data-part="${i}" data-d="1">+</button></div>`).join("")}<p class=small>Part selections must equal the chicken quantity.</p></div>`;
+if(f.type==="bucket"&&f.bucketPieces>0)h+=`<div class=field><b>BUCKET ${f.bucketPieces}PCS</b><p>Choose Original/Spicy. Spicy +${peso(f.spicyPrice||5)} per piece.</p><div class=counter>Original <button class=mini id=origMinus>−</button><b id=orig>0</b><button class=mini id=origPlus>+</button></div><div class=counter>Spicy <button class=mini id=spicyMinus>−</button><b id=spicy>0</b><button class=mini id=spicyPlus>+</button></div><p id=bucketTotal class=small>Total: 0/${f.bucketPieces}</p></div>`;
+h+=`<button class=add id=addConfigured>ADD TO CART</button>`;$("menuBody").innerHTML=h;
+let qty=1,parts=(f.chickenParts||[]).map(()=>0),orig=0,spicy=0;
+function update(){if(f.type==="chicken")$("bucketTotal")?.remove();if(f.type==="bucket")$("bucketTotal").textContent=`Total: ${orig+spicy}/${f.bucketPieces} per bucket`;$("orig")&&($("orig").textContent=orig);$("spicy")&&($("spicy").textContent=spicy);parts.forEach((v,i)=>{const e=$("part-"+i);if(e)e.textContent=v})}
+document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{const i=+b.dataset.part,d=+b.dataset.d;let total=parts.reduce((a,x)=>a+x,0);if(d>0&&total>=qty)return;parts[i]=Math.max(0,parts[i]+d);update()});
+if(f.type==="bucket"){const change=(which,d)=>{let total=orig+spicy;if(d>0&&total>=f.bucketPieces)return;if(which==="o")orig=Math.max(0,orig+d);else spicy=Math.max(0,spicy+d);update()};$("origMinus").onclick=()=>change("o",-1);$("origPlus").onclick=()=>change("o",1);$("spicyMinus").onclick=()=>change("s",-1);$("spicyPlus").onclick=()=>change("s",1)}
+$("addConfigured").onclick=()=>{if(f.type==="chicken"&&parts.reduce((a,x)=>a+x,0)!==qty)return alert("Please select chicken part for every piece.");if(f.type==="bucket"&&orig+spicy!==f.bucketPieces)return alert("Please select Original + Spicy to equal "+f.bucketPieces+" pieces.");const ch=f.choices?.[Number(document.querySelector('input[name=choice]:checked')?.value||0)],adds=[...(document.querySelectorAll("[data-addon]:checked"))].map(x=>f.addOns[+x.dataset.addon]);const extra=(ch?.price||0)+adds.reduce((a,x)=>a+Number(x.price||0),0)+(f.type==="bucket"?spicy*Number(f.spicyPrice||5):0);const key=Date.now()+"-"+Math.random();draftCart.push({key,store:data.stores[si].name,name:f.name,price:Number(f.price)+extra,basePrice:Number(f.price),qty,type:f.type,choice:ch?.name||"",addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:f.type==="chicken"?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:f.type==="bucket"?orig:undefined,spicy:f.type==="bucket"?spicy:undefined,spicyPrice:f.type==="bucket"?Number(f.spicyPrice||5):0});renderCart();closeMenu()};update()}
+function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
+function renderCart(){const names=[...new Set(draftCart.map(x=>x.store))];$("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);$("storeCount").textContent=`Stores selected: ${names.length}/2`;if(!draftCart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return}$("checkoutBtn").disabled=false;$("cart").innerHTML=draftCart.map((x,i)=>`<div class=row><b>${x.qty} × ${esc(x.store)} — ${esc(x.name)}</b><br><small>${esc(x.choice)}${x.addOns?.length?" • "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}${x.original!==undefined?" • Original "+x.original+" / Spicy "+x.spicy:""}</small><div class=qty><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`).join("");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("totals").innerHTML=`Food: <b>${peso(sub)}</b><br>10% SF: <b>${peso(sf)}</b><br>Delivery: <b>${distanceKm===null?"—":peso(deliveryFee)}</b><br>2nd Store: <b>${peso(second)}</b><br><span class=total>GRAND TOTAL ${peso(total)}</span>`}
+function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}${x.original!==undefined?" • Original "+x.original+" / Spicy "+x.spicy:""}</small></div>`).join("");updateTotals()}
+function updateTotals(){const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("checkoutTotals").innerHTML=`Food: ${peso(sub)}<br>10% SF: ${peso(sf)}<br>Delivery: ${distanceKm===null?"—":peso(deliveryFee)}<br>2nd Store: ${peso(second)}<br><b class=total>TOTAL ${peso(total)}</b>`}
+function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
+async function calculateByGPS(){navigator.geolocation?.getCurrentPosition(async p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;$("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)}m`;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`),g=await r.json();$("gpsLocationDisplay").textContent="📍 "+(g.display_name||`${gpsLat},${gpsLon}`)}catch(e){}$("locStatus").textContent="GPS detected. Calculate fee.";$("calculateFeeBtn").disabled=false},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
+async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
+async function placeOrder(){if(!isOpen())return alert("MHAC Delivery is closed.");const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact)return alert("Complete name and contact.");if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(draftCart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;const o={orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value};try{const ref=await addDoc(collection(db,"orders"),o);$("sendStatus").textContent="✅ ORDER SENT: "+ref.id;draftCart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,800)}catch(e){$("sendStatus").textContent="❌ "+e.message}}
+function startOrders(){if(ordersUnsub)ordersUnsub();ordersUnsub=onSnapshot(collection(db,"orders"),s=>{const arr=s.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED");$("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>`<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status)}</span><br>${(o.items||[]).map(i=>`${esc(i.store)} — ${esc(i.name)} ×${i.qty}`).join("<br>")}<br><b>Grand Total: ${peso(o.fees?.total)}</b></div>`).join(""):"No active orders.";});}
+window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
 </script></body></html>

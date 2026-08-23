@@ -1,230 +1,84 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:900px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:12px;margin:6px 0;border-radius:10px;font-size:15px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}</style></head><body><header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU MANAGER • RIDER ASSIGNMENT • LIVE STATUS</p></header><main><div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><p><b>MHAC Admin</b> — sign in using the authorized Google account.</p><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div><div id="app" class="hidden"><div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p></div><div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No orders yet.</div></div><div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div><div class="card"><h2>🏪 STORE MANAGER</h2><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button><div id="stores"></div></div><div class="card"><h2>🍔 FOOD MANAGER</h2><select id="storeSel"></select><input id="catName" placeholder="Category"><input id="foodName" placeholder="Food name"><input id="foodPrice" type="number" placeholder="Price"><textarea id="foodChoices" placeholder="Choices: No Drink:0, Coke Regular:25"></textarea><button id="addFood" class="red">ADD FOOD</button></div><div class="card"><h2>📋 MENU LIST</h2><div id="menuList"></div></div></div></main><script type="module">
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-  getRedirectResult, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import {
-  getFirestore, collection, onSnapshot, updateDoc, doc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}
+</style>
+<style>
+.mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
+.mhacSplash.hide{opacity:0;pointer-events:none}
+.mhacSplash img{width:min(72vw,330px);height:auto;animation:mhacIn .8s ease both}
+.mhacSplash h1{color:#fff;margin:16px 0 5px;font-size:30px;letter-spacing:2px}
+.mhacSplash p{color:#e21d25;font-weight:900;letter-spacing:2px}
+.mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
+.mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
+@keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
+</style>
+</head><body>
+<div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
+<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><main>
+<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
+<div id="app" class="hidden">
+<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p></div>
+<div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
+<div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
+<div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
+<div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish.</p>
+<div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
+<div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
+</div></main>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
-  authDomain:"mhac-delivery-53099.firebaseapp.com",
-  projectId:"mhac-delivery-53099",
-  storageBucket:"mhac-delivery-53099.firebasestorage.app",
-  messagingSenderId:"878081137607",
-  appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
-  measurementId:"G-7NZEK618YC"
-};
-const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com";
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const gp=new GoogleAuthProvider();
-gp.setCustomParameters({prompt:"select_account"});
-const $=x=>document.getElementById(x);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const peso=n=>"₱"+Number(n||0).toFixed(2);
-let orders=[],riders=[],ou=null,ru=null;
+const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
-function friendlyFirebaseError(e){
-  const code=e?.code||"";
-  if(code==="permission-denied") return "Firestore permission denied. Check Firebase Firestore Rules.";
-  if(code==="failed-precondition") return "Firestore needs an index or is not ready. The app is using a no-index order listener.";
-  if(code==="unavailable") return "Firestore is temporarily unavailable. Check internet/Firebase status.";
-  if(code==="auth/popup-closed-by-user") return "Google sign-in was cancelled.";
-  if(code==="auth/unauthorized-domain") return "This GitHub Pages domain is not authorized in Firebase Authentication.";
-  if(code==="auth/operation-not-allowed") return "Google sign-in is not enabled in Firebase Authentication.";
-  if(code==="auth/invalid-credential") return "Google credential was rejected. Make sure you selected the authorized MHAC Admin Google account.";
-  return e?.message||"Unknown Firebase error.";
-}
-function setStatus(el,msg,isError=false){
-  $(el).innerHTML=(isError?'<span class="error">❌ ':'')+esc(msg)+(isError?"</span>":"");
-}
-function loginView(){ $("login").classList.remove("hidden"); $("app").classList.add("hidden"); }
-function appView(){ $("login").classList.add("hidden"); $("app").classList.remove("hidden"); }
-
-$("googleBtn").onclick=async()=>{
-  setStatus("loginStatus","Opening Google sign-in…");
-  try{
-    const r=await signInWithPopup(auth,gp);
-    if((r.user.email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
-      await signOut(auth);
-      throw new Error("This Google account is not authorized as MHAC Admin.");
-    }
-  }catch(e){
-    if(e?.code==="auth/popup-blocked" || e?.code==="auth/popup-timeout"){
-      try{ await signInWithRedirect(auth,gp); return; }catch(x){ setStatus("loginStatus",friendlyFirebaseError(x),true); return; }
-    }
-    setStatus("loginStatus",friendlyFirebaseError(e),true);
-  }
-};
+const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
+const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
+let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
+function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
+function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
+$("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
 
-function renderOrders(){
-  // COMPLETED orders remain in Firestore for history, but are hidden
-  // from the Admin Incoming Orders list.
-  const activeOrders = orders.filter(o =>
-    String(o.status || "NEW").toUpperCase() !== "COMPLETED"
-  );
-
-  if(!activeOrders.length){
-    $("orders").innerHTML="<div class=item>No active orders.</div>";
-    return;
-  }
-
-  $("orders").innerHTML=activeOrders.map(o=>{
-    let opts='<option value="">Assign rider</option>'+
-      riders.filter(r=>r.approved!==false).map(r=>{
-        let u=r.uid||r.id,n=r.nickname||r.name||r.email||u;
-        return '<option value="'+esc(u)+'" '+(o.assignedRiderUid===u?"selected":"")+'>'+esc(n)+"</option>";
-      }).join("");
-    let items=(o.items||[]).map(i=>"<b>"+esc(i.store||i.storeName||"STORE")+"</b> — "+esc(i.name||i.food||"")+" ×"+esc(i.qty||1)+(i.choice?" • "+esc(i.choice):"")).join("<br>");
-    return '<div class="order"><div class="row"><b>'+esc(o.orderNo||o.id)+'</b><span class="pill">'+esc(o.status||"NEW")+'</span></div>'+
-      '<h3>'+esc(o.customer?.name||"")+'</h3>'+
-      '<p>📞 '+esc(o.customer?.contact||o.customer?.phone||"")+'<br>📍 '+esc(o.customer?.address||"")+'<br>'+
-      esc(o.customer?.barangay||"")+', '+esc(o.customer?.municipality||"")+'</p>'+
-      '<p>'+items+'</p><p><b>Delivery:</b> '+peso(o.fees?.deliveryFee??o.deliveryFee)+'<br><b>Collect:</b> '+peso(o.fees?.total??o.total)+'</p>'+
-      '<select id="r-'+esc(o.id)+'">'+opts+'</select>'+
-      '<button class="red" data-a="'+esc(o.id)+'">ASSIGN RIDER</button>'+
-      '<button class="green" data-c="'+esc(o.id)+'">COMPLETE</button></div>';
-  }).join("");
+function calcStats(){
+ const done=orders.filter(o=>String(o.status).toUpperCase()==="COMPLETED");
+ const active=orders.filter(o=>String(o.status).toUpperCase()!=="COMPLETED");
+ const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
+ const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
+ $("metrics").innerHTML=`<div class=metric><span>Total Deliveries</span><b>${done.length}</b></div><div class=metric><span>Active Orders</span><b>${active.length}</b></div><div class=metric><span>Admin 10% Earnings</span><b>${peso(sf)}</b></div><div class=metric><span>Rider Delivery Earnings</span><b>${peso(df)}</b></div>`;
+ const by={};done.forEach(o=>{const id=o.assignedRiderUid||"UNASSIGNED";by[id]??={count:0,df:0,sf:0};by[id].count++;by[id].df+=Number(o.fees?.deliveryFee||0);by[id].sf+=Number(o.fees?.serviceFee||0)});
+ $("riderAccounting").innerHTML="<h3>RIDER ACCOUNTING</h3>"+Object.entries(by).map(([id,v])=>`<div class=item><b>${esc(riders.find(r=>(r.uid||r.id)===id)?.nickname||riders.find(r=>(r.uid||r.id)===id)?.name||id)}</b><br>Completed: ${v.count} • Delivery earnings: ${peso(v.df)} • Admin service fees to remit: ${peso(v.sf)}</div>`).join("")||'<div class=status>No completed deliveries yet.</div>';
 }
+function renderOrders(){const active=orders.filter(o=>String(o.status||"NEW").toUpperCase()!=="COMPLETED");if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}$("orders").innerHTML=active.map(o=>{const opts='<option value="">Assign rider</option>'+riders.filter(r=>r.approved!==false).map(r=>{const u=r.uid||r.id;return `<option value="${esc(u)}" ${o.assignedRiderUid===u?"selected":""}>${esc(r.nickname||r.name||r.email||u)}</option>`}).join("");const items=(o.items||[]).map(i=>`<div><b>${esc(i.store||"STORE")}</b> — ${esc(i.name||"")} ×${i.qty||1}<br><small>${esc(i.choice||"")}${i.addOns?.length?" • Add-ons: "+i.addOns.map(a=>esc(a.name||a)).join(", "):""}${i.chickenParts?.length?" • Parts: "+i.chickenParts.map(p=>esc(p.name||p)+"×"+(p.qty||1)).join(", "):""}${i.original!==undefined?" • Original: "+i.original:""}${i.spicy!==undefined?" • Spicy: "+i.spicy:""}</small></div>`).join("");return `<div class=order><div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div><h3>${esc(o.customer?.name||"")}</h3><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>${items}<p><b>Food:</b> ${peso(o.fees?.foodOrder)} • <b>10% SF:</b> ${peso(o.fees?.serviceFee)} • <b>Delivery:</b> ${peso(o.fees?.deliveryFee)}<br><b>Total:</b> ${peso(o.fees?.total)}</p><select id="r-${esc(o.id)}">${opts}</select><button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button><button class=green data-c="${esc(o.id)}">COMPLETE</button></div>`}).join("")}
+$("orders").onclick=async e=>{const a=e.target.closest("[data-a]");if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u)return alert("Select rider first.");try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,status:"ASSIGNED",updatedAt:serverTimestamp()});alert("✅ Order assigned.")}catch(x){alert(err(x))}}const c=e.target.closest("[data-c]");if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}};
 
-$("orders").onclick=async e=>{
-  let a=e.target.closest("[data-a]");
-  if(a){
-    let id=a.dataset.a,u=$("r-"+id).value;
-    if(!u)return alert("Select rider first.");
-    try{
-      await updateDoc(doc(db,"orders",id),{
-        assignedRiderUid:u,status:"ASSIGNED",updatedAt:serverTimestamp()
-      });
-      alert("✅ Order assigned to rider.");
-    }catch(x){alert("Unable to assign rider: "+friendlyFirebaseError(x))}
-  }
+function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class=item>🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||"")}<br><span class=pill>${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class=green data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
+$("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
 
-  let c=e.target.closest("[data-c]");
-  if(c){
-    c.disabled=true;
-    c.textContent="COMPLETING…";
-    try{
-      await updateDoc(doc(db,"orders",c.dataset.c),{
-        status:"COMPLETED",updatedAt:serverTimestamp()
-      });
-      // onSnapshot will automatically refresh the list and remove
-      // the completed order from Incoming Orders.
-    }catch(x){
-      c.disabled=false;
-      c.textContent="COMPLETE";
-      alert("Unable to complete order: "+friendlyFirebaseError(x));
-    }
-  }
-};
-
-function start(){
-  if(ru)ru();
-  ru=onSnapshot(collection(db,"riders"),s=>{
-    riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));
-    $("riders").innerHTML=riders.length
-      ?riders.map(r=>'<div class=item>🏍️ <b>'+esc(r.nickname||r.name||"RIDER")+'</b><br>'+
-        esc(r.email||r.uid||"")+'<br><span class=pill>'+
-        (r.approved===false?"PENDING":"APPROVED")+"</span>"+(r.approved===false?' <button class="green" data-approve="'+esc(r.uid||r.id)+'">APPROVE RIDER</button>':'')+"</div>").join("")
-      :"<div class=status>No rider profiles found.</div>";
-    $("riders").onclick=async e=>{
-      const b=e.target.closest("[data-approve]");
-      if(!b)return;
-      b.disabled=true;
-      try{
-        await updateDoc(doc(db,"riders",b.dataset.approve),{
-          approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email
-        });
-        alert("✅ Rider approved.");
-      }catch(x){alert("Unable to approve rider: "+friendlyFirebaseError(x))}
-      finally{b.disabled=false}
-    };
-    if(ou)ou();
-    /*
-      Deliberately do NOT use orderBy("createdAt","desc") here.
-      That prevents the common missing-index error and lets us test
-      the live orders collection first. We sort client-side instead.
-    */
-    ou=onSnapshot(collection(db,"orders"),x=>{
-      orders=x.docs.map(d=>({id:d.id,...d.data()}));
-      orders.sort((a,b)=>{
-        const ta=a.createdAt?.seconds??0, tb=b.createdAt?.seconds??0;
-        return tb-ta;
-      });
-
-      const activeCount = orders.filter(o =>
-        String(o.status || "NEW").toUpperCase() !== "COMPLETED"
-      ).length;
-
-      $("orderStatus").textContent="🟢 LIVE — "+activeCount+" active orders";
-      renderOrders();
-    },e=>{
-      setStatus("orderStatus",friendlyFirebaseError(e),true);
-    });
-  },e=>{
-    setStatus("orderStatus","Rider database: "+friendlyFirebaseError(e),true);
-    $("riders").innerHTML='<div class="error">❌ '+esc(friendlyFirebaseError(e))+'</div>';
-  });
+function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],type:i.type||"standard",spicyPrice:Number(i.spicyPrice||5),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
+function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
+$("stores").onclick=e=>{const b=e.target.closest("[data-store]");if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}};
+$("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
+function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
+function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
+function renderEditor(){if(!draft.stores[selectedStore]){$("editor").classList.add("hidden");return}$("editor").classList.remove("hidden");const s=draft.stores[selectedStore];$("editor").innerHTML=`<h2>✏️ EDIT ${esc(s.name)}</h2><input id="editStoreName" value="${esc(s.name)}" placeholder="Store name"><button class=red id="saveStoreName">SAVE STORE NAME</button><h3>CATEGORIES</h3><div id="cats">${s.categories.map((c,i)=>`<div class=item><b>${esc(c.name)}</b><button class=gray data-cat="${i}">EDIT CATEGORY</button><div id="cat-${i}"></div></div>`).join("")}</div><input id="newCat" placeholder="New category name"><button class=blue id="addCat">ADD CATEGORY</button><hr><button class=green id="publish">📢 PUBLISH TO CUSTOMER APP</button><p class=small>Publishing replaces the Customer App menu with this complete draft.</p>`;
+$("saveStoreName").onclick=()=>{s.name=$("editStoreName").value.trim()||s.name;renderStores();renderEditor()};
+$("addCat").onclick=()=>{const n=$("newCat").value.trim();if(!n)return;s.categories.push({name:n,items:[]});renderEditor()};
+$("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
+$("publish").onclick=publishMenu;
 }
-
-const KEY="mhac_v2_stable";
-let st=JSON.parse(localStorage.getItem(KEY)||"null")||{menu:{stores:[]}};
-if(!st.menu?.stores)st.menu={stores:[]};
-function save(){localStorage.setItem(KEY,JSON.stringify(st));menu()}
-function menu(){
-  $("stores").innerHTML=st.menu.stores.map((s,i)=>
-    '<div class=item><b>'+esc(s.name)+'</b> <button class=gray data-rs="'+i+'">REMOVE</button></div>').join("");
-  $("storeSel").innerHTML=st.menu.stores.map((s,i)=>
-    '<option value="'+i+'">'+esc(s.name)+"</option>").join("");
-  $("menuList").innerHTML=st.menu.stores.map(s=>
-    '<div class=item><h3>'+esc(s.name)+'</h3>'+
-    s.categories.map(c=>'<b>'+esc(c.name)+'</b>'+
-      c.items.map(it=>'<div class=item>'+esc(it.name)+' — '+peso(it.price)+'</div>').join("")
-    ).join("")+"</div>").join("");
+function renderCategory(ci){const s=draft.stores[selectedStore],c=s.categories[ci];const box=$("cat-"+ci);box.innerHTML=`<input id="catName-${ci}" value="${esc(c.name)}"><button class=blue id="catSave-${ci}">SAVE CATEGORY</button><h4>FOODS</h4>${c.items.map((it,i)=>`<div class=item><b>${esc(it.name)}</b> — ${peso(it.price)} <button class=gray data-food="${i}">EDIT FOOD</button><div id="food-${i}"></div></div>`).join("")}<input id="newFood-${ci}" placeholder="New food name"><input id="newPrice-${ci}" type="number" placeholder="Price"><button class=red id="addFood-${ci}">ADD FOOD</button>`;
+$("catSave-"+ci).onclick=()=>{c.name=$("catName-"+ci).value.trim()||c.name;renderEditor()};
+box.querySelectorAll("[data-food]").forEach(b=>b.onclick=()=>renderFood(ci,+b.dataset.food));
+$("addFood-"+ci).onclick=()=>{const n=$("newFood-"+ci).value.trim(),p=+$("newPrice-"+ci).value;if(!n||!p)return alert("Enter food name and price.");c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],type:"standard",spicyPrice:5,bucketPieces:0});renderEditor();setTimeout(()=>renderCategory(ci),0)}
 }
-$("addStore").onclick=()=>{
-  let n=$("newStore").value.trim();if(!n)return;
-  st.menu.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});
-  $("newStore").value="";save();
-};
-$("stores").onclick=e=>{
-  let b=e.target.closest("[data-rs]");
-  if(b){st.menu.stores.splice(+b.dataset.rs,1);save()}
-};
-$("addFood").onclick=()=>{
-  if(!st.menu.stores.length)return alert("Add a store first.");
-  let s=st.menu.stores[+$("storeSel").value],
-      cn=$("catName").value.trim(),fn=$("foodName").value.trim(),
-      p=+$("foodPrice").value;
-  if(!cn||!fn||!p)return alert("Complete category, food and price.");
-  let c=s.categories.find(x=>x.name.toLowerCase()===cn.toLowerCase());
-  if(!c){c={name:cn,items:[]};s.categories.push(c)}
-  c.items.push({
-    name:fn,price:p,available:true,
-    choices:$("foodChoices").value.split(",").filter(Boolean)
-  });
-  save();
-};
-
-getRedirectResult(auth).catch(e=>{
-  if(e) setStatus("loginStatus",friendlyFirebaseError(e),true);
-});
-
-onAuthStateChanged(auth,u=>{
-  if(!u){loginView();return}
-  if((u.email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
-    signOut(auth);loginView();return;
-  }
-  appView();
-  $("adminInfo").textContent="Signed in as "+u.email;
-  menu();
-  start();
-});
+function renderFood(ci,fi){const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+fi);box.innerHTML=`<input id="fn-${ci}-${fi}" value="${esc(it.name)}"><input id="fp-${ci}-${fi}" type="number" value="${it.price}"><select id="ft-${ci}-${fi}"><option value="standard">Standard</option><option value="chicken">Chicken</option><option value="bucket">Bucket Chicken</option></select><textarea id="ch-${ci}-${fi}" placeholder="Drink choices, one per line: Coke Regular|0">${esc(pairsText(it.choices))}</textarea><textarea id="ao-${ci}-${fi}" placeholder="Optional add-ons, one per line: Extra Rice|20">${esc(pairsText(it.addOns))}</textarea><input id="cp-${ci}-${fi}" placeholder="Chicken parts, comma separated" value="${esc((it.chickenParts||[]).map(x=>x.name||x).join(", "))}"><input id="sp-${ci}-${fi}" type="number" value="${it.spicyPrice||5}" placeholder="Spicy add-on per piece"><input id="bp-${ci}-${fi}" type="number" value="${it.bucketPieces||0}" placeholder="Bucket pieces (6 or 8)"><button class=green id="saveFood-${ci}-${fi}">SAVE FOOD</button>`;
+$("ft-"+ci+"-"+fi).value=it.type||"standard";
+$("saveFood-"+ci+"-"+fi).onclick=()=>{it.name=$("fn-"+ci+"-"+fi).value.trim()||it.name;it.price=+$("fp-"+ci+"-"+fi).value||0;it.type=$("ft-"+ci+"-"+fi).value;it.choices=parsePairs($("ch-"+ci+"-"+fi).value);it.addOns=parsePairs($("ao-"+ci+"-"+fi).value);it.chickenParts=$("cp-"+ci+"-"+fi).value.split(",").map(x=>x.trim()).filter(Boolean).map(name=>({name}));it.spicyPrice=+$("sp-"+ci+"-"+fi).value||5;it.bucketPieces=+$("bp-"+ci+"-"+fi).value||0;alert("✅ Food saved in draft. Click PUBLISH TO CUSTOMER APP when ready.");renderEditor()}
+}
+async function publishMenu(){try{menu=normalizeMenu(draft);await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});alert("✅ MENU PUBLISHED TO CUSTOMER APP.");}catch(e){alert("Publish failed: "+err(e))}}
+async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();renderEditor()}
+function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
+getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
+onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 </script></body></html>

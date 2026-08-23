@@ -1,21 +1,21 @@
-MHAC DELIVERY ADMIN V4 — COMPLETE FIX
+MHAC DELIVERY FINAL BUILD V1
+
+This package is the integrated test build.
+
+FILES:
+- customer.html: published Firebase menu, menu customization, chicken parts,
+  bucket Original/Spicy counters, order tracking until COMPLETED, GPS delivery fee.
+- admin.html: store/category/food editor, drinks/add-ons/chicken/bucket fields,
+  PUBLISH TO CUSTOMER APP, active/completed orders, delivery/accounting dashboard.
+- rider.html: exact order selections, delivery earnings, Admin 10% service-fee
+  remittance, completed delivery count.
+- mhac-logo.png: original supplied MHAC logo.
 
 UPLOAD:
-Replace ONLY the existing admin.html with the admin.html in this ZIP.
+Replace customer.html, admin.html, rider.html and upload mhac-logo.png.
+Do NOT replace Firestore Rules or other Firebase files.
 
-DO NOT DELETE OR REPLACE:
-- customer.html
-- rider.html
-- Firebase files
-- Firestore Rules
-- other repository files
-
-FIX:
-- Orders with status COMPLETED remain stored in Firestore.
-- COMPLETED orders are hidden from Incoming Orders.
-- Live count shows ACTIVE orders only.
-- Clicking COMPLETE changes status to COMPLETED.
-- The live Firestore listener automatically refreshes the Admin list.
-- If completing fails, the button returns to COMPLETE and shows the Firebase error.
-
-All other Admin V4 login, rider approval, rider assignment, and menu-manager logic is preserved from the supplied code.
+IMPORTANT:
+This is a TEST BUILD. Test all flows before declaring final/locked.
+The menu is now sourced from settings/menu. Admin edits are draft until
+PUBLISH TO CUSTOMER APP.
