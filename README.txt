@@ -1,20 +1,21 @@
-MHAC DELIVERY V4 - RIDER + ADMIN FIX
+MHAC DELIVERY ADMIN V4 — COMPLETE FIX
 
-Upload:
-- Replace rider.html with the fixed rider.html.
-- Replace admin.html with the fixed admin.html.
-Do NOT delete customer app, Firebase files, or other repository files.
+UPLOAD:
+Replace ONLY the existing admin.html with the admin.html in this ZIP.
 
-Rider changes:
-- Google login has mobile redirect fallback.
-- First-time Google rider automatically creates riders/{uid} with approved:false.
-- Rider remains pending until MHAC Admin approves.
-- Existing approved riders continue to receive assigned orders.
+DO NOT DELETE OR REPLACE:
+- customer.html
+- rider.html
+- Firebase files
+- Firestore Rules
+- other repository files
 
-Admin changes:
-- Rider list shows pending riders.
-- Pending riders get an APPROVE RIDER button.
-- Approval writes approved:true to the rider profile.
-- Existing live orders and rider assignment remain.
+FIX:
+- Orders with status COMPLETED remain stored in Firestore.
+- COMPLETED orders are hidden from Incoming Orders.
+- Live count shows ACTIVE orders only.
+- Clicking COMPLETE changes status to COMPLETED.
+- The live Firestore listener automatically refreshes the Admin list.
+- If completing fails, the button returns to COMPLETE and shows the Firebase error.
 
-If rider profile creation reports Firestore permission-denied, the Firestore Rules must allow an authenticated user to create/read only their own riders/{uid} document. The exact rule should be reviewed before changing production rules.
+All other Admin V4 login, rider approval, rider assignment, and menu-manager logic is preserved from the supplied code.
