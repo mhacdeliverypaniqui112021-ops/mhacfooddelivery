@@ -65,8 +65,18 @@ $("googleBtn").onclick=async()=>{
 $("logout").onclick=()=>signOut(auth);
 
 function renderOrders(){
-  if(!orders.length){$("orders").innerHTML="<div class=item>No orders yet.</div>";return}
-  $("orders").innerHTML=orders.map(o=>{
+  // COMPLETED orders remain in Firestore for history, but are hidden
+  // from the Admin Incoming Orders list.
+  const activeOrders = orders.filter(o =>
+    String(o.status || "NEW").toUpperCase() !== "COMPLETED"
+  );
+
+  if(!activeOrders.length){
+    $("orders").innerHTML="<div class=item>No active orders.</div>";
+    return;
+  }
+
+  $("orders").innerHTML=activeOrders.map(o=>{
     let opts='<option value="">Assign rider</option>'+
       riders.filter(r=>r.approved!==false).map(r=>{
         let u=r.uid||r.id,n=r.nickname||r.name||r.email||u;
@@ -96,12 +106,23 @@ $("orders").onclick=async e=>{
       alert("✅ Order assigned to rider.");
     }catch(x){alert("Unable to assign rider: "+friendlyFirebaseError(x))}
   }
+
   let c=e.target.closest("[data-c]");
-  if(c)try{
-    await updateDoc(doc(db,"orders",c.dataset.c),{
-      status:"COMPLETED",updatedAt:serverTimestamp()
-    });
-  }catch(x){alert("Unable to complete order: "+friendlyFirebaseError(x))}
+  if(c){
+    c.disabled=true;
+    c.textContent="COMPLETING…";
+    try{
+      await updateDoc(doc(db,"orders",c.dataset.c),{
+        status:"COMPLETED",updatedAt:serverTimestamp()
+      });
+      // onSnapshot will automatically refresh the list and remove
+      // the completed order from Incoming Orders.
+    }catch(x){
+      c.disabled=false;
+      c.textContent="COMPLETE";
+      alert("Unable to complete order: "+friendlyFirebaseError(x));
+    }
+  }
 };
 
 function start(){
@@ -137,7 +158,12 @@ function start(){
         const ta=a.createdAt?.seconds??0, tb=b.createdAt?.seconds??0;
         return tb-ta;
       });
-      $("orderStatus").textContent="🟢 LIVE — "+orders.length+" orders";
+
+      const activeCount = orders.filter(o =>
+        String(o.status || "NEW").toUpperCase() !== "COMPLETED"
+      ).length;
+
+      $("orderStatus").textContent="🟢 LIVE — "+activeCount+" active orders";
       renderOrders();
     },e=>{
       setStatus("orderStatus",friendlyFirebaseError(e),true);
