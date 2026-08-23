@@ -157,6 +157,41 @@
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 </style>
+
+<style>
+/* V2.5 mobile editor: readable drink names, compact add-price */
+.oneFoodBox .drinkRows .editorRow{
+  grid-template-columns:minmax(0,1fr) 58px 40px !important;
+  gap:5px !important;
+}
+.oneFoodBox .drinkRows .editorRow .drinkName{
+  font-size:13px !important;
+  padding:10px 8px !important;
+}
+.oneFoodBox .drinkRows .editorRow .drinkPrice{
+  width:58px !important;
+  font-size:13px !important;
+  padding:10px 4px !important;
+  text-align:center;
+}
+.oneFoodBox .drinkRows .editorRow button{
+  width:40px !important;
+  padding:0 !important;
+}
+.categoryControls{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:7px;
+  padding:10px 0 4px;
+}
+.categoryControls input{
+  width:100%;
+  box-sizing:border-box;
+}
+.categoryControls button{
+  width:100%;
+}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -263,7 +298,7 @@ $("orders").onclick=async e=>{
 function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class=item>🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||"")}<br><span class=pill>${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class=green data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
 $("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
 
-function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],type:i.type||"standard",spicyPrice:Number(i.spicyPrice||5),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
+function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
 function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
 $("stores").onclick=e=>{const b=e.target.closest("[data-store]");if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}};
 $("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
@@ -314,13 +349,31 @@ function renderEditor(){
        <div><b>🍽️ ${esc(c.name)}</b><div class="small">${(c.items||[]).length} food item(s)</div></div>
        <button class="gray" type="button">OPEN / CLOSE</button>
      </div>
+     <div class="categoryControls">
+       <input class="categoryNameEdit" value="${esc(c.name)}" placeholder="Category name">
+       <button class="blue saveCategoryName" type="button">SAVE CATEGORY</button>
+       <button class="danger deleteCategory" type="button">DELETE CATEGORY</button>
+     </div>
      <div class="directFoodList"></div>`;
    wrap.appendChild(card);
    const list=card.querySelector(".directFoodList");
    list.classList.add("hidden");
-   card.querySelector(".categoryHeader").onclick=()=>{
+   card.querySelector(".categoryHeader").onclick=(e)=>{
+     if(e.target.closest(".categoryControls")) return;
      list.classList.toggle("hidden");
      if(!list.classList.contains("hidden")) renderDirectFoodList(ci,list);
+   };
+   card.querySelector(".saveCategoryName").onclick=()=>{
+     const n=card.querySelector(".categoryNameEdit").value.trim();
+     if(!n) return alert("Enter category name.");
+     c.name=n;
+     renderEditor();
+   };
+   card.querySelector(".deleteCategory").onclick=()=>{
+     if(confirm("Delete this category and all its foods?")){
+       s.categories.splice(ci,1);
+       renderEditor();
+     }
    };
  });
  $("publish").onclick=publishMenu;
@@ -374,15 +427,30 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <label class="label">FOOD NAME</label>
    <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
 
-   <label class="label">PRICE</label>
-   <input class="foodPriceEdit" type="number" min="0" step="0.01" value="${Number(it.price||0)}" placeholder="Price">
+   <label class="label">FOOD TYPE</label>
+   <select class="foodType">
+     <option value="regular">REGULAR FOOD</option>
+     <option value="chicken">CHICKEN</option>
+     <option value="bucket">BUCKET</option>
+   </select>
+
+   <div class="bucketSection hidden">
+     <h4>🪣 BUCKET CHOICES</h4>
+     <p class="hint">Add the bucket choices you want customers to select. Example: 6pcs Original, 6pcs Spicy, 8pcs Original. Add price when needed.</p>
+     <div class="bucketRows"></div>
+     <div class="copyPasteRow">
+       <button type="button" class="blue smallBtn copyBucket">📋 COPY ALL BUCKET</button>
+       <button type="button" class="blue smallBtn pasteBucket">📥 PASTE ALL BUCKET</button>
+     </div>
+     <button type="button" class="blue addBucket">➕ ADD BUCKET CHOICE</button>
+   </div>
 
    <h4>🍗 PARTS</h4>
    <p class="hint">Optional. Leave empty for solo. Add as many parts as needed.</p>
    <div class="partsRows"></div>
    <div class="copyPasteRow">
-     <button type="button" class="blue smallBtn copyParts">📋 COPY PARTS</button>
-     <button type="button" class="blue smallBtn pasteParts">📥 PASTE PARTS</button>
+     <button type="button" class="blue smallBtn copyParts">📋 COPY ALL PARTS</button>
+     <button type="button" class="blue smallBtn pasteParts">📥 PASTE ALL PARTS</button>
    </div>
    <button type="button" class="blue addPart">➕ ADD PART</button>
 
@@ -390,8 +458,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <p class="hint">Optional. Every drink can have its own size/add price. Example: Coke Regular ₱0, Medium +₱35, Large +₱45.</p>
    <div class="drinkRows"></div>
    <div class="copyPasteRow">
-     <button type="button" class="blue smallBtn copyDrinks">📋 COPY DRINKS</button>
-     <button type="button" class="blue smallBtn pasteDrinks">📥 PASTE DRINKS</button>
+     <button type="button" class="blue smallBtn copyDrinks">📋 COPY ALL DRINKS</button>
+     <button type="button" class="blue smallBtn pasteDrinks">📥 PASTE ALL DRINKS</button>
    </div>
    <button type="button" class="blue addDrink">➕ ADD DRINK / CHOICE</button>
 
@@ -399,8 +467,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <p class="hint">Optional. Add-on name and additional price.</p>
    <div class="addonRows"></div>
    <div class="copyPasteRow">
-     <button type="button" class="blue smallBtn copyAddons">📋 COPY ADD-ONS</button>
-     <button type="button" class="blue smallBtn pasteAddons">📥 PASTE ADD-ONS</button>
+     <button type="button" class="blue smallBtn copyAddons">📋 COPY ALL ADD-ONS</button>
+     <button type="button" class="blue smallBtn pasteAddons">📥 PASTE ALL ADD-ONS</button>
    </div>
    <button type="button" class="blue addAddon">➕ ADD ADD-ON</button>
 
@@ -433,12 +501,35 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    r.innerHTML=`<input class=addonName placeholder="Add-on name" value="${esc(typeof name==="string"?name:(name.name||""))}"><input class=addonPrice type=number min=0 step=.01 placeholder="Price" value="${Number(typeof name==="string"?price:(name.price||price||0))}"><button type=button class=danger>✕</button>`;
    r.querySelector("button").onclick=()=>r.remove(); addonRows.appendChild(r);
  };
- parts.forEach(addPartRow); drinks.forEach(x=>addDrinkRow(x[0]??x.name??"",x[1]??x.price??0)); addons.forEach(x=>addAddonRow(x[0]??x.name??"",x[1]??x.price??0));
+ const bucketRows=ed.querySelector(".bucketRows");
+ const addBucketRow=(name="",price=0)=>{
+   const r=document.createElement("div");r.className="editorRow";
+   r.innerHTML=`<input class=bucketName placeholder="Bucket choice (e.g. 6pcs Original)" value="${esc(typeof name==="string"?name:(name.name||""))}"><input class=bucketPrice type=number min=0 step=.01 placeholder="Add price" value="${Number(typeof name==="string"?price:(name.price||price||0))}"><button type=button class=danger>✕</button>`;
+   r.querySelector("button").onclick=()=>r.remove(); bucketRows.appendChild(r);
+ };
+ const buckets=it.bucketChoices||[];
+ parts.forEach(addPartRow); drinks.forEach(x=>addDrinkRow(x[0]??x.name??"",x[1]??x.price??0)); addons.forEach(x=>addAddonRow(x[0]??x.name??"",x[1]??x.price??0)); buckets.forEach(x=>addBucketRow(x[0]??x.name??"",x[1]??x.price??0));
  ed.querySelector(".availability").value=String(it.available!==false);
+
+ const typeSel=ed.querySelector(".foodType");
+ const bucketSection=ed.querySelector(".bucketSection");
+ typeSel.value=it.type==="bucket"?"bucket":(it.type==="chicken"?"chicken":"regular");
+ const syncBucketVisibility=()=>bucketSection.classList.toggle("hidden",typeSel.value!=="bucket");
+ typeSel.onchange=syncBucketVisibility;
+ syncBucketVisibility;
 
  ed.querySelector(".addPart").onclick=()=>addPartRow();
  ed.querySelector(".addDrink").onclick=()=>addDrinkRow();
  ed.querySelector(".addAddon").onclick=()=>addAddonRow();
+ ed.querySelector(".addBucket").onclick=()=>addBucketRow();
+
+ ed.querySelector(".copyBucket").onclick=()=>{
+   foodClipboard.bucketChoices=[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>[
+     r.querySelector(".bucketName").value.trim(),Number(r.querySelector(".bucketPrice").value||0)
+   ]).filter(x=>x[0]);
+   alert("All bucket choices copied.");
+ };
+ ed.querySelector(".pasteBucket").onclick=()=>foodClipboard.bucketChoices.forEach(x=>addBucketRow(x[0],x[1]));
 
  ed.querySelector(".copyParts").onclick=()=>{
    foodClipboard.parts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean);
@@ -474,8 +565,10 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    it.addOns=[...ed.querySelectorAll(".addonName")].map((x)=>{
      const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".addonPrice").value||0)]
    }).filter(x=>x[0]);
-   // No separate Standard/Chicken/Bucket type is required.
-   delete it.type;
+   it.bucketChoices=[...ed.querySelectorAll(".bucketName")].map((x)=>{
+     const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".bucketPrice").value||0)]
+   }).filter(x=>x[0]);
+   it.type=ed.querySelector(".foodType").value;
    renderDirectFoodList(ci,list);
  };
  ed.querySelector(".deleteDirectFood").onclick=()=>{

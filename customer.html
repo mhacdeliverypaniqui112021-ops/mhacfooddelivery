@@ -94,6 +94,9 @@ function customize(si,ci,fi){
  if(f.choices?.length){
    h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
+ if(f.bucketChoices?.length){
+   h+=`<div class=field><b>🪣 BUCKET CHOICES</b>${f.bucketChoices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=bucketChoice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+ }
  if(f.addOns?.length){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
@@ -112,12 +115,14 @@ function customize(si,ci,fi){
    if(f.chickenParts?.length && parts.reduce((a,x)=>a+x,0)!==qty)return alert("Please select chicken part for every piece.");
    const ch=document.querySelector('input[name=choice]:checked');
    const choice=ch?f.choices[+ch.value]:null;
+   const bh=document.querySelector('input[name=bucketChoice]:checked');
+   const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
    const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
-   const extra=Number(choice?.price||0)+adds.reduce((a,x)=>a+Number(x.price||0),0);
+   const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+adds.reduce((a,x)=>a+Number(x.price||0),0);
    draftCart.push({
      key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
      price:Number(f.price)+extra,basePrice:Number(f.price),qty,
-     choice:choice?.name||"",addOns:adds.map(x=>({name:x.name,price:x.price})),
+     choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",addOns:adds.map(x=>({name:x.name,price:x.price})),
      chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[]
    });
    renderCart();closeMenu();

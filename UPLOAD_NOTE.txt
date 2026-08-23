@@ -1,1 +1,7 @@
-V2.4: Drink editor spacing improved. Drink name gets most of the row width; add-price field is narrower so names like Coke Regular remain readable.
+V2.5 changes:
+- Category name can be edited and deleted.
+- Drink name field is wider; add-price field is narrower and text smaller.
+- COPY ALL / PASTE ALL for parts, drinks, add-ons, plus bucket choices.
+- Added FOOD TYPE: Regular Food / Chicken / Bucket.
+- Bucket choices can be added with optional additional prices.
+- Customer app displays bucket choices and includes the selected bucket choice in cart pricing.
