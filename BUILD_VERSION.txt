@@ -1,2 +1,8 @@
-MHAC DELIVERY FINAL BUILD V1.9
-Clean mobile food editor: larger editable fields, clearer drink/part/add-on rows, removed confusing Standard/Chicken/Bucket selector, and removed food-save confirmation popup.
+MHAC DELIVERY V2 - UNIFIED FOOD EDITOR
+- One complete editable food box per food.
+- Store name, category, food name, base price, parts, drinks/choices, add-ons and save together.
+- Add unlimited chicken parts, drinks and add-ons.
+- Copy/Paste Parts, Drinks and Add-ons between foods.
+- Larger mobile fields for easier typing.
+- Removed confusing Standard/Chicken/Bucket type selector.
+- Removed save confirmation popup.

@@ -31,6 +31,18 @@
  .choiceRow input{font-size:17px!important}
  .foodEditorWrap{padding:14px!important}
 }
+
+/* Unified food editor V2: mobile-first */
+.foodEditorWrapInner{margin-top:10px!important;border:3px solid #1976d2!important}
+.foodEditorWrapInner .label{display:block!important;font-size:18px!important;font-weight:900!important;margin-top:14px!important}
+.foodEditorWrapInner input,.foodEditorWrapInner select{width:100%!important;min-height:58px!important;font-size:20px!important;padding:14px 16px!important;box-sizing:border-box!important}
+.choiceRow{display:grid!important;grid-template-columns:minmax(0,1fr) 120px 54px!important;gap:8px!important;align-items:center!important;margin:9px 0!important}
+.choiceRow input{min-height:58px!important;font-size:18px!important}
+.choiceRow button{min-height:58px!important}
+.copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important}
+.saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
+@media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -71,6 +83,18 @@
  .choiceRow input{font-size:17px!important}
  .foodEditorWrap{padding:14px!important}
 }
+
+/* Unified food editor V2: mobile-first */
+.foodEditorWrapInner{margin-top:10px!important;border:3px solid #1976d2!important}
+.foodEditorWrapInner .label{display:block!important;font-size:18px!important;font-weight:900!important;margin-top:14px!important}
+.foodEditorWrapInner input,.foodEditorWrapInner select{width:100%!important;min-height:58px!important;font-size:20px!important;padding:14px 16px!important;box-sizing:border-box!important}
+.choiceRow{display:grid!important;grid-template-columns:minmax(0,1fr) 120px 54px!important;gap:8px!important;align-items:center!important;margin:9px 0!important}
+.choiceRow input{min-height:58px!important;font-size:18px!important}
+.choiceRow button{min-height:58px!important}
+.copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important}
+.saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
+@media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -208,170 +232,138 @@ function renderEditor(){
  $("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
  $("publish").onclick=publishMenu;
 }
+let foodClipboard={parts:[],choices:[],addOns:[]};
 function renderCategory(ci){
  const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);
  if(!c||!box)return;
-
  box.innerHTML=`
  <div class="editorBox storeFoodBox">
-   <h3>🍽️ ${esc(s.name)}</h3>
-   <label class=label>FOOD CATEGORY</label>
-   <input id="catName-${ci}" value="${esc(c.name)}" placeholder="Chicken / Burger / etc.">
-   <button class=blue id="catSave-${ci}">💾 SAVE CATEGORY</button>
-
-   <div class=hint><b>Everything for each food is in ONE BOX.</b><br>
-   Food name • price • chicken parts • drinks/sizes • add-ons. Edit here anytime, then publish this store.</div>
-
+   <h3>📂 ${esc(c.name)}</h3>
+   <div class="hint"><b>Food editor</b> — bawat pagkain may sariling complete box. Store, category, food, parts, drinks at add-ons ay dito na lahat.</div>
    <div id="foodList-${ci}">
      ${(c.items||[]).map((it,i)=>`
        <div class="foodEditorWrap">
          <div class="foodBoxHeader">
            <b>🍽️ FOOD ${i+1}</b>
-           <button type=button class=danger miniBtn data-delete-food="${i}">🗑️ DELETE FOOD</button>
+           <button type="button" class="danger miniBtn" data-delete-food="${i}">🗑️ DELETE</button>
          </div>
          <div id="food-${ci}-${i}"></div>
        </div>`).join("")}
    </div>
-
    <hr>
    <h3>➕ ADD NEW FOOD</h3>
    <input id="newFood-${ci}" placeholder="Food name">
    <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
-   <button class=red id="addFood-${ci}">➕ ADD FOOD BOX</button>
+   <button class="red" id="addFood-${ci}">➕ ADD FOOD</button>
  </div>`;
-
- $("catSave-"+ci).onclick=()=>{
-   c.name=$("catName-"+ci).value.trim()||c.name;
-   renderEditor();
-   setTimeout(()=>renderCategory(ci),0);
- };
 
  box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{
    const i=+b.dataset.deleteFood;
    if(confirm("Delete this food from the draft?")){
-     c.items.splice(i,1);
-     renderEditor();
-     setTimeout(()=>renderCategory(ci),0);
+     c.items.splice(i,1); renderEditor(); setTimeout(()=>renderCategory(ci),0);
    }
  });
-
  $("addFood-"+ci).onclick=()=>{
    const n=$("newFood-"+ci).value.trim();
    const p=Number($("newPrice-"+ci).value);
    if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
-   c.items.push({
-     name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],
-     type:"standard",spicyPrice:5,bucketPieces:0,description:""
-   });
-   renderEditor();
-   setTimeout(()=>renderCategory(ci),0);
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
+   renderEditor(); setTimeout(()=>renderCategory(ci),0);
  };
-
- // Automatically open every food in this category.
  (c.items||[]).forEach((_,i)=>renderFood(ci,i));
 }
 function renderFood(ci,fi){
- const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
+ const s=draft.stores[selectedStore],c=s.categories[ci],it=c.items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
  const choices=it.choices||[], addons=it.addOns||[], parts=(it.chickenParts||[]).map(x=>typeof x==="string"?x:(x.name||""));
- box.innerHTML=`<div class=editorBox>
-  <h4>✏️ COMPLETE FOOD BOX</h4>
+ box.innerHTML=`<div class="editorBox foodEditorWrapInner">
+  <label class="label">🏪 STORE NAME</label>
+  <input value="${esc(s.name)}" disabled>
 
-  <label class=label>🏪 STORE</label>
-  <input value="${esc(draft.stores[selectedStore].name)}" disabled>
+  <label class="label">📂 FOOD CATEGORY</label>
+  <input id="fc-${ci}-${fi}" value="${esc(c.name)}" placeholder="Chicken / Burger / etc.">
 
-  <label class=label>📂 CATEGORY</label>
-  <input value="${esc(draft.stores[selectedStore].categories[ci].name)}" disabled>
+  <label class="label">🍽️ FOOD NAME</label>
+  <input id="fn-${ci}-${fi}" value="${esc(it.name)}" placeholder="Food name">
 
-  <label class=label>🍽️ FOOD NAME</label>
-  <input id="fn-${ci}-${fi}" value="${esc(it.name)}">
+  <label class="label">💰 BASE PRICE</label>
+  <input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}" placeholder="Price">
 
-  <label class=label>💰 BASE PRICE</label>
-  <input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}">
-
-  <label class=label>AVAILABILITY</label>
-  <select id="fa-${ci}-${fi}">
-    <option value="true">AVAILABLE</option>
-    <option value="false">UNAVAILABLE</option>
-  </select>
-
-  <h4>🍗 CHICKEN PARTS — CUSTOMER SELECTABLE</h4>
-  <div class=hint>Kung chicken food ito, idagdag dito ang available parts. Puwedeng piliin ng customer ang part.</div>
+  <h4>🍗 PARTS</h4>
+  <div class="hint">Mag-add ng kahit ilang parts. Customer ang pipili ng available part.</div>
   <div id="parts-${ci}-${fi}"></div>
-  <button type=button class=blue id="addPart-${ci}-${fi}">➕ ADD CHICKEN PART</button>
+  <div class="copyPasteRow">
+    <button type="button" class="blue smallBtn" id="copyParts-${ci}-${fi}">📋 COPY PARTS</button>
+    <button type="button" class="blue smallBtn" id="pasteParts-${ci}-${fi}">📥 PASTE PARTS</button>
+  </div>
+  <button type="button" class="blue" id="addPart-${ci}-${fi}">➕ ADD PART</button>
 
   <h4>🥤 DRINKS / CHOICES</h4>
-  <div class=hint>Kung SOLO: iwanang walang choices. Kung may drinks: idagdag dito ang bawat drink at additional price.</div>
+  <div class="hint">Bawat drink ay may sariling additional price. Halimbawa: Regular ₱0, Medium ₱35, Large ₱45.</div>
   <div id="choices-${ci}-${fi}"></div>
-  <button type=button class=blue id="addChoice-${ci}-${fi}">➕ ADD DRINK / CHOICE</button>
+  <div class="copyPasteRow">
+    <button type="button" class="blue smallBtn" id="copyChoice-${ci}-${fi}">📋 COPY DRINKS</button>
+    <button type="button" class="blue smallBtn" id="pasteChoice-${ci}-${fi}">📥 PASTE DRINKS</button>
+  </div>
+  <button type="button" class="blue" id="addChoice-${ci}-${fi}">➕ ADD DRINK</button>
 
-  <h4>➕ OPTIONAL ADD-ONS</h4>
-  <div class=hint>Customer puwedeng piliin o hindi. Halimbawa: Extra Rice +₱25.</div>
+  <h4>➕ ADD-ONS</h4>
+  <div class="hint">Optional add-ons na may sariling additional price.</div>
   <div id="addons-${ci}-${fi}"></div>
-  <button type=button class=blue id="addAddon-${ci}-${fi}">➕ ADD ADD-ON</button>
+  <div class="copyPasteRow">
+    <button type="button" class="blue smallBtn" id="copyAddon-${ci}-${fi}">📋 COPY ADD-ONS</button>
+    <button type="button" class="blue smallBtn" id="pasteAddon-${ci}-${fi}">📥 PASTE ADD-ONS</button>
+  </div>
+  <button type="button" class="blue" id="addAddon-${ci}-${fi}">➕ ADD ADD-ON</button>
 
-  <label class=label>DESCRIPTION (OPTIONAL)</label>
-  <textarea id="fd-${ci}-${fi}" placeholder="Short food description">${esc(it.description||"")}</textarea>
+  <label class="label">AVAILABILITY</label>
+  <select id="fa-${ci}-${fi}"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
 
-  <button class=green id="saveFood-${ci}-${fi}">💾 SAVE FOOD TO DRAFT</button>
-  <div class=hint>After saving, click <b>PUBLISH THIS STORE TO CUSTOMER APP</b>. Only this store will be updated.</div>
+  <button class="green saveFoodBtn" id="saveFood-${ci}-${fi}">💾 SAVE FOOD</button>
+  <button class="danger deleteFoodBtn" id="deleteFood2-${ci}-${fi}">🗑️ DELETE FOOD</button>
  </div>`;
-
- $("ft-"+ci+"-"+fi).value=it.type||"standard";
  $("fa-"+ci+"-"+fi).value=String(it.available!==false);
 
- const addRow=(containerId,clsName,clsPrice,name="",price=0)=>{
+ const addRow=(containerId,nameCls,priceCls,name="",price=0)=>{
    const row=document.createElement("div");row.className="choiceRow";
-   row.innerHTML=`<input class="${clsName}" placeholder="Name" value="${esc(name)}">
-     <input class="${clsPrice}" type="number" min="0" step="0.01" placeholder="+ ₱" value="${Number(price||0)}">
-     <button type=button class=danger>✕</button>`;
-   row.querySelector("button").onclick=()=>row.remove();
-   $(containerId).appendChild(row);
+   row.innerHTML=`<input class="${nameCls}" placeholder="Name" value="${esc(name)}"><input class="${priceCls}" type="number" min="0" step="0.01" placeholder="Add price" value="${Number(price||0)}"><button type="button" class="danger">✕</button>`;
+   row.querySelector("button").onclick=()=>row.remove(); $(containerId).appendChild(row);
  };
- const addPart=()=>{
-   const row=document.createElement("div");row.className="choiceRow";
-   row.innerHTML=`<input class="partName" placeholder="Chicken part e.g. Leg / Thigh / Breast">
-     <span></span><button type=button class=danger>✕</button>`;
-   row.querySelector("button").onclick=()=>row.remove();
-   $("parts-"+ci+"-"+fi).appendChild(row);
+ const addPartRow=(name="")=>{
+   const row=document.createElement("div");row.className="choiceRow partRow";
+   row.innerHTML=`<input class="partName" placeholder="Chicken part (Leg / Thigh / Breast / Wings)" value="${esc(name)}"><span></span><button type="button" class="danger">✕</button>`;
+   row.querySelector("button").onclick=()=>row.remove(); $("parts-"+ci+"-"+fi).appendChild(row);
  };
- parts.forEach(x=>addPartRow());
- function addPartRow(name=""){
-   const row=document.createElement("div");row.className="choiceRow";
-   row.innerHTML=`<input class="partName" placeholder="Chicken part e.g. Leg / Thigh / Breast" value="${esc(name)}">
-     <span></span><button type=button class=danger>✕</button>`;
-   row.querySelector("button").onclick=()=>row.remove();
-   $("parts-"+ci+"-"+fi).appendChild(row);
- }
-
+ parts.forEach(addPartRow);
  choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0],x[1]));
  addons.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0],x[1]));
- $("addChoice-"+ci+"-"+fi).onclick=()=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice","","0");
- $("addAddon-"+ci+"-"+fi).onclick=()=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice","","0");
- $("addPart-"+ci+"-"+fi).onclick=()=>addPartRow("");
 
- $("saveFood-"+ci+"-"+fi).onclick=()=>{
-   const name=$("fn-"+ci+"-"+fi).value.trim();
-   const price=Number($("fp-"+ci+"-"+fi).value);
-   if(!name||!Number.isFinite(price)||price<0)return alert("Please enter a food name and valid base price.");
+ $("addPart-"+ci+"-"+fi).onclick=()=>addPartRow();
+ $("addChoice-"+ci+"-"+fi).onclick=()=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice");
+ $("addAddon-"+ci+"-"+fi).onclick=()=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice");
 
-   it.name=name;it.price=price;
-   it.type=$("ft-"+ci+"-"+fi).value;
+ $("copyParts-"+ci+"-"+fi).onclick=()=>{foodClipboard.parts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")].map(x=>x.value.trim()).filter(Boolean);};
+ $("copyChoice-"+ci+"-"+fi).onclick=()=>{foodClipboard.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)]).filter(x=>x[0]);};
+ $("copyAddon-"+ci+"-"+fi).onclick=()=>{foodClipboard.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)]).filter(x=>x[0]);};
+ $("pasteParts-"+ci+"-"+fi).onclick=()=>{foodClipboard.parts.forEach(addPartRow);};
+ $("pasteChoice-"+ci+"-"+fi).onclick=()=>{foodClipboard.choices.forEach(x=>addRow("choices-"+ci+"-"+fi,"choiceName","choicePrice",x[0],x[1]));};
+ $("pasteAddon-"+ci+"-"+fi).onclick=()=>{foodClipboard.addOns.forEach(x=>addRow("addons-"+ci+"-"+fi,"addonName","addonPrice",x[0],x[1]));};
+
+ function collect(){
+   it.name=$("fn-"+ci+"-"+fi).value.trim();
+   it.price=Number($("fp-"+ci+"-"+fi).value);
    it.available=$("fa-"+ci+"-"+fi).value==="true";
-   it.description=$("fd-"+ci+"-"+fi).value.trim();
-
-   it.chickenParts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")]
-     .map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
-
-   it.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")]
-     .map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)])
-     .filter(x=>x[0]);
-
-   it.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")]
-     .map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)])
-     .filter(x=>x[0]);
-
-   
-   renderEditor();setTimeout(()=>renderCategory(ci),0);
+   c.name=$("fc-"+ci+"-"+fi).value.trim()||c.name;
+   it.chickenParts=[...document.querySelectorAll("#parts-"+ci+"-"+fi+" .partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
+   it.choices=[...document.querySelectorAll("#choices-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".choiceName").value.trim(),Number(r.querySelector(".choicePrice").value||0)]).filter(x=>x[0]);
+   it.addOns=[...document.querySelectorAll("#addons-"+ci+"-"+fi+" .choiceRow")].map(r=>[r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)]).filter(x=>x[0]);
+ }
+ $("saveFood-"+ci+"-"+fi).onclick=()=>{
+   const name=$("fn-"+ci+"-"+fi).value.trim(), price=Number($("fp-"+ci+"-"+fi).value);
+   if(!name||!Number.isFinite(price)||price<0)return alert("Please enter a food name and valid base price.");
+   collect(); renderEditor(); setTimeout(()=>renderCategory(ci),0);
+ };
+ $("deleteFood2-"+ci+"-"+fi).onclick=()=>{
+   if(confirm("Delete this food from the draft?")){c.items.splice(fi,1);renderEditor();setTimeout(()=>renderCategory(ci),0);}
  };
 }
 async function publishMenu(){
