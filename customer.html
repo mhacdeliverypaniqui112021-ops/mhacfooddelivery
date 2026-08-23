@@ -12,6 +12,20 @@
 .mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
 @keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
 </style>
+
+<style>
+.catTabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0;margin:0 -2px 10px}
+.catTab{white-space:nowrap;border:0;background:#fff;padding:10px 13px;font-weight:800;border-bottom:3px solid transparent}
+.catTab.active{border-bottom-color:#e21d25;color:#e21d25}
+.productRow{display:flex;align-items:center;gap:10px;padding:14px 2px;border-bottom:1px solid #eee}
+.productInfo{flex:1;min-width:0}
+.productName{font-weight:800;line-height:1.25}
+.productPrice{font-weight:800;margin-top:7px}
+.productPlus{width:38px;height:38px;border-radius:50%;border:0;background:#e21d25;color:#fff;font-size:25px;line-height:1}
+.choiceRowCustomer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #eee}
+.choiceRowCustomer label{display:flex;align-items:center;gap:9px;flex:1}
+.choicePrice{white-space:nowrap;font-weight:700}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -45,19 +59,71 @@ function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style
 getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
 onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders()});
 function renderStores(){$("stores").innerHTML=(data.stores||[]).map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("")}
-function openStore(si){const s=data.stores[si];$("menuBody").innerHTML=`<button class=back onclick=closeMenu()>← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`+(s.categories||[]).map((c,ci)=>`<div class=food onclick="openCat(${si},${ci})"><b>🍽️ ${esc(c.name)}</b><br><span class=small>${(c.items||[]).length} menu items</span></div>`).join("");$("menuModal").style.display="block"}
-function openCat(si,ci){const c=data.stores[si].categories[ci];$("menuBody").innerHTML=`<button class=back onclick="openStore(${si})">← ${esc(data.stores[si].name)}</button><h2>${esc(c.name)}</h2>`+(c.items||[]).filter(f=>f.available!==false).map((f,fi)=>`<div class=food><h3>${esc(f.name)}</h3><b>${peso(f.price)}</b><button class=add onclick="customize(${si},${ci},${fi})">CUSTOMIZE & ADD</button></div>`).join("");}
-function customize(si,ci,fi){const f=data.stores[si].categories[ci].items[fi];const existing=draftCart.filter(x=>x.store===data.stores[si].name&&x.name===f.name).reduce((a,x)=>a+x.qty,0);let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(f.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
-if(f.choices?.length)h+=`<div class=field><b>DRINK / CHOICE</b>${f.choices.map((x,i)=>`<label class=choice><span>${esc(x.name)} ${x.price?`(+${peso(x.price)})`:""}</span><input type=radio name=choice value="${i}" ${i===0?"checked":""}></label>`).join("")}</div>`;
-if(f.addOns?.length)h+=`<div class=field><b>OPTIONAL ADD-ONS</b>${f.addOns.map((x,i)=>`<label class=choice><span>${esc(x.name)} ${x.price?`(+${peso(x.price)})`:""}</span><input type=checkbox data-addon="${i}"></label>`).join("")}</div>`;
-if(f.chickenParts?.length)h+=`<div class=field><b>CHICKEN PART</b>${f.chickenParts.map((x,i)=>`<div class=counter"><span>${esc(x.name)}</span><button class=mini data-part="${i}" data-d="-1">−</button><b id=part-${i}>0</b><button class=mini data-part="${i}" data-d="1">+</button></div>`).join("")}<p class=small>Part selections must equal the chicken quantity.</p></div>`;
-if(f.type==="bucket"&&f.bucketPieces>0)h+=`<div class=field><b>BUCKET ${f.bucketPieces}PCS</b><p>Choose Original/Spicy. Spicy +${peso(f.spicyPrice||5)} per piece.</p><div class=counter>Original <button class=mini id=origMinus>−</button><b id=orig>0</b><button class=mini id=origPlus>+</button></div><div class=counter>Spicy <button class=mini id=spicyMinus>−</button><b id=spicy>0</b><button class=mini id=spicyPlus>+</button></div><p id=bucketTotal class=small>Total: 0/${f.bucketPieces}</p></div>`;
-h+=`<button class=add id=addConfigured>ADD TO CART</button>`;$("menuBody").innerHTML=h;
-let qty=1,parts=(f.chickenParts||[]).map(()=>0),orig=0,spicy=0;
-function update(){if(f.type==="chicken")$("bucketTotal")?.remove();if(f.type==="bucket")$("bucketTotal").textContent=`Total: ${orig+spicy}/${f.bucketPieces} per bucket`;$("orig")&&($("orig").textContent=orig);$("spicy")&&($("spicy").textContent=spicy);parts.forEach((v,i)=>{const e=$("part-"+i);if(e)e.textContent=v})}
-document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{const i=+b.dataset.part,d=+b.dataset.d;let total=parts.reduce((a,x)=>a+x,0);if(d>0&&total>=qty)return;parts[i]=Math.max(0,parts[i]+d);update()});
-if(f.type==="bucket"){const change=(which,d)=>{let total=orig+spicy;if(d>0&&total>=f.bucketPieces)return;if(which==="o")orig=Math.max(0,orig+d);else spicy=Math.max(0,spicy+d);update()};$("origMinus").onclick=()=>change("o",-1);$("origPlus").onclick=()=>change("o",1);$("spicyMinus").onclick=()=>change("s",-1);$("spicyPlus").onclick=()=>change("s",1)}
-$("addConfigured").onclick=()=>{if(f.type==="chicken"&&parts.reduce((a,x)=>a+x,0)!==qty)return alert("Please select chicken part for every piece.");if(f.type==="bucket"&&orig+spicy!==f.bucketPieces)return alert("Please select Original + Spicy to equal "+f.bucketPieces+" pieces.");const ch=f.choices?.[Number(document.querySelector('input[name=choice]:checked')?.value||0)],adds=[...(document.querySelectorAll("[data-addon]:checked"))].map(x=>f.addOns[+x.dataset.addon]);const extra=(ch?.price||0)+adds.reduce((a,x)=>a+Number(x.price||0),0)+(f.type==="bucket"?spicy*Number(f.spicyPrice||5):0);const key=Date.now()+"-"+Math.random();draftCart.push({key,store:data.stores[si].name,name:f.name,price:Number(f.price)+extra,basePrice:Number(f.price),qty,type:f.type,choice:ch?.name||"",addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:f.type==="chicken"?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:f.type==="bucket"?orig:undefined,spicy:f.type==="bucket"?spicy:undefined,spicyPrice:f.type==="bucket"?Number(f.spicyPrice||5):0});renderCart();closeMenu()};update()}
+function openStore(si){
+ const s=data.stores[si];
+ let h=`<button class=back onclick="closeMenu()">← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`;
+ h+=`<div class="catTabs">${(s.categories||[]).map((c,i)=>`<button class="catTab ${i===0?"active":""}" onclick="openCat(${si},${i})">${esc(c.name)}</button>`).join("")}</div>`;
+ if((s.categories||[]).length) h+=`<div class=small>Select a category above.</div>`;
+ $("menuBody").innerHTML=h;
+ $("menuModal").style.display="block";
+ if((s.categories||[]).length) openCat(si,0);
+}
+function openCat(si,ci){
+ const s=data.stores[si],c=s.categories[ci];
+ let h=`<button class=back onclick="openStore(${si})">← ${esc(s.name)}</button>`;
+ h+=`<div class="catTabs">${(s.categories||[]).map((x,i)=>`<button class="catTab ${i===ci?"active":""}" onclick="openCat(${si},${i})">${esc(x.name)}</button>`).join("")}</div>`;
+ h+=`<h2>${esc(c.name)}</h2>`;
+ h+=(c.items||[]).filter(f=>f.available!==false).map((f,fi)=>`
+   <div class="productRow">
+     <div class="productInfo">
+       <div class="productName">${esc(f.name)}</div>
+       <div class="productPrice">${peso(f.price)}</div>
+     </div>
+     <button class="productPlus" onclick="customize(${si},${ci},${fi})">+</button>
+   </div>`).join("");
+ if(!(c.items||[]).length)h+=`<p class=small>No food published in this category yet.</p>`;
+ $("menuBody").innerHTML=h;
+ $("menuModal").style.display="block";
+}
+function customize(si,ci,fi){
+ const f=data.stores[si].categories[ci].items[fi];
+ let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(data.stores[si].name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
+ if(f.chickenParts?.length){
+   h+=`<div class=field><b>🍗 CHICKEN PART</b>${f.chickenParts.map((x,i)=>`<div class="counter"><span>${esc(x.name)}</span><button class=mini data-part="${i}" data-d="-1">−</button><b id=part-${i}>0</b><button class=mini data-part="${i}" data-d="1">+</button></div>`).join("")}<p class=small>Choose the part for each chicken piece.</p></div>`;
+ }
+ if(f.choices?.length){
+   h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+ }
+ if(f.addOns?.length){
+   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+ }
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
+ $("menuBody").innerHTML=h;
+ let qty=1,parts=(f.chickenParts||[]).map(()=>0);
+ const update=()=>{ $("foodQty").textContent=qty; parts.forEach((v,i)=>{const e=$("part-"+i);if(e)e.textContent=v}) };
+ $("qminus").onclick=()=>{qty=Math.max(1,qty-1);update()};
+ $("qplus").onclick=()=>{qty++;update()};
+ document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{
+   const i=+b.dataset.part,d=+b.dataset.d,total=parts.reduce((a,x)=>a+x,0);
+   if(d>0&&total>=qty)return;
+   parts[i]=Math.max(0,parts[i]+d);update();
+ });
+ $("addConfigured").onclick=()=>{
+   if(f.chickenParts?.length && parts.reduce((a,x)=>a+x,0)!==qty)return alert("Please select chicken part for every piece.");
+   const ch=document.querySelector('input[name=choice]:checked');
+   const choice=ch?f.choices[+ch.value]:null;
+   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
+   const extra=Number(choice?.price||0)+adds.reduce((a,x)=>a+Number(x.price||0),0);
+   draftCart.push({
+     key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
+     price:Number(f.price)+extra,basePrice:Number(f.price),qty,
+     choice:choice?.name||"",addOns:adds.map(x=>({name:x.name,price:x.price})),
+     chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[]
+   });
+   renderCart();closeMenu();
+ };
+ update();
+}
 function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
 function renderCart(){const names=[...new Set(draftCart.map(x=>x.store))];$("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);$("storeCount").textContent=`Stores selected: ${names.length}/2`;if(!draftCart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return}$("checkoutBtn").disabled=false;$("cart").innerHTML=draftCart.map((x,i)=>`<div class=row><b>${x.qty} × ${esc(x.store)} — ${esc(x.name)}</b><br><small>${esc(x.choice)}${x.addOns?.length?" • "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}${x.original!==undefined?" • Original "+x.original+" / Spicy "+x.spicy:""}</small><div class=qty><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`).join("");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("totals").innerHTML=`Food: <b>${peso(sub)}</b><br>10% SF: <b>${peso(sf)}</b><br>Delivery: <b>${distanceKm===null?"—":peso(deliveryFee)}</b><br>2nd Store: <b>${peso(second)}</b><br><span class=total>GRAND TOTAL ${peso(total)}</span>`}
 function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}${x.original!==undefined?" • Original "+x.original+" / Spicy "+x.spicy:""}</small></div>`).join("");updateTotals()}

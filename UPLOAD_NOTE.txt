@@ -1,1 +1,1 @@
-V2.1: Category click now opens foods. Each food uses one unified editor: Store Name, Food Name, Base Price, Parts, Drinks/Choices, Add-ons, Save. Copy/Paste Parts, Drinks and Add-ons included. Customer app shows Parts whenever Parts are attached.
+V2.2: Customer menu follows Store -> Category tabs -> Food list with price and + button -> Food customization. Optional Parts, Drinks/Choices with add prices, Add-ons with prices, quantity, Add to Cart. Admin uses unified food editor with copy/paste Parts, Drinks and Add-ons.
