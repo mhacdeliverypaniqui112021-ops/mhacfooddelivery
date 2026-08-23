@@ -26,7 +26,7 @@
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Completed Deliveries: <b id="doneCount">0</b><br>Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
 </main>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -108,6 +108,7 @@ async function afterLogin(user){
 }
 async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||p.name||"RIDER"}
 function maps(o){const g=o.customer?.gps;let d="";if(g&&typeof g.lat==="number"&&typeof g.lon==="number")d=g.lat+","+g.lon;else d=[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
+function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function render(arr){
  if(!arr.length){$("orders").innerHTML='<div class="card"><h3>No assigned orders.</h3><p class="status">New assigned orders will appear here automatically.</p></div>';return}
  $("orders").innerHTML=arr.map(o=>{
@@ -115,14 +116,15 @@ function render(arr){
  return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICKED UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
-$("orders").addEventListener("click",async e=>{const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
+$("orders").addEventListener("click",async e=>{const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
 function startOrdersListener(){
  if(unsub){unsub();unsub=null}
  const q=query(collection(db,"orders"),where("assignedRiderUid","==",uid));
  unsub=onSnapshot(q,s=>{
   const all=s.docs.map(d=>({id:d.id,...d.data()}));
   const active=all.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");
-  const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED");
+  const today=businessDayKey();
+  const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0),sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
   $("doneCount").textContent=done.length;$("myEarnings").textContent=peso(df);$("toRemit").textContent=peso(sf);
   for(const o of active){if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);beep()}}

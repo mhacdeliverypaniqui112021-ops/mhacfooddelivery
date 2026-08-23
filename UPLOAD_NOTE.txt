@@ -1,8 +1,5 @@
-TEST INSTRUCTIONS
-1. This is an ADMIN build-up test.
-2. Upload admin.html only to a TEST branch/repository first.
-3. Sign in with the authorized MHAC Admin Google account.
-4. Edit/add a store, category, food, base price, choices and add-ons.
-5. Click PUBLISH TO CUSTOMER APP.
-6. Check the Customer App settings/menu document.
-7. Do not delete customer.html, rider.html, Firebase files, or production files.
+ONE-BUILD TEST
+This package contains admin.html, customer.html, rider.html and mhac-logo.png.
+For the first test, the apps can be tested starting with Admin while Customer/Rider are closed.
+Do not change Firestore Rules.
+Admin menu publishing is store-to-store: publishing Jollibee updates only Jollibee in settings/menu.
