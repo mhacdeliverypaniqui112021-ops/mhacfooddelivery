@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -70,20 +70,87 @@ $("stores").onclick=e=>{const b=e.target.closest("[data-store]");if(b){selectedS
 $("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
 function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
 function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
-function renderEditor(){if(!draft.stores[selectedStore]){$("editor").classList.add("hidden");return}$("editor").classList.remove("hidden");const s=draft.stores[selectedStore];$("editor").innerHTML=`<h2>✏️ EDIT ${esc(s.name)}</h2><input id="editStoreName" value="${esc(s.name)}" placeholder="Store name"><button class=red id="saveStoreName">SAVE STORE NAME</button><h3>CATEGORIES</h3><div id="cats">${s.categories.map((c,i)=>`<div class=item><b>${esc(c.name)}</b><button class=gray data-cat="${i}">EDIT CATEGORY</button><div id="cat-${i}"></div></div>`).join("")}</div><input id="newCat" placeholder="New category name"><button class=blue id="addCat">ADD CATEGORY</button><hr><button class=green id="publish">📢 PUBLISH TO CUSTOMER APP</button><p class=small>Publishing replaces the Customer App menu with this complete draft.</p>`;
-$("saveStoreName").onclick=()=>{s.name=$("editStoreName").value.trim()||s.name;renderStores();renderEditor()};
-$("addCat").onclick=()=>{const n=$("newCat").value.trim();if(!n)return;s.categories.push({name:n,items:[]});renderEditor()};
-$("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
-$("publish").onclick=publishMenu;
+function renderEditor(){
+ if(!draft.stores[selectedStore]){$("editor").classList.add("hidden");return}
+ $("editor").classList.remove("hidden");
+ const s=draft.stores[selectedStore];
+ $("editor").innerHTML=`
+ <h2>✏️ EDIT ${esc(s.name)}</h2>
+ <label class=label>STORE NAME</label><input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
+ <button class=red id="saveStoreName">SAVE STORE NAME</button>
+ <h3>📂 CATEGORIES & FOODS</h3>
+ <p class=hint>Tap <b>EDIT FOOD</b> beside any food to change its price, drinks, add-ons, chicken parts, Original/Spicy or bucket pieces.</p>
+ <div id="cats">${s.categories.map((c,i)=>`
+   <div class=item>
+    <div class=foodTitle>🍽️ ${esc(c.name)}</div>
+    <div class=small>${(c.items||[]).length} food item(s)</div>
+    <button class=gray data-cat="${i}">OPEN / EDIT CATEGORY</button>
+    <div id="cat-${i}"></div>
+   </div>`).join("")}</div>
+ <input id="newCat" placeholder="New category name"><button class=blue id="addCat">ADD CATEGORY</button>
+ <div class=publishBar><button class=green id="publish">📢 PUBLISH TO CUSTOMER APP</button><p class=small>Publish only after you finish editing this store. Customer App will receive the complete draft.</p></div>`;
+ $("saveStoreName").onclick=()=>{s.name=$("editStoreName").value.trim()||s.name;renderStores();renderEditor()};
+ $("addCat").onclick=()=>{const n=$("newCat").value.trim();if(!n)return;s.categories.push({name:n,items:[]});renderEditor()};
+ $("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
+ $("publish").onclick=publishMenu;
 }
-function renderCategory(ci){const s=draft.stores[selectedStore],c=s.categories[ci];const box=$("cat-"+ci);box.innerHTML=`<input id="catName-${ci}" value="${esc(c.name)}"><button class=blue id="catSave-${ci}">SAVE CATEGORY</button><h4>FOODS</h4>${c.items.map((it,i)=>`<div class=item><b>${esc(it.name)}</b> — ${peso(it.price)} <button class=gray data-food="${i}">EDIT FOOD</button><div id="food-${i}"></div></div>`).join("")}<input id="newFood-${ci}" placeholder="New food name"><input id="newPrice-${ci}" type="number" placeholder="Price"><button class=red id="addFood-${ci}">ADD FOOD</button>`;
-$("catSave-"+ci).onclick=()=>{c.name=$("catName-"+ci).value.trim()||c.name;renderEditor()};
-box.querySelectorAll("[data-food]").forEach(b=>b.onclick=()=>renderFood(ci,+b.dataset.food));
-$("addFood-"+ci).onclick=()=>{const n=$("newFood-"+ci).value.trim(),p=+$("newPrice-"+ci).value;if(!n||!p)return alert("Enter food name and price.");c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],type:"standard",spicyPrice:5,bucketPieces:0});renderEditor();setTimeout(()=>renderCategory(ci),0)}
+function renderCategory(ci){
+ const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);if(!c||!box)return;
+ box.innerHTML=`
+ <div class=editorBox>
+  <label class=label>CATEGORY NAME</label><input id="catName-${ci}" value="${esc(c.name)}">
+  <button class=blue id="catSave-${ci}">SAVE CATEGORY</button>
+  <h4>🍔 FOOD ITEMS</h4>
+  ${(c.items||[]).map((it,i)=>`<div class=foodCard>
+    <div class=foodTitle>${esc(it.name)}</div><b>${peso(it.price)}</b>
+    <div class=small>${it.available===false?"🔴 UNAVAILABLE":"🟢 AVAILABLE"} • ${it.type||"standard"}</div>
+    <button class=gray miniBtn data-food="${i}">✏️ EDIT FOOD</button>
+    <button class=danger miniBtn data-delete-food="${i}">🗑️ DELETE</button>
+    <div id="food-${ci}-${i}"></div>
+  </div>`).join("")}
+  <hr><b>➕ ADD NEW FOOD</b>
+  <input id="newFood-${ci}" placeholder="Food name">
+  <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
+  <button class=red id="addFood-${ci}">ADD FOOD</button>
+ </div>`;
+ $("catSave-"+ci).onclick=()=>{c.name=$("catName-"+ci).value.trim()||c.name;renderEditor();setTimeout(()=>renderCategory(ci),0)};
+ box.querySelectorAll("[data-food]").forEach(b=>b.onclick=()=>renderFood(ci,+b.dataset.food));
+ box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{const i=+b.dataset.deleteFood;if(confirm("Delete this food from the draft?")){c.items.splice(i,1);renderEditor();setTimeout(()=>renderCategory(ci),0)}});
+ $("addFood-"+ci).onclick=()=>{const n=$("newFood-"+ci).value.trim(),p=Number($("newPrice-"+ci).value);if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],type:"standard",spicyPrice:5,bucketPieces:0});renderEditor();setTimeout(()=>renderCategory(ci),0)};
 }
-function renderFood(ci,fi){const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+fi);box.innerHTML=`<input id="fn-${ci}-${fi}" value="${esc(it.name)}"><input id="fp-${ci}-${fi}" type="number" value="${it.price}"><select id="ft-${ci}-${fi}"><option value="standard">Standard</option><option value="chicken">Chicken</option><option value="bucket">Bucket Chicken</option></select><textarea id="ch-${ci}-${fi}" placeholder="Drink choices, one per line: Coke Regular|0">${esc(pairsText(it.choices))}</textarea><textarea id="ao-${ci}-${fi}" placeholder="Optional add-ons, one per line: Extra Rice|20">${esc(pairsText(it.addOns))}</textarea><input id="cp-${ci}-${fi}" placeholder="Chicken parts, comma separated" value="${esc((it.chickenParts||[]).map(x=>x.name||x).join(", "))}"><input id="sp-${ci}-${fi}" type="number" value="${it.spicyPrice||5}" placeholder="Spicy add-on per piece"><input id="bp-${ci}-${fi}" type="number" value="${it.bucketPieces||0}" placeholder="Bucket pieces (6 or 8)"><button class=green id="saveFood-${ci}-${fi}">SAVE FOOD</button>`;
-$("ft-"+ci+"-"+fi).value=it.type||"standard";
-$("saveFood-"+ci+"-"+fi).onclick=()=>{it.name=$("fn-"+ci+"-"+fi).value.trim()||it.name;it.price=+$("fp-"+ci+"-"+fi).value||0;it.type=$("ft-"+ci+"-"+fi).value;it.choices=parsePairs($("ch-"+ci+"-"+fi).value);it.addOns=parsePairs($("ao-"+ci+"-"+fi).value);it.chickenParts=$("cp-"+ci+"-"+fi).value.split(",").map(x=>x.trim()).filter(Boolean).map(name=>({name}));it.spicyPrice=+$("sp-"+ci+"-"+fi).value||5;it.bucketPieces=+$("bp-"+ci+"-"+fi).value||0;alert("✅ Food saved in draft. Click PUBLISH TO CUSTOMER APP when ready.");renderEditor()}
+function renderFood(ci,fi){
+ const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
+ box.innerHTML=`<div class=editorBox>
+  <h4>✏️ EDIT FOOD</h4>
+  <label class=label>FOOD NAME</label><input id="fn-${ci}-${fi}" value="${esc(it.name)}">
+  <div class=two><div><label class=label>BASE PRICE</label><input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}"></div>
+  <div><label class=label>TYPE</label><select id="ft-${ci}-${fi}"><option value="standard">Standard</option><option value="chicken">Chicken</option><option value="bucket">Bucket Chicken</option></select></div></div>
+  <label class=label>AVAILABILITY</label><select id="fa-${ci}-${fi}"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
+  <label class=label>🥤 DRINKS / CHOICES</label><textarea id="ch-${ci}-${fi}" placeholder="One per line: Coke Regular|0\nCoke Medium|10\nCoke Large|20">${esc(pairsText(it.choices))}</textarea>
+  <div class=hint>Format: <b>Name|additional price</b>. Example: Coke Medium|10</div>
+  <label class=label>➕ OPTIONAL ADD-ONS</label><textarea id="ao-${ci}-${fi}" placeholder="One per line: Extra Rice|20\nSpicy|10">${esc(pairsText(it.addOns))}</textarea>
+  <div class=hint>Customers can select or skip these add-ons.</div>
+  <label class=label>🍗 CHICKEN PARTS</label><input id="cp-${ci}-${fi}" placeholder="Example: Leg, Thigh, Breast, Wing" value="${esc((it.chickenParts||[]).map(x=>x.name||x).join(", "))}">
+  <div class=hint>For Chicken type, customer quantity selection must match the selected parts.</div>
+  <div class=two><div><label class=label>🌶️ SPICY ADD-ON / PIECE</label><input id="sp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.spicyPrice||5)}"></div>
+  <div><label class=label>🍗 BUCKET PIECES</label><input id="bp-${ci}-${fi}" type="number" min="0" step="1" value="${Number(it.bucketPieces||0)}"></div></div>
+  <button class=green id="saveFood-${ci}-${fi}">💾 SAVE FOOD TO DRAFT</button>
+ </div>`;
+ $("ft-"+ci+"-"+fi).value=it.type||"standard";
+ $("fa-"+ci+"-"+fi).value=String(it.available!==false);
+ $("saveFood-"+ci+"-"+fi).onclick=()=>{
+   it.name=$("fn-"+ci+"-"+fi).value.trim()||it.name;
+   it.price=Number($("fp-"+ci+"-"+fi).value)||0;
+   it.type=$("ft-"+ci+"-"+fi).value;
+   it.available=$("fa-"+ci+"-"+fi).value==="true";
+   it.choices=parsePairs($("ch-"+ci+"-"+fi).value);
+   it.addOns=parsePairs($("ao-"+ci+"-"+fi).value);
+   it.chickenParts=$("cp-"+ci+"-"+fi).value.split(",").map(x=>x.trim()).filter(Boolean).map(name=>({name}));
+   it.spicyPrice=Number($("sp-"+ci+"-"+fi).value)||0;
+   it.bucketPieces=Number($("bp-"+ci+"-"+fi).value)||0;
+   alert("✅ Food saved in DRAFT. Click PUBLISH TO CUSTOMER APP when all changes are ready.");
+   renderEditor();setTimeout(()=>renderCategory(ci),0);
+ };
 }
 async function publishMenu(){try{menu=normalizeMenu(draft);await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});alert("✅ MENU PUBLISHED TO CUSTOMER APP.");}catch(e){alert("Publish failed: "+err(e))}}
 async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();renderEditor()}
