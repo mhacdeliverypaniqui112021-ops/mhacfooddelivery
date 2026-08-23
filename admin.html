@@ -249,6 +249,113 @@
   width:100%;
 }
 </style>
+
+<style>
+/* V2.7 COMPACT STORE / MENU MANAGER */
+.card:has(#newStore){
+  padding:12px !important;
+}
+.card:has(#newStore) > p.status{
+  margin:4px 0 8px !important;
+}
+.card:has(#newStore) > .row{
+  margin-bottom:8px !important;
+  gap:6px !important;
+}
+.card:has(#newStore) > .row input,
+.card:has(#newStore) > .row button{
+  margin:0 !important;
+  min-height:48px !important;
+}
+.card:has(#newStore) #stores{
+  margin:0 !important;
+}
+.card:has(#newStore) .storeBox{
+  padding:10px 12px !important;
+  margin:6px 0 !important;
+  border-radius:12px !important;
+}
+.card:has(#newStore) .storeBox b{
+  font-size:17px !important;
+}
+.card:has(#newStore) .storeBox .small{
+  font-size:11px !important;
+}
+.card:has(#newStore) > hr{
+  margin:8px 0 !important;
+}
+.directStoreEditor{
+  padding-bottom:8px !important;
+}
+.directStoreEditor > h2{
+  display:none !important;
+}
+.directStoreEditor > .label{
+  margin-top:3px !important;
+}
+.directStoreEditor > input#editStoreName{
+  min-height:48px !important;
+  font-size:17px !important;
+  margin:3px 0 !important;
+}
+.directStoreEditor > #saveStoreName{
+  min-height:46px !important;
+  margin:3px 0 8px !important;
+}
+.directStoreEditor > h3{
+  margin:10px 0 4px !important;
+}
+.directStoreEditor > .hint{
+  margin:2px 0 6px !important;
+}
+.directCategoryCard{
+  margin:7px 0 !important;
+  border-radius:12px !important;
+}
+.categoryHeader{
+  padding:10px 12px !important;
+  gap:8px !important;
+}
+.categoryHeader b{
+  font-size:18px !important;
+}
+.categoryHeader button{
+  min-height:42px !important;
+  margin:0 !important;
+  padding:8px 10px !important;
+  font-size:13px !important;
+}
+.categoryControls{
+  padding:6px 10px 8px !important;
+  gap:5px !important;
+}
+.categoryControls input,
+.categoryControls button{
+  min-height:44px !important;
+  margin:0 !important;
+}
+.directFoodList{
+  padding:0 8px 8px !important;
+}
+.foodLine{
+  margin:6px 0 !important;
+  padding:9px !important;
+  border-radius:11px !important;
+}
+.foodLineMain{
+  font-size:16px !important;
+  margin-bottom:6px !important;
+}
+.addFoodInline{
+  margin-top:8px !important;
+  padding-top:8px !important;
+}
+.publishBar{
+  margin-top:8px !important;
+  padding:6px !important;
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -367,8 +474,7 @@ function renderEditor(){
  $("editor").classList.remove("hidden");
  $("editor").innerHTML=`
  <div class="directStoreEditor">
-   <h2>✏️ EDIT ${esc(s.name)}</h2>
-   <label class="label">STORE NAME</label>
+   <label class="label">🏪 STORE NAME</label>
    <input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
    <button class="red" id="saveStoreName">SAVE STORE NAME</button>
 

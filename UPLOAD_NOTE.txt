@@ -1,1 +1,1 @@
-V2.6: Parts, Drinks, Add-ons and Bucket rows now use wide name + compact add-price + delete columns. Added bucket quick choices for Original, Spicy and Original+Spicy combinations. Added missing Food Base Price editor field.
+V2.7: Compact Store/Menu Manager. Store add/list and selected store editor are visually grouped with reduced spacing; repeated EDIT heading removed; categories and food editor remain accessible in the same continuous section.
