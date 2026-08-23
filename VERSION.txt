@@ -1,2 +1,3 @@
-MHAC DELIVERY V3.4 — LOUD RINGTONES + ADMIN RIDER APPROVAL + GOOGLE RIDER LOGIN
-Business hours default: 09:00–19:00 device local time.
+MHAC DELIVERY V1.5 BUILD-UP TEST
+Admin-only build for testing the new Store → Category → Food → Choices/Add-ons → Publish flow.
+Existing production repository should NOT be deleted or replaced until this build is tested.

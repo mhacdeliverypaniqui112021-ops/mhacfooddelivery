@@ -1,162 +1,214 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MHAC DELIVERY — ADMIN V1.5 BUILD-UP</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}
+header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}
+main{max-width:960px;margin:auto;padding:16px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}
+input,textarea,select,button{width:100%;padding:12px;margin:5px 0;border-radius:10px;font-size:15px}
+input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}
+.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}
+.hidden{display:none!important}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+.item{border:2px solid #ddd;border-radius:14px;padding:14px;margin:9px 0}
+.pill{display:inline-block;padding:5px 9px;border-radius:18px;background:#eee;font-weight:900}
+.small{font-size:12px;color:#666}.danger{color:#b00020;font-weight:900}
+.choice{display:grid;grid-template-columns:1fr 110px 70px;gap:6px;align-items:center;margin:5px 0}
+.choice button{margin:0;padding:8px}.sectionTitle{font-size:20px;font-weight:900;margin:5px 0 12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:#111;color:#fff;border-radius:14px;padding:14px}.stat b{display:block;font-size:27px;margin-top:4px}
+.storeBox{border:2px solid #222;border-radius:15px;padding:13px;margin:10px 0}.catBox{border:1.5px solid #aaa;border-radius:12px;padding:11px;margin:8px 0}
+.foodBox{border:1.5px solid #ddd;border-radius:11px;padding:10px;margin:7px 0}
+@media(max-width:600px){.choice{grid-template-columns:1fr 85px 60px}.stats{grid-template-columns:1fr}}
 </style>
-<style>
-.mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
-.mhacSplash.hide{opacity:0;pointer-events:none}
-.mhacSplash img{width:min(72vw,330px);height:auto;animation:mhacIn .8s ease both}
-.mhacSplash h1{color:#fff;margin:16px 0 5px;font-size:30px;letter-spacing:2px}
-.mhacSplash p{color:#e21d25;font-weight:900;letter-spacing:2px}
-.mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
-.mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
-@keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
-</style>
-</head><body>
-<div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
-<script>
-// Independent splash fallback: this runs even if Firebase/module code has an error.
-window.setTimeout(function(){
-  var splash=document.getElementById("mhacSplash");
-  if(!splash) return;
-  splash.classList.add("hide");
-  window.setTimeout(function(){ if(splash.parentNode) splash.parentNode.removeChild(splash); },650);
-},2200);
-</script>
-<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><main>
-<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
-<div id="app" class="hidden">
-<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p></div>
-<div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
-<div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
-<div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
-<div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish.</p>
-<div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
-<div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
-</div></main>
+</head>
+<body>
+<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header>
+<main>
+<section id="login" class="card">
+<h2>🔐 ADMIN LOGIN</h2><p>Authorized MHAC Admin Google account required.</p>
+<button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="small">Ready.</p>
+</section>
+
+<section id="app" class="hidden">
+<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="small"></p></div>
+
+<div class="card"><div class="sectionTitle">📊 DELIVERY & EARNINGS — CURRENT SESSION</div>
+<div class="stats">
+<div class="stat">Total Deliveries<b id="totalDeliveries">0</b></div>
+<div class="stat">Active Orders<b id="activeOrders">0</b></div>
+<div class="stat">Admin 10% Earnings<b id="adminEarnings">₱0.00</b></div>
+<div class="stat">Rider Delivery Earnings<b id="riderEarnings">₱0.00</b></div>
+</div><p class="small">Build-up test: session totals are calculated from completed orders created during the current business session. Historical orders are not deleted.</p></div>
+
+<div class="card"><div class="sectionTitle">📥 ORDERS</div><p id="orderStatus" class="small">Connecting…</p><div id="orders">No orders yet.</div></div>
+
+<div class="card"><div class="sectionTitle">🏍️ RIDERS</div><div id="riders">Loading…</div></div>
+
+<div class="card">
+<div class="sectionTitle">🏪 STORE MENU EDITOR</div>
+<p class="small">Edit a store, category, food, base price, required choices and optional add-ons. Changes stay in the Admin draft until PUBLISH TO CUSTOMER APP.</p>
+<div id="storeList"></div>
+<div class="item"><h3>➕ ADD STORE</h3>
+<input id="newStoreName" placeholder="Store name, e.g. Jollibee">
+<button class="red" id="addStore">ADD STORE</button></div>
+</div>
+
+<div class="card">
+<div class="sectionTitle">📢 CUSTOMER APP PUBLISH</div>
+<p id="publishStatus" class="small">No publish yet.</p>
+<button id="publishBtn" class="green">📢 PUBLISH COMPLETE MENU TO CUSTOMER APP</button>
+<p class="small">Publishing replaces the Customer App menu with the current complete Admin draft.</p>
+</div>
+</section>
+</main>
+
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
+const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();
+gp.setCustomParameters({prompt:"select_account"});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const peso=n=>"₱"+Number(n||0).toFixed(2);
+let draft={version:"1.5",stores:[]},orders=[],unsubs=[];
 
-const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
-const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
-function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
-function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
-$("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
+const seed={stores:[
+{id:"jollibee",name:"Jollibee",icon:"🍗",categories:[
+{name:"Chicken",items:[
+{name:"1pc Chicken Solo",price:99,available:true,choices:[],addons:[]},
+{name:"2pc Chicken with Drinks",price:159,available:true,choices:[
+["Coke Regular",0],["Coke Zero Regular",0],["Go Medium Coke",35],["Go Large Coke",45],["Go Medium Iced Tea",50],["Go Large Royal",45],["Go Large Sprite",45]
+],addons:[]}]},
+{name:"Burger",items:[]}]},
+{id:"mcdo",name:"McDo",icon:"🍟",categories:[{name:"Chicken",items:[]},{name:"Burger",items:[]}]}
+]};
+
+function showApp(){ $("login").classList.add("hidden");$("app").classList.remove("hidden");$("adminInfo").textContent="Signed in as "+auth.currentUser.email; loadDraft(); startLive(); }
+function err(e){return e?.message||"Firebase error";}
+
+$("googleBtn").onclick=async()=>{
+ $("loginStatus").textContent="Opening Google sign-in…";
+ try{await signInWithPopup(auth,gp)}catch(e){
+   if(e?.code==="auth/popup-blocked"||e?.code==="auth/popup-timeout"){try{await signInWithRedirect(auth,gp)}catch(x){$("loginStatus").textContent=err(x)}}else $("loginStatus").textContent=err(e);
+ }
+};
 $("logout").onclick=()=>signOut(auth);
+getRedirectResult(auth).catch(e=>$("loginStatus").textContent=err(e));
 
-function calcStats(){
- const done=orders.filter(o=>String(o.status).toUpperCase()==="COMPLETED");
- const active=orders.filter(o=>String(o.status).toUpperCase()!=="COMPLETED");
- const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
- const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
- $("metrics").innerHTML=`<div class=metric><span>Total Deliveries</span><b>${done.length}</b></div><div class=metric><span>Active Orders</span><b>${active.length}</b></div><div class=metric><span>Admin 10% Earnings</span><b>${peso(sf)}</b></div><div class=metric><span>Rider Delivery Earnings</span><b>${peso(df)}</b></div>`;
- const by={};done.forEach(o=>{const id=o.assignedRiderUid||"UNASSIGNED";by[id]??={count:0,df:0,sf:0};by[id].count++;by[id].df+=Number(o.fees?.deliveryFee||0);by[id].sf+=Number(o.fees?.serviceFee||0)});
- $("riderAccounting").innerHTML="<h3>RIDER ACCOUNTING</h3>"+Object.entries(by).map(([id,v])=>`<div class=item><b>${esc(riders.find(r=>(r.uid||r.id)===id)?.nickname||riders.find(r=>(r.uid||r.id)===id)?.name||id)}</b><br>Completed: ${v.count} • Delivery earnings: ${peso(v.df)} • Admin service fees to remit: ${peso(v.sf)}</div>`).join("")||'<div class=status>No completed deliveries yet.</div>';
+onAuthStateChanged(auth,u=>{
+ if(!u){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}
+ if((u.email||"").toLowerCase()!==ADMIN_EMAIL.toLowerCase()){signOut(auth);$("loginStatus").textContent="Unauthorized admin account.";return}
+ showApp();
+});
+
+async function loadDraft(){
+ try{
+   const s=await getDoc(doc(db,"settings","menu"));
+   if(s.exists() && Array.isArray(s.data().stores)) draft={...s.data()};
+   else draft=JSON.parse(JSON.stringify(seed));
+   renderEditor();
+ }catch(e){draft=JSON.parse(JSON.stringify(seed));renderEditor();$("publishStatus").textContent="Draft loaded locally; Firebase menu read failed: "+err(e);}
 }
-function renderOrders(){const active=orders.filter(o=>String(o.status||"NEW").toUpperCase()!=="COMPLETED");if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}$("orders").innerHTML=active.map(o=>{const opts='<option value="">Assign rider</option>'+riders.filter(r=>r.approved!==false).map(r=>{const u=r.uid||r.id;return `<option value="${esc(u)}" ${o.assignedRiderUid===u?"selected":""}>${esc(r.nickname||r.name||r.email||u)}</option>`}).join("");const items=(o.items||[]).map(i=>`<div><b>${esc(i.store||"STORE")}</b> — ${esc(i.name||"")} ×${i.qty||1}<br><small>${esc(i.choice||"")}${i.addOns?.length?" • Add-ons: "+i.addOns.map(a=>esc(a.name||a)).join(", "):""}${i.chickenParts?.length?" • Parts: "+i.chickenParts.map(p=>esc(p.name||p)+"×"+(p.qty||1)).join(", "):""}${i.original!==undefined?" • Original: "+i.original:""}${i.spicy!==undefined?" • Spicy: "+i.spicy:""}</small></div>`).join("");return `<div class=order><div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div><h3>${esc(o.customer?.name||"")}</h3><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>${items}<p><b>Food:</b> ${peso(o.fees?.foodOrder)} • <b>10% SF:</b> ${peso(o.fees?.serviceFee)} • <b>Delivery:</b> ${peso(o.fees?.deliveryFee)}<br><b>Total:</b> ${peso(o.fees?.total)}</p><select id="r-${esc(o.id)}">${opts}</select><button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button><button class=green data-c="${esc(o.id)}">COMPLETE</button></div>`}).join("")}
-$("orders").onclick=async e=>{const a=e.target.closest("[data-a]");if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u)return alert("Select rider first.");try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,status:"ASSIGNED",updatedAt:serverTimestamp()});alert("✅ Order assigned.")}catch(x){alert(err(x))}}const c=e.target.closest("[data-c]");if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}};
-
-function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class=item>🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||"")}<br><span class=pill>${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class=green data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
-$("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
-
-function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],type:i.type||"standard",spicyPrice:Number(i.spicyPrice||5),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
-function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
-$("stores").onclick=e=>{const b=e.target.closest("[data-store]");if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}};
-$("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
-function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
-function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
+function saveLocal(){localStorage.setItem("mhac_admin_v15_draft",JSON.stringify(draft));renderEditor()}
 function renderEditor(){
- if(!draft.stores[selectedStore]){$("editor").classList.add("hidden");return}
- $("editor").classList.remove("hidden");
- const s=draft.stores[selectedStore];
- $("editor").innerHTML=`
- <h2>✏️ EDIT ${esc(s.name)}</h2>
- <label class=label>STORE NAME</label><input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
- <button class=red id="saveStoreName">SAVE STORE NAME</button>
- <h3>📂 CATEGORIES & FOODS</h3>
- <p class=hint>Tap <b>EDIT FOOD</b> beside any food to change its price, drinks, add-ons, chicken parts, Original/Spicy or bucket pieces.</p>
- <div id="cats">${s.categories.map((c,i)=>`
-   <div class=item>
-    <div class=foodTitle>🍽️ ${esc(c.name)}</div>
-    <div class=small>${(c.items||[]).length} food item(s)</div>
-    <button class=gray data-cat="${i}">OPEN / EDIT CATEGORY</button>
-    <div id="cat-${i}"></div>
-   </div>`).join("")}</div>
- <input id="newCat" placeholder="New category name"><button class=blue id="addCat">ADD CATEGORY</button>
- <div class=publishBar><button class=green id="publish">📢 PUBLISH TO CUSTOMER APP</button><p class=small>Publish only after you finish editing this store. Customer App will receive the complete draft.</p></div>`;
- $("saveStoreName").onclick=()=>{s.name=$("editStoreName").value.trim()||s.name;renderStores();renderEditor()};
- $("addCat").onclick=()=>{const n=$("newCat").value.trim();if(!n)return;s.categories.push({name:n,items:[]});renderEditor()};
- $("cats").onclick=e=>{const b=e.target.closest("[data-cat]");if(b)renderCategory(+b.dataset.cat)};
- $("publish").onclick=publishMenu;
+ $("storeList").innerHTML=(draft.stores||[]).map((s,si)=>`
+ <div class="storeBox">
+   <div class="row"><input value="${esc(s.name)}" onchange="renameStore(${si},this.value)"><button class="gray" onclick="removeStore(${si})">REMOVE STORE</button></div>
+   <div id="cats-${si}">${(s.categories||[]).map((c,ci)=>renderCategory(s,si,c,ci)).join("")}</div>
+   <div class="item"><input id="newcat-${si}" placeholder="New category name"><button class="blue" onclick="addCategory(${si})">ADD CATEGORY</button></div>
+ </div>`).join("") || '<div class="item">No stores yet.</div>';
 }
-function renderCategory(ci){
- const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);if(!c||!box)return;
- box.innerHTML=`
- <div class=editorBox>
-  <label class=label>CATEGORY NAME</label><input id="catName-${ci}" value="${esc(c.name)}">
-  <button class=blue id="catSave-${ci}">SAVE CATEGORY</button>
-  <h4>🍔 FOOD ITEMS</h4>
-  ${(c.items||[]).map((it,i)=>`<div class=foodCard>
-    <div class=foodTitle>${esc(it.name)}</div><b>${peso(it.price)}</b>
-    <div class=small>${it.available===false?"🔴 UNAVAILABLE":"🟢 AVAILABLE"} • ${it.type||"standard"}</div>
-    <button class=gray miniBtn data-food="${i}">✏️ EDIT FOOD</button>
-    <button class=danger miniBtn data-delete-food="${i}">🗑️ DELETE</button>
-    <div id="food-${ci}-${i}"></div>
-  </div>`).join("")}
-  <hr><b>➕ ADD NEW FOOD</b>
-  <input id="newFood-${ci}" placeholder="Food name">
-  <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
-  <button class=red id="addFood-${ci}">ADD FOOD</button>
+function renderCategory(s,si,c,ci){
+ return `<div class="catBox"><div class="row"><input value="${esc(c.name)}" onchange="renameCategory(${si},${ci},this.value)"><button class="gray" onclick="removeCategory(${si},${ci})">REMOVE</button></div>
+ ${(c.items||[]).map((f,fi)=>renderFood(si,ci,f,fi)).join("")}
+ <div class="item"><h4>➕ ADD FOOD</h4>
+ <input id="fn-${si}-${ci}" placeholder="Food name">
+ <input id="fp-${si}-${ci}" type="number" step="0.01" placeholder="Base price">
+ <textarea id="fd-${si}-${ci}" placeholder="Description (optional)"></textarea>
+ <button class="red" onclick="addFood(${si},${ci})">ADD FOOD</button></div></div>`;
+}
+function renderFood(si,ci,f,fi){
+ const choices=(f.choices||[]);
+ const addons=(f.addons||[]);
+ return `<div class="foodBox">
+ <b>🍽️ ${esc(f.name)}</b> <span class="pill">${peso(f.price)}</span>
+ <button class="blue" onclick="editFood(${si},${ci},${fi})">EDIT FOOD</button>
+ <button class="${f.available===false?'gray':'green'}" onclick="toggleFood(${si},${ci},${fi})">${f.available===false?'HIDDEN':'AVAILABLE'}</button>
+ <button class="gray" onclick="removeFood(${si},${ci},${fi})">DELETE</button>
+ <div class="small">${esc(f.description||"")}</div>
+ <div class="small"><b>Choices:</b> ${choices.length} • <b>Add-ons:</b> ${addons.length}</div>
  </div>`;
- $("catSave-"+ci).onclick=()=>{c.name=$("catName-"+ci).value.trim()||c.name;renderEditor();setTimeout(()=>renderCategory(ci),0)};
- box.querySelectorAll("[data-food]").forEach(b=>b.onclick=()=>renderFood(ci,+b.dataset.food));
- box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{const i=+b.dataset.deleteFood;if(confirm("Delete this food from the draft?")){c.items.splice(i,1);renderEditor();setTimeout(()=>renderCategory(ci),0)}});
- $("addFood-"+ci).onclick=()=>{const n=$("newFood-"+ci).value.trim(),p=Number($("newPrice-"+ci).value);if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],type:"standard",spicyPrice:5,bucketPieces:0});renderEditor();setTimeout(()=>renderCategory(ci),0)};
 }
-function renderFood(ci,fi){
- const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
- box.innerHTML=`<div class=editorBox>
-  <h4>✏️ EDIT FOOD</h4>
-  <label class=label>FOOD NAME</label><input id="fn-${ci}-${fi}" value="${esc(it.name)}">
-  <div class=two><div><label class=label>BASE PRICE</label><input id="fp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.price||0)}"></div>
-  <div><label class=label>TYPE</label><select id="ft-${ci}-${fi}"><option value="standard">Standard</option><option value="chicken">Chicken</option><option value="bucket">Bucket Chicken</option></select></div></div>
-  <label class=label>AVAILABILITY</label><select id="fa-${ci}-${fi}"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
-  <label class=label>🥤 DRINKS / CHOICES</label><textarea id="ch-${ci}-${fi}" placeholder="One per line: Coke Regular|0\nCoke Medium|10\nCoke Large|20">${esc(pairsText(it.choices))}</textarea>
-  <div class=hint>Format: <b>Name|additional price</b>. Example: Coke Medium|10</div>
-  <label class=label>➕ OPTIONAL ADD-ONS</label><textarea id="ao-${ci}-${fi}" placeholder="One per line: Extra Rice|20\nSpicy|10">${esc(pairsText(it.addOns))}</textarea>
-  <div class=hint>Customers can select or skip these add-ons.</div>
-  <label class=label>🍗 CHICKEN PARTS</label><input id="cp-${ci}-${fi}" placeholder="Example: Leg, Thigh, Breast, Wing" value="${esc((it.chickenParts||[]).map(x=>x.name||x).join(", "))}">
-  <div class=hint>For Chicken type, customer quantity selection must match the selected parts.</div>
-  <div class=two><div><label class=label>🌶️ SPICY ADD-ON / PIECE</label><input id="sp-${ci}-${fi}" type="number" min="0" step="0.01" value="${Number(it.spicyPrice||5)}"></div>
-  <div><label class=label>🍗 BUCKET PIECES</label><input id="bp-${ci}-${fi}" type="number" min="0" step="1" value="${Number(it.bucketPieces||0)}"></div></div>
-  <button class=green id="saveFood-${ci}-${fi}">💾 SAVE FOOD TO DRAFT</button>
- </div>`;
- $("ft-"+ci+"-"+fi).value=it.type||"standard";
- $("fa-"+ci+"-"+fi).value=String(it.available!==false);
- $("saveFood-"+ci+"-"+fi).onclick=()=>{
-   it.name=$("fn-"+ci+"-"+fi).value.trim()||it.name;
-   it.price=Number($("fp-"+ci+"-"+fi).value)||0;
-   it.type=$("ft-"+ci+"-"+fi).value;
-   it.available=$("fa-"+ci+"-"+fi).value==="true";
-   it.choices=parsePairs($("ch-"+ci+"-"+fi).value);
-   it.addOns=parsePairs($("ao-"+ci+"-"+fi).value);
-   it.chickenParts=$("cp-"+ci+"-"+fi).value.split(",").map(x=>x.trim()).filter(Boolean).map(name=>({name}));
-   it.spicyPrice=Number($("sp-"+ci+"-"+fi).value)||0;
-   it.bucketPieces=Number($("bp-"+ci+"-"+fi).value)||0;
-   alert("✅ Food saved in DRAFT. Click PUBLISH TO CUSTOMER APP when all changes are ready.");
-   renderEditor();setTimeout(()=>renderCategory(ci),0);
- };
-}
-async function publishMenu(){try{menu=normalizeMenu(draft);await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});alert("✅ MENU PUBLISHED TO CUSTOMER APP.");}catch(e){alert("Publish failed: "+err(e))}}
-async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();renderEditor()}
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
-getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
-onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
+window.renameStore=(si,v)=>{draft.stores[si].name=v.trim()||draft.stores[si].name;saveLocal()};
+window.removeStore=si=>{if(confirm("Remove this store from the draft?")){draft.stores.splice(si,1);saveLocal()}};
+window.addCategory=si=>{let el=$("newcat-"+si),n=el.value.trim();if(!n)return;draft.stores[si].categories.push({name:n,items:[]});el.value="";saveLocal()};
+window.renameCategory=(si,ci,v)=>{draft.stores[si].categories[ci].name=v.trim()||draft.stores[si].categories[ci].name;saveLocal()};
+window.removeCategory=(si,ci)=>{if(confirm("Remove this category?")){draft.stores[si].categories.splice(ci,1);saveLocal()}};
+window.addFood=(si,ci)=>{
+ let n=$("fn-"+si+"-"+ci).value.trim(),p=Number($("fp-"+si+"-"+ci).value),d=$("fd-"+si+"-"+ci).value.trim();
+ if(!n||!Number.isFinite(p))return alert("Enter food name and base price.");
+ draft.stores[si].categories[ci].items.push({name:n,price:p,description:d,available:true,choices:[],addons:[]});saveLocal();
+};
+window.toggleFood=(si,ci,fi)=>{draft.stores[si].categories[ci].items[fi].available=draft.stores[si].categories[ci].items[fi].available===false;saveLocal()};
+window.removeFood=(si,ci,fi)=>{if(confirm("Delete this food?")){draft.stores[si].categories[ci].items.splice(fi,1);saveLocal()}};
 
+window.editFood=(si,ci,fi)=>{
+ const f=draft.stores[si].categories[ci].items[fi];
+ const name=prompt("Food name:",f.name); if(name===null)return;
+ const price=prompt("Base price:",f.price); if(price===null)return;
+ const desc=prompt("Description:",f.description||"");
+ f.name=name.trim()||f.name; f.price=Number(price); f.description=desc??f.description;
+ editChoices(f);
+ saveLocal();
+};
+function editChoices(f){
+ let raw=prompt("Choices, one per line: NAME | PRICE\\nExample:\\nCoke Regular | 0\\nGo Medium Coke | 35\\nGo Large Coke | 45", (f.choices||[]).map(x=>x[0]+" | "+x[1]).join("\\n"));
+ if(raw===null)return;
+ f.choices=raw.split("\\n").map(x=>x.trim()).filter(Boolean).map(x=>{let a=x.split("|"),n=a[0].trim(),p=Number((a[1]||"0").trim());return[n,Number.isFinite(p)?p:0]});
+ let ar=prompt("Optional add-ons, one per line: NAME | PRICE", (f.addons||[]).map(x=>x[0]+" | "+x[1]).join("\\n"));
+ if(ar!==null)f.addons=ar.split("\\n").map(x=>x.trim()).filter(Boolean).map(x=>{let a=x.split("|"),n=a[0].trim(),p=Number((a[1]||"0").trim());return[n,Number.isFinite(p)?p:0]});
+}
+
+$("addStore").onclick=()=>{let n=$("newStoreName").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStoreName").value="";saveLocal()};
+
+async function publish(){
+ if(!draft.stores.length)return alert("Add at least one store.");
+ $("publishBtn").disabled=true;$("publishStatus").textContent="Publishing complete menu…";
+ try{
+   await setDoc(doc(db,"settings","menu"),{...draft,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email},{merge:false});
+   $("publishStatus").textContent="✅ PUBLISHED TO CUSTOMER APP • "+new Date().toLocaleString();
+ }catch(e){$("publishStatus").textContent="❌ Publish failed: "+err(e)}finally{$("publishBtn").disabled=false}
+}
+$("publishBtn").onclick=publish;
+
+function startLive(){
+ unsubs.forEach(x=>x&&x());unsubs=[];
+ const u=onSnapshot(collection(db,"orders"),s=>{
+   orders=s.docs.map(d=>({id:d.id,...d.data()}));
+   const active=orders.filter(o=>String(o.status||"NEW").toUpperCase()!=="COMPLETED");
+   const completed=orders.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED");
+   $("totalDeliveries").textContent=completed.length;
+   $("activeOrders").textContent=active.length;
+   $("adminEarnings").textContent=peso(completed.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0));
+   $("riderEarnings").textContent=peso(completed.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0));
+   $("orderStatus").textContent="🟢 LIVE — "+orders.length+" orders";
+   $("orders").innerHTML=orders.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,20).map(o=>`
+   <div class="item"><b>${esc(o.orderNo||o.id)}</b> <span class="pill">${esc(o.status||"NEW")}</span>
+   <br>${esc(o.customer?.name||"")} • ${peso(o.fees?.total||o.total)}
+   ${o.assignedRiderUid?`<br>🏍️ Rider: ${esc(o.assignedRiderNickname||o.assignedRiderUid)}`:""}
+   </div>`).join("")||"No orders.";
+ },e=>$("orderStatus").textContent="❌ "+err(e));
+ unsubs.push(u);
+ const r=onSnapshot(collection(db,"riders"),s=>{
+   $("riders").innerHTML=s.docs.map(d=>{let r={id:d.id,...d.data()};return `<div class="item">🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||d.id)}<br><span class="pill">${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class="green" onclick="approveRider('${esc(r.uid||d.id)}')">APPROVE RIDER</button>`:""}</div>`}).join("")||"No rider profiles.";
+ },e=>$("riders").textContent="❌ "+err(e));
+ unsubs.push(r);
+}
+window.approveRider=async uid=>{try{await updateDoc(doc(db,"riders",uid),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});alert("✅ Rider approved.")}catch(e){alert("Unable to approve rider: "+err(e))}};
 </script>
 </body></html>
