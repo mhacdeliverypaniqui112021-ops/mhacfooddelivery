@@ -81,4 +81,15 @@ async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=n
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
-</script></body></html>
+
+<script>
+// MHAC introduction: show briefly, then reveal the Admin app/login.
+window.addEventListener("load",()=>{
+  const splash=document.getElementById("mhacSplash");
+  if(!splash) return;
+  setTimeout(()=>{
+    splash.classList.add("hide");
+    setTimeout(()=>splash.remove(),650);
+  },2200);
+});
+</script></script></body></html>
