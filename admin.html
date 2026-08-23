@@ -356,6 +356,34 @@
 }
 </style>
 
+
+<style>
+/* V2.8 ONE-BOX MENU EDITOR */
+.storeDeleteBtn{width:auto!important;float:right!important;background:#8b0000!important;padding:7px 10px!important;margin:0!important;font-size:12px!important}
+.storeBox{overflow:hidden!important}
+.oneFoodBox{border:3px solid #1976d2!important;border-radius:16px!important;background:#f8fbff!important;padding:12px!important}
+.oneFoodBox h3{margin:4px 0 8px!important}
+.oneFoodBox .compactField{margin:6px 0!important}
+.oneFoodBox .compactField label{font-size:15px!important}
+.oneFoodBox .compactField input{min-height:50px!important;font-size:17px!important}
+.oneFoodBox .sectionTitle{margin:12px 0 4px!important;font-size:18px!important}
+.oneFoodBox .selectionBox{border:2px solid #ddd;border-radius:12px;background:#fff;padding:8px;margin:7px 0}
+.oneFoodBox .selectionRow{display:grid;grid-template-columns:minmax(0,1fr) 42px 45px 42px;gap:5px;align-items:center;margin:5px 0}
+.oneFoodBox .selectionRow button{min-height:44px!important;margin:0!important}
+.oneFoodBox .selectionRow b{text-align:center}
+.chatPanel{position:fixed;right:14px;bottom:14px;width:min(390px,calc(100vw - 28px));background:#fff;border:3px solid #1976d2;border-radius:18px;z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden}
+.chatHead{background:#1976d2;color:#fff;padding:12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.chatMessages{height:300px;overflow:auto;padding:10px;background:#f5f7fa}
+.chatMsg{max-width:82%;padding:8px 10px;border-radius:12px;margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.chatMsg.admin{margin-left:auto;background:#d8f5df}
+.chatMsg.customer{margin-right:auto;background:#fff;border:1px solid #ddd}
+.chatInput{display:flex;gap:6px;padding:8px;border-top:1px solid #ddd}
+.chatInput input{margin:0!important;flex:1!important;min-width:0}
+.chatInput button{width:auto!important;margin:0!important;padding:10px 13px!important}
+.chatOpenBtn{background:#1976d2!important;margin-top:5px!important}
+@media(max-width:600px){.chatPanel{right:7px;bottom:7px;width:calc(100vw - 14px)}.chatMessages{height:260px}}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -377,11 +405,17 @@ window.setTimeout(function(){
 <div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish.</p>
 <div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
 <div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
-</div></main>
+</div>
+<div id="adminChatPanel" class="chatPanel hidden">
+  <div class="chatHead"><span id="adminChatTitle">💬 CUSTOMER CHAT</span><button id="adminChatClose" class="gray miniBtn">✕</button></div>
+  <div id="adminChatMessages" class="chatMessages"></div>
+  <div class="chatInput"><input id="adminChatInput" placeholder="Type message…"><button id="adminChatSend" class="blue">SEND</button></div>
+</div>
+</main>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,addDoc,collection,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
@@ -404,6 +438,18 @@ function calcStats(){
  const by={};done.forEach(o=>{const id=o.assignedRiderUid||"UNASSIGNED";by[id]??={count:0,df:0,sf:0};by[id].count++;by[id].df+=Number(o.fees?.deliveryFee||0);by[id].sf+=Number(o.fees?.serviceFee||0)});
  $("riderAccounting").innerHTML="<h3>RIDER ACCOUNTING — TODAY</h3>"+Object.entries(by).map(([id,v])=>`<div class=item><b>${esc(riders.find(r=>(r.uid||r.id)===id)?.nickname||riders.find(r=>(r.uid||r.id)===id)?.name||id)}</b><br>Completed: ${v.count} • Delivery earnings: ${peso(v.df)} • Admin service fees to remit: ${peso(v.sf)}</div>`).join("")||'<div class=status>No completed deliveries yet.</div>';
 }
+function countdownText(o){
+ const mins=Number(o.waitingMinutes||0);
+ const ts=o.waitingStartedAt?.seconds?o.waitingStartedAt.seconds*1000:(o.waitingStartedAt?Date.parse(o.waitingStartedAt):0);
+ if(!mins||!ts)return "";
+ const left=Math.max(0,ts+mins*60000-Date.now());
+ if(left<=0)return "⏱️ TIME EXPIRED — ORDER STILL ACTIVE";
+ const m=Math.floor(left/60000),sec=Math.floor((left%60000)/1000);
+ return `⏱️ WAITING TIME: ${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEach(el=>{const o=orders.find(x=>x.id===el.dataset.countdown);if(o)el.textContent=countdownText(o)})}
+setInterval(refreshCountdowns,1000);
+
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{};
  const items=o.items||[];
@@ -448,23 +494,69 @@ function renderOrders(){
     <p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
     <p><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
     <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
+    <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
+    ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
+    ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><br><button class=blue data-time="${esc(o.id)}">⏱️ SET / CHANGE WAITING TIME</button></div>`:""}
     <select id="r-${esc(o.id)}">${opts}</select>
     <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
-    <button class=green data-c="${esc(o.id)}">COMPLETE</button>
+    <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button>
    </div>`;
  }).join("");
 }
 $("orders").onclick=async e=>{
+ const chat=e.target.closest("[data-chat]");
+ if(chat){openAdminChat(chat.dataset.chat);return;}
  const v=e.target.closest("[data-view]");
- if(v){const d=$("details-"+v.dataset.view);if(d)d.classList.toggle("hidden");return;}const a=e.target.closest("[data-a]");if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u)return alert("Select rider first.");try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,status:"ASSIGNED",updatedAt:serverTimestamp()});alert("✅ Order assigned.")}catch(x){alert(err(x))}}const c=e.target.closest("[data-c]");if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}};
+ if(v){const d=$("details-"+v.dataset.view);if(d)d.classList.toggle("hidden");return;}
+ const accept=e.target.closest("[data-accept]");
+ if(accept){
+   const id=accept.dataset.accept;
+   if(!confirm("Accept this customer order? You will set the rider-based waiting time next."))return;
+   accept.disabled=true;
+   try{await updateDoc(doc(db,"orders",id),{status:"ACCEPTED",acceptedAt:serverTimestamp(),updatedAt:serverTimestamp()});}
+   catch(x){accept.disabled=false;alert(err(x));}
+   return;
+ }
+ const tm=e.target.closest("[data-time]");
+ if(tm){
+   const id=tm.dataset.time;
+   const val=prompt("Rider waiting time in minutes:","30");
+   if(val===null)return;
+   const mins=Math.max(1,Math.floor(Number(val)));
+   if(!Number.isFinite(mins)||mins<1){alert("Enter a valid number of minutes.");return;}
+   try{await updateDoc(doc(db,"orders",id),{waitingMinutes:mins,waitingStartedAt:serverTimestamp(),updatedAt:serverTimestamp()});}
+   catch(x){alert(err(x));}
+   return;
+ }
+ const a=e.target.closest("[data-a]");
+ if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u)return alert("Select rider first.");try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,updatedAt:serverTimestamp()});alert("✅ Order assigned.")}catch(x){alert(err(x))}return;}
+ const c=e.target.closest("[data-c]");
+ if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}
+};
 
 function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class=item>🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||"")}<br><span class=pill>${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class=green data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
 $("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
 
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
-function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
-$("stores").onclick=e=>{const b=e.target.closest("[data-store]");if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}};
+function renderStores(){$("stores").innerHTML=draft.stores.map((s,i)=>`<div class="storeBox ${i===selectedStore?"selected":""}" data-store="${i}"><button class="storeDeleteBtn" data-delete-store="${i}" type="button">DELETE</button><b>🏪 ${esc(s.name)}</b><br><span class=small>${(s.categories||[]).length} categories • ${s.categories?.reduce((a,c)=>a+(c.items||[]).length,0)||0} foods</span></div>`).join("")||"<div class=item>No stores yet.</div>"}
+$("stores").onclick=e=>{
+ const del=e.target.closest("[data-delete-store]");
+ if(del){
+   e.stopPropagation();
+   const i=+del.dataset.deleteStore;
+   const s=draft.stores[i];
+   if(!s)return;
+   if(confirm("Delete store "+s.name+" and all its categories/foods?")){
+     draft.stores.splice(i,1);
+     selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
+     renderStores();renderEditor();
+   }
+   return;
+ }
+ const b=e.target.closest("[data-store]");
+ if(b){selectedStore=+b.dataset.store;renderEditor();renderStores()}
+};
 $("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
 function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
 function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
@@ -584,14 +676,25 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  <div class="oneFoodBox">
    <h3>🍽️ FOOD EDITOR</h3>
 
-   <label class="label">STORE NAME</label>
-   <input value="${esc(s.name)}" disabled>
+   <div class="compactField">
+     <label class="label">🏪 STORE NAME</label>
+     <input class="storeNameEdit" value="${esc(s.name)}" placeholder="Store name">
+   </div>
 
-   <label class="label">FOOD NAME</label>
-   <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
+   <div class="compactField">
+     <label class="label">📂 CATEGORY NAME</label>
+     <input class="categoryNameInFoodEdit" value="${esc(c.name)}" placeholder="Category name">
+   </div>
 
-   <label class="label">BASE PRICE</label>
-   <input class="foodPriceEdit" type="number" min="0" step="0.01" value="${Number(it.price||0)}" placeholder="Base price">
+   <div class="compactField">
+     <label class="label">🍽️ FOOD NAME</label>
+     <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
+   </div>
+
+   <div class="compactField">
+     <label class="label">💰 BASE PRICE</label>
+     <input class="foodPriceEdit" type="number" min="0" step="0.01" value="${Number(it.price||0)}" placeholder="Base price">
+   </div>
 
    <label class="label">FOOD TYPE</label>
    <select class="foodType">
@@ -617,6 +720,13 @@ function renderDirectFoodEditor(ci,fi,ed,list){
        <button type="button" class="blue smallBtn pasteBucket">📥 PASTE ALL BUCKET</button>
      </div>
      <button type="button" class="blue addBucket">➕ ADD BUCKET CHOICE</button>
+   </div>
+
+   <div class="sectionTitle">🎯 SELECTION — ORIGINAL / SPICY</div>
+   <div class="selectionBox">
+     <p class="hint">Optional backup for bucket/chicken combinations. Set the number of Original and Spicy pieces.</p>
+     <div class="selectionRow"><span>ORIGINAL</span><button type="button" class="blue selBtn" data-sel="original" data-d="-1">−</button><b class="selValue" data-sel-value="original">0</b><button type="button" class="blue selBtn" data-sel="original" data-d="1">+</button></div>
+     <div class="selectionRow"><span>SPICY</span><button type="button" class="blue selBtn" data-sel="spicy" data-d="-1">−</button><b class="selValue" data-sel-value="spicy">0</b><button type="button" class="blue selBtn" data-sel="spicy" data-d="1">+</button></div>
    </div>
 
    <h4>🍗 PARTS</h4>
@@ -676,6 +786,13 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    r.querySelector("button").onclick=()=>r.remove(); addonRows.appendChild(r);
  };
  const bucketRows=ed.querySelector(".bucketRows");
+ const selection={original:Number(it.selection?.original||0),spicy:Number(it.selection?.spicy||0)};
+ ed.querySelectorAll(".selValue").forEach(x=>x.textContent=selection[x.dataset.selValue]||0);
+ ed.querySelectorAll(".selBtn").forEach(b=>b.onclick=()=>{
+   const k=b.dataset.sel,d=Number(b.dataset.d);
+   selection[k]=Math.max(0,Number(selection[k]||0)+d);
+   const out=ed.querySelector(`[data-sel-value="${k}"]`); if(out)out.textContent=selection[k];
+ });
  const addBucketRow=(name="",price=0)=>{
    const r=document.createElement("div");r.className="editorRow";
    r.innerHTML=`<input class=bucketName placeholder="Bucket choice (e.g. 6pcs Original)" value="${esc(typeof name==="string"?name:(name.name||""))}"><input class=bucketPrice type=number min=0 step=.01 placeholder="Add price" value="${Number(typeof name==="string"?price:(name.price||price||0))}"><button type=button class=danger>✕</button>`;
@@ -736,7 +853,11 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    const name=ed.querySelector(".foodNameEdit").value.trim();
    const price=Number(ed.querySelector(".foodPriceEdit").value);
    if(!name||!Number.isFinite(price)||price<0)return alert("Please enter food name and valid price.");
+   s.name=ed.querySelector(".storeNameEdit").value.trim()||s.name;
+   const categoryName=ed.querySelector(".categoryNameInFoodEdit").value.trim();
+   if(categoryName)c.name=categoryName;
    it.name=name;it.price=price;it.available=ed.querySelector(".availability").value==="true";
+   it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};
    it.chickenParts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
    it.choices=[...ed.querySelectorAll(".drinkName")].map((x)=>{
      const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".drinkPrice").value||0)]
@@ -756,6 +877,28 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    }
  };
 }
+
+let adminChatUnsub=null,adminChatOrderId="";
+function openAdminChat(orderId){
+ adminChatOrderId=orderId;
+ const o=orders.find(x=>x.id===orderId);
+ $("adminChatTitle").textContent="💬 "+(o?.customer?.name||"CUSTOMER")+" — CHAT";
+ $("adminChatPanel").classList.remove("hidden");
+ if(adminChatUnsub)adminChatUnsub();
+ adminChatUnsub=onSnapshot(collection(db,"orders",orderId,"messages"),snap=>{
+   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
+   $("adminChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"customer"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"CUSTOMER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
+   $("adminChatMessages").scrollTop=$("adminChatMessages").scrollHeight;
+ });
+}
+function closeAdminChat(){if(adminChatUnsub){adminChatUnsub();adminChatUnsub=null}adminChatOrderId="";$("adminChatPanel").classList.add("hidden")}
+$("adminChatClose").onclick=closeAdminChat;
+$("adminChatSend").onclick=async()=>{
+ const text=$("adminChatInput").value.trim();if(!text||!adminChatOrderId)return;
+ try{await addDoc(collection(db,"orders",adminChatOrderId,"messages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminChatInput").value=""}catch(e){alert(err(e))}
+};
+$("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminChatSend").click()}});
+
 async function publishMenu(){
  try{
    if(!draft.stores[selectedStore]) return alert("Select a store first.");

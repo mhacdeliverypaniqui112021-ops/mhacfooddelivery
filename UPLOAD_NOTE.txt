@@ -1,1 +1,21 @@
-V2.7: Compact Store/Menu Manager. Store add/list and selected store editor are visually grouped with reduced spacing; repeated EDIT heading removed; categories and food editor remain accessible in the same continuous section.
+MHAC DELIVERY V2.9 FINAL
+
+FINAL LOCKED BUILD:
+- One-box store/menu editor: Store Name, Category Name, Food Name, Base Price, Parts, Drinks, Add-ons, Original/Spicy selection backup.
+- Parts, drinks and add-ons are editable; copy/paste support remains.
+- Stores, categories and foods can be edited/deleted.
+- Customer app menu stays store-to-store and category-to-food.
+- Customer <-> Admin order-linked real-time chat.
+- Customer places order -> NEW / WAITING FOR ADMIN.
+- Admin manually ACCEPTS the order.
+- After acceptance, Admin manually enters rider-provided waiting time in minutes.
+- Countdown is shown to both Admin and Customer.
+- Countdown never auto-completes or auto-cancels the order; zero means time expired but order remains active.
+- Admin can change/reset waiting time when rider gives a new estimate.
+- Admin manually assigns rider and manually COMPLETES the order.
+- Customer can CANCEL an active order before completion.
+- Customer active order remains visible until COMPLETED (or customer cancellation).
+- Completed orders disappear from active Admin and Customer lists.
+- Daily earnings use completed orders for the current business day.
+
+TEST SCOPE: Admin + Customer first. Rider app remains unchanged/closed for this build.
