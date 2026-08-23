@@ -1,11 +1,9 @@
-MHAC DELIVERY SPLASH INTRO
+MHAC DELIVERY ADMIN V4
 
-Original logo: mhac-logo.png
+Replace ONLY admin.html in your GitHub repository.
+Do not delete customer files, rider files, or Firebase configuration/rules.
 
-Use on Customer App, Rider App, and Admin App.
-Black splash, original logo, MHAC DELIVERY title, FAST • SAFE • ON TIME,
-then automatic transition after about 2.2 seconds.
+Admin login is Google-only and accepts:
+mhacdeliverypaniqui112021@gmail.com
 
-This is an asset/snippet package only. It does not replace the locked apps.
-Insert the snippet into each existing HTML while preserving existing
-Firebase, login, order, and rider code.
+This version includes live Firestore orders, rider assignment, rider list, and the existing local menu manager key mhac_v2_stable.
