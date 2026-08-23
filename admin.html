@@ -4,6 +4,15 @@
 
 .choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
 .choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+
+.foodEditorWrap{border:2px solid #222;border-radius:18px;padding:12px;margin:14px 0;background:#fff}
+.foodBoxHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.foodBoxHeader .miniBtn{width:auto!important;margin:0!important;padding:9px 12px!important;font-size:13px!important}
+.storeFoodBox{padding:14px!important}
+.storeFoodBox h3{margin:8px 0 12px}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
+.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
 </style>
 <style>
 .mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
@@ -17,6 +26,15 @@
 
 .choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
 .choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+
+.foodEditorWrap{border:2px solid #222;border-radius:18px;padding:12px;margin:14px 0;background:#fff}
+.foodBoxHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.foodBoxHeader .miniBtn{width:auto!important;margin:0!important;padding:9px 12px!important;font-size:13px!important}
+.storeFoodBox{padding:14px!important}
+.storeFoodBox h3{margin:8px 0 12px}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
+.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -155,28 +173,66 @@ function renderEditor(){
  $("publish").onclick=publishMenu;
 }
 function renderCategory(ci){
- const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);if(!c||!box)return;
+ const s=draft.stores[selectedStore],c=s.categories[ci],box=$("cat-"+ci);
+ if(!c||!box)return;
+
  box.innerHTML=`
- <div class=editorBox>
-  <label class=label>CATEGORY NAME</label><input id="catName-${ci}" value="${esc(c.name)}">
-  <button class=blue id="catSave-${ci}">SAVE CATEGORY</button>
-  <h4>🍔 FOOD ITEMS</h4>
-  ${(c.items||[]).map((it,i)=>`<div class=foodCard>
-    <div class=foodTitle>${esc(it.name)}</div><b>${peso(it.price)}</b>
-    <div class=small>${it.available===false?"🔴 UNAVAILABLE":"🟢 AVAILABLE"} • ${it.type||"standard"}</div>
-    <button class=gray miniBtn data-food="${i}">✏️ EDIT FOOD</button>
-    <button class=danger miniBtn data-delete-food="${i}">🗑️ DELETE</button>
-    <div id="food-${ci}-${i}"></div>
-  </div>`).join("")}
-  <hr><b>➕ ADD NEW FOOD</b>
-  <input id="newFood-${ci}" placeholder="Food name">
-  <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
-  <button class=red id="addFood-${ci}">ADD FOOD</button>
+ <div class="editorBox storeFoodBox">
+   <h3>🍽️ ${esc(s.name)}</h3>
+   <label class=label>FOOD CATEGORY</label>
+   <input id="catName-${ci}" value="${esc(c.name)}" placeholder="Chicken / Burger / etc.">
+   <button class=blue id="catSave-${ci}">💾 SAVE CATEGORY</button>
+
+   <div class=hint><b>Everything for each food is in ONE BOX.</b><br>
+   Food name • price • chicken parts • drinks/sizes • add-ons. Edit here anytime, then publish this store.</div>
+
+   <div id="foodList-${ci}">
+     ${(c.items||[]).map((it,i)=>`
+       <div class="foodEditorWrap">
+         <div class="foodBoxHeader">
+           <b>🍽️ FOOD ${i+1}</b>
+           <button type=button class=danger miniBtn data-delete-food="${i}">🗑️ DELETE FOOD</button>
+         </div>
+         <div id="food-${ci}-${i}"></div>
+       </div>`).join("")}
+   </div>
+
+   <hr>
+   <h3>➕ ADD NEW FOOD</h3>
+   <input id="newFood-${ci}" placeholder="Food name">
+   <input id="newPrice-${ci}" type="number" min="0" step="0.01" placeholder="Base price">
+   <button class=red id="addFood-${ci}">➕ ADD FOOD BOX</button>
  </div>`;
- $("catSave-"+ci).onclick=()=>{c.name=$("catName-"+ci).value.trim()||c.name;renderEditor();setTimeout(()=>renderCategory(ci),0)};
- box.querySelectorAll("[data-food]").forEach(b=>b.onclick=()=>renderFood(ci,+b.dataset.food));
- box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{const i=+b.dataset.deleteFood;if(confirm("Delete this food from the draft?")){c.items.splice(i,1);renderEditor();setTimeout(()=>renderCategory(ci),0)}});
- $("addFood-"+ci).onclick=()=>{const n=$("newFood-"+ci).value.trim(),p=Number($("newPrice-"+ci).value);if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],type:"standard",spicyPrice:5,bucketPieces:0});renderEditor();setTimeout(()=>renderCategory(ci),0)};
+
+ $("catSave-"+ci).onclick=()=>{
+   c.name=$("catName-"+ci).value.trim()||c.name;
+   renderEditor();
+   setTimeout(()=>renderCategory(ci),0);
+ };
+
+ box.querySelectorAll("[data-delete-food]").forEach(b=>b.onclick=()=>{
+   const i=+b.dataset.deleteFood;
+   if(confirm("Delete this food from the draft?")){
+     c.items.splice(i,1);
+     renderEditor();
+     setTimeout(()=>renderCategory(ci),0);
+   }
+ });
+
+ $("addFood-"+ci).onclick=()=>{
+   const n=$("newFood-"+ci).value.trim();
+   const p=Number($("newPrice-"+ci).value);
+   if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
+   c.items.push({
+     name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],
+     type:"standard",spicyPrice:5,bucketPieces:0,description:""
+   });
+   renderEditor();
+   setTimeout(()=>renderCategory(ci),0);
+ };
+
+ // Automatically open every food in this category.
+ (c.items||[]).forEach((_,i)=>renderFood(ci,i));
 }
 function renderFood(ci,fi){
  const it=draft.stores[selectedStore].categories[ci].items[fi],box=$("food-"+ci+"-"+fi);if(!it||!box)return;
