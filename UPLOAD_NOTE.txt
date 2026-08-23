@@ -1,1 +1,1 @@
-V2.2: Customer menu follows Store -> Category tabs -> Food list with price and + button -> Food customization. Optional Parts, Drinks/Choices with add prices, Add-ons with prices, quantity, Add to Cart. Admin uses unified food editor with copy/paste Parts, Drinks and Add-ons.
+V2.3: Direct food editor. Category opens directly to food list. No OPEN FOODS category editor. Each food has one editor containing Store Name, Food Name, Price, Parts, Drinks, Add-ons, Save. No Standard/Chicken/Bucket type selector. Copy/Paste for Parts, Drinks, Add-ons.
