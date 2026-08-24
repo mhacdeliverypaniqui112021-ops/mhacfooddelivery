@@ -430,7 +430,12 @@
 .storeBox .label{margin-top:4px!important}
 .storeBox .storeNameInline{margin:3px 0!important}
 </style>
-<style>.publishBar{position:relative!important;z-index:20!important;pointer-events:auto!important}.publishBar button{position:relative!important;z-index:21!important;pointer-events:auto!important;cursor:pointer!important}</style></head><body>
+<style>.publishBar{position:relative!important;z-index:20!important;pointer-events:auto!important}.publishBar button{position:relative!important;z-index:21!important;pointer-events:auto!important;cursor:pointer!important}</style><style>
+[data-cancel-order]{width:100%;min-height:52px;margin-top:7px;font-size:17px;font-weight:900;border-radius:10px;touch-action:manipulation}
+</style>
+<style>.soundBox{margin-top:10px;padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.soundBox button{margin-top:6px}</style>
+<style>.adminOrderPreview{border:2px solid #ddd;border-radius:12px;padding:9px;margin:8px 0;background:#fff;font-size:14px;line-height:1.35}.adminOrderPreview>div+div{margin-top:8px;border-top:1px solid #ddd;padding-top:8px}.adminOrderPreview span{font-weight:700}</style>
+</head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -442,10 +447,10 @@ window.setTimeout(function(){
   window.setTimeout(function(){ if(splash.parentNode) splash.parentNode.removeChild(splash); },650);
 },2200);
 </script>
-<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><main>
+<header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
-<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p></div>
+<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER ALERT</b><button id="adminSoundBtn" class="blue">🔊 ENABLE SOUND</button><span id="adminSoundState" class="status"></span></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
@@ -470,6 +475,9 @@ const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(fireba
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
+let adminSoundReady=false;
+async function playAdminAlert(){if(!adminSoundReady)return;const a=$("orderAlertAudio");if(!a)return;try{a.pause();a.currentTime=0;a.volume=1;await a.play()}catch(e){$("adminSoundState").textContent="❌ Tap ENABLE SOUND again"}}
+$("adminSoundBtn").onclick=async()=>{try{const a=$("orderAlertAudio");a.volume=1;await a.play();a.pause();a.currentTime=0;adminSoundReady=true;$("adminSoundState").textContent="🔊 Sound enabled — loud alert ready"}catch(e){$("adminSoundState").textContent="❌ Sound could not be enabled — tap again"}};
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
 $("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
@@ -498,35 +506,16 @@ function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEa
 setInterval(refreshCountdowns,1000);
 
 function orderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{};
- const items=o.items||[];
- const rows=items.map(i=>{
-   const qty=Number(i.qty||1);
-   const line=Number(i.price||0)*qty;
-   const choice=i.choice||i.selectedChoice||"";
-   const choices=i.choices||i.selectedChoices;
-   const adds=i.addOns||i.addons||i.selectedAddons||[];
-   const parts=i.chickenParts||i.parts||[];
-   return `<div class="item"><b>${qty} × ${esc(i.name||"Food")}</b> — ${peso(line)}
-   <br><small>🏪 ${esc(i.store||i.storeName||"STORE")}
-   ${choice?" • Choice: "+esc(choice):""}
-   ${choices?" • Choices: "+esc(typeof choices==="string"?choices:JSON.stringify(choices)):""}
-   ${parts.length?" • Parts: "+esc(parts.map(p=>p.name||p).join(", ")):""}
-   ${adds.length?" • Add-ons: "+esc(adds.map(a=>a.name||a).join(", ")):""}
-   ${i.original!==undefined?" • Original: "+esc(i.original):""}
-   ${i.spicy!==undefined?" • Spicy: "+esc(i.spicy):""}</small></div>`;
- }).join("")||"<div class=item>No item details.</div>";
- return `<div class="item" style="background:#f7f7f7">
- <b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>
- 📍 ${esc(c.gps?.display||c.address||"Customer GPS")}
- <hr><b>🛒 ORDER DETAILS</b>${rows}
- <hr><b>💰 BILL</b><br>
- Food Order: ${peso(f.foodOrder)}<br>
- 10% Service Fee: ${peso(f.serviceFee)}<br>
- Delivery Fee: ${peso(f.deliveryFee)}<br>
- 2nd Store Fee: ${peso(f.secondStoreFee)}<br>
- <b>Customer Total: ${peso(f.total)}</b>
- </div>`;
+ const c=o.customer||{}, f=o.fees||{}, groups={};
+ (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="item"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{
+   const qty=Math.max(1,Number(i.qty||1));
+   const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div>${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
+   const drink=i.choice?`<div>Drinks: ${esc(i.choice)}</div>`:"";
+   const adds=i.addOns?.length?`<div>Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
+   return `<div style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${adds}</div>`;
+ }).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
+ return `<div class="item" style="background:#f7f7f7"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}<hr><b>🛒 ORDER DETAILS</b>${rows}<hr><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>`;
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
@@ -541,10 +530,11 @@ function renderOrders(){
     <h3>${esc(o.customer?.name||"")}</h3>
     <p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
     <p><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
+    <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}</div>`}).join("")}</div>`).join("")})()}</div>
     <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
-    ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
+    ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class=red data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
     ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
     <select id="r-${esc(o.id)}">${opts}</select>
     <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
@@ -563,6 +553,28 @@ $("orders").onclick=async e=>{
    accept.disabled=true;
    try{await updateDoc(doc(db,"orders",id),{status:"ACCEPTED",acceptedAt:serverTimestamp(),updatedAt:serverTimestamp(),waitingMinutes:30});toast("Order accepted. Set the rider waiting time.");}
    catch(x){accept.disabled=false;toast(err(x));}
+   return;
+ }
+ const cancel=e.target.closest("[data-cancel-order]");
+ if(cancel){
+   const id=cancel.dataset.cancelOrder;
+   const ok=confirm("CANCEL THIS ORDER?\n\nUse this for fake/suspicious bookings or orders you cannot accept.\n\nThe customer will see the order as CANCELLED.");
+   if(!ok)return;
+   const reason=prompt("Cancellation reason (optional):","Fake / suspicious booking");
+   cancel.disabled=true;
+   try{
+     await updateDoc(doc(db,"orders",id),{
+       status:"CANCELLED",
+       cancelledAt:serverTimestamp(),
+       cancelledBy:auth.currentUser?.email||"ADMIN",
+       cancellationReason:String(reason||"Admin cancelled order").trim(),
+       updatedAt:serverTimestamp()
+     });
+     toast("Order cancelled.");
+   }catch(x){
+     cancel.disabled=false;
+     toast(err(x));
+   }
    return;
  }
  const tm=e.target.closest("[data-time]");
@@ -832,7 +844,7 @@ function renderEditor(){
  </div>`;
  $("saveStoreName").onclick=()=>{
    s.name=$("editStoreName").value.trim()||s.name;
-   renderStores(); renderEditor();
+   saveDraftMenu(); renderStores(); renderEditor();
  };
  $("addCat").onclick=()=>{
    const n=$("newCat").value.trim();
@@ -868,11 +880,11 @@ function renderEditor(){
      const n=card.querySelector(".categoryNameEdit").value.trim();
      if(!n) return toast("Enter category name.");
      c.name=n;
-     renderEditor();
+     saveDraftMenu(); renderEditor();
    };
    card.querySelector(".deleteCategory").onclick=()=>{
      s.categories.splice(ci,1);
-     renderEditor();
+     saveDraftMenu(); renderEditor();
    };
  });
  $("publish").onclick=async()=>{if(publishedStoreIds().has(s.id)) await unpublishStore(selectedStore); else await publishMenu();};
@@ -901,7 +913,7 @@ function renderDirectFoodList(ci,list){
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
-   renderDirectFoodList(ci,list);
+   renderDirectFoodList(ci,list); saveDraftMenu();
  };
  list.querySelectorAll(".editDirectFood").forEach(btn=>{
    btn.onclick=(e)=>{
@@ -1229,31 +1241,26 @@ async function loadMenu(){
   const pubSnap=await getDoc(doc(db,"settings","menu"));
   menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
   const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
-  draft=normalizeMenu(draftSnap.exists()?draftSnap.data():menu);
+  const hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
+  draft=normalizeMenu(hasDraft?draftSnap.data():menu);
 
-  // CUSTOMER APP must only contain stores that still exist in ADMIN DRAFT.
-  // This also fixes the old-store-ID problem caused by deleting a store and
-  // adding the same store name again: the old published copy is removed.
-  const draftIds=new Set((draft.stores||[]).map(x=>x.id));
-  const cleanedStores=(menu.stores||[])
-    .filter(x=>draftIds.has(x.id))
-    .map(x=>({...x,published:true}));
-  const needsCleanup=cleanedStores.length!==(menu.stores||[]).length ||
-    cleanedStores.some((x,i)=>menu.stores?.[i]?.published!==true || menu.stores?.[i]?.id!==x.id);
-  if(needsCleanup){
-    menu=normalizeMenu({...menu,stores:cleanedStores,publishVersion:Date.now()});
-    try{
-      await setDoc(doc(db,"settings","menu"),{
-        ...menu,
-        updatedAt:serverTimestamp(),
-        updatedBy:auth.currentUser.email
-      });
-    }catch(e){console.warn("Published-menu cleanup failed",e)}
+  // Recovery: never erase customer-facing stores just because the editable draft
+  // was missing/stale. Published stores are copied back into the admin draft.
+  // A real ADMIN DELETE removes the published store first, so this does not
+  // resurrect intentionally deleted stores.
+  const byId=new Map((draft.stores||[]).map(s=>[s.id,s]));
+  let recovered=false;
+  for(const ps of (menu.stores||[])){
+    if(!byId.has(ps.id)){draft.stores.push(JSON.parse(JSON.stringify(ps)));recovered=true;}
+  }
+  if(recovered){
+    await flushDraftMenu().catch(e=>console.warn("Draft recovery save failed",e));
   }
   renderStores();
   $("editor").classList.add("hidden");
 }
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
+let seenAdminOrders=new Set();let adminOrdersPrimed=false;
+function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 

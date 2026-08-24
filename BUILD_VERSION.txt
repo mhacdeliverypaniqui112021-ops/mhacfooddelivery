@@ -1,1 +1,3 @@
-MHAC DELIVERY V3.5 - CUSTOMER INFO + RELIABLE GPS + CLICKABLE PART BOXES
+MHAC DELIVERY — V4.0 INTEGRATED TEST BUILD
+Base: V3.6 RIDER_ADMIN_SECURITY
+Includes: chat permission guidance, persistent admin menu draft recovery, publish/unpublish flow, compact customer info/GPS, checkbox chicken parts, white customer UI, uploaded 17-second order alert sound, grouped admin/rider order display, admin cancel order, rider earnings/order status.

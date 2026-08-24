@@ -1,0 +1,36 @@
+MHAC DELIVERY V4.0 — FIRESTORE CHAT RULES
+
+The chatbox uses:
+  /orders/{orderId}/messages/{messageId}
+
+The current app error "Missing or insufficient permissions" means the existing Firestore Rules do not allow this subcollection.
+
+ADD the following inside your existing match /databases/{database}/documents block. Do NOT delete your existing order/rider/menu rules; merge this match into them.
+
+function isAdmin() {
+  return request.auth != null
+    && request.auth.token.email == "mhacdeliverypaniqui112021@gmail.com";
+}
+
+match /orders/{orderId}/messages/{messageId} {
+  allow read: if request.auth != null && (
+    isAdmin() ||
+    get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
+  );
+
+  allow create: if request.auth != null && (
+    isAdmin() ||
+    (
+      get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid &&
+      request.resource.data.senderRole == "customer" &&
+      request.resource.data.senderUid == request.auth.uid
+    )
+  );
+
+  allow update, delete: if isAdmin();
+}
+
+IMPORTANT:
+- Keep your existing rules for orders, riders and settings.
+- Publish/menu operations still depend on your existing settings/menu and settings/menuDraft permissions.
+- After saving Rules, reload Customer/Admin apps and test CHAT again.
