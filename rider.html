@@ -30,19 +30,15 @@
 <body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
-(function(){
-  // Rider Introduction is the loading screen.
-  // Show it on every page load/refresh, then continue to the Rider App.
-  window.addEventListener("load",function(){
-    setTimeout(function(){
-      const x=document.getElementById("mhacSplash");
-      if(x){
-        x.classList.add("hide");
-        setTimeout(function(){ if(x.parentNode) x.remove(); },650);
-      }
-    },2200);
-  });
-})();
+// Same independent loading splash behavior as the Admin App.
+window.setTimeout(function(){
+  var splash=document.getElementById("mhacSplash");
+  if(!splash) return;
+  splash.classList.add("hide");
+  window.setTimeout(function(){
+    if(splash.parentNode) splash.parentNode.removeChild(splash);
+  },650);
+},2200);
 </script>
 
 <header><h1>MHAC DELIVERY — RIDER APP</h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
