@@ -626,7 +626,13 @@ $('addStore').onclick=async()=>{
 };
 
 function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base;}
-function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type==="bucket"?"bucket":"chicken",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
+function normalizeMenu(x){
+ const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));
+ const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
+ const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ return m;
+}
 let draftSaveTimer=null;
 async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
 async function flushDraftMenu(){
@@ -1100,14 +1106,14 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    it.spicyPrice=ed.querySelector(".spicyPrice")?Number(ed.querySelector(".spicyPrice").value||0):0;
    it.chickenParts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
    it.choices=[...ed.querySelectorAll(".drinkName")].map((x)=>{
-     const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".drinkPrice").value||0)]
-   }).filter(x=>x[0]);
+     const r=x.closest(".editorRow");return {name:x.value.trim(),price:Number(r.querySelector(".drinkPrice").value||0)}
+   }).filter(x=>x.name);
    it.addOns=[...ed.querySelectorAll(".addonName")].map((x)=>{
-     const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".addonPrice").value||0)]
-   }).filter(x=>x[0]);
+     const r=x.closest(".editorRow");return {name:x.value.trim(),price:Number(r.querySelector(".addonPrice").value||0)}
+   }).filter(x=>x.name);
    it.bucketChoices=[...ed.querySelectorAll(".bucketName")].map((x)=>{
-     const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".bucketPrice").value||0)]
-   }).filter(x=>x[0]);
+     const r=x.closest(".editorRow");return {name:x.value.trim(),price:Number(r.querySelector(".bucketPrice").value||0)}
+   }).filter(x=>x.name);
    it.type=ed.querySelector(".foodType").value;
    renderDirectFoodList(ci,list); saveDraftMenu();
  };

@@ -1,1 +1,1 @@
-V3.3.6 - reliable admin publish + customer live sync
+V3.3.8 - Firestore publish fix: choices/add-ons/bucket choices stored as objects, legacy arrays normalized
