@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL COMPACT</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}.pubState{font-size:12px;font-weight:900;text-align:center;padding:7px;border-radius:9px;margin-bottom:5px}.pubState.published{background:#e8f7ed;color:#138a36}.pubState.draft{background:#fff7d6;color:#8a6500}
 
 /* FINAL COMPACT RIDERS */
 #riders .riderCompact{padding:8px 10px!important;margin:5px 0!important;border-radius:10px!important}
@@ -618,7 +618,14 @@ function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",
 let draftSaveTimer=null;
 async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
 function publishedStoreIds(){return new Set((menu?.stores||[]).map(s=>s.id));}
-function renderPublishButton(si){const st=draft?.stores?.[si];return st&&publishedStoreIds().has(st.id)?'<button type="button" class="danger" data-unpublish-store="'+si+'">🔴 UNPUBLISH STORE</button>':'<button type="button" class="green" data-publish-store="'+si+'">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>';}
+function renderPublishButton(si){
+ const st=draft?.stores?.[si];
+ if(!st)return '';
+ if(publishedStoreIds().has(st.id)){
+   return '<div class="pubState published">🟢 PUBLISHED — CUSTOMER APP IS USING THIS MENU</div><button type="button" class="danger" data-unpublish-store="'+si+'">🔴 UNPUBLISH STORE</button>';
+ }
+ return '<div class="pubState draft">🟡 DRAFT — NOT VISIBLE TO CUSTOMER</div><button type="button" class="green" data-publish-store="'+si+'">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>';
+}
 function renderStores(){
  const host=$("stores");
  host.innerHTML=(draft.stores||[]).map((st,si)=>`
@@ -705,13 +712,17 @@ function renderStores(){
    list.classList.toggle("hidden");
    if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
- host.querySelectorAll("[data-publish-store]").forEach(b=>b.onclick=()=>{
+ host.querySelectorAll("[data-publish-store]").forEach(b=>b.onclick=async()=>{
+   if(b.dataset.busy==="1")return;
+   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ PUBLISHING...";
    selectedStore=+b.dataset.publishStore;
-   if(typeof publishMenu==="function") publishMenu();
+   try{ await publishMenu(); } finally { b.dataset.busy="0"; }
  });
  host.querySelectorAll("[data-unpublish-store]").forEach(b=>b.onclick=async()=>{
+   if(b.dataset.busy==="1")return;
+   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ UNPUBLISHING...";
    selectedStore=+b.dataset.unpublishStore;
-   await unpublishStore(selectedStore);
+   try{ await unpublishStore(selectedStore); } finally { b.dataset.busy="0"; }
  });
  saveDraftMenu();
 }
