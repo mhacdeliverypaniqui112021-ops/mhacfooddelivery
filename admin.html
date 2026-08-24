@@ -595,6 +595,23 @@ $("riders").onclick=async e=>{
  const del=e.target.closest("[data-delete-rider]");
  if(del){try{await deleteDoc(doc(db,"riders",del.dataset.deleteRider));toast("Rider profile deleted.")}catch(x){toast(err(x))}return;}
 };
+$('addStore').onclick=()=>{
+ const inp=$('newStore'), n=inp.value.trim();
+ if(!n)return toast('Enter store name.');
+ draft.stores=draft.stores||[];
+ draft.stores.push({
+   name:n,
+   categories:[
+     {name:'Chicken',items:[]},
+     {name:'Burger',items:[]}
+   ]
+ });
+ inp.value='';
+ selectedStore=draft.stores.length-1;
+ renderStores();
+ toast('Store added. Categories are ready to edit.');
+};
+
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
 function renderStores(){
  const host=$("stores");
@@ -1068,7 +1085,7 @@ async function publishMenu(){
    toast("✅ "+draft.stores[selectedStore].name+" published to customer app.");
  }catch(e){toast("Publish failed: "+err(e))}
 }
-async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();renderEditor()}
+async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();$("editor").classList.add("hidden")}
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
