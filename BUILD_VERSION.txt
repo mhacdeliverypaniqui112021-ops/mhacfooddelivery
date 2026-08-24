@@ -1,5 +1,1 @@
-FINAL ADMIN BUILD
-- Removed browser confirm/prompt/alert popups from admin workflows
-- Rider approval can be removed; rider profile can be deleted
-- Compact rider cards
-- Waiting time is entered inline
+MHAC DELIVERY V3.2 — FINAL PUBLISH / UNPUBLISH FLOW

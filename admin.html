@@ -430,7 +430,7 @@
 .storeBox .label{margin-top:4px!important}
 .storeBox .storeNameInline{margin:3px 0!important}
 </style>
-</head><body>
+<style>.publishBar{position:relative!important;z-index:20!important;pointer-events:auto!important}.publishBar button{position:relative!important;z-index:21!important;pointer-events:auto!important;cursor:pointer!important}</style></head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -601,6 +601,7 @@ $('addStore').onclick=()=>{
  draft.stores=draft.stores||[];
  draft.stores.push({
    name:n,
+   id:storeKey(n,draft.stores.length),
    categories:[
      {name:'Chicken',items:[]},
      {name:'Burger',items:[]}
@@ -612,7 +613,12 @@ $('addStore').onclick=()=>{
  toast('Store added. Categories are ready to edit.');
 };
 
-function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
+function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base+"_"+index;}
+function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
+let draftSaveTimer=null;
+async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
+function publishedStoreIds(){return new Set((menu?.stores||[]).map(s=>s.id));}
+function renderPublishButton(si){const st=draft?.stores?.[si];return st&&publishedStoreIds().has(st.id)?'<button type="button" class="danger" data-unpublish-store="'+si+'">🔴 UNPUBLISH STORE</button>':'<button type="button" class="green" data-publish-store="'+si+'">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>';}
 function renderStores(){
  const host=$("stores");
  host.innerHTML=(draft.stores||[]).map((st,si)=>`
@@ -651,7 +657,7 @@ function renderStores(){
     </div>
 
     <div class="publishBar compactPublish">
-      <button class="green" data-publish-store="${si}">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>
+      ${renderPublishButton(si)}
       <p class="small">Only this selected store will be published.</p>
     </div>
    </div>
@@ -703,6 +709,11 @@ function renderStores(){
    selectedStore=+b.dataset.publishStore;
    if(typeof publishMenu==="function") publishMenu();
  });
+ host.querySelectorAll("[data-unpublish-store]").forEach(b=>b.onclick=async()=>{
+   selectedStore=+b.dataset.unpublishStore;
+   await unpublishStore(selectedStore);
+ });
+ saveDraftMenu();
 }
 function renderNestedFoods(si,ci,list){
  const s=draft.stores[si],c=s.categories[ci];
@@ -725,7 +736,7 @@ function renderNestedFoods(si,ci,list){
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
-   renderNestedFoods(si,ci,list);
+   renderNestedFoods(si,ci,list); saveDraftMenu();
  };
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
    const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
@@ -756,7 +767,7 @@ function renderEditor(){
    </div>
 
    <div class="publishBar">
-     <button class="green" id="publish">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>
+     <button type="button" class="green" id="publish">📢 PUBLISH / UNPUBLISH STORE</button>
      <p class="small">Only this selected store will be published. Other stores stay unchanged.</p>
    </div>
  </div>`;
@@ -805,7 +816,7 @@ function renderEditor(){
      renderEditor();
    };
  });
- $("publish").onclick=publishMenu;
+ $("publish").onclick=async()=>{if(publishedStoreIds().has(s.id)) await unpublishStore(selectedStore); else await publishMenu();};
 }
 
 function renderDirectFoodList(ci,list){
@@ -1043,11 +1054,11 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".bucketPrice").value||0)]
    }).filter(x=>x[0]);
    it.type=ed.querySelector(".foodType").value;
-   renderDirectFoodList(ci,list);
+   renderDirectFoodList(ci,list); saveDraftMenu();
  };
  ed.querySelector(".deleteDirectFood").onclick=()=>{
    {
-     c.items.splice(fi,1);renderDirectFoodList(ci,list);
+     c.items.splice(fi,1);renderDirectFoodList(ci,list);saveDraftMenu();
    }
  };
 }
@@ -1075,17 +1086,29 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
 
 async function publishMenu(){
  try{
-   if(!draft.stores[selectedStore]) return toast("Select a store first.");
-   const currentSnap=await getDoc(doc(db,"settings","menu"));
-   const current=normalizeMenu(currentSnap.exists()?currentSnap.data():{version:"final",stores:[]});
-   const storeToPublish=normalizeMenu({version:draft.version||"final",stores:[draft.stores[selectedStore]]});
-   const otherStores=current.stores.filter(s=>s.id!==draft.stores[selectedStore].id);
-   menu=normalizeMenu({...current,version:draft.version||current.version,stores:[...otherStores,storeToPublish.stores[0]]});
+   const st=draft?.stores?.[selectedStore]; if(!st)return toast("Select a store first.");
+   const snap=await getDoc(doc(db,"settings","menu"));
+   const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+   const pubStore=normalizeMenu({version:draft.version||"final",stores:[st]}).stores[0];
+   const others=current.stores.filter(s=>s.id!==pubStore.id);
+   menu=normalizeMenu({...current,stores:[...others,pubStore]});
    await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});
-   toast("✅ "+draft.stores[selectedStore].name+" published to customer app.");
+   await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+   renderStores(); toast("✅ "+pubStore.name+" published to customer app.");
  }catch(e){toast("Publish failed: "+err(e))}
 }
-async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();$("editor").classList.add("hidden")}
+async function unpublishStore(si){
+ try{
+   const st=draft?.stores?.[si]; if(!st)return;
+   const snap=await getDoc(doc(db,"settings","menu"));
+   const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+   menu=normalizeMenu({...current,stores:current.stores.filter(s=>s.id!==st.id)});
+   await setDoc(doc(db,"settings","menu"),{...menu,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+   await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+   renderStores(); toast("🔴 "+st.name+" unpublished. Customer app will no longer show it.");
+ }catch(e){toast("Unpublish failed: "+err(e))}
+}
+async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});const d=await getDoc(doc(db,"settings","menuDraft"));draft=normalizeMenu(d.exists()?d.data():menu);renderStores();$("editor").classList.add("hidden")}
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
