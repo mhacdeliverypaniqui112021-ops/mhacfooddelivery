@@ -1,2 +1,3 @@
-MHAC DELIVERY V4.1.3 — FINAL RIDER INTRODUCTION FIX
-Rider splash/introduction now appears only on the first visit on the device/browser. Refreshing the Rider App no longer shows the introduction again. Rider login, orders, customer location, navigation, Admin/Menu files were left unchanged.
+Upload this full replacement to the SAME GitHub repository.
+V4.1.3 keeps the MHAC DELIVERY rider introduction/splash for the first visit of a browser tab, then skips it on refresh using sessionStorage.
+Rider Login, orders, customer location, navigation, and the V4.1.2 menu/admin files are otherwise unchanged.

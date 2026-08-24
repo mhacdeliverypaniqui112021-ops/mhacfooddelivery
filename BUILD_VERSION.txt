@@ -1,1 +1,3 @@
-V4.1.3 RIDER INTRODUCTION FIX — first-visit intro only; refresh stays in Rider App.
+V4.1.4 RIDER LOADING INTRO FINAL
+
+Rider introduction is shown on every page load/refresh.
