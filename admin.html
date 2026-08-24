@@ -614,7 +614,7 @@ $('addStore').onclick=()=>{
 };
 
 function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base+"_"+index;}
-function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
+function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type==="bucket"?"bucket":"chicken",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
 let draftSaveTimer=null;
 async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
 function publishedStoreIds(){return new Set((menu?.stores||[]).map(s=>s.id));}
@@ -883,14 +883,22 @@ function renderDirectFoodEditor(ci,fi,ed,list){
 
    <label class="label">FOOD TYPE</label>
    <select class="foodType">
-     <option value="regular">REGULAR FOOD</option>
-     <option value="chicken">CHICKEN</option>
-     <option value="bucket">BUCKET</option>
+     <option value="chicken">CHICKEN / REGULAR ITEM</option>
+     <option value="bucket">BUCKET / COMBINATION</option>
    </select>
 
    <div class="bucketSection hidden">
+     <h4>🪣 BUCKET / COMBINATION</h4>
+     <p class="hint">Original/Spicy selection is only for bucket or chicken combinations.</p>
+     <div class="selectionBox">
+       <div class="sectionTitle">🎯 ORIGINAL / SPICY</div>
+       <div class="selectionRow"><span>ORIGINAL</span><button type="button" class="blue selBtn" data-sel="original" data-d="-1">−</button><b class="selValue" data-sel-value="original">0</b><button type="button" class="blue selBtn" data-sel="original" data-d="1">+</button></div>
+       <div class="selectionRow"><span>SPICY</span><button type="button" class="blue selBtn" data-sel="spicy" data-d="-1">−</button><b class="selValue" data-sel-value="spicy">0</b><button type="button" class="blue selBtn" data-sel="spicy" data-d="1">+</button></div>
+       <div class="compactField"><label class="label">🌶️ SPICY ADD PRICE / PIECE</label><input class="spicyPrice" type="number" min="0" step="0.01" placeholder="0" value="${Number(it.spicyPrice||0)}"></div>
+     </div>
+
      <h4>🪣 BUCKET CHOICES</h4>
-     <p class="hint">Add the bucket choices you want customers to select. Example: 6pcs Original, 6pcs Spicy, 8pcs Original. Add price when needed.</p>
+     <p class="hint">Add the bucket choices customers can select. You can set an extra price for each choice.</p>
      <div class="bucketRows"></div>
      <div class="bucketQuickChoices">
        <button type="button" class="blue bucketQuick" data-bucket="6pcs Original">6pcs Original</button>
@@ -905,13 +913,6 @@ function renderDirectFoodEditor(ci,fi,ed,list){
        <button type="button" class="blue smallBtn pasteBucket">📥 PASTE ALL BUCKET</button>
      </div>
      <button type="button" class="blue addBucket">➕ ADD BUCKET CHOICE</button>
-   </div>
-
-   <div class="sectionTitle">🎯 SELECTION — ORIGINAL / SPICY</div>
-   <div class="selectionBox">
-     <p class="hint">Optional backup for bucket/chicken combinations. Set the number of Original and Spicy pieces.</p>
-     <div class="selectionRow"><span>ORIGINAL</span><button type="button" class="blue selBtn" data-sel="original" data-d="-1">−</button><b class="selValue" data-sel-value="original">0</b><button type="button" class="blue selBtn" data-sel="original" data-d="1">+</button></div>
-     <div class="selectionRow"><span>SPICY</span><button type="button" class="blue selBtn" data-sel="spicy" data-d="-1">−</button><b class="selValue" data-sel-value="spicy">0</b><button type="button" class="blue selBtn" data-sel="spicy" data-d="1">+</button></div>
    </div>
 
    <h4>🍗 PARTS</h4>
@@ -989,7 +990,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
 
  const typeSel=ed.querySelector(".foodType");
  const bucketSection=ed.querySelector(".bucketSection");
- typeSel.value=it.type==="bucket"?"bucket":(it.type==="chicken"?"chicken":"regular");
+ typeSel.value=it.type==="bucket"?"bucket":"chicken";
  const syncBucketVisibility=()=>bucketSection.classList.toggle("hidden",typeSel.value!=="bucket");
  typeSel.onchange=syncBucketVisibility;
  syncBucketVisibility;
@@ -1042,7 +1043,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    const categoryName=ed.querySelector(".categoryNameInFoodEdit").value.trim();
    if(categoryName)c.name=categoryName;
    it.name=name;it.price=price;it.available=ed.querySelector(".availability").value==="true";
-   it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};
+   it.selection=ed.querySelector(".foodType").value==="bucket"?{original:Number(selection.original||0),spicy:Number(selection.spicy||0)}:{original:0,spicy:0};
+   it.spicyPrice=ed.querySelector(".spicyPrice")?Number(ed.querySelector(".spicyPrice").value||0):0;
    it.chickenParts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
    it.choices=[...ed.querySelectorAll(".drinkName")].map((x)=>{
      const r=x.closest(".editorRow");return [x.value.trim(),Number(r.querySelector(".drinkPrice").value||0)]
