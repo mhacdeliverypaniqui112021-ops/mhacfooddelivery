@@ -595,13 +595,25 @@ $("riders").onclick=async e=>{
  const del=e.target.closest("[data-delete-rider]");
  if(del){try{await deleteDoc(doc(db,"riders",del.dataset.deleteRider));toast("Rider profile deleted.")}catch(x){toast(err(x))}return;}
 };
-$('addStore').onclick=()=>{
+$('addStore').onclick=async()=>{
  const inp=$('newStore'), n=inp.value.trim();
  if(!n)return toast('Enter store name.');
  draft.stores=draft.stores||[];
+ const newId=storeKey(n,draft.stores.length);
+ // A newly added store is ALWAYS DRAFT. If an older published copy with the
+ // same ID/name exists, remove that stale published copy first.
+ try{
+   const snap=await getDoc(doc(db,"settings","menu"));
+   const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+   const cleaned=(current.stores||[]).filter(x=>x.id!==newId && String(x.name||"").trim().toLowerCase()!==n.toLowerCase());
+   if(cleaned.length!==(current.stores||[]).length){
+     menu=normalizeMenu({...current,stores:cleaned,publishVersion:Date.now()});
+     await setDoc(doc(db,"settings","menu"),{...menu,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+   }
+ }catch(e){console.warn("Stale published store cleanup failed",e)}
  draft.stores.push({
    name:n,
-   id:storeKey(n,draft.stores.length),
+   id:newId,
    categories:[
      {name:'Chicken',items:[]},
      {name:'Burger',items:[]}
@@ -610,10 +622,10 @@ $('addStore').onclick=()=>{
  inp.value='';
  selectedStore=draft.stores.length-1;
  renderStores();
- toast('Store added. Categories are ready to edit.');
+ toast('Store added as DRAFT. Edit it, then PUBLISH to customer app.');
 };
 
-function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base+"_"+index;}
+function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base;}
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type==="bucket"?"bucket":"chicken",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
 let draftSaveTimer=null;
 async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
@@ -622,7 +634,7 @@ async function flushDraftMenu(){
   clearTimeout(draftSaveTimer);
   await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
 }
-function publishedStoreIds(){return new Set((menu?.stores||[]).map(s=>s.id));}
+function publishedStoreIds(){return new Set((menu?.stores||[]).filter(s=>s.published!==false).map(s=>s.id));}
 function renderPublishButton(si){
  const st=draft?.stores?.[si];
  if(!st)return '';
@@ -1139,7 +1151,7 @@ async function publishMenu(){
       new Promise((_,reject)=>setTimeout(()=>reject(new Error("Reading published menu timed out.")),12000))
     ]);
     const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-    const pubStore=normalizeMenu({version:draft.version||"final",stores:[st]}).stores[0];
+    const pubStore=normalizeMenu({version:draft.version||"final",stores:[{...st,published:true}]}).stores[0];
     const others=(current.stores||[]).filter(s=>s.id!==pubStore.id);
     const nextMenu=normalizeMenu({...current,stores:[...others,pubStore],publishVersion:Date.now()});
 
@@ -1172,7 +1184,34 @@ async function unpublishStore(si){
    renderStores(); toast("🔴 "+st.name+" unpublished. Customer app will no longer show it.");
  }catch(e){toast("Unpublish failed: "+err(e))}
 }
-async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});const d=await getDoc(doc(db,"settings","menuDraft"));draft=normalizeMenu(d.exists()?d.data():menu);renderStores();$("editor").classList.add("hidden")}
+async function loadMenu(){
+  const pubSnap=await getDoc(doc(db,"settings","menu"));
+  menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
+  const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
+  draft=normalizeMenu(draftSnap.exists()?draftSnap.data():menu);
+
+  // CUSTOMER APP must only contain stores that still exist in ADMIN DRAFT.
+  // This also fixes the old-store-ID problem caused by deleting a store and
+  // adding the same store name again: the old published copy is removed.
+  const draftIds=new Set((draft.stores||[]).map(x=>x.id));
+  const cleanedStores=(menu.stores||[])
+    .filter(x=>draftIds.has(x.id))
+    .map(x=>({...x,published:true}));
+  const needsCleanup=cleanedStores.length!==(menu.stores||[]).length ||
+    cleanedStores.some((x,i)=>menu.stores?.[i]?.published!==true || menu.stores?.[i]?.id!==x.id);
+  if(needsCleanup){
+    menu=normalizeMenu({...menu,stores:cleanedStores,publishVersion:Date.now()});
+    try{
+      await setDoc(doc(db,"settings","menu"),{
+        ...menu,
+        updatedAt:serverTimestamp(),
+        updatedBy:auth.currentUser.email
+      });
+    }catch(e){console.warn("Published-menu cleanup failed",e)}
+  }
+  renderStores();
+  $("editor").classList.add("hidden");
+}
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});

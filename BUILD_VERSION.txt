@@ -1,4 +1,1 @@
-MHAC DELIVERY V3.3.4
-STORE DELETE -> CUSTOMER SYNC FIX
-Delete a store in Admin also removes its published store from Customer App immediately.
-Publish/Unpublish behavior preserved.
+MHAC DELIVERY V3.3.5 — PUBLISH FLAG + CUSTOMER ONLY PUBLISHED STORES

@@ -97,9 +97,14 @@ async function boot(){await loadHours();await loadMenu();applyHours()}
 function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
 getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
 onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders()});
-function renderStores(){$("stores").innerHTML=(data.stores||[]).map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("")}
+function renderStores(){
+ const published=(data.stores||[]).filter(s=>s.published===true);
+ $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("");
+ if(!published.length) $("stores").innerHTML='<div class="small">No published food stores available right now.</div>';
+}
 function openStore(si){
- const s=data.stores[si];
+ const published=(data.stores||[]).filter(s=>s.published===true);
+ const s=published[si];
  let h=`<button class=back onclick="closeMenu()">← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`;
  h+=`<div class="catTabs">${(s.categories||[]).map((c,i)=>`<button class="catTab ${i===0?"active":""}" onclick="openCat(${si},${i})">${esc(c.name)}</button>`).join("")}</div>`;
  if((s.categories||[]).length) h+=`<div class=small>Select a category above.</div>`;
