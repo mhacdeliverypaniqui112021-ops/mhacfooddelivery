@@ -1,11 +1,9 @@
-MHAC DELIVERY — V4.0.2 ADMIN CANCEL + SOUND TEST BUILD
+MHAC DELIVERY — V4.0.4 STORE PERSISTENCE TEST BUILD
 
-FIXES IN THIS BUILD:
-- Admin alert sound: direct mobile audio unlock from ENABLE SOUND; bundled 17.3s alert; WebAudio media-element amplifier fallback.
-- Rider alert sound: same direct mobile audio unlock and amplifier fallback.
-- Admin CANCEL ORDER: no confirmation popup and no cancellation-reason popup. One tap cancels immediately.
-- Cancelled orders are removed immediately from Admin active order list and no longer counted as active.
-- Firestore status remains CANCELLED so Customer can see the cancellation state.
-- Store/Menu data was not intentionally changed in this patch.
-
-TEST: Admin sound -> cancel order -> confirm it disappears. Then Rider sound.
+Fix in this test:
+- Admin food/store/category draft saves now write immediately instead of using a delayed 250ms save.
+- Local device backup is created for the Admin draft.
+- On refresh, if the Firestore draft is missing, the app recovers the last local Admin draft instead of showing an empty Store/Menu Manager.
+- Food SAVE reports whether the Firestore draft write succeeded.
+- Existing Admin/Rider sound fix and Admin cancel-order fix retained.
+- Customer UI/GPS/order flow intentionally unchanged.
