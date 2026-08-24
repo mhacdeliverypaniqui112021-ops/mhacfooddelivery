@@ -409,6 +409,19 @@
 .storeEditorActions{margin-top:8px;padding-top:8px;border-top:1px solid #ddd}
 .storeEditorActions input{margin:4px 0!important}
 </style>
+
+<style>
+/* V3.1: one compact store editor only */
+#editor{display:none!important}
+.directStoreEditor,.directCategoryCard{display:none!important}
+.categoryInlineEdit{display:flex;gap:6px;padding:6px 10px 9px}
+.categoryInlineEdit input{flex:1!important;margin:0!important;min-height:42px!important}
+.categoryInlineEdit button{width:auto!important;margin:0!important;padding:8px 10px!important;font-size:12px!important}
+.compactPublish{margin-top:9px!important}
+.storeBox{padding:9px!important}
+.storeBox .label{margin-top:4px!important}
+.storeBox .storeNameInline{margin:3px 0!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -566,21 +579,20 @@ $("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)r
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
 function renderStores(){
  const host=$("stores");
- host.innerHTML=(draft.stores||[]).map((s,si)=>`
-  <div class="storeBox">
+ host.innerHTML=(draft.stores||[]).map((st,si)=>`
+  <div class="storeBox" data-store-card="${si}">
    <div class="storeBoxHeader">
-    <b>🏪 ${esc(s.name)}</b>
+    <b>🏪 ${esc(st.name)}</b>
     <button class="danger storeDelete" data-store-delete="${si}">🗑️ DELETE STORE</button>
    </div>
    <div class="storeInner">
-    <div class="storeEditorActions">
-      <label class="label">STORE NAME</label>
-      <input class="storeNameInline" data-store="${si}" value="${esc(s.name)}" placeholder="Store name">
-      <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
-    </div>
+    <label class="label">🏪 STORE NAME</label>
+    <input class="storeNameInline" data-store="${si}" value="${esc(st.name)}" placeholder="Store name">
+    <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
+
     <div class="storeCategories">
-     ${(s.categories||[]).map((c,ci)=>`
-      <div class="storeCategory">
+     ${(st.categories||[]).map((c,ci)=>`
+      <div class="storeCategory" data-category-card="${si}-${ci}">
        <div class="storeCategoryHeader">
         <b>📂 ${esc(c.name)}</b>
         <div class="categoryBtns">
@@ -589,34 +601,41 @@ function renderStores(){
          <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
         </div>
        </div>
+       <div class="categoryInlineEdit hidden">
+         <input class="categoryInlineName" value="${esc(c.name)}" placeholder="Category name">
+         <button class="blue categoryInlineSave">SAVE CATEGORY</button>
+       </div>
        <div id="store-food-${si}-${ci}" class="storeFoodList hidden"></div>
       </div>`).join("")}
     </div>
+
     <div class="storeAddCategory">
       <input data-new-cat="${si}" placeholder="New category name">
       <button class="blue" data-add-cat="${si}">➕ CATEGORY</button>
+    </div>
+
+    <div class="publishBar compactPublish">
+      <button class="green" data-publish-store="${si}">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>
+      <p class="small">Only this selected store will be published.</p>
     </div>
    </div>
   </div>`).join("");
 
  host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
-   const si=+b.dataset.storeSave;
-   const inp=host.querySelector(`[data-store="${si}"]`);
-   const n=inp.value.trim();
-   if(n)draft.stores[si].name=n;
+   const si=+b.dataset.storeSave, inp=host.querySelector(`[data-store="${si}"]`);
+   const n=inp.value.trim(); if(n)draft.stores[si].name=n;
    renderStores();
-   if(selectedStore===si) renderEditor();
  });
  host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.storeDelete;
    if(confirm("Delete this entire store and all its foods?")){
      draft.stores.splice(si,1);
      selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
-     renderStores(); renderEditor();
+     renderStores();
    }
  });
  host.querySelectorAll("[data-add-cat]").forEach(b=>b.onclick=()=>{
-   const si=+b.dataset.addCat,inp=host.querySelector(`[data-new-cat="${si}"]`),n=inp.value.trim();
+   const si=+b.dataset.addCat, inp=host.querySelector(`[data-new-cat="${si}"]`), n=inp.value.trim();
    if(!n)return;
    draft.stores[si].categories=draft.stores[si].categories||[];
    draft.stores[si].categories.push({name:n,items:[]});
@@ -624,14 +643,21 @@ function renderStores(){
  });
  host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
-   const c=draft.stores[si].categories[ci];
-   const n=prompt("Edit category name:",c.name);
-   if(n&&n.trim()){c.name=n.trim();renderStores();}
+   const card=host.querySelector(`[data-category-card="${si}-${ci}"]`);
+   card.querySelector(".categoryInlineEdit").classList.toggle("hidden");
+ });
+ host.querySelectorAll(".categoryInlineSave").forEach(b=>b.onclick=()=>{
+   const card=b.closest(".storeCategory");
+   const [si,ci]=card.dataset.categoryCard.split("-").map(Number);
+   const n=card.querySelector(".categoryInlineName").value.trim();
+   if(!n)return;
+   draft.stores[si].categories[ci].name=n;
+   renderStores();
  });
  host.querySelectorAll("[data-cat-delete]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catDelete.split("-").map(Number);
-   if(confirm("Delete this category and its foods?")){
-     draft.stores[si].categories.splice(ci,1);renderStores();
+   if(confirm("Delete this category and all its foods?")){
+     draft.stores[si].categories.splice(ci,1); renderStores();
    }
  });
  host.querySelectorAll("[data-cat-open]").forEach(b=>b.onclick=()=>{
@@ -640,11 +666,11 @@ function renderStores(){
    list.classList.toggle("hidden");
    if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
-};
-$("addStore").onclick=()=>{const n=$("newStore").value.trim();if(!n)return;draft.stores.push({id:"store-"+Date.now(),name:n,icon:"🍽️",categories:[]});$("newStore").value="";selectedStore=draft.stores.length-1;renderStores();renderEditor()};
-function parsePairs(text){return text.split(/\n|,/).map(x=>x.trim()).filter(Boolean).map(x=>{const [name,price]=x.split("|");return {name:(name||"").trim(),price:Number(price||0)}})}
-function pairsText(a){return (a||[]).map(x=>`${x.name||x[0]||""}|${Number(x.price??x[1]??0)}`).join("\n")}
-
+ host.querySelectorAll("[data-publish-store]").forEach(b=>b.onclick=()=>{
+   selectedStore=+b.dataset.publishStore;
+   if(typeof publishMenu==="function") publishMenu();
+ });
+}
 function renderNestedFoods(si,ci,list){
  const s=draft.stores[si],c=s.categories[ci];
  list.innerHTML=(c.items||[]).map((f,fi)=>`

@@ -1,2 +1,6 @@
-MHAC DELIVERY V3 FINAL - COMPACT STORE-FIRST MENU
-Store is the main box. Categories and foods are nested inside each store. Store/category/food edit/delete remain available. Existing chat/order/time logic preserved.
+MHAC DELIVERY V3.1 FINAL
+- Removed duplicate legacy FOOD CATEGORIES editor.
+- Removed browser prompt/OK for category editing; category edit is inline.
+- Category/store changes apply immediately in the compact store box.
+- Publish button is inside each store box.
+- Food editor remains nested under category/food.
