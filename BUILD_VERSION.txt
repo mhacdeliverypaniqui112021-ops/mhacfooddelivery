@@ -1,17 +1,3 @@
-MHAC DELIVERY — V4.0.7 LIVE TEST BUILD
+MHAC DELIVERY V4.0.8 FOOD EDITOR + PERSISTENCE FIX
 
-PURPOSE:
-- This is a deployment-identification build only.
-- A highly visible red V4.0.7 badge is shown at the top of Admin.
-- Cache-control meta tags were added to reduce stale browser caching.
-- Existing V4.0.6 menu recovery logic and all existing Admin features are preserved.
-
-TEST:
-1. Upload this build to the same GitHub Pages project.
-2. Open Admin and log in.
-3. The very top of the page MUST show:
-   🧪 V4.0.7 LIVE TEST BUILD — THIS IS THE NEW FILE
-4. If that badge is not visible, the live site is still serving an older build.
-
-NEXT:
-- Once V4.0.7 is confirmed live, fix the remaining Food Editor problems without changing the deployment target.
+Fixes: real Firestore admin draft persistence; working food copy/paste clipboard; food-name copy/paste; full food template copy/paste; unpublished edits remain in ADMIN DRAFT until published.

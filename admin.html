@@ -478,6 +478,8 @@ const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomai
 const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
+// Food editor clipboard. Keep this in memory for Copy/Paste buttons.
+const foodClipboard={bucketChoices:[],parts:[],choices:[],addOns:[],foodName:"",foodTemplate:null};
 function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
 let adminSoundReady=false,adminAudioCtx=null,adminMediaSource=null,adminGain=null,adminAlertUrl="";
 async function initAdminAlertSound(){
@@ -1059,6 +1061,14 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      <label class="label">🍽️ FOOD NAME</label>
      <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
    </div>
+   <div class="copyPasteRow foodNameCopyRow">
+     <button type="button" class="blue smallBtn copyFoodName">📋 COPY FOOD NAME</button>
+     <button type="button" class="blue smallBtn pasteFoodName">📥 PASTE FOOD NAME</button>
+   </div>
+   <div class="copyPasteRow foodTemplateCopyRow">
+     <button type="button" class="gray smallBtn copyFoodTemplate">📋 COPY FOOD TEMPLATE</button>
+     <button type="button" class="gray smallBtn pasteFoodTemplate">📥 PASTE FOOD TEMPLATE</button>
+   </div>
 
    <div class="compactField">
      <label class="label">💰 BASE PRICE</label>
@@ -1188,6 +1198,58 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    const exists=[...ed.querySelectorAll(".bucketName")].some(x=>x.value.trim().toLowerCase()===n.toLowerCase());
    if(!exists) addBucketRow(n,0);
  });
+
+ // Simple food-name clipboard: useful when adding many similar foods.
+ ed.querySelector(".copyFoodName").onclick=()=>{
+   foodClipboard.foodName=ed.querySelector(".foodNameEdit").value.trim();
+   if(!foodClipboard.foodName)return toast("Enter a food name first.");
+   toast("📋 Food name copied. Open the next food and tap PASTE FOOD NAME.");
+ };
+ ed.querySelector(".pasteFoodName").onclick=()=>{
+   if(!foodClipboard.foodName)return toast("No food name copied yet.");
+   ed.querySelector(".foodNameEdit").value=foodClipboard.foodName;
+   toast("📥 Food name pasted. Tap SAVE FOOD when ready.");
+ };
+ // Full template clipboard: copies the current food's parts/drinks/add-ons,
+ // bucket choices, type and spicy price. Name and base price are also copied.
+ const readFoodTemplate=()=>({
+   name:ed.querySelector(".foodNameEdit").value.trim(),
+   price:Number(ed.querySelector(".foodPriceEdit").value||0),
+   type:ed.querySelector(".foodType").value,
+   spicyPrice:Number(ed.querySelector(".spicyPrice")?.value||0),
+   availability:ed.querySelector(".availability").value,
+   selection:{original:Number(ed.querySelector('[data-sel-value="original"]')?.textContent||0),spicy:Number(ed.querySelector('[data-sel-value="spicy"]')?.textContent||0)},
+   parts:[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean),
+   drinks:[...ed.querySelectorAll(".drinkRows .editorRow")].map(r=>({name:r.querySelector(".drinkName")?.value.trim()||"",price:Number(r.querySelector(".drinkPrice")?.value||0)})).filter(x=>x.name),
+   addOns:[...ed.querySelectorAll(".addonRows .editorRow")].map(r=>({name:r.querySelector(".addonName")?.value.trim()||"",price:Number(r.querySelector(".addonPrice")?.value||0)})).filter(x=>x.name),
+   bucketChoices:[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>({name:r.querySelector(".bucketName")?.value.trim()||"",price:Number(r.querySelector(".bucketPrice")?.value||0)})).filter(x=>x.name)
+ });
+ ed.querySelector(".copyFoodTemplate").onclick=()=>{
+   foodClipboard.foodTemplate=readFoodTemplate();
+   foodClipboard.foodName=foodClipboard.foodTemplate.name;
+   toast("📋 Food template copied. Open the next food and tap PASTE FOOD TEMPLATE.");
+ };
+ ed.querySelector(".pasteFoodTemplate").onclick=()=>{
+   const t=foodClipboard.foodTemplate;
+   if(!t)return toast("No food template copied yet.");
+   ed.querySelector(".foodNameEdit").value=t.name||"";
+   ed.querySelector(".foodPriceEdit").value=Number(t.price||0);
+   ed.querySelector(".foodType").value=t.type==="bucket"?"bucket":"chicken";
+   if(ed.querySelector(".spicyPrice"))ed.querySelector(".spicyPrice").value=Number(t.spicyPrice||0);
+   ed.querySelector(".availability").value=String(t.availability!=="false");
+   ed.querySelector(".partsRows").innerHTML="";
+   ed.querySelector(".drinkRows").innerHTML="";
+   ed.querySelector(".addonRows").innerHTML="";
+   ed.querySelector(".bucketRows").innerHTML="";
+   (t.parts||[]).forEach(addPartRow);
+   (t.drinks||[]).forEach(x=>addDrinkRow(x.name,x.price));
+   (t.addOns||[]).forEach(x=>addAddonRow(x.name,x.price));
+   (t.bucketChoices||[]).forEach(x=>addBucketRow(x.name,x.price));
+   const vals={original:Number(t.selection?.original||0),spicy:Number(t.selection?.spicy||0)};
+   ed.querySelectorAll(".selValue").forEach(x=>{const k=x.dataset.selValue;if(k)x.textContent=String(vals[k]||0)});
+   syncBucketVisibility();
+   toast("📥 Food template pasted. Review name/price, then SAVE FOOD.");
+ };
 
  ed.querySelector(".copyBucket").onclick=()=>{
    foodClipboard.bucketChoices=[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>[
@@ -1425,11 +1487,11 @@ function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.d
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 
-window.__MHAC_BUILD__="V4.0.7 LIVE TEST BUILD";
+window.__MHAC_BUILD__="V4.0.8 FOOD EDITOR + PERSISTENCE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🧪 V4.0.7 LIVE TEST BUILD — THIS IS THE NEW FILE";
+  badge.textContent="🧪 V4.0.8 FOOD EDITOR + PERSISTENCE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
