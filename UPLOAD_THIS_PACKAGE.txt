@@ -1,6 +1,1 @@
-MHAC DELIVERY V4.1.1 FULL REPLACEMENT
-
-Replace the existing files in the GitHub Pages repository with the files in this package.
-Do not create a new repository.
-After deployment, the Admin page must show:
-V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX
+Upload this full replacement to the SAME GitHub repository. Commit changes. Live marker must show V4.1.2 COPY PARTS FIX. This version makes Copy All Parts/Paste All Parts robust on Android touch/click.

@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX</title>
-<meta name="build-version" content="V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.2 COPY PARTS FIX — FOOD EDITOR + DRAFT PERSISTENCE FIX</title>
+<meta name="build-version" content="V4.1.2 COPY PARTS FIX — FOOD EDITOR + DRAFT PERSISTENCE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -52,7 +52,7 @@
 .choiceRow input{min-height:58px!important;font-size:18px!important}
 .choiceRow button{min-height:58px!important}
 .copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
-.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:5}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:50;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:rgba(25,118,210,.2)}
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 
@@ -222,7 +222,7 @@
 .choiceRow input{min-height:58px!important;font-size:18px!important}
 .choiceRow button{min-height:58px!important}
 .copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
-.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:5}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:50;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:rgba(25,118,210,.2)}
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 </style>
@@ -480,7 +480,7 @@ const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(fireba
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 // Food editor clipboard. Keep this in memory for Copy/Paste buttons.
-const FOOD_CLIPBOARD_KEY="mhac_food_editor_clipboard_v410";
+const FOOD_CLIPBOARD_KEY="mhac_food_editor_clipboard_v412";
 const foodClipboard={bucketChoices:[],parts:[],choices:[],addOns:[],foodName:"",foodTemplate:null};
 function loadFoodClipboard(){
   try{
@@ -1130,8 +1130,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <p class="hint">Optional. Leave empty for solo. Add as many parts as needed.</p>
    <div class="partsRows"></div>
    <div class="copyPasteRow">
-     <button type="button" class="blue smallBtn copyParts">📋 COPY ALL PARTS</button>
-     <button type="button" class="blue smallBtn pasteParts">📥 PASTE ALL PARTS</button>
+     <button type="button" class="blue smallBtn copyParts" data-copy-action="copyParts">📋 COPY ALL PARTS</button>
+     <button type="button" class="blue smallBtn pasteParts" data-copy-action="pasteParts">📥 PASTE ALL PARTS</button>
    </div>
    <button type="button" class="blue addPart">➕ ADD PART</button>
 
@@ -1284,6 +1284,23 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    toast("Bucket choices copied.");
  };
  ed.querySelector(".pasteBucket").onclick=()=>foodClipboard.bucketChoices.forEach(x=>addBucketRow(x[0],x[1]));
+
+ ed.addEventListener("click",(ev)=>{
+   const btn=ev.target.closest("button[data-copy-action]");
+   if(!btn || !ed.contains(btn)) return;
+   ev.preventDefault();
+   ev.stopPropagation();
+   if(btn.dataset.copyAction==="copyParts"){
+     foodClipboard.parts=[...ed.querySelectorAll(".partsRows .partName")].map(x=>x.value.trim()).filter(Boolean);
+     saveFoodClipboard();
+     copySystemText(foodClipboard.parts.join("\n"));
+     toast("📋 ALL PARTS COPIED — " + foodClipboard.parts.length + " part(s). Tap PASTE ALL PARTS on the next food.");
+   }else if(btn.dataset.copyAction==="pasteParts"){
+     if(!foodClipboard.parts.length){ toast("No parts copied yet."); return; }
+     foodClipboard.parts.forEach(addPartRow);
+     toast("📥 ALL PARTS PASTED — " + foodClipboard.parts.length + " part(s).");
+   }
+ }, true);
 
  ed.querySelector(".copyParts").onclick=()=>{
    foodClipboard.parts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean);
@@ -1549,11 +1566,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX";
+window.__MHAC_BUILD__="V4.1.2 COPY PARTS FIX — FOOD EDITOR + DRAFT PERSISTENCE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🧪 V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX — NEW FILE";
+  badge.textContent="🧪 V4.1.2 COPY PARTS FIX — FOOD EDITOR + DRAFT PERSISTENCE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
