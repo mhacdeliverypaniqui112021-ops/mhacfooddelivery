@@ -731,44 +731,11 @@ function normalizeMenu(x){
  return m;
 }
 let draftSaveTimer=null;
-const DRAFT_LOCAL_KEY="mhac_admin_menu_draft_v4";
-function saveDraftLocal(){
-  try{
-    const clean=normalizeMenu(draft);
-    localStorage.setItem(DRAFT_LOCAL_KEY,JSON.stringify({savedAt:Date.now(),menu:clean}));
-  }catch(e){console.warn("Local draft backup failed",e)}
-}
-async function saveDraftMenu(){
-  try{
-    if(!draft)return;
-    saveDraftLocal();
-    if(!auth.currentUser)return;
-    clearTimeout(draftSaveTimer);
-    draftSaveTimer=setTimeout(async()=>{
-      try{
-        const clean=normalizeMenu(draft);
-        // Primary draft storage is embedded in the already-authorized settings/menu
-        // document. This avoids losing Admin edits when separate menuDraft rules
-        // are missing. Customer app continues reading only the published `stores`.
-        const snap=await getDoc(doc(db,"settings","menu"));
-        const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-        await setDoc(doc(db,"settings","menu"),{...current,draftStores:clean.stores,draftVersion:Date.now(),draftUpdatedAt:serverTimestamp(),draftUpdatedBy:auth.currentUser.email});
-        // Keep the old draft document as a secondary backup when rules permit it.
-        try{await setDoc(doc(db,"settings","menuDraft"),{...clean,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Secondary menuDraft save skipped",e)}
-      }catch(e){console.warn("Embedded draft save failed; local backup remains available",e)}
-    },150);
-  }catch(e){console.warn("Draft save failed",e)}
-}
+async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
 async function flushDraftMenu(){
-  if(!draft)return;
+  if(!auth.currentUser||!draft)return;
   clearTimeout(draftSaveTimer);
-  saveDraftLocal();
-  if(!auth.currentUser)return;
-  const clean=normalizeMenu(draft);
-  const currentSnap=await getDoc(doc(db,"settings","menu"));
-  const current=normalizeMenu(currentSnap.exists()?currentSnap.data():{version:"final",stores:[]});
-  await setDoc(doc(db,"settings","menu"),{...current,draftStores:clean.stores,draftVersion:Date.now(),draftUpdatedAt:serverTimestamp(),draftUpdatedBy:auth.currentUser.email});
-  try{await setDoc(doc(db,"settings","menuDraft"),{...clean,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Secondary menuDraft save skipped",e)}
+  await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
 }
 function publishedStoreIds(){return new Set((menu?.stores||[]).filter(s=>s.published!==false).map(s=>s.id));}
 function renderPublishButton(si){
@@ -826,7 +793,6 @@ function renderStores(){
  host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.storeSave, inp=host.querySelector(`[data-store="${si}"]`);
    const n=inp.value.trim(); if(n)draft.stores[si].name=n;
-   saveDraftMenu();
    renderStores();
  });
  host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=async()=>{
@@ -864,7 +830,6 @@ function renderStores(){
    if(!n)return;
    draft.stores[si].categories=draft.stores[si].categories||[];
    draft.stores[si].categories.push({name:n,items:[]});
-   saveDraftMenu();
    renderStores();
  });
  host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
@@ -878,12 +843,11 @@ function renderStores(){
    const n=card.querySelector(".categoryInlineName").value.trim();
    if(!n)return;
    draft.stores[si].categories[ci].name=n;
-   saveDraftMenu();
    renderStores();
  });
  host.querySelectorAll("[data-cat-delete]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catDelete.split("-").map(Number);
-   draft.stores[si].categories.splice(ci,1); saveDraftMenu(); renderStores();
+   draft.stores[si].categories.splice(ci,1); renderStores();
  });
  host.querySelectorAll("[data-cat-open]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catOpen.split("-").map(Number);
@@ -1248,18 +1212,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      const r=x.closest(".editorRow");return {name:x.value.trim(),price:Number(r.querySelector(".bucketPrice").value||0)}
    }).filter(x=>x.name);
    it.type=ed.querySelector(".foodType").value;
-   saveDraftLocal();
-   const saveBtn=ed.querySelector(".saveDirectFood");
-   saveBtn.disabled=true; saveBtn.textContent="💾 SAVING...";
-   flushDraftMenu().then(()=>{
-     toast("✅ FOOD SAVED — refresh test is safe.");
-     renderDirectFoodList(ci,list);
-   }).catch(e=>{
-     console.error("Food save failed",e);
-     // Local backup is already saved, so the edit survives a refresh on this Admin device.
-     toast("⚠️ SAVED TO ADMIN BACKUP — Firestore save failed: "+err(e));
-     renderDirectFoodList(ci,list);
-   });
+   renderDirectFoodList(ci,list); saveDraftMenu();
  };
  ed.querySelector(".deleteDirectFood").onclick=()=>{
    {
@@ -1372,27 +1325,14 @@ async function unpublishStore(si){
 async function loadMenu(){
   const pubSnap=await getDoc(doc(db,"settings","menu"));
   menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
-  const data=pubSnap.exists()?pubSnap.data():{};
-  let embeddedDraft=null;
-  if(Array.isArray(data?.draftStores)) embeddedDraft=normalizeMenu({version:data.version||"final",stores:data.draftStores});
-
   const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
   const hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
+  draft=normalizeMenu(hasDraft?draftSnap.data():menu);
 
-  let localDraft=null;
-  try{
-    const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
-    if(raw){
-      const parsed=JSON.parse(raw);
-      if(parsed?.menu && Array.isArray(parsed.menu.stores) && parsed.menu.stores.length) localDraft=normalizeMenu(parsed.menu);
-    }
-  }catch(e){console.warn("Local draft recovery failed",e)}
-
-  // Priority: embedded Firestore draft > non-empty local backup > legacy menuDraft > published menu.
-  // The embedded draft is the shared source of truth and survives refresh/device cache loss.
-  draft=embeddedDraft?.stores?.length ? embeddedDraft : (localDraft || normalizeMenu(hasDraft?draftSnap.data():menu));
-
-  // Recover any published store not yet present in the editable draft.
+  // Recovery: never erase customer-facing stores just because the editable draft
+  // was missing/stale. Published stores are copied back into the admin draft.
+  // A real ADMIN DELETE removes the published store first, so this does not
+  // resurrect intentionally deleted stores.
   const byId=new Map((draft.stores||[]).map(s=>[s.id,s]));
   let recovered=false;
   for(const ps of (menu.stores||[])){
@@ -1404,12 +1344,10 @@ async function loadMenu(){
   renderStores();
   $("editor").classList.add("hidden");
 }
-
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 
-window.__MHAC_BUILD__="V4.0.6 STORE PERSISTENCE AUTHORITATIVE FIX";
 </script>
 </body></html>
