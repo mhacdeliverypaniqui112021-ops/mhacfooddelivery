@@ -475,42 +475,92 @@ const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(fireba
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
-let adminSoundReady=false,adminAudioCtx=null,adminMediaSource=null,adminGain=null;
-async function prepareAdminAlertSound(){
+let adminSoundReady=false,adminAudioCtx=null,adminMediaSource=null,adminGain=null,adminAlertUrl="";
+async function initAdminAlertSound(){
   const a=$("orderAlertAudio");
   if(!a) throw new Error("Alert audio element missing.");
-  a.src=new URL("assets/mhac-order-alert.mp3",location.href).href;
-  a.preload="auto"; a.loop=false; a.muted=false; a.volume=1;
-  await a.play();
-  a.pause(); a.currentTime=0;
+  const url=new URL("assets/mhac-order-alert.mp3",document.baseURI).href;
+  adminAlertUrl=url;
+  try{
+    const resp=await fetch(url,{cache:"force-cache"});
+    if(!resp.ok) throw new Error("HTTP "+resp.status);
+    const blob=await resp.blob();
+    adminAlertUrl=URL.createObjectURL(blob);
+  }catch(e){ console.warn("Alert preload failed; using direct audio URL.",e); }
+  a.src=adminAlertUrl; a.preload="auto"; a.loop=false; a.muted=false; a.volume=1;
+  try{a.load()}catch(e){}
+}
+function makeAdminFallbackSound(){
   try{
     const AC=window.AudioContext||window.webkitAudioContext;
-    if(AC){
-      if(!adminAudioCtx) adminAudioCtx=new AC();
-      await adminAudioCtx.resume();
-      if(!adminMediaSource){
-        adminMediaSource=adminAudioCtx.createMediaElementSource(a);
-        adminGain=adminAudioCtx.createGain();
-        adminGain.gain.value=2.2;
-        adminMediaSource.connect(adminGain); adminGain.connect(adminAudioCtx.destination);
-      }
+    if(!AC)return false;
+    if(!adminAudioCtx)adminAudioCtx=new AC();
+    const ctx=adminAudioCtx;
+    if(ctx.state==="suspended")ctx.resume();
+    const now=ctx.currentTime;
+    for(let i=0;i<12;i++){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type=i%2?"square":"sawtooth";
+      o.frequency.value=i%2?880:660;
+      g.gain.setValueAtTime(0.0001,now+i*0.28);
+      g.gain.exponentialRampToValueAtTime(0.55,now+i*0.28+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,now+i*0.28+0.22);
+      o.connect(g);g.connect(ctx.destination);o.start(now+i*0.28);o.stop(now+i*0.28+0.24);
     }
-  }catch(e){console.warn("Volume amplifier unavailable; using normal HTML audio.",e)}
-  adminSoundReady=true;
-  $("adminSoundState").textContent="🔊 Sound enabled — loud 17-second alert ready";
+    return true;
+  }catch(e){console.warn("Fallback sound failed",e);return false}
+}
+async function prepareAdminAlertSound(){
+  const a=$("orderAlertAudio");
+  if(!a)throw new Error("Alert audio element missing.");
+  if(!adminAlertUrl)await initAdminAlertSound();
+  a.muted=false;a.volume=1;
+  try{
+    const p=a.play();
+    if(p)await p;
+    a.pause();a.currentTime=0;
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(AC){
+        if(!adminAudioCtx)adminAudioCtx=new AC();
+        await adminAudioCtx.resume();
+        if(!adminMediaSource){
+          adminMediaSource=adminAudioCtx.createMediaElementSource(a);
+          adminGain=adminAudioCtx.createGain();
+          adminGain.gain.value=2.5;
+          adminMediaSource.connect(adminGain);adminGain.connect(adminAudioCtx.destination);
+        }
+      }
+    }catch(e){console.warn("Volume amplifier unavailable; using normal HTML audio.",e)}
+    adminSoundReady=true;
+    $("adminSoundState").textContent="🔊 Sound enabled — alert ready";
+    return;
+  }catch(e){
+    console.warn("MP3 playback unavailable",e);
+    if(makeAdminFallbackSound()){
+      adminSoundReady=true;
+      $("adminSoundState").textContent="🔊 Sound enabled — backup alert ready";
+      return;
+    }
+    throw e;
+  }
 }
 async function playAdminAlert(){
   if(!adminSoundReady)return;
   try{
-    const a=$("orderAlertAudio"); if(!a)return;
+    const a=$("orderAlertAudio");
+    if(!a)throw new Error("Alert audio missing");
     if(adminAudioCtx)await adminAudioCtx.resume();
-    a.pause();a.currentTime=0;a.muted=false;a.volume=1;await a.play();
-  }catch(e){$("adminSoundState").textContent="❌ Alert playback failed — tap ENABLE SOUND again";adminSoundReady=false}
+    a.pause();a.currentTime=0;a.muted=false;a.volume=1;
+    const p=a.play();if(p)await p;
+  }catch(e){
+    if(!makeAdminFallbackSound())$("adminSoundState").textContent="❌ Alert playback failed — tap ENABLE SOUND again";
+  }
 }
 $("adminSoundBtn").onclick=async()=>{
   const b=$("adminSoundBtn");b.disabled=true;
   try{await prepareAdminAlertSound()}
-  catch(e){console.error(e);$("adminSoundState").textContent="❌ Sound could not be enabled — tap again";adminSoundReady=false}
+  catch(e){console.error(e);$("adminSoundState").textContent="❌ Sound could not be enabled — check phone media volume";adminSoundReady=false}
   finally{b.disabled=false}
 };
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
