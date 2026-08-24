@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.0.7 LIVE TEST BUILD</title>
-<meta name="build-version" content="V4.0.7 LIVE TEST BUILD">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.0.9 MENU DIAGNOSTIC BUILD</title>
+<meta name="build-version" content="V4.0.9 MENU DIAGNOSTIC BUILD">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -458,6 +458,7 @@ window.setTimeout(function(){
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
+<div class="card" id="menuDiagnosticCard"><h2>🧪 MENU DATA DIAGNOSTIC</h2><p class="status">Read-only check. This does not change or delete your menu.</p><button id="checkMenuData" class="blue">🔎 CHECK MENU DATA</button><div id="menuDiagnosticResult" class="status" style="margin-top:10px;white-space:pre-wrap"></div></div>
 <div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish.</p>
 <div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
 <div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
@@ -1487,13 +1488,49 @@ function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.d
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 
-window.__MHAC_BUILD__="V4.0.8 FOOD EDITOR + PERSISTENCE FIX";
+
+async function runMenuDiagnostic(){
+  const out=$("menuDiagnosticResult");
+  if(!out)return;
+  out.textContent="⏳ Checking Firebase menu data…";
+  try{
+    const pub=await getDoc(doc(db,"settings","menu"));
+    const dr=await getDoc(doc(db,"settings","menuDraft"));
+    let local=null;
+    try{local=JSON.parse(localStorage.getItem(DRAFT_LOCAL_KEY)||"null")}catch(e){}
+    const pm=pub.exists()?normalizeMenu(pub.data()):{stores:[]};
+    const dm=dr.exists()?normalizeMenu(dr.data()):{stores:[]};
+    const lm=local?.menu?normalizeMenu(local.menu):{stores:[]};
+    const lines=[];
+    lines.push("FIREBASE settings/menu: "+(pub.exists()?"FOUND":"NOT FOUND"));
+    lines.push("Published stores: "+(pm.stores||[]).length);
+    lines.push("Published names: "+((pm.stores||[]).map(x=>x.name).join(", ")||"—"));
+    lines.push("");
+    lines.push("FIREBASE settings/menuDraft: "+(dr.exists()?"FOUND":"NOT FOUND"));
+    lines.push("Draft stores: "+(dm.stores||[]).length);
+    lines.push("Draft names: "+((dm.stores||[]).map(x=>x.name).join(", ")||"—"));
+    lines.push("");
+    lines.push("PHONE LOCAL BACKUP: "+(local?.menu?"FOUND":"NOT FOUND"));
+    lines.push("Local stores: "+(lm.stores||[]).length);
+    lines.push("Local names: "+((lm.stores||[]).map(x=>x.name).join(", ")||"—"));
+    lines.push("");
+    lines.push("RESULT: "+(((pm.stores||[]).length+(dm.stores||[]).length+(lm.stores||[]).length)>0?"MENU DATA EXISTS somewhere above.":"NO MENU DATA FOUND in these 3 locations."));
+    out.textContent=lines.join("\n");
+  }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
+}
+
+window.__MHAC_BUILD__="V4.0.9 MENU DIAGNOSTIC BUILD";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🧪 V4.0.8 FOOD EDITOR + PERSISTENCE FIX — NEW FILE";
+  badge.textContent="🧪 V4.0.9 MENU DIAGNOSTIC BUILD — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
+
+try{
+  const b=$("checkMenuData");
+  if(b)b.addEventListener("click",runMenuDiagnostic);
+}catch(e){console.warn("Diagnostic button setup failed",e)}
 </script>
 </body></html>
