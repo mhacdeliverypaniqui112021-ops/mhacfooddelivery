@@ -1,12 +1,17 @@
-MHAC DELIVERY — V4.0.6 MENU RECOVERY FIX
+MHAC DELIVERY — V4.0.7 LIVE TEST BUILD
 
-FIXES:
-- Fixed Admin menu loader so an empty/stale localStorage draft can no longer hide a valid Firestore menu.
-- Firestore menuDraft is preferred when it contains stores and the local backup is empty.
-- Published customer menu is used as fallback when no editable draft exists.
-- Published stores are copied back into the Admin draft and local backup.
-- Existing Store/Menu Editor, food editing, add-ons, drinks, Original/Spicy selection, publishing and rider/order features are preserved.
-- Build marker: V4.0.6 MENU RECOVERY FIX
+PURPOSE:
+- This is a deployment-identification build only.
+- A highly visible red V4.0.7 badge is shown at the top of Admin.
+- Cache-control meta tags were added to reduce stale browser caching.
+- Existing V4.0.6 menu recovery logic and all existing Admin features are preserved.
 
-IMPORTANT:
-This patch can recover stores that still exist in Firebase. If the Firebase menu document itself was already deleted/overwritten before this build, the old data cannot be reconstructed from this ZIP alone.
+TEST:
+1. Upload this build to the same GitHub Pages project.
+2. Open Admin and log in.
+3. The very top of the page MUST show:
+   🧪 V4.0.7 LIVE TEST BUILD — THIS IS THE NEW FILE
+4. If that badge is not visible, the live site is still serving an older build.
+
+NEXT:
+- Once V4.0.7 is confirmed live, fix the remaining Food Editor problems without changing the deployment target.
