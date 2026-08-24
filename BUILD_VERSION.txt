@@ -1,1 +1,1 @@
-V3.3.8 - Firestore publish fix: choices/add-ons/bucket choices stored as objects, legacy arrays normalized
+V3.3.9 - Customer published-store index fix: all menu/category/food views now use the published-store list consistently.

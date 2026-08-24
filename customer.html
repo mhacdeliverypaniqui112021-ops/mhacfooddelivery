@@ -113,7 +113,9 @@ function openStore(si){
  if((s.categories||[]).length) openCat(si,0);
 }
 function openCat(si,ci){
- const s=data.stores[si],c=s.categories[ci];
+ const published=(data.stores||[]).filter(s=>s.published===true);
+ const s=published[si],c=s?.categories?.[ci];
+ if(!s||!c){closeMenu();return;}
  let h=`<button class=back onclick="openStore(${si})">← ${esc(s.name)}</button>`;
  h+=`<div class="catTabs">${(s.categories||[]).map((x,i)=>`<button class="catTab ${i===ci?"active":""}" onclick="openCat(${si},${i})">${esc(x.name)}</button>`).join("")}</div>`;
  h+=`<h2>${esc(c.name)}</h2>`;
@@ -130,8 +132,10 @@ function openCat(si,ci){
  $("menuModal").style.display="block";
 }
 function customize(si,ci,fi){
- const f=data.stores[si].categories[ci].items[fi];
- let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(data.stores[si].name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
+ const published=(data.stores||[]).filter(s=>s.published===true);
+ const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
+ if(!s||!f){closeMenu();return;}
+ let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
  if(f.chickenParts?.length){
    h+=`<div class=field><b>🍗 CHICKEN PART</b>${f.chickenParts.map((x,i)=>`<div class="counter"><span>${esc(x.name)}</span><button class=mini data-part="${i}" data-d="-1">−</button><b id=part-${i}>0</b><button class=mini data-part="${i}" data-d="1">+</button></div>`).join("")}<p class=small>Choose the part for each chicken piece.</p></div>`;
  }
