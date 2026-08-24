@@ -121,6 +121,83 @@
 }
 </style>
 
+
+<style>
+/* V3.5 CUSTOMER INFO / GPS / PART SELECTION MOBILE */
+.checkout-panel{
+  width:min(680px,96vw)!important;
+  max-width:680px!important;
+  padding:20px 16px!important;
+  box-sizing:border-box;
+}
+.checkout-panel h2{font-size:28px!important}
+.checkout-panel h3{font-size:24px!important}
+.checkout-panel input,.checkout-panel select{
+  width:100%!important;
+  min-height:54px!important;
+  box-sizing:border-box!important;
+  font-size:18px!important;
+  padding:12px 14px!important;
+  margin:8px 0!important;
+}
+#gpsBtn,#calculateFeeBtn,#sendOrderBtn{
+  width:100%!important;
+  min-height:58px!important;
+  font-size:18px!important;
+  font-weight:900!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#gpsBtn{background:#111!important;color:#fff!important;border:0!important;border-radius:12px!important}
+#calculateFeeBtn{background:#111!important;color:#fff!important;border:0!important;border-radius:12px!important}
+#gpsBtn:disabled,#calculateFeeBtn:disabled{opacity:.55!important}
+.partSelectionField{margin-top:12px}
+.partHeader{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-size:18px;margin-bottom:5px
+}
+.qtyBadge{
+  border:2px solid #222;border-radius:9px;padding:7px 10px;
+  background:#fff;white-space:nowrap
+}
+.partGrid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px
+}
+.partBox{
+  min-height:72px!important;
+  border:2px solid #222!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:#111!important;
+  padding:10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+  font-size:17px!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+}
+.partBox.selected{background:#ffe9e9!important;border-color:#d71920!important}
+.partName{text-align:left}
+.partCount{
+  min-width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#eee;border:2px solid #222;font-size:17px
+}
+.partBox.selected .partCount{background:#d71920;color:#fff;border-color:#d71920}
+.partTotal{
+  margin-top:10px;padding:10px;border-radius:10px;background:#f2f2f2;
+  font-size:17px;text-align:center
+}
+@media(max-width:480px){
+  .checkout-panel{width:96vw!important;padding:18px 13px!important}
+  .partGrid{grid-template-columns:1fr 1fr}
+  .partBox{min-height:68px!important;font-size:16px!important}
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -139,7 +216,7 @@
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button type="button" id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button type="button" id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
 <script>
 function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}}window.addEventListener("load",()=>setTimeout(hideSplash,2200));
 </script>
@@ -212,7 +289,16 @@ function customize(si,ci,fi){
  if(!s||!f){closeMenu();return;}
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
  if(f.chickenParts?.length){
-   h+=`<div class=field><b>🍗 CHICKEN PART</b>${f.chickenParts.map((x,i)=>`<div class="counter"><span>${esc(x.name)}</span><button class=mini data-part="${i}" data-d="-1">−</button><b id=part-${i}>0</b><button class=mini data-part="${i}" data-d="1">+</button></div>`).join("")}<p class=small>Choose the part for each chicken piece.</p></div>`;
+   h+=`<div class="field partSelectionField">
+     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
+     <p class="small">Tap the box for the part you want. The number selected appears on the box.</p>
+     <div class="partGrid">${f.chickenParts.map((x,i)=>`
+       <button type="button" class="partBox" data-part-select="${i}">
+         <span class="partName">${esc(x.name)}</span>
+         <span class="partCount" id="part-${i}">0</span>
+       </button>`).join("")}</div>
+     <div class="partTotal">Selected parts: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+   </div>`;
  }
  if(f.choices?.length){
    h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
@@ -231,13 +317,24 @@ function customize(si,ci,fi){
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
- const update=()=>{ $("foodQty").textContent=qty; parts.forEach((v,i)=>{const e=$("part-"+i);if(e)e.textContent=v}) };
- $("qminus").onclick=()=>{qty=Math.max(1,qty-1);update()};
+ const update=()=>{
+   $("foodQty").textContent=qty;
+   const top=$("foodQtyTop"); if(top) top.textContent=qty;
+   const need=$("partNeed"); if(need) need.textContent=qty;
+   const totalParts=parts.reduce((a,x)=>a+x,0);
+   const pt=$("partTotal"); if(pt) pt.textContent=totalParts;
+   parts.forEach((v,i)=>{
+     const e=$("part-"+i);if(e)e.textContent=v;
+     const b=document.querySelector(`[data-part-select="${i}"]`);
+     if(b)b.classList.toggle("selected",v>0);
+   });
+ };
+ $("qminus").onclick=()=>{qty=Math.max(1,qty-1);parts=parts.map(v=>Math.min(v,qty));update()};
  $("qplus").onclick=()=>{qty++;update()};
- document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>{
-   const i=+b.dataset.part,d=+b.dataset.d,total=parts.reduce((a,x)=>a+x,0);
-   if(d>0&&total>=qty)return;
-   parts[i]=Math.max(0,parts[i]+d);update();
+ document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=()=>{
+   const i=+b.dataset.partSelect,total=parts.reduce((a,x)=>a+x,0);
+   if(total>=qty)return;
+   parts[i]++;update();
  });
  document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
    const k=b.dataset.style,d=Number(b.dataset.d);
@@ -351,4 +448,19 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-</script></body></html>
+</script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const g=document.getElementById("gpsBtn");
+  const c=document.getElementById("calculateFeeBtn");
+  if(g){
+    g.addEventListener("click",()=>window.calculateByGPS?.(),{passive:true});
+    g.addEventListener("touchend",e=>{e.preventDefault();window.calculateByGPS?.()},{passive:false});
+  }
+  if(c){
+    c.addEventListener("click",()=>window.calculateGPSFee?.(),{passive:true});
+  }
+});
+</script>
+
+</body></html>
