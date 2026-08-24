@@ -1142,34 +1142,26 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
 async function publishMenu(){
   const st=draft?.stores?.[selectedStore];
   if(!st){ toast("Select a store first."); return false; }
+  if(!auth.currentUser){ toast("Admin session expired. Please log in again."); return false; }
+  const publishButton=document.querySelector('[data-publish-store="'+selectedStore+'"]');
+  if(publishButton){publishButton.disabled=true;publishButton.textContent="⏳ PUBLISHING...";}
   try{
-    // Publish directly from the current ADMIN DRAFT. Do not wait for a
-    // second draft write first; that was causing the button to remain
-    // stuck on PUBLISHING on slow mobile connections.
-    const snap=await Promise.race([
-      getDoc(doc(db,"settings","menu")),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Reading published menu timed out.")),12000))
-    ]);
+    const cleanDraft=normalizeMenu(draft);
+    await setDoc(doc(db,"settings","menuDraft"),{...cleanDraft,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+    const snap=await getDoc(doc(db,"settings","menu"));
     const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-    const pubStore=normalizeMenu({version:draft.version||"final",stores:[{...st,published:true}]}).stores[0];
-    const others=(current.stores||[]).filter(s=>s.id!==pubStore.id);
+    const pubStore=normalizeMenu({version:cleanDraft.version||"final",stores:[{...st,published:true,publishedAt:Date.now()}]}).stores[0];
+    const others=(current.stores||[]).filter(x=>x.id!==pubStore.id);
     const nextMenu=normalizeMenu({...current,stores:[...others,pubStore],publishVersion:Date.now()});
-
-    await Promise.race([
-      setDoc(doc(db,"settings","menu"),{...nextMenu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email}),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Publishing timed out. Check Firebase connection/rules.")),12000))
-    ]);
-
+    await setDoc(doc(db,"settings","menu"),{...nextMenu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
     menu=nextMenu;
-    // Keep the editable draft saved, but do not make customer publishing
-    // depend on this second write.
-    saveDraftMenu();
     renderStores();
-    toast("✅ "+pubStore.name+" PUBLISHED — customer menu updated.");
+    toast("✅ "+pubStore.name+" PUBLISHED — customer app updated.");
     return true;
   }catch(e){
-    console.error("Publish failed",e);
+    console.error("PUBLISH FAILED",e);
     toast("❌ PUBLISH FAILED: "+err(e));
+    if(publishButton){publishButton.disabled=false;publishButton.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP";}
     return false;
   }
 }

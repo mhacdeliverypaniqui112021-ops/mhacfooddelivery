@@ -1,1 +1,1 @@
-MHAC DELIVERY V3.3.5 — PUBLISH FLAG + CUSTOMER ONLY PUBLISHED STORES
+V3.3.6 - reliable admin publish + customer live sync
