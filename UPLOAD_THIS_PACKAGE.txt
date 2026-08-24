@@ -1,0 +1,6 @@
+MHAC DELIVERY V4.1.1 FULL REPLACEMENT
+
+Replace the existing files in the GitHub Pages repository with the files in this package.
+Do not create a new repository.
+After deployment, the Admin page must show:
+V4.1.1 FULL REPLACEMENT — FOOD EDITOR + DRAFT PERSISTENCE FIX
