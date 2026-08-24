@@ -1,1 +1,1 @@
-V3.3.9 - Customer published-store index fix: all menu/category/food views now use the published-store list consistently.
+MHAC DELIVERY V3.4 - CUSTOMER INFO + GPS MOBILE FIX

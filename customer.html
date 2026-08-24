@@ -46,6 +46,81 @@
 .bucketSelectRow b{text-align:center}
 </style>
 
+
+<style>
+/* V3.4 CUSTOMER INFO + GPS MOBILE FIX */
+.checkout{padding:10px}
+.checkout-panel{
+  width:min(680px,100%);
+  max-width:680px;
+  padding:22px 18px;
+  border-radius:20px;
+}
+.checkout-panel h2{font-size:28px;margin:8px 0 18px}
+.checkout-panel input,
+.checkout-panel select{
+  width:100%;
+  min-height:52px;
+  margin:8px 0;
+  padding:12px 14px;
+  font-size:18px;
+  border:2px solid #bbb;
+  border-radius:10px;
+  background:#fff;
+}
+.checkout-panel .field{
+  font-size:17px;
+  line-height:1.35;
+  padding:14px;
+  margin:10px 0;
+}
+.checkout-panel #gpsBtn,
+.checkout-panel #calculateFeeBtn,
+.checkout-panel #sendOrderBtn{
+  width:100%;
+  min-height:54px;
+  margin:8px 0;
+  padding:13px 14px;
+  font-size:17px;
+  font-weight:900;
+  border-radius:10px;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.checkout-panel #gpsBtn,
+.checkout-panel #calculateFeeBtn{
+  background:#111;
+  color:#fff;
+  border:0;
+}
+.checkout-panel #gpsBtn:disabled,
+.checkout-panel #calculateFeeBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+.checkout-panel .status{
+  font-size:16px;
+  line-height:1.35;
+  margin:6px 0;
+}
+.checkout-panel .small{
+  font-size:16px;
+  line-height:1.35;
+}
+@media(max-width:600px){
+  .checkout{padding:8px}
+  .checkout-panel{
+    width:100%;
+    padding:20px 14px;
+    border-radius:20px;
+  }
+  .checkout-panel h2{font-size:26px}
+  .checkout-panel input,
+  .checkout-panel select{font-size:18px;min-height:54px}
+  .checkout-panel .field{font-size:17px}
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -64,7 +139,7 @@
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><input id="custName" placeholder="Customer Name"><input id="custContact" placeholder="Contact Number" inputmode="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to detect current location.</div><button id="gpsBtn" onclick="calculateByGPS()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button type="button" id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
 <script>
 function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}}window.addEventListener("load",()=>setTimeout(hideSplash,2200));
 </script>
@@ -194,7 +269,32 @@ function renderCart(){const names=[...new Set(draftCart.map(x=>x.store))];$("cou
 function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}${x.original!==undefined&&(x.original||x.spicy)?" • Original "+x.original+" / Spicy "+x.spicy+(x.spicyAddPrice?" (+"+peso(x.spicyAddPrice)+"/pc)":""):""}</small></div>`).join("");updateTotals()}
 function updateTotals(){const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("checkoutTotals").innerHTML=`Food: ${peso(sub)}<br>10% SF: ${peso(sf)}<br>Delivery: ${distanceKm===null?"—":peso(deliveryFee)}<br>2nd Store: ${peso(second)}<br><b class=total>TOTAL ${peso(total)}</b>`}
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
-async function calculateByGPS(){navigator.geolocation?.getCurrentPosition(async p=>{gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;$("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)}m`;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`),g=await r.json();$("gpsLocationDisplay").textContent="📍 "+(g.display_name||`${gpsLat},${gpsLon}`)}catch(e){}$("locStatus").textContent="GPS detected. Calculate fee.";$("calculateFeeBtn").disabled=false},{enableHighAccuracy:true,timeout:20000,maximumAge:0})}
+async function calculateByGPS(){
+ const btn=$("gpsBtn");
+ if(!window.isSecureContext){$("locStatus").textContent="❌ GPS requires HTTPS. Please open the GitHub Pages HTTPS link.";return}
+ if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";return}
+ btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
+ navigator.geolocation.getCurrentPosition(async p=>{
+   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
+   $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
+   $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
+   $("calculateFeeBtn").disabled=false;
+   btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
+   try{
+     const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`);
+     const g=await r.json();
+     $("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+(g.display_name||`${gpsLat}, ${gpsLon}`);
+   }catch(e){
+     $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
+   }
+ },err=>{
+   gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
+   btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
+   const msg={1:"Location permission was denied. Please allow Location for Chrome.",2:"GPS position is unavailable. Turn on phone Location and try again.",3:"GPS request timed out. Move to an open area and try again."}[err.code]||"Unable to get GPS location.";
+   $("locStatus").textContent="❌ "+msg;
+   $("gpsLocationDisplay").textContent="";
+ });
+}
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){if(!isOpen())return alert("MHAC Delivery is closed.");const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact)return alert("Complete name and contact.");if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(draftCart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;const o={orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value};try{const ref=await addDoc(collection(db,"orders"),o);$("sendStatus").textContent="✅ ORDER SENT: "+ref.id;draftCart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,800)}catch(e){$("sendStatus").textContent="❌ "+e.message}}
 
