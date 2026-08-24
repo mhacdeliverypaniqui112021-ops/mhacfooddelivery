@@ -1,6 +1,14 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN FINAL COMPACT</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}
+
+/* FINAL COMPACT RIDERS */
+#riders .riderCompact{padding:8px 10px!important;margin:5px 0!important;border-radius:10px!important}
+#riders .riderMain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.15}
+#riders .riderName{font-size:15px;white-space:nowrap}
+#riders .riderEmail{font-size:12px;color:#555;overflow-wrap:anywhere}
+#riders .riderCompact .pill{font-size:11px;padding:4px 7px;margin-left:auto}
+#riders .riderApprove{width:auto!important;padding:7px 10px!important;font-size:12px!important;margin:5px 0 0!important}
 
 .choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
 .choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
@@ -573,7 +581,7 @@ $("orders").onclick=async e=>{
  if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}
 };
 
-function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class=item>🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b><br>${esc(r.email||r.uid||"")}<br><span class=pill>${r.approved===false?"PENDING":"APPROVED"}</span>${r.approved===false?`<button class=green data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
+function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class="item riderCompact"><div class="riderMain"><span class="riderName">🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b></span><span class="riderEmail">${esc(r.email||r.uid||"")}</span><span class="pill">${r.approved===false?"PENDING":"APPROVED"}</span></div>${r.approved===false?`<button class="green riderApprove" data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
 $("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
 
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
@@ -656,9 +664,7 @@ function renderStores(){
  });
  host.querySelectorAll("[data-cat-delete]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catDelete.split("-").map(Number);
-   if(confirm("Delete this category and all its foods?")){
-     draft.stores[si].categories.splice(ci,1); renderStores();
-   }
+   draft.stores[si].categories.splice(ci,1); renderStores();
  });
  host.querySelectorAll("[data-cat-open]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catOpen.split("-").map(Number);
@@ -768,10 +774,8 @@ function renderEditor(){
      renderEditor();
    };
    card.querySelector(".deleteCategory").onclick=()=>{
-     if(confirm("Delete this category and all its foods?")){
-       s.categories.splice(ci,1);
-       renderEditor();
-     }
+     s.categories.splice(ci,1);
+     renderEditor();
    };
  });
  $("publish").onclick=publishMenu;
