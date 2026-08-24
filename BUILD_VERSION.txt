@@ -1,3 +1,1 @@
-MHAC DELIVERY V4.0.8 FOOD EDITOR + PERSISTENCE FIX
-
-Fixes: real Firestore admin draft persistence; working food copy/paste clipboard; food-name copy/paste; full food template copy/paste; unpublished edits remain in ADMIN DRAFT until published.
+V4.0.9 MENU DIAGNOSTIC BUILD
