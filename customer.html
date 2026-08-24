@@ -84,7 +84,8 @@ async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
   menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
     data=snap.exists()?snap.data():{stores:[]};
-    $("menuStatus").textContent=data.stores?.length?"🟢 PUBLISHED MENU READY":"⚠️ No menu has been published yet.";
+    const count=(data.stores||[]).length;
+    $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
     renderStores();
     renderCart();
   },err=>{

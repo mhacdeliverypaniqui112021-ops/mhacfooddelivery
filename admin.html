@@ -680,12 +680,35 @@ function renderStores(){
    const n=inp.value.trim(); if(n)draft.stores[si].name=n;
    renderStores();
  });
- host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=()=>{
+ host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=async()=>{
+   if(b.dataset.busy==="1")return;
    const si=+b.dataset.storeDelete;
-   draft.stores.splice(si,1);
-   selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
-   renderStores();
-   toast("Store deleted.");
+   const st=draft?.stores?.[si];
+   if(!st)return;
+   b.dataset.busy="1";
+   b.disabled=true;
+   b.textContent="DELETING...";
+   try{
+     // Deleting a store from ADMIN must also remove its published copy
+     // so the CUSTOMER APP immediately stops showing that store.
+     const snap=await getDoc(doc(db,"settings","menu"));
+     const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+     const next=normalizeMenu({...current,stores:(current.stores||[]).filter(x=>x.id!==st.id),publishVersion:Date.now()});
+     await setDoc(doc(db,"settings","menu"),{...next,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+
+     draft.stores.splice(si,1);
+     selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
+     menu=next;
+     await flushDraftMenu();
+     renderStores();
+     toast("🗑️ "+st.name+" deleted. It is also removed from the CUSTOMER APP.");
+   }catch(e){
+     console.error("Store delete failed",e);
+     toast("❌ STORE DELETE FAILED: "+err(e));
+     b.disabled=false;
+     b.textContent="🗑️ DELETE STORE";
+     b.dataset.busy="0";
+   }
  });
  host.querySelectorAll("[data-add-cat]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.addCat, inp=host.querySelector(`[data-new-cat="${si}"]`), n=inp.value.trim();
@@ -721,7 +744,9 @@ function renderStores(){
    if(b.dataset.busy==="1")return;
    b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ PUBLISHING...";
    selectedStore=+b.dataset.publishStore;
-   try{ await publishMenu(); } finally { b.dataset.busy="0"; }
+   const ok=await publishMenu();
+   b.dataset.busy="0";
+   if(!ok){ b.disabled=false; b.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP"; }
  });
  host.querySelectorAll("[data-unpublish-store]").forEach(b=>b.onclick=async()=>{
    if(b.dataset.busy==="1")return;
@@ -1103,17 +1128,38 @@ $("adminChatSend").onclick=async()=>{
 $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminChatSend").click()}});
 
 async function publishMenu(){
- try{
-   const st=draft?.stores?.[selectedStore]; if(!st)return toast("Select a store first.");
-   await flushDraftMenu();
-   const snap=await getDoc(doc(db,"settings","menu"));
-   const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-   const pubStore=normalizeMenu({version:draft.version||"final",stores:[st]}).stores[0];
-   const others=current.stores.filter(s=>s.id!==pubStore.id);
-   menu=normalizeMenu({...current,stores:[...others,pubStore]});
-   await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});
-   renderStores(); toast("✅ "+pubStore.name+" published to customer app.");
- }catch(e){toast("Publish failed: "+err(e))}
+  const st=draft?.stores?.[selectedStore];
+  if(!st){ toast("Select a store first."); return false; }
+  try{
+    // Publish directly from the current ADMIN DRAFT. Do not wait for a
+    // second draft write first; that was causing the button to remain
+    // stuck on PUBLISHING on slow mobile connections.
+    const snap=await Promise.race([
+      getDoc(doc(db,"settings","menu")),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Reading published menu timed out.")),12000))
+    ]);
+    const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+    const pubStore=normalizeMenu({version:draft.version||"final",stores:[st]}).stores[0];
+    const others=(current.stores||[]).filter(s=>s.id!==pubStore.id);
+    const nextMenu=normalizeMenu({...current,stores:[...others,pubStore],publishVersion:Date.now()});
+
+    await Promise.race([
+      setDoc(doc(db,"settings","menu"),{...nextMenu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email}),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Publishing timed out. Check Firebase connection/rules.")),12000))
+    ]);
+
+    menu=nextMenu;
+    // Keep the editable draft saved, but do not make customer publishing
+    // depend on this second write.
+    saveDraftMenu();
+    renderStores();
+    toast("✅ "+pubStore.name+" PUBLISHED — customer menu updated.");
+    return true;
+  }catch(e){
+    console.error("Publish failed",e);
+    toast("❌ PUBLISH FAILED: "+err(e));
+    return false;
+  }
 }
 async function unpublishStore(si){
  try{
