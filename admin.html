@@ -617,6 +617,11 @@ function storeKey(name,index){const base=String(name||"store").toLowerCase().rep
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type==="bucket"?"bucket":"chicken",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m;}
 let draftSaveTimer=null;
 async function saveDraftMenu(){try{if(!auth.currentUser||!draft)return;clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(async()=>{try{await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});}catch(e){console.warn("Draft save failed",e);}},250);}catch(e){}}
+async function flushDraftMenu(){
+  if(!auth.currentUser||!draft)return;
+  clearTimeout(draftSaveTimer);
+  await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+}
 function publishedStoreIds(){return new Set((menu?.stores||[]).map(s=>s.id));}
 function renderPublishButton(si){
  const st=draft?.stores?.[si];
@@ -1100,13 +1105,13 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
 async function publishMenu(){
  try{
    const st=draft?.stores?.[selectedStore]; if(!st)return toast("Select a store first.");
+   await flushDraftMenu();
    const snap=await getDoc(doc(db,"settings","menu"));
    const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
    const pubStore=normalizeMenu({version:draft.version||"final",stores:[st]}).stores[0];
    const others=current.stores.filter(s=>s.id!==pubStore.id);
    menu=normalizeMenu({...current,stores:[...others,pubStore]});
    await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});
-   await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
    renderStores(); toast("✅ "+pubStore.name+" published to customer app.");
  }catch(e){toast("Publish failed: "+err(e))}
 }

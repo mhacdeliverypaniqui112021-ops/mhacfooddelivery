@@ -1,1 +1,1 @@
-MHAC DELIVERY V3.3.1 - Publish/Unpublish visual state + guarded buttons
+MHAC DELIVERY V3.3.2 - REALTIME PUBLISH MENU SYNC
