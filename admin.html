@@ -431,6 +431,7 @@
 .storeBox .storeNameInline{margin:3px 0!important}
 </style>
 </head><body>
+<div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
 // Independent splash fallback: this runs even if Firebase/module code has an error.
@@ -461,7 +462,7 @@ window.setTimeout(function(){
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,addDoc,collection,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,addDoc,collection,onSnapshot,updateDoc,deleteDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
@@ -527,6 +528,7 @@ function orderDetailHtml(o){
  <b>Customer Total: ${peso(f.total)}</b>
  </div>`;
 }
+function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
  const active=orders.filter(o=>String(o.status||"NEW").toUpperCase()!=="COMPLETED");
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
@@ -543,7 +545,7 @@ function renderOrders(){
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
     ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
-    ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><br><button class=blue data-time="${esc(o.id)}">⏱️ SET / CHANGE WAITING TIME</button></div>`:""}
+    ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
     <select id="r-${esc(o.id)}">${opts}</select>
     <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
     <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button>
@@ -558,32 +560,41 @@ $("orders").onclick=async e=>{
  const accept=e.target.closest("[data-accept]");
  if(accept){
    const id=accept.dataset.accept;
-   if(!confirm("Accept this customer order? You will set the rider-based waiting time next."))return;
    accept.disabled=true;
-   try{await updateDoc(doc(db,"orders",id),{status:"ACCEPTED",acceptedAt:serverTimestamp(),updatedAt:serverTimestamp()});}
-   catch(x){accept.disabled=false;alert(err(x));}
+   try{await updateDoc(doc(db,"orders",id),{status:"ACCEPTED",acceptedAt:serverTimestamp(),updatedAt:serverTimestamp(),waitingMinutes:30});toast("Order accepted. Set the rider waiting time.");}
+   catch(x){accept.disabled=false;toast(err(x));}
    return;
  }
  const tm=e.target.closest("[data-time]");
  if(tm){
    const id=tm.dataset.time;
-   const val=prompt("Rider waiting time in minutes:","30");
-   if(val===null)return;
-   const mins=Math.max(1,Math.floor(Number(val)));
-   if(!Number.isFinite(mins)||mins<1){alert("Enter a valid number of minutes.");return;}
-   try{await updateDoc(doc(db,"orders",id),{waitingMinutes:mins,waitingStartedAt:serverTimestamp(),updatedAt:serverTimestamp()});}
-   catch(x){alert(err(x));}
+   const inp=$("orders").querySelector(`[data-wait-input="${CSS.escape(id)}"]`);
+   const mins=Math.floor(Number(inp?.value||0));
+   if(!Number.isFinite(mins)||mins<1){toast("Enter a valid waiting time.");return;}
+   try{await updateDoc(doc(db,"orders",id),{waitingMinutes:mins,waitingStartedAt:serverTimestamp(),updatedAt:serverTimestamp()});toast("Waiting time saved.");}
+   catch(x){toast(err(x));}
    return;
  }
  const a=e.target.closest("[data-a]");
- if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u)return alert("Select rider first.");try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,updatedAt:serverTimestamp()});alert("✅ Order assigned.")}catch(x){alert(err(x))}return;}
+ if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u){toast("Select rider first.");return;}try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,updatedAt:serverTimestamp()});toast("Order assigned.")}catch(x){toast(err(x))}return;}
  const c=e.target.closest("[data-c]");
- if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()})}catch(x){c.disabled=false;alert(err(x))}}
+ if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()});toast("Order completed.")}catch(x){c.disabled=false;toast(err(x))}}
 };
 
-function renderRiders(){ $("riders").innerHTML=riders.length?riders.map(r=>`<div class="item riderCompact"><div class="riderMain"><span class="riderName">🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b></span><span class="riderEmail">${esc(r.email||r.uid||"")}</span><span class="pill">${r.approved===false?"PENDING":"APPROVED"}</span></div>${r.approved===false?`<button class="green riderApprove" data-approve="${esc(r.uid||r.id)}">APPROVE RIDER</button>`:""}</div>`).join(""):"<div class=status>No rider profiles found.</div>"}
-$("riders").onclick=async e=>{const b=e.target.closest("[data-approve]");if(!b)return;try{await updateDoc(doc(db,"riders",b.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});}catch(x){alert(err(x))}};
-
+function renderRiders(){
+ $("riders").innerHTML=riders.length?riders.map(r=>{
+   const id=esc(r.uid||r.id), approved=r.approved!==false;
+   return `<div class="item riderCompact"><div class="riderMain"><span class="riderName">🏍️ <b>${esc(r.nickname||r.name||"RIDER")}</b></span><span class="riderEmail">${esc(r.email||r.uid||"")}</span><span class="pill">${approved?"APPROVED":"PENDING"}</span></div><div class="riderActions">${approved?`<button class="gray" data-unapprove="${id}">REMOVE APPROVAL</button>`:`<button class="green" data-approve="${id}">APPROVE</button>`}<button class="danger" data-delete-rider="${id}">DELETE RIDER</button></div></div>`
+ }).join(""):"<div class=status>No rider profiles found.</div>"
+}
+$("riders").onclick=async e=>{
+ const ap=e.target.closest("[data-approve]");
+ if(ap){try{await updateDoc(doc(db,"riders",ap.dataset.approve),{approved:true,approvedAt:serverTimestamp(),approvedBy:auth.currentUser.email});toast("Rider approved.")}catch(x){toast(err(x))}return;}
+ const un=e.target.closest("[data-unapprove]");
+ if(un){try{await updateDoc(doc(db,"riders",un.dataset.unapprove),{approved:false,unapprovedAt:serverTimestamp(),unapprovedBy:auth.currentUser.email});toast("Rider approval removed.")}catch(x){toast(err(x))}return;}
+ const del=e.target.closest("[data-delete-rider]");
+ if(del){try{await deleteDoc(doc(db,"riders",del.dataset.deleteRider));toast("Rider profile deleted.")}catch(x){toast(err(x))}return;}
+};
 function normalizeMenu(x){const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));m.stores=(m.stores||[]).map(s=>({...s,categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:i.choices||[],addOns:i.addOns||[],chickenParts:i.chickenParts||[],bucketChoices:i.bucketChoices||[],type:i.type||"regular",spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));return m}
 function renderStores(){
  const host=$("stores");
@@ -636,11 +647,10 @@ function renderStores(){
  });
  host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.storeDelete;
-   if(confirm("Delete this entire store and all its foods?")){
-     draft.stores.splice(si,1);
-     selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
-     renderStores();
-   }
+   draft.stores.splice(si,1);
+   selectedStore=Math.max(0,Math.min(selectedStore,draft.stores.length-1));
+   renderStores();
+   toast("Store deleted.");
  });
  host.querySelectorAll("[data-add-cat]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.addCat, inp=host.querySelector(`[data-new-cat="${si}"]`), n=inp.value.trim();
@@ -695,7 +705,7 @@ function renderNestedFoods(si,ci,list){
  list.querySelector(".nestedAddFood").onclick=()=>{
    const n=list.querySelector(".nestedFoodName").value.trim();
    const p=Number(list.querySelector(".nestedFoodPrice").value);
-   if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
+   if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
    renderNestedFoods(si,ci,list);
@@ -769,7 +779,7 @@ function renderEditor(){
    };
    card.querySelector(".saveCategoryName").onclick=()=>{
      const n=card.querySelector(".categoryNameEdit").value.trim();
-     if(!n) return alert("Enter category name.");
+     if(!n) return toast("Enter category name.");
      c.name=n;
      renderEditor();
    };
@@ -801,7 +811,7 @@ function renderDirectFoodList(ci,list){
  list.querySelector(".addDirectFood").onclick=()=>{
    const n=list.querySelector(".newFoodName").value.trim();
    const p=Number(list.querySelector(".newFoodPrice").value);
-   if(!n||!Number.isFinite(p)||p<0)return alert("Enter food name and valid price.");
+   if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
    renderDirectFoodList(ci,list);
@@ -970,13 +980,13 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.bucketChoices=[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>[
      r.querySelector(".bucketName").value.trim(),Number(r.querySelector(".bucketPrice").value||0)
    ]).filter(x=>x[0]);
-   alert("All bucket choices copied.");
+   toast("Bucket choices copied.");
  };
  ed.querySelector(".pasteBucket").onclick=()=>foodClipboard.bucketChoices.forEach(x=>addBucketRow(x[0],x[1]));
 
  ed.querySelector(".copyParts").onclick=()=>{
    foodClipboard.parts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean);
-   alert("Parts copied.");
+   toast("Parts copied.");
  };
  ed.querySelector(".pasteParts").onclick=()=>foodClipboard.parts.forEach(addPartRow);
 
@@ -984,7 +994,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.choices=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".drinkName")).map(r=>[
      r.querySelector(".drinkName").value.trim(),Number(r.querySelector(".drinkPrice").value||0)
    ]).filter(x=>x[0]);
-   alert("Drinks copied.");
+   toast("Drinks copied.");
  };
  ed.querySelector(".pasteDrinks").onclick=()=>foodClipboard.choices.forEach(x=>addDrinkRow(x[0],x[1]));
 
@@ -992,14 +1002,14 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.addOns=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".addonName")).map(r=>[
      r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)
    ]).filter(x=>x[0]);
-   alert("Add-ons copied.");
+   toast("Add-ons copied.");
  };
  ed.querySelector(".pasteAddons").onclick=()=>foodClipboard.addOns.forEach(x=>addAddonRow(x[0],x[1]));
 
  ed.querySelector(".saveDirectFood").onclick=()=>{
    const name=ed.querySelector(".foodNameEdit").value.trim();
    const price=Number(ed.querySelector(".foodPriceEdit").value);
-   if(!name||!Number.isFinite(price)||price<0)return alert("Please enter food name and valid price.");
+   if(!name||!Number.isFinite(price)||price<0)return toast("Enter food name and valid price.");
    s.name=ed.querySelector(".storeNameEdit").value.trim()||s.name;
    const categoryName=ed.querySelector(".categoryNameInFoodEdit").value.trim();
    if(categoryName)c.name=categoryName;
@@ -1019,7 +1029,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    renderDirectFoodList(ci,list);
  };
  ed.querySelector(".deleteDirectFood").onclick=()=>{
-   if(confirm("Delete this food?")){
+   {
      c.items.splice(fi,1);renderDirectFoodList(ci,list);
    }
  };
@@ -1042,21 +1052,21 @@ function closeAdminChat(){if(adminChatUnsub){adminChatUnsub();adminChatUnsub=nul
 $("adminChatClose").onclick=closeAdminChat;
 $("adminChatSend").onclick=async()=>{
  const text=$("adminChatInput").value.trim();if(!text||!adminChatOrderId)return;
- try{await addDoc(collection(db,"orders",adminChatOrderId,"messages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminChatInput").value=""}catch(e){alert(err(e))}
+ try{await addDoc(collection(db,"orders",adminChatOrderId,"messages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminChatInput").value=""}catch(e){toast(err(e))}
 };
 $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminChatSend").click()}});
 
 async function publishMenu(){
  try{
-   if(!draft.stores[selectedStore]) return alert("Select a store first.");
+   if(!draft.stores[selectedStore]) return toast("Select a store first.");
    const currentSnap=await getDoc(doc(db,"settings","menu"));
    const current=normalizeMenu(currentSnap.exists()?currentSnap.data():{version:"final",stores:[]});
    const storeToPublish=normalizeMenu({version:draft.version||"final",stores:[draft.stores[selectedStore]]});
    const otherStores=current.stores.filter(s=>s.id!==draft.stores[selectedStore].id);
    menu=normalizeMenu({...current,version:draft.version||current.version,stores:[...otherStores,storeToPublish.stores[0]]});
    await setDoc(doc(db,"settings","menu"),{...menu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email});
-   alert("✅ "+draft.stores[selectedStore].name+" PUBLISHED TO CUSTOMER APP. Other stores were preserved.");
- }catch(e){alert("Publish failed: "+err(e))}
+   toast("✅ "+draft.stores[selectedStore].name+" published to customer app.");
+ }catch(e){toast("Publish failed: "+err(e))}
 }
 async function loadMenu(){const s=await getDoc(doc(db,"settings","menu"));menu=normalizeMenu(s.exists()?s.data():{version:"final",stores:[]});draft=normalizeMenu(menu);renderStores();renderEditor()}
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{orders=x.docs.map(d=>({id:d.id,...d.data()}));orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
