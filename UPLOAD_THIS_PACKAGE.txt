@@ -1,1 +1,2 @@
-Upload this full replacement to the SAME GitHub repository. Commit changes. Live marker must show V4.1.2 COPY PARTS FIX. This version makes Copy All Parts/Paste All Parts robust on Android touch/click.
+MHAC DELIVERY V4.1.3 — FINAL RIDER INTRODUCTION FIX
+Rider splash/introduction now appears only on the first visit on the device/browser. Refreshing the Rider App no longer shows the introduction again. Rider login, orders, customer location, navigation, Admin/Menu files were left unchanged.
