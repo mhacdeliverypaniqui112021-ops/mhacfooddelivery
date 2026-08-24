@@ -475,9 +475,44 @@ const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(fireba
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
-let adminSoundReady=false;
-async function playAdminAlert(){if(!adminSoundReady)return;const a=$("orderAlertAudio");if(!a)return;try{a.pause();a.currentTime=0;a.volume=1;await a.play()}catch(e){$("adminSoundState").textContent="❌ Tap ENABLE SOUND again"}}
-$("adminSoundBtn").onclick=async()=>{try{const a=$("orderAlertAudio");a.volume=1;await a.play();a.pause();a.currentTime=0;adminSoundReady=true;$("adminSoundState").textContent="🔊 Sound enabled — loud alert ready"}catch(e){$("adminSoundState").textContent="❌ Sound could not be enabled — tap again"}};
+let adminSoundReady=false,adminAudioCtx=null,adminMediaSource=null,adminGain=null;
+async function prepareAdminAlertSound(){
+  const a=$("orderAlertAudio");
+  if(!a) throw new Error("Alert audio element missing.");
+  a.src=new URL("assets/mhac-order-alert.mp3",location.href).href;
+  a.preload="auto"; a.loop=false; a.muted=false; a.volume=1;
+  await a.play();
+  a.pause(); a.currentTime=0;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC){
+      if(!adminAudioCtx) adminAudioCtx=new AC();
+      await adminAudioCtx.resume();
+      if(!adminMediaSource){
+        adminMediaSource=adminAudioCtx.createMediaElementSource(a);
+        adminGain=adminAudioCtx.createGain();
+        adminGain.gain.value=2.2;
+        adminMediaSource.connect(adminGain); adminGain.connect(adminAudioCtx.destination);
+      }
+    }
+  }catch(e){console.warn("Volume amplifier unavailable; using normal HTML audio.",e)}
+  adminSoundReady=true;
+  $("adminSoundState").textContent="🔊 Sound enabled — loud 17-second alert ready";
+}
+async function playAdminAlert(){
+  if(!adminSoundReady)return;
+  try{
+    const a=$("orderAlertAudio"); if(!a)return;
+    if(adminAudioCtx)await adminAudioCtx.resume();
+    a.pause();a.currentTime=0;a.muted=false;a.volume=1;await a.play();
+  }catch(e){$("adminSoundState").textContent="❌ Alert playback failed — tap ENABLE SOUND again";adminSoundReady=false}
+}
+$("adminSoundBtn").onclick=async()=>{
+  const b=$("adminSoundBtn");b.disabled=true;
+  try{await prepareAdminAlertSound()}
+  catch(e){console.error(e);$("adminSoundState").textContent="❌ Sound could not be enabled — tap again";adminSoundReady=false}
+  finally{b.disabled=false}
+};
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
 $("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
@@ -486,7 +521,7 @@ function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMon
 function calcStats(){
  const today=businessDayKey();
  const done=orders.filter(o=>String(o.status).toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
- const active=orders.filter(o=>String(o.status).toUpperCase()!=="COMPLETED");
+ const active=orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status).toUpperCase()));
  const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
  const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
  $("metrics").innerHTML=`<div class=metric><span>Today's Deliveries</span><b>${done.length}</b></div><div class=metric><span>Active Orders</span><b>${active.length}</b></div><div class=metric><span>Today's Admin 10% Earnings</span><b>${peso(sf)}</b></div><div class=metric><span>Today's Rider Delivery Earnings</span><b>${peso(df)}</b></div>`;
@@ -519,7 +554,7 @@ function orderDetailHtml(o){
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
- const active=orders.filter(o=>String(o.status||"NEW").toUpperCase()!=="COMPLETED");
+ const active=orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"NEW").toUpperCase()));
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
  $("orders").innerHTML=active.map((o,idx)=>{
    const opts='<option value="">Assign rider</option>'+riders.filter(r=>r.approved!==false).map(r=>{
@@ -558,18 +593,18 @@ $("orders").onclick=async e=>{
  const cancel=e.target.closest("[data-cancel-order]");
  if(cancel){
    const id=cancel.dataset.cancelOrder;
-   const ok=confirm("CANCEL THIS ORDER?\n\nUse this for fake/suspicious bookings or orders you cannot accept.\n\nThe customer will see the order as CANCELLED.");
-   if(!ok)return;
-   const reason=prompt("Cancellation reason (optional):","Fake / suspicious booking");
    cancel.disabled=true;
    try{
      await updateDoc(doc(db,"orders",id),{
        status:"CANCELLED",
        cancelledAt:serverTimestamp(),
        cancelledBy:auth.currentUser?.email||"ADMIN",
-       cancellationReason:String(reason||"Admin cancelled order").trim(),
+       cancellationReason:"Admin cancelled order",
        updatedAt:serverTimestamp()
      });
+     orders=orders.filter(o=>o.id!==id);
+     renderOrders();
+     calcStats();
      toast("Order cancelled.");
    }catch(x){
      cancel.disabled=false;
@@ -1260,7 +1295,7 @@ async function loadMenu(){
   $("editor").classList.add("hidden");
 }
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>o.status!=="COMPLETED").length+" active orders";renderOrders();calcStats()})})}
+function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
 

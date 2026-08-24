@@ -44,13 +44,37 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirec
 import {getFirestore,doc,getDoc,setDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
-const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,seenAssigned=new Set();
+const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
 async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()}}catch(e){console.warn("Business hours settings unavailable:",e)}}
 function showLogin(){$("login").classList.remove("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden")}function showClosed(){$("login").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden");$("closed").classList.remove("hidden");$("closedText").textContent="🔒 Rider app is closed now. Please try again during business hours."}function showPending(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("app").classList.add("hidden");$("pending").classList.remove("hidden")}function showApp(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.remove("hidden")}
-async function playAlert(){if(!soundReady)return;const a=$("orderAlertAudio");if(!a)return;try{a.pause();a.currentTime=0;a.volume=1;await a.play()}catch(e){$("soundState").textContent=" ❌ Tap ENABLE SOUND again"}}
-$("soundBtn").onclick=async()=>{try{const a=$("orderAlertAudio");a.volume=1;await a.play();a.pause();a.currentTime=0;soundReady=true;$("soundState").textContent=" 🔊 Sound enabled — loud alert ready"}catch(e){$("soundState").textContent=" ❌ Sound could not be enabled — tap again"}};
+async function prepareRiderAlertSound(){
+  const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound element missing.");
+  a.src=new URL("assets/mhac-order-alert.mp3",location.href).href;
+  a.preload="auto";a.loop=false;a.muted=false;a.volume=1;
+  await a.play();
+  a.pause();a.currentTime=0;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC){
+      if(!soundCtx)soundCtx=new AC();
+      await soundCtx.resume();
+      if(!soundMediaSource){
+        soundMediaSource=soundCtx.createMediaElementSource(a);
+        soundGain=soundCtx.createGain();soundGain.gain.value=2.2;
+        soundMediaSource.connect(soundGain);soundGain.connect(soundCtx.destination);
+      }
+    }
+  }catch(e){console.warn("Volume amplifier unavailable; using normal HTML audio.",e)}
+  soundReady=true;$("soundState").textContent=" 🔊 Sound enabled — loud 17-second alert ready";
+}
+async function playAlert(){
+  if(!soundReady)return;
+  try{const a=$("orderAlertAudio");if(!a)return;if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;await a.play();}
+  catch(e){$("soundState").textContent=" ❌ Alert playback failed — tap ENABLE SOUND again";soundReady=false}
+}
+$("soundBtn").onclick=async()=>{const b=$("soundBtn");b.disabled=true;try{await prepareRiderAlertSound()}catch(e){console.error(e);$("soundState").textContent=" ❌ Sound could not be enabled — tap again";soundReady=false}finally{b.disabled=false}};
 async function googleLogin(){
  $("googleBtn").disabled=true;$("googleStatus").textContent="Opening Google sign-in…";
  try{
