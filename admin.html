@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.0.9 MENU DIAGNOSTIC BUILD</title>
-<meta name="build-version" content="V4.0.9 MENU DIAGNOSTIC BUILD">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.0 FOOD EDITOR + DRAFT PERSISTENCE FIX</title>
+<meta name="build-version" content="V4.1.0 FOOD EDITOR + DRAFT PERSISTENCE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -52,7 +52,7 @@
 .choiceRow input{min-height:58px!important;font-size:18px!important}
 .choiceRow button{min-height:58px!important}
 .copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
-.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:5}
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 
@@ -222,7 +222,7 @@
 .choiceRow input{min-height:58px!important;font-size:18px!important}
 .choiceRow button{min-height:58px!important}
 .copyPasteRow{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin:8px 0!important}
-.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important}
+.smallBtn{font-size:15px!important;min-height:52px!important;padding:8px!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;position:relative;z-index:5}
 .saveFoodBtn,.deleteFoodBtn{width:100%!important;min-height:60px!important;margin-top:12px!important;font-size:19px!important}
 @media(max-width:600px){.choiceRow{grid-template-columns:minmax(0,1fr) 105px 50px!important}.choiceRow input{font-size:17px!important}.copyPasteRow{grid-template-columns:1fr 1fr!important}}
 </style>
@@ -459,7 +459,7 @@ window.setTimeout(function(){
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
 <div class="card" id="menuDiagnosticCard"><h2>🧪 MENU DATA DIAGNOSTIC</h2><p class="status">Read-only check. This does not change or delete your menu.</p><button id="checkMenuData" class="blue">🔎 CHECK MENU DATA</button><div id="menuDiagnosticResult" class="status" style="margin-top:10px;white-space:pre-wrap"></div></div>
-<div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish.</p>
+<div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish. Unpublish hides a store from customers; it does NOT delete your foods.</p>
 <div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
 <div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
 </div>
@@ -480,7 +480,23 @@ const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(fireba
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 // Food editor clipboard. Keep this in memory for Copy/Paste buttons.
+const FOOD_CLIPBOARD_KEY="mhac_food_editor_clipboard_v410";
 const foodClipboard={bucketChoices:[],parts:[],choices:[],addOns:[],foodName:"",foodTemplate:null};
+function loadFoodClipboard(){
+  try{
+    const raw=localStorage.getItem(FOOD_CLIPBOARD_KEY);
+    if(!raw)return;
+    const x=JSON.parse(raw);
+    if(x&&typeof x==="object") Object.assign(foodClipboard,x);
+  }catch(e){console.warn("Food clipboard restore failed",e)}
+}
+function saveFoodClipboard(){
+  try{localStorage.setItem(FOOD_CLIPBOARD_KEY,JSON.stringify(foodClipboard));}catch(e){console.warn("Food clipboard save failed",e)}
+}
+async function copySystemText(text){
+  try{if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(String(text||""));}catch(e){/* internal clipboard remains the reliable Android fallback */}
+}
+loadFoodClipboard();
 function err(e){if(e?.code==="permission-denied")return"Firestore permission denied.";if(e?.code==="auth/unauthorized-domain")return"GitHub Pages domain is not authorized in Firebase.";return e?.message||"Unknown error"}
 let adminSoundReady=false,adminAudioCtx=null,adminMediaSource=null,adminGain=null,adminAlertUrl="";
 async function initAdminAlertSound(){
@@ -1140,7 +1156,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <label class="label">AVAILABILITY</label>
    <select class="availability"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
 
-   <button type="button" class="green saveDirectFood">💾 SAVE FOOD</button>
+   <button type="button" class="green saveDirectFood">💾 SAVE FOOD TO DRAFT</button><div class="small foodSaveHint">Saved foods stay in ADMIN DRAFT even when the store is unpublished.</div>
    <button type="button" class="danger deleteDirectFood">🗑️ DELETE FOOD</button>
  </div>`;
 
@@ -1201,15 +1217,21 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  });
 
  // Simple food-name clipboard: useful when adding many similar foods.
- ed.querySelector(".copyFoodName").onclick=()=>{
-   foodClipboard.foodName=ed.querySelector(".foodNameEdit").value.trim();
-   if(!foodClipboard.foodName)return toast("Enter a food name first.");
-   toast("📋 Food name copied. Open the next food and tap PASTE FOOD NAME.");
+ ed.querySelector(".copyFoodName").onclick=async()=>{
+   const value=ed.querySelector(".foodNameEdit").value.trim();
+   if(!value)return toast("Enter a food name first.");
+   foodClipboard.foodName=value;
+   saveFoodClipboard();
+   await copySystemText(value);
+   toast("📋 FOOD NAME COPIED — open the next food and tap PASTE FOOD NAME.");
  };
  ed.querySelector(".pasteFoodName").onclick=()=>{
-   if(!foodClipboard.foodName)return toast("No food name copied yet.");
+   if(!foodClipboard.foodName){
+     loadFoodClipboard();
+   }
+   if(!foodClipboard.foodName)return toast("No food name copied yet. Copy a food name first.");
    ed.querySelector(".foodNameEdit").value=foodClipboard.foodName;
-   toast("📥 Food name pasted. Tap SAVE FOOD when ready.");
+   toast("📥 FOOD NAME PASTED — tap SAVE FOOD.");
  };
  // Full template clipboard: copies the current food's parts/drinks/add-ons,
  // bucket choices, type and spicy price. Name and base price are also copied.
@@ -1225,10 +1247,12 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    addOns:[...ed.querySelectorAll(".addonRows .editorRow")].map(r=>({name:r.querySelector(".addonName")?.value.trim()||"",price:Number(r.querySelector(".addonPrice")?.value||0)})).filter(x=>x.name),
    bucketChoices:[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>({name:r.querySelector(".bucketName")?.value.trim()||"",price:Number(r.querySelector(".bucketPrice")?.value||0)})).filter(x=>x.name)
  });
- ed.querySelector(".copyFoodTemplate").onclick=()=>{
+ ed.querySelector(".copyFoodTemplate").onclick=async()=>{
    foodClipboard.foodTemplate=readFoodTemplate();
    foodClipboard.foodName=foodClipboard.foodTemplate.name;
-   toast("📋 Food template copied. Open the next food and tap PASTE FOOD TEMPLATE.");
+   saveFoodClipboard();
+   await copySystemText(JSON.stringify(foodClipboard.foodTemplate));
+   toast("📋 FOOD TEMPLATE COPIED — open the next food and tap PASTE FOOD TEMPLATE.");
  };
  ed.querySelector(".pasteFoodTemplate").onclick=()=>{
    const t=foodClipboard.foodTemplate;
@@ -1256,12 +1280,14 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.bucketChoices=[...ed.querySelectorAll(".bucketRows .editorRow")].map(r=>[
      r.querySelector(".bucketName").value.trim(),Number(r.querySelector(".bucketPrice").value||0)
    ]).filter(x=>x[0]);
+   saveFoodClipboard();
    toast("Bucket choices copied.");
  };
  ed.querySelector(".pasteBucket").onclick=()=>foodClipboard.bucketChoices.forEach(x=>addBucketRow(x[0],x[1]));
 
  ed.querySelector(".copyParts").onclick=()=>{
    foodClipboard.parts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean);
+   saveFoodClipboard();
    toast("Parts copied.");
  };
  ed.querySelector(".pasteParts").onclick=()=>foodClipboard.parts.forEach(addPartRow);
@@ -1270,6 +1296,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.choices=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".drinkName")).map(r=>[
      r.querySelector(".drinkName").value.trim(),Number(r.querySelector(".drinkPrice").value||0)
    ]).filter(x=>x[0]);
+   saveFoodClipboard();
    toast("Drinks copied.");
  };
  ed.querySelector(".pasteDrinks").onclick=()=>foodClipboard.choices.forEach(x=>addDrinkRow(x[0],x[1]));
@@ -1278,6 +1305,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    foodClipboard.addOns=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".addonName")).map(r=>[
      r.querySelector(".addonName").value.trim(),Number(r.querySelector(".addonPrice").value||0)
    ]).filter(x=>x[0]);
+   saveFoodClipboard();
    toast("Add-ons copied.");
  };
  ed.querySelector(".pasteAddons").onclick=()=>foodClipboard.addOns.forEach(x=>addAddonRow(x[0],x[1]));
@@ -1307,7 +1335,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    const saveBtn=ed.querySelector(".saveDirectFood");
    saveBtn.disabled=true; saveBtn.textContent="💾 SAVING...";
    flushDraftMenu().then(()=>{
-     toast("✅ FOOD SAVED — refresh test is safe.");
+     toast("✅ FOOD SAVED TO DRAFT — safe to refresh or unpublish.");
      renderDirectFoodList(ci,list);
    }).catch(e=>{
      console.error("Food save failed",e);
@@ -1452,30 +1480,32 @@ async function loadMenu(){
   const firestoreDraftHasStores = !!(firestoreDraft && Array.isArray(firestoreDraft.stores) && firestoreDraft.stores.length);
   const publishedHasStores = !!(menu && Array.isArray(menu.stores) && menu.stores.length);
 
-  if(localHasStores){
-    draft = localDraft;
-  }else if(firestoreDraftHasStores){
+  // FIRESTORE DRAFT IS AUTHORITATIVE when it exists and contains stores.
+  // The phone backup is only a fallback. This prevents an older local copy from
+  // overwriting newer menu edits that were already saved in Firebase.
+  if(firestoreDraftHasStores){
     draft = firestoreDraft;
+  }else if(localHasStores){
+    draft = localDraft;
+    // Recover a local-only draft into Firestore once permission is available.
+    await flushDraftMenu().catch(e=>console.warn("Local draft recovery save failed",e));
   }else{
     draft = normalizeMenu(menu);
   }
 
   // Recovery: never erase customer-facing stores just because the editable draft
-  // was missing/stale. Published stores are copied back into the admin draft.
-  // A real ADMIN DELETE removes the published store first, so this does not
-  // resurrect intentionally deleted stores.
+  // is missing a published store. A real ADMIN DELETE removes the published store
+  // first, so this does not resurrect intentionally deleted stores.
   const byId=new Map((draft.stores||[]).map(s=>[s.id,s]));
   let recovered=false;
   for(const ps of (menu.stores||[])){
     if(!byId.has(ps.id)){draft.stores.push(JSON.parse(JSON.stringify(ps)));recovered=true;}
   }
 
-  // If Firestore has a non-empty draft but the local backup is empty, refresh
-  // the local backup from the real Firestore draft instead of saving the empty
-  // backup over it.
-  if(recovered || (draft.stores||[]).length){
+  if(recovered){
     await flushDraftMenu().catch(e=>console.warn("Draft recovery save failed",e));
   }
+  saveDraftLocal();
 
   renderStores();
   $("editor").classList.add("hidden");
@@ -1519,11 +1549,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.0.9 MENU DIAGNOSTIC BUILD";
+window.__MHAC_BUILD__="V4.1.0 FOOD EDITOR + DRAFT PERSISTENCE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🧪 V4.0.9 MENU DIAGNOSTIC BUILD — NEW FILE";
+  badge.textContent="🧪 V4.1.0 FOOD EDITOR + DRAFT PERSISTENCE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
