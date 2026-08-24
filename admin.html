@@ -1139,42 +1139,85 @@ $("adminChatSend").onclick=async()=>{
 };
 $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminChatSend").click()}});
 
+function withTimeout(promise, ms, label){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+" timed out. Check Firebase connection/rules.")),ms))
+  ]);
+}
 async function publishMenu(){
-  const st=draft?.stores?.[selectedStore];
+  const si=Number(selectedStore);
+  const st=draft?.stores?.[si];
   if(!st){ toast("Select a store first."); return false; }
   if(!auth.currentUser){ toast("Admin session expired. Please log in again."); return false; }
-  const publishButton=document.querySelector('[data-publish-store="'+selectedStore+'"]');
-  if(publishButton){publishButton.disabled=true;publishButton.textContent="⏳ PUBLISHING...";}
+  const publishButton=document.querySelector('[data-publish-store="'+si+'"]');
+  if(publishButton){publishButton.disabled=true;publishButton.dataset.busy="1";publishButton.textContent="⏳ PUBLISHING...";}
   try{
-    const cleanDraft=normalizeMenu(draft);
-    await setDoc(doc(db,"settings","menuDraft"),{...cleanDraft,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
-    const snap=await getDoc(doc(db,"settings","menu"));
+    // IMPORTANT: publish the exact current ADMIN draft for this store.
+    // Do not depend on a separate draft write completing first.
+    const cleanStore=normalizeMenu({version:draft.version||"final",stores:[JSON.parse(JSON.stringify(st))]}).stores[0];
+    cleanStore.published=true;
+    cleanStore.publishedAt=Date.now();
+
+    const snap=await withTimeout(getDoc(doc(db,"settings","menu")),10000,"Loading published menu");
     const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-    const pubStore=normalizeMenu({version:cleanDraft.version||"final",stores:[{...st,published:true,publishedAt:Date.now()}]}).stores[0];
-    const others=(current.stores||[]).filter(x=>x.id!==pubStore.id);
-    const nextMenu=normalizeMenu({...current,stores:[...others,pubStore],publishVersion:Date.now()});
-    await setDoc(doc(db,"settings","menu"),{...nextMenu,publishedAt:serverTimestamp(),publishedBy:auth.currentUser.email,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
+    const others=(current.stores||[]).filter(x=>x.id!==cleanStore.id);
+    const nextMenu=normalizeMenu({...current,version:draft.version||current.version||"final",stores:[...others,cleanStore],publishVersion:Date.now()});
+
+    // Single authoritative write to the customer-facing menu.
+    await withTimeout(setDoc(doc(db,"settings","menu"),{
+      ...nextMenu,
+      updatedAt:serverTimestamp(),
+      updatedBy:auth.currentUser.email,
+      publishedAt:serverTimestamp(),
+      publishedBy:auth.currentUser.email
+    }),10000,"Publishing menu");
+
+    // Keep the editable ADMIN draft synchronized too, but failure here must not
+    // undo a successful customer publish.
+    try{
+      await withTimeout(setDoc(doc(db,"settings","menuDraft"),{
+        ...normalizeMenu(draft),
+        updatedAt:serverTimestamp(),
+        updatedBy:auth.currentUser.email
+      }),10000,"Saving admin draft");
+    }catch(e){ console.warn("Admin draft save after publish failed",e); }
+
     menu=nextMenu;
     renderStores();
-    toast("✅ "+pubStore.name+" PUBLISHED — customer app updated.");
+    toast("✅ "+cleanStore.name+" PUBLISHED — customer app updated.");
     return true;
   }catch(e){
     console.error("PUBLISH FAILED",e);
-    toast("❌ PUBLISH FAILED: "+err(e));
-    if(publishButton){publishButton.disabled=false;publishButton.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP";}
+    const message=err(e);
+    toast("❌ PUBLISH FAILED: "+message);
+    alert("PUBLISH FAILED\n\n"+message);
+    if(publishButton){publishButton.disabled=false;publishButton.dataset.busy="0";publishButton.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP";}
     return false;
   }
 }
 async function unpublishStore(si){
- try{
-   const st=draft?.stores?.[si]; if(!st)return;
-   const snap=await getDoc(doc(db,"settings","menu"));
-   const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-   menu=normalizeMenu({...current,stores:current.stores.filter(s=>s.id!==st.id)});
-   await setDoc(doc(db,"settings","menu"),{...menu,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
-   await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
-   renderStores(); toast("🔴 "+st.name+" unpublished. Customer app will no longer show it.");
- }catch(e){toast("Unpublish failed: "+err(e))}
+  try{
+    const st=draft?.stores?.[si]; if(!st)return false;
+    if(!auth.currentUser){toast("Admin session expired. Please log in again.");return false;}
+    const button=document.querySelector('[data-unpublish-store="'+si+'"]');
+    if(button){button.disabled=true;button.textContent="⏳ UNPUBLISHING...";}
+    const snap=await withTimeout(getDoc(doc(db,"settings","menu")),10000,"Loading published menu");
+    const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
+    const next=normalizeMenu({...current,stores:(current.stores||[]).filter(x=>x.id!==st.id),publishVersion:Date.now()});
+    await withTimeout(setDoc(doc(db,"settings","menu"),{...next,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email}),10000,"Unpublishing menu");
+    menu=next;
+    try{await withTimeout(setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email}),10000,"Saving admin draft");}catch(e){console.warn("Draft save after unpublish failed",e)}
+    renderStores();
+    toast("🔴 "+st.name+" unpublished. Customer app will no longer show it.");
+    return true;
+  }catch(e){
+    console.error("UNPUBLISH FAILED",e);
+    toast("❌ UNPUBLISH FAILED: "+err(e));
+    alert("UNPUBLISH FAILED\n\n"+err(e));
+    renderStores();
+    return false;
+  }
 }
 async function loadMenu(){
   const pubSnap=await getDoc(doc(db,"settings","menu"));
