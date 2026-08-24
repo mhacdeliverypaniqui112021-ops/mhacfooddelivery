@@ -1,11 +1,12 @@
-MHAC DELIVERY — V4.0.2 ADMIN CANCEL + SOUND TEST BUILD
+MHAC DELIVERY — V4.0.6 MENU RECOVERY FIX
 
-FIXES IN THIS BUILD:
-- Admin alert sound: direct mobile audio unlock from ENABLE SOUND; bundled 17.3s alert; WebAudio media-element amplifier fallback.
-- Rider alert sound: same direct mobile audio unlock and amplifier fallback.
-- Admin CANCEL ORDER: no confirmation popup and no cancellation-reason popup. One tap cancels immediately.
-- Cancelled orders are removed immediately from Admin active order list and no longer counted as active.
-- Firestore status remains CANCELLED so Customer can see the cancellation state.
-- Store/Menu data was not intentionally changed in this patch.
+FIXES:
+- Fixed Admin menu loader so an empty/stale localStorage draft can no longer hide a valid Firestore menu.
+- Firestore menuDraft is preferred when it contains stores and the local backup is empty.
+- Published customer menu is used as fallback when no editable draft exists.
+- Published stores are copied back into the Admin draft and local backup.
+- Existing Store/Menu Editor, food editing, add-ons, drinks, Original/Spicy selection, publishing and rider/order features are preserved.
+- Build marker: V4.0.6 MENU RECOVERY FIX
 
-TEST: Admin sound -> cancel order -> confirm it disappears. Then Rider sound.
+IMPORTANT:
+This patch can recover stores that still exist in Firebase. If the Firebase menu document itself was already deleted/overwritten before this build, the old data cannot be reconstructed from this ZIP alone.
