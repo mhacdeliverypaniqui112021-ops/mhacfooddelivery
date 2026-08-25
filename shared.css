@@ -34,3 +34,8 @@ input,select,textarea{width:100%;border:1px solid #ccc;border-radius:9px;padding
 .gcash-box{padding:10px}
 .gcash-box .two{align-items:end}
 @media(max-width:650px){.gcash-box{padding:10px}.gcash-box .two{grid-template-columns:1fr}}
+
+.admin-head{position:sticky;top:48px;z-index:15;background:#fff;padding:8px 0 10px;border-bottom:1px solid #ddd}
+.admin-head-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.admin-head-row .section-title{margin:0}
+@media(max-width:650px){.admin-head{top:44px}.admin-head-row{position:relative}.logout-btn{position:sticky;top:54px}}
