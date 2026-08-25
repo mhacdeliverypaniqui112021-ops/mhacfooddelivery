@@ -763,6 +763,124 @@ main{max-width:980px!important;padding:10px 12px!important}
 }
 </style>
 
+
+<style id="MHAC_V4_1_29_ADMIN_COMPACT_FIX">
+/* V4.1.29 — final mobile compact corrections */
+/* Keep order details full-width when VIEW FULL ORDER is opened. */
+.orderActions [id^="details-"]{
+  grid-column:1 / -1 !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+.orderActions [id^="details-"] *{
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+/* Action buttons stay white/black in the unified base UI. */
+.orderActions .chatOpenBtn,
+.orderActions .riderChatOpenBtn{
+  background:#fff !important;
+  color:#111 !important;
+  border:1px solid #111 !important;
+}
+.orderActions [data-cancel-order]{
+  background:#fff !important;
+  color:#b00000 !important;
+  border:1px solid #b00000 !important;
+}
+/* Rider controls: no filled gray button. */
+#riders .riderActions .gray,
+#riders .riderApprove{
+  background:#fff !important;
+  color:#111 !important;
+  border:1px solid #999 !important;
+}
+#riders .riderActions .danger{
+  background:#fff !important;
+  color:#a00000 !important;
+  border:1px solid #a00000 !important;
+}
+#riders .riderActions button{
+  min-height:34px !important;
+  padding:6px 8px !important;
+  font-size:11px !important;
+}
+/* Smaller, cleaner chat popup; never stretch the page. */
+.chatPanel{
+  position:fixed !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:max(10px, var(--chat-bottom, 10px)) !important;
+  transform:translateX(-50%) !important;
+  width:min(360px, calc(100vw - 24px)) !important;
+  max-width:calc(100vw - 24px) !important;
+  height:auto !important;
+  max-height:42vh !important;
+  z-index:99999 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:1px solid #1976d2 !important;
+  border-radius:12px !important;
+  overflow:hidden !important;
+}
+.chatHead{padding:8px 10px !important;font-size:13px !important}
+.chatMessages{height:90px !important;min-height:60px !important;max-height:18vh !important;padding:6px !important;font-size:12px !important}
+.chatMsg{padding:6px 8px !important;margin:4px 0 !important;font-size:12px !important}
+.chatInput{padding:5px !important;gap:5px !important}
+.chatInput input{height:36px !important;font-size:13px !important}
+.chatInput button{height:36px !important;min-height:36px !important;font-size:12px !important}
+.chatHead .miniBtn{min-height:30px !important;padding:5px 9px !important}
+/* Compact Menu / Store Manager without changing its functions. */
+.card:has(#newStore){
+  padding:8px !important;
+  margin:6px 0 !important;
+}
+.card:has(#newStore) > h2{
+  font-size:19px !important;
+  margin:3px 0 5px !important;
+}
+.card:has(#newStore) > p.status{
+  font-size:11px !important;
+  line-height:1.2 !important;
+  margin:3px 0 6px !important;
+}
+.card:has(#newStore) > .row{
+  gap:5px !important;
+  margin:0 !important;
+}
+.card:has(#newStore) > .row input,
+.card:has(#newStore) > .row button{
+  min-height:36px !important;
+  height:36px !important;
+  padding:5px 8px !important;
+  font-size:12px !important;
+  margin:0 !important;
+}
+.card:has(#newStore) .storeBox{
+  padding:7px 9px !important;
+  margin:5px 0 !important;
+  border-radius:9px !important;
+}
+.card:has(#newStore) .storeBoxHeader{padding:3px 1px 5px !important}
+.card:has(#newStore) .storeBoxHeader b{font-size:16px !important}
+.card:has(#newStore) .directStoreEditor{padding-bottom:5px !important}
+.card:has(#newStore) .directStoreEditor > input#editStoreName{min-height:38px !important;font-size:14px !important}
+.card:has(#newStore) .directCategoryCard{margin:5px 0 !important}
+.card:has(#newStore) .categoryHeader{padding:7px 9px !important}
+.card:has(#newStore) .categoryHeader b{font-size:16px !important}
+.card:has(#newStore) .foodLine{margin:4px 0 !important;padding:7px !important}
+.card:has(#newStore) .foodLineMain{font-size:14px !important}
+@media(max-width:700px){
+  .orderActions [id^="details-"]{grid-column:1 / -1 !important;}
+  .chatPanel{width:calc(100vw - 24px) !important;max-width:calc(100vw - 24px) !important;}
+  .card:has(#newStore) > .row{grid-template-columns:1fr !important;}
+  .card:has(#newStore) > .row button{width:100% !important;}
+}
+</style>
+
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2111,7 +2229,7 @@ window.__MHAC_BUILD__="V4.1.28 TRUE PROSPECT ADMIN UI";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.28 TRUE PROSPECT ADMIN UI — NEW FILE";
+  badge.textContent="🛠️ V4.1.29 ADMIN COMPACT FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
