@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.19 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
 </style>
@@ -305,7 +305,7 @@ async function loadMenu(){
 async function boot(){await loadHours();await loadMenu();applyHours()}
 function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
 getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();await autoEnableCustomerChatSound();startOrders()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();await autoEnableCustomerChatSound();startOrders()});
 function renderStores(){
  const published=(data.stores||[]).filter(s=>s.published===true);
  $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("");
@@ -572,20 +572,43 @@ function orderCountdownText(o){
 }
 setInterval(()=>document.querySelectorAll('[data-customer-countdown]').forEach(el=>{const o=window.__mhacOrders?.find(x=>x.id===el.dataset.customerCountdown);if(o)el.textContent=orderCountdownText(o)}),1000);
 
+const customerChatWatchers=new Map();
+function syncCustomerChatWatchers(active){
+  const ids=new Set(active.map(o=>o.id));
+  for(const [id,unsub] of customerChatWatchers){
+    if(!ids.has(id)){try{unsub()}catch(_){}customerChatWatchers.delete(id);}
+  }
+  for(const o of active){
+    if(customerChatWatchers.has(o.id))continue;
+    let primed=false;
+    const unsub=onSnapshot(collection(db,"orders",o.id,"messages"),snap=>{
+      const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="customer");
+      if(!primed){primed=true;return;}
+      if(!incoming.length)return;
+      openCustomerChat(o.id);
+      playCustomerChatAlert();
+    },e=>console.warn("Customer global chat watcher:",e));
+    customerChatWatchers.set(o.id,unsub);
+  }
+}
+function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
+
 function startOrders(){
- if(ordersUnsub)ordersUnsub();
- ordersUnsub=onSnapshot(query(collection(db,"orders"),where("customer.uid","==",currentUser.uid)),snap=>{
-   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
-   window.__mhacOrders=arr;
-   $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
-     const st=String(o.status||"NEW").toUpperCase();
-     const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-     return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span><br>${(o.items||[]).map(i=>`${esc(i.store)} — ${esc(i.name)} ×${i.qty}`).join("<br>")}<br><b>Grand Total: ${peso(o.fees?.total)}</b>
-     ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
-     ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
-     <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
-   }).join(""):"No active orders.";
- });
+  if(ordersUnsub)ordersUnsub();
+  stopCustomerChatWatchers();
+  ordersUnsub=onSnapshot(query(collection(db,"orders"),where("customer.uid","==",currentUser.uid)),snap=>{
+    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
+    window.__mhacOrders=arr;
+    $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
+      const st=String(o.status||"NEW").toUpperCase();
+      const canCancel=!['COMPLETED','CANCELLED'].includes(st);
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span><br>${(o.items||[]).map(i=>`${esc(i.store)} — ${esc(i.name)} ×${i.qty}`).join("<br>")}<br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
+      ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
+      <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
+    }).join(""):"No active orders.";
+    syncCustomerChatWatchers(arr);
+  });
 }
 $("myOrders").onclick=async e=>{
  const b=e.target.closest("[data-cancel-order]");if(!b)return;
@@ -594,8 +617,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+window.__MHAC_BUILD__="V4.1.19 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.19 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>

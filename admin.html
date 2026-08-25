@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX</title>
-<meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.19 AUTO CHAT POPUP + RINGTONE FIX</title>
+<meta name="build-version" content="V4.1.19 AUTO CHAT POPUP + RINGTONE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1645,9 +1645,67 @@ async function loadMenu(){
   }
 }
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
+
+// V4.1.19 GLOBAL CHAT POPUP: incoming messages are watched even when
+// no chat button/panel is open. The correct chat opens automatically.
+const adminChatWatchers=new Map();
+function syncAdminChatWatchers(){
+  const active=new Map(orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).map(o=>[o.id,o]));
+  for(const [key,unsub] of adminChatWatchers){
+    const id=key.split("::")[1];
+    if(!active.has(id)){try{unsub()}catch(_){}adminChatWatchers.delete(key);}
+  }
+  for(const [id,o] of active){
+    const specs=[["customer",collection(db,"orders",id,"messages")],["rider",collection(db,"orders",id,"riderMessages")]];
+    for(const [kind,ref] of specs){
+      const key=kind+"::"+id;
+      if(adminChatWatchers.has(key))continue;
+      let primed=false;
+      const unsub=onSnapshot(ref,snap=>{
+        const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin");
+        if(!primed){primed=true;return;}
+        if(!incoming.length)return;
+        if(kind==="customer")openAdminChat(id);else openAdminRiderChat(id);
+        playAdminChatAlert();
+      },e=>console.warn("Admin global chat watcher:",e));
+      adminChatWatchers.set(key,unsub);
+    }
+  }
+}
+function stopAdminChatWatchers(){for(const unsub of adminChatWatchers.values()){try{unsub()}catch(_){}}adminChatWatchers.clear();}
+
+function start(){
+  if(ru)ru();
+  ru=onSnapshot(collection(db,"riders"),s=>{
+    riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));
+    renderRiders();calcStats();
+    if(ou)ou();
+    ou=onSnapshot(collection(db,"orders"),x=>{
+      const incoming=x.docs.map(d=>({id:d.id,...d.data()}));
+      if(!adminOrdersPrimed){
+        incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;
+      }else{
+        incoming.forEach(o=>{
+          if(!seenAdminOrders.has(o.id)){
+            seenAdminOrders.add(o.id);
+            if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert();
+          }
+        });
+      }
+      orders=incoming;
+      orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      $("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";
+      renderOrders();calcStats();syncAdminChatWatchers();
+    });
+  });
+}
+
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
-onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start()});
+onAuthStateChanged(auth,u=>{
+ if(!u){stopAdminChatWatchers();if(ou){ou();ou=null}if(ru){ru();ru=null}loginView();return}
+ if((u.email||"").toLowerCase()!==ADMIN_EMAIL){stopAdminChatWatchers();signOut(auth);loginView();return}
+ appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start();
+});
 
 
 async function runMenuDiagnostic(){
@@ -1680,11 +1738,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
+window.__MHAC_BUILD__="V4.1.19 AUTO CHAT POPUP + RINGTONE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.19 AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
