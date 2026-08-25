@@ -56,19 +56,15 @@ service cloud.firestore {
         );
     }
 
-    // CUSTOMER <-> ADMIN CHAT
-    // Chat messages live at:
-    // /orders/{orderId}/messages/{messageId}
+    // Customer <-> Admin chat
     match /orders/{orderId}/messages/{messageId} {
-
       allow read:
         if isSignedIn()
         && (
           isAdmin()
           || (
-            get(
-              /databases/$(database)/documents/orders/$(orderId)
-            ).data.customer.uid == request.auth.uid
+            get(/databases/$(database)/documents/orders/$(orderId))
+              .data.customer.uid == request.auth.uid
           )
         );
 
@@ -77,25 +73,20 @@ service cloud.firestore {
         && (
           isAdmin()
           || (
-            get(
-              /databases/$(database)/documents/orders/$(orderId)
-            ).data.customer.uid == request.auth.uid
+            get(/databases/$(database)/documents/orders/$(orderId))
+              .data.customer.uid == request.auth.uid
             && request.resource.data.senderRole == "customer"
             && request.resource.data.senderUid == request.auth.uid
           )
         );
 
-      allow update, delete:
-        if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     match /riders/{uid} {
       allow read:
         if isAdmin()
-        || (
-          isSignedIn()
-          && request.auth.uid == uid
-        );
+        || (isSignedIn() && request.auth.uid == uid);
 
       allow create:
         if isSignedIn()
@@ -112,35 +103,22 @@ service cloud.firestore {
           && request.resource.data.approved == resource.data.approved
         );
 
-      allow delete:
-        if isAdmin();
+      allow delete: if isAdmin();
     }
 
     match /riderApplications/{uid} {
       allow create:
-        if isSignedIn()
-        && request.auth.uid == uid;
+        if isSignedIn() && request.auth.uid == uid;
 
       allow read:
         if isAdmin()
-        || (
-          isSignedIn()
-          && request.auth.uid == uid
-        );
+        || (isSignedIn() && request.auth.uid == uid);
 
-      allow update:
-        if isAdmin();
-
-      allow delete:
-        if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     match /menuSeedLogs/{id} {
-      allow create:
-        if isAdmin();
-
-      allow read:
-        if isAdmin();
+      allow create, read: if isAdmin();
     }
   }
 }
