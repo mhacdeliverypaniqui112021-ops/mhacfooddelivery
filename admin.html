@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN UI BASE V1</title>
-<meta name="build-version" content="ADMIN UI BASE V1">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.32 FULL ADMIN RESTORE + FLOW FIX</title>
+<meta name="build-version" content="V4.1.32 FULL ADMIN RESTORE + FLOW FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -466,75 +466,48 @@
 <style>.soundBox{margin-top:10px;padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.soundBox button{margin-top:6px}</style>
 <style>.adminOrderPreview{border:2px solid #ddd;border-radius:12px;padding:9px;margin:8px 0;background:#fff;font-size:14px;line-height:1.35}.adminOrderPreview>div+div{margin-top:8px;border-top:1px solid #ddd;padding-top:8px}.adminOrderPreview span{font-weight:700}</style>
 
-<style id="mhac-unified-admin-ui-v1">
-:root{--mhac-red:#e91b23;--mhac-blue:#1976d2;--mhac-green:#16883a;--mhac-border:#d9d9d9}
-*{box-sizing:border-box}
-body{background:#fff!important;color:#111!important;font-family:Arial,Helvetica,sans-serif!important}
-header{position:sticky;top:0;z-index:100;background:var(--mhac-red)!important;color:#fff!important;text-align:left!important;padding:10px 16px!important;border:0!important;box-shadow:0 2px 8px #0002!important;font-size:16px!important;font-weight:900!important}
-header *{color:#fff!important}
-main{max-width:980px!important;margin:0 auto!important;padding:12px 14px 40px!important}
-.card{background:#fff!important;border:1px solid var(--mhac-border)!important;border-radius:18px!important;padding:14px!important;margin:10px 0!important;box-shadow:0 1px 2px #0000000b!important}
-.card h2{font-size:22px!important;margin:2px 0 10px!important;line-height:1.2!important}
-.status{font-size:13px!important;color:#666!important}
-button{min-height:42px!important;border-radius:10px!important;font-weight:900!important;font-size:14px!important}
-input,textarea,select{min-height:42px!important;border:1px solid #ccc!important;border-radius:10px!important;font-size:14px!important}
-.row{gap:8px!important}
-#logout{width:auto!important;min-width:120px!important;background:#fff!important;color:#111!important;border:1px solid #111!important;margin:0!important}
-.soundBox{margin-top:8px!important;padding:10px!important;border:2px solid #222!important;border-radius:12px!important;background:#fff8e6!important}
-.soundBox button{width:auto!important}
-#metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
-.metric{background:#fff!important;color:#111!important;border:1px solid #ddd!important;border-radius:12px!important;padding:11px!important;text-align:center!important;min-height:80px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
-.metric b{font-size:22px!important;margin-top:4px!important}
-#riderAccounting{margin-top:8px!important}
-#riderAccounting>div{border:1px solid #ddd!important;border-radius:12px!important;padding:10px!important;background:#fff!important}
-.order{border:1px solid #ddd!important;border-radius:15px!important;padding:12px!important;background:#fff!important}
-.adminOrderPreview{border:1px solid #ddd!important;border-radius:12px!important;padding:10px!important;font-size:14px!important}
-.order .row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
-.order .row button{margin:0!important}
-.order .row .red{background:#fff!important;color:#a40000!important;border:1px solid #a40000!important}
-.order .row .green{background:#fff!important;color:var(--mhac-green)!important;border:1px solid var(--mhac-green)!important}
-.order .row .blue{background:var(--mhac-blue)!important;color:#fff!important}
-.order .row .gray{background:#111!important;color:#fff!important}
-.order select{margin-top:8px!important}
-.publishBar{position:relative!important;bottom:auto!important;z-index:2!important;background:#fff!important;padding:10px!important;border:1px solid var(--mhac-green)!important;border-radius:12px!important}
-.pubState{font-size:12px!important}
-#riders .riderCompact{padding:10px!important;margin:6px 0!important;border:1px solid #ddd!important;border-radius:12px!important}
-#riders .riderMain{gap:7px!important}
-#riders .riderApprove{width:auto!important;min-height:38px!important}
-.storeBox{border:1px solid #ddd!important;border-radius:12px!important}
-.directCategoryCard,.foodEditorWrap,.storeFoodBox{border:1px solid #ddd!important;border-radius:12px!important}
-.directCategoryCard{margin:8px 0!important}
-.categoryHeader{padding:12px!important}
-.categoryHeader b{font-size:17px!important}
-.oneFoodBox{border:1px solid var(--mhac-blue)!important;border-radius:12px!important;padding:10px!important;background:#f8fbff!important}
-.oneFoodBox input,.oneFoodBox select{min-height:40px!important;font-size:14px!important;padding:9px!important}
-.oneFoodBox h4{font-size:16px!important;margin:12px 0 4px!important}
-.editorRow{grid-template-columns:minmax(0,1fr) 70px 40px!important;gap:5px!important}
-.editorRow input{min-height:40px!important;font-size:14px!important}
-.editorRow button{height:40px!important}
-/* Chat: centered, independent overlay; never changes page height */
-.chatPanel{position:fixed!important;left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(520px,92vw)!important;height:min(500px,72vh)!important;max-height:none!important;background:#fff!important;border:2px solid #222!important;border-radius:16px!important;box-shadow:0 12px 40px #0004!important;z-index:9999!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
-.chatPanel.hidden{display:none!important}
-.chatHead{background:var(--mhac-blue)!important;color:#fff!important;padding:10px 12px!important;min-height:52px!important}
-.chatHead button{width:42px!important;min-width:42px!important;background:#666!important;color:#fff!important;padding:5px!important;margin:0!important}
-.chatMessages{flex:1!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:auto!important;padding:10px!important;background:#f7f7f7!important}
-.chatMsg{font-size:14px!important;padding:9px 11px!important;margin:6px 0!important}
-.chatInput{flex:0 0 auto!important;padding:8px!important;gap:6px!important}
-.chatInput input{height:44px!important;margin:0!important;font-size:15px!important}
-.chatInput button{height:44px!important;min-width:82px!important;width:auto!important;margin:0!important}
+<style id="mhac-ui-final-v1">
+/* MHAC CLEAN COMPACT WHITE UI — FINAL OVERRIDE */
+html,body{background:#fff!important;color:#111!important;font-family:Arial,sans-serif!important}
+body{margin:0!important}
+header{position:relative!important;top:auto!important;z-index:10!important;background:#fff!important;color:#111!important;text-align:center!important;padding:18px 14px 14px!important;border-bottom:4px solid #e21d25!important;box-shadow:none!important}
+header h1{color:#111!important;font-size:32px!important;line-height:1.05!important;margin:0 0 8px!important;font-weight:900!important}
+header p{color:#333!important;font-size:15px!important;line-height:1.35!important;margin:0!important}
+main{max-width:980px!important;margin:0 auto!important;padding:12px 14px 30px!important}
+.card{background:#fff!important;border:1px solid #ddd!important;border-radius:18px!important;padding:14px!important;margin:10px 0!important;box-shadow:none!important}
+.card h2{font-size:24px!important;line-height:1.15!important;margin:4px 0 10px!important}
+#app>.card:first-child .row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;flex-wrap:nowrap!important}
+#app>.card:first-child .row h2{margin:0!important;font-size:25px!important}
+#logout{width:auto!important;min-width:120px!important;margin:0!important;padding:11px 18px!important;background:#fff!important;color:#111!important;border:1px solid #111!important}
+#adminInfo{font-size:14px!important;margin:8px 0!important}
+.soundBox{border:2px solid #222!important;background:#fff9e8!important;border-radius:12px!important;padding:10px!important;font-size:16px!important}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
+.metric{background:#fff!important;color:#111!important;border:1px solid #ddd!important;border-radius:12px!important;padding:13px!important;text-align:center!important}
+.metric b{font-size:24px!important}
+.order{border:1px solid #ddd!important;border-radius:14px!important;padding:12px!important}
+button{font-size:14px!important}
+.chatPanel{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(520px,calc(100vw - 24px))!important;max-height:min(600px,78vh)!important;z-index:99990!important;background:#fff!important;border:1px solid #bbb!important;border-radius:14px!important;box-shadow:0 12px 35px #0004!important;overflow:hidden!important}
+.chatHead{padding:12px 14px!important;font-size:17px!important}
+.chatMessages{max-height:52vh!important;overflow-y:auto!important}
+.chatInput{display:grid!important;grid-template-columns:minmax(0,1fr) 90px!important;gap:6px!important;padding:8px!important;background:#fff!important}
+.chatInput input{min-width:0!important;margin:0!important}
+.chatInput button{width:90px!important;margin:0!important}
+.storeBox{padding:9px!important}
+.storeBox .storeDeleteBtn{font-size:12px!important}
 @media(max-width:700px){
- #metrics{grid-template-columns:1fr 1fr!important}
- .card{padding:12px!important;border-radius:16px!important}
- .card h2{font-size:20px!important}
-}
-@media(max-width:480px){
- main{padding:10px 10px 35px!important}
- header{font-size:14px!important;padding:9px 12px!important}
- #metrics{grid-template-columns:1fr 1fr!important}
- .metric{min-height:76px!important;font-size:13px!important}
- .metric b{font-size:20px!important}
- .order .row{grid-template-columns:1fr 1fr!important}
- .chatPanel{width:94vw!important;height:62vh!important}
+ header{padding:16px 12px 12px!important}
+ header h1{font-size:27px!important}
+ header p{font-size:14px!important}
+ main{padding:9px 10px 25px!important}
+ .card{padding:12px!important;margin:9px 0!important}
+ .card h2{font-size:22px!important}
+ #app>.card:first-child .row h2{font-size:22px!important}
+ #logout{min-width:112px!important;padding:10px 14px!important}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .metric{padding:12px 8px!important}
+ .metric b{font-size:22px!important}
+ .chatPanel{width:calc(100vw - 20px)!important;max-height:72vh!important}
+ .chatMessages{max-height:50vh!important}
 }
 </style>
 </head><body>
@@ -1760,13 +1733,7 @@ async function runMenuDiagnostic(){
 }
 
 window.__MHAC_BUILD__="V4.1.32 FULL ADMIN RESTORE + FLOW FIX";
-try{
-  const badge=document.createElement("div");
-  badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.32 FULL ADMIN RESTORE + FLOW FIX — NEW FILE";
-  badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
-  document.body.prepend(badge);
-}catch(e){console.warn("Build badge error",e)}
+
 
 try{
   const b=$("checkMenuData");

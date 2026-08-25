@@ -1,2 +1,1 @@
-MHAC DELIVERY — ADMIN UI BASE V1
-UI-only update: compact white interface; preserves existing Admin functionality and Firebase flow.
+Admin UI cleanup only. Existing Firebase/order/menu/chat logic retained.
