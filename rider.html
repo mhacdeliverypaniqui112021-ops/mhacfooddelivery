@@ -198,6 +198,42 @@ button{
 }
 </style>
 
+
+<style id="MHAC_PROSPECT_UI_V4_1_27">
+/* Prospect layout: clean white, compact, desktop-style grid that collapses on phones */
+body{background:#fff!important;color:#111!important;font-family:Arial,Helvetica,sans-serif!important}
+main,#app{max-width:980px!important;margin:0 auto!important;padding:10px 14px!important}
+.card,.panel,.section,.box{background:#fff!important;color:#111!important;border:1px solid #d7d7d7!important;border-radius:12px!important;box-shadow:none!important}
+button{border-radius:8px!important;min-height:34px!important;padding:6px 10px!important;font-weight:700!important}
+input,select,textarea{background:#fff!important;color:#111!important;border:1px solid #cfcfcf!important;border-radius:8px!important}
+.logout,.logoutBtn{min-height:30px!important;padding:5px 9px!important;font-size:12px!important}
+#deliveryEarnings,.deliveryEarnings,.earnings,.earningsDashboard{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
+#deliveryEarnings .metric,.deliveryEarnings .metric,.earnings .metric,.earningsDashboard .metric{margin:0!important;padding:10px!important;border:1px solid #ddd!important;background:#fff!important;color:#111!important;border-radius:9px!important}
+.metric{background:#fff!important;color:#111!important}
+.metric *{color:#111!important}
+.metric b{font-size:20px!important}
+.riderAccounting{background:#fff!important;border:1px solid #ddd!important;border-radius:9px!important;padding:9px!important}
+.order-card,.order,.incoming-order{background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important}
+.order-actions,.orderActions{display:flex!important;flex-direction:column!important;gap:7px!important}
+.order-layout{display:grid!important;grid-template-columns:minmax(0,1fr) 260px!important;gap:9px!important}
+.order-actions button{width:100%!important}
+.rider-list{display:grid!important;gap:7px!important}
+.rider-row{display:grid!important;grid-template-columns:1fr auto auto!important;gap:7px!important;align-items:center!important}
+.store-manager-row,.gcash-row{display:grid!important;grid-template-columns:1fr auto!important;gap:8px!important;align-items:center!important}
+@media(max-width:700px){
+ main,#app{padding:8px!important}
+ #deliveryEarnings,.deliveryEarnings,.earnings,.earningsDashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .order-layout{grid-template-columns:1fr!important}
+ .order-actions{display:grid!important;grid-template-columns:1fr 1fr!important}
+ .order-actions button{width:100%!important}
+ .rider-row{grid-template-columns:1fr 1fr!important}
+ .store-manager-row,.gcash-row{grid-template-columns:1fr!important}
+}
+@media(min-width:1000px){
+ .incoming-orders .order-card,.incoming-orders .order,.incoming-orders .incoming-order{display:block!important}
+}
+</style>
+
 </head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">

@@ -1,3 +1,4 @@
-MHAC DELIVERY V4.1.26 — FINAL UNIFIED WHITE UI BASE
-Admin + Customer + Rider use the same clean white background, black typography, compact cards and controls.
-Colored buttons remain only for actions/statuses.
+MHAC DELIVERY V4.1.27 — PROSPECT ADMIN UI
+Target layout based on the supplied prospect screenshot.
+White/black compact design, four earnings metrics, compact accounting,
+two-column incoming-order layout on wider screens, stacked on phones.
