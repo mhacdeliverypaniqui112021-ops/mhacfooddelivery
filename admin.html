@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.27 ADMIN UI COMPACT WHITE</title>
-<meta name="build-version" content="V4.1.27 ADMIN UI COMPACT WHITE">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.28 TRUE PROSPECT ADMIN UI</title>
+<meta name="build-version" content="V4.1.28 TRUE PROSPECT ADMIN UI">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -680,6 +680,89 @@ input,select,textarea{background:#fff!important;color:#111!important;border:1px 
 }
 </style>
 
+
+<style id="MHAC_V4_1_28_TRUE_PROSPECT">
+/* TRUE PROSPECT ADMIN UI — compact white / black */
+html,body{background:#fff!important;color:#111!important}
+body{font-family:Arial,Helvetica,sans-serif!important}
+header{background:#fff!important;color:#111!important;border-bottom:1px solid #ddd!important;padding:14px 14px 10px!important;box-shadow:none!important}
+header h1,header .brandName{color:#111!important;font-size:30px!important;font-weight:900!important;margin:0!important}
+header .appName{color:#111!important;font-size:25px!important;font-weight:900!important}
+header p{color:#222!important;font-size:14px!important;margin:8px 0 0!important}
+main{max-width:980px!important;padding:10px 12px!important}
+.card{background:#fff!important;border:1px solid #d7d7d7!important;border-radius:14px!important;padding:12px!important;margin:8px 0!important;box-shadow:none!important}
+.card>h2{font-size:21px!important;margin:4px 0 8px!important;color:#111!important}
+#app>.card:first-child{padding:10px!important}
+#logoutRow{align-items:center!important}
+#logoutRow h2{font-size:22px!important;margin:0!important}
+#logout{width:auto!important;min-width:90px!important;min-height:32px!important;padding:6px 12px!important;font-size:12px!important;background:#fff!important;color:#111!important;border:1px solid #111!important}
+.soundBox{background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important;padding:8px 10px!important}
+.soundBox b{font-size:14px!important}
+.soundBox .status{font-size:12px!important}
+#metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+#metrics .metric{background:#fff!important;color:#111!important;border:1px solid #ddd!important;border-radius:9px!important;padding:10px!important;text-align:center!important;min-height:70px!important}
+#metrics .metric span{display:block!important;font-size:13px!important;line-height:1.2!important}
+#metrics .metric b{display:block!important;font-size:20px!important;margin-top:4px!important;color:#111!important}
+#riderAccounting{margin-top:7px!important}
+#riderAccounting h3{font-size:15px!important;margin:7px 0 5px!important}
+#riderAccounting .item{border:1px solid #ddd!important;border-radius:9px!important;padding:8px!important;margin:5px 0!important}
+#riderAccounting .item b{font-size:13px!important}
+#riderAccounting .item{font-size:12px!important}
+#orders{display:block!important}
+.order{display:grid!important;grid-template-columns:minmax(0,1fr) 260px!important;gap:10px!important;background:#fff!important;border:1px solid #d7d7d7!important;border-radius:12px!important;padding:10px!important;margin:7px 0!important}
+.orderInfo{min-width:0!important}
+.orderActions{display:flex!important;flex-direction:column!important;gap:5px!important;align-self:start!important}
+.orderActions button,.orderActions select{width:100%!important;margin:0!important;min-height:34px!important;padding:6px 8px!important;font-size:12px!important;border-radius:8px!important}
+.orderActions select{background:#fff!important;color:#111!important;border:1px solid #ccc!important}
+.orderInfo h3{font-size:16px!important;margin:8px 0!important}
+.orderInfo p{font-size:13px!important;line-height:1.25!important;margin:6px 0!important}
+.orderInfo .adminOrderPreview{border:1px solid #ddd!important;border-radius:9px!important;padding:8px!important;font-size:12px!important;margin-top:7px!important}
+.orderInfo .adminOrderPreview b{font-size:14px!important}
+.orderInfo .pill{font-size:11px!important;padding:5px 8px!important}
+.orderActions .blue{background:#fff!important;color:#111!important;border:1px solid #111!important}
+.orderActions .red{background:#fff!important;color:#b00000!important;border:1px solid #b00000!important}
+.orderActions .green{background:#fff!important;color:#137333!important;border:1px solid #137333!important}
+.orderActions .riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #111!important}
+.orderActions .item{background:#fff!important;border:1px solid #ddd!important;padding:7px!important;margin:0!important}
+.orderActions [data-wait-input]{width:82px!important;display:inline-block!important}
+.orderActions [data-time]{width:auto!important;display:inline-block!important}
+#riders .riderCompact{border:1px solid #ddd!important;padding:7px 9px!important;margin:5px 0!important}
+#riders .riderApprove{background:#fff!important;color:#111!important;border:1px solid #999!important}
+#riders .danger{background:#fff!important;color:#a00000!important;border:1px solid #a00000!important}
+#menuDiagnosticCard,#menuDiagnosticCard .card{background:#fff!important}
+#checkMenuData{background:#fff!important;color:#111!important;border:1px solid #111!important}
+.card:has(#newStore){padding:10px!important}
+.card:has(#newStore)>.row{display:grid!important;grid-template-columns:1fr auto!important;gap:7px!important}
+.card:has(#newStore)>.row input{margin:0!important}
+.card:has(#newStore)>.row button{width:auto!important;margin:0!important;background:#fff!important;color:#111!important;border:1px solid #111!important}
+.gcSettings{border:1px solid #ddd!important;border-radius:10px!important;padding:9px!important}
+.gcSettings .row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+.gcSettings .row button{margin:0!important;background:#fff!important;color:#111!important;border:1px solid #111!important}
+.gcSettings input{min-height:38px!important;padding:8px!important;margin:3px 0!important}
+@media(max-width:700px){
+ main{padding:7px!important}
+ header{padding:10px 10px 8px!important}
+ header .brandName{font-size:26px!important}
+ header .appName{font-size:21px!important}
+ header p{font-size:12px!important}
+ .card{padding:9px!important;margin:6px 0!important}
+ #metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #metrics .metric{min-height:65px!important;padding:8px!important}
+ #metrics .metric span{font-size:12px!important}
+ #metrics .metric b{font-size:19px!important}
+ .order{grid-template-columns:1fr!important}
+ .orderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important}
+ .orderActions .item{grid-column:1/-1!important}
+ .orderActions select{grid-column:1/-1!important}
+ .orderActions [data-a],.orderActions [data-c]{grid-column:span 1!important}
+ .orderActions button{min-height:38px!important}
+ #riders .riderMain{gap:5px!important}
+ .gcSettings .row{grid-template-columns:1fr!important}
+ .card:has(#newStore)>.row{grid-template-columns:1fr!important}
+ .card:has(#newStore)>.row button{width:100%!important}
+}
+</style>
+
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -953,14 +1036,15 @@ function renderOrders(){
    const opts='<option value="">Assign rider</option>'+riders.filter(r=>r.approved!==false).map(r=>{
      const u=r.uid||r.id;return `<option value="${esc(u)}" ${o.assignedRiderUid===u?"selected":""}>${esc(r.nickname||r.name||r.email||u)}</option>`;
    }).join("");
-   return `<div class=order>
+   return `<div class="order">
+    <div class="orderInfo">
     <div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div>
     <h3>${esc(o.customer?.name||"")}</h3>
     <p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
     <p><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
     <div>${String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<span class="paymentBadge ${String(o.paymentStatus||"PENDING").toLowerCase()==="received"?"received":"pending"}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>${o.paymentScreenshotUrl?` <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}`:`<span class="paymentBadge cod">💵 CASH ON DELIVERY</span>`}</div>
     <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}</div>`}).join("")}</div>`).join("")})()}</div>
-    <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
+    </div><div class="orderActions"><button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
     <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
@@ -968,7 +1052,7 @@ function renderOrders(){
     ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
     <select id="r-${esc(o.id)}">${opts}</select>
     <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
-    <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button>
+    <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button></div>
    </div>`;
  }).join("");
 }
@@ -2023,11 +2107,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.27 ADMIN UI COMPACT WHITE";
+window.__MHAC_BUILD__="V4.1.28 TRUE PROSPECT ADMIN UI";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.27 ADMIN UI COMPACT WHITE — NEW FILE";
+  badge.textContent="🛠️ V4.1.28 TRUE PROSPECT ADMIN UI — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}

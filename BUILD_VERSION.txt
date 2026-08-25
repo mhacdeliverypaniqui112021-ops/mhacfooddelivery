@@ -1,4 +1,2 @@
-MHAC DELIVERY V4.1.27 — PROSPECT ADMIN UI
-Target layout based on the supplied prospect screenshot.
-White/black compact design, four earnings metrics, compact accounting,
-two-column incoming-order layout on wider screens, stacked on phones.
+MHAC DELIVERY V4.1.28 — TRUE PROSPECT ADMIN UI
+Admin layout rebuilt around the supplied prospect: white header, compact black text, four earnings metrics, compact rider accounting, two-column incoming order on wider screens, compact action panel, and responsive mobile stacking.
