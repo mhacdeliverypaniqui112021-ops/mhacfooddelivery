@@ -1,1 +1,2 @@
-V4.1.30 ADMIN TRUE UNIFIED UI + COMPACT FOOD EDITOR + COMPACT CHATBOX
+MHAC DELIVERY V4.1.29 — ADMIN COMPACT FIX + CENTER CHAT
+Base: V4.1.29 Admin Compact Fix. Existing order, Firebase, rider, menu, GCash and chat functions are preserved. Admin customer/rider chat panels are centered on screen with compact responsive sizing and keyboard-aware positioning.
