@@ -15,6 +15,7 @@
 .mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
 .mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
 @keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
+.mhacAutoSoundHide{display:none!important}
 </style>
 </style><style>
 .riderOrderGroup{margin:12px 0;padding:12px 14px;border:2px solid #222;border-radius:14px;background:#fff}
@@ -51,6 +52,43 @@
 </style>
 </head>
 <body>
+<div id="mhacRiderSplash" class="mhacRiderSplash">
+  <div class="mhacRiderSplashInner">
+    <img src="mhac-logo.png" alt="MHAC DELIVERY">
+    <div class="mhacRiderSplashTitle">MHAC DELIVERY</div>
+    <div class="mhacRiderSplashTag">FAST • SAFE • ON TIME</div>
+    <div class="mhacRiderSplashTrack"><div class="mhacRiderSplashBar"></div></div>
+  </div>
+</div>
+<style>
+.mhacRiderSplash{position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;opacity:1}
+.mhacRiderSplashInner{width:min(86vw,420px);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mhacRiderSplashInner img{width:min(58vw,260px);height:auto;object-fit:contain;display:block}
+.mhacRiderSplashTitle{color:#fff;font-weight:800;font-size:24px;margin-top:14px}
+.mhacRiderSplashTag{color:#fff;font-size:13px;letter-spacing:1.5px;margin-top:6px}
+.mhacRiderSplashTrack{width:min(72vw,280px);height:5px;background:#333;border-radius:8px;overflow:hidden;margin-top:22px}
+.mhacRiderSplashBar{width:40%;height:100%;background:#fff;border-radius:8px;animation:mhacRiderSplashLoad 1.6s infinite}
+@keyframes mhacRiderSplashLoad{0%{transform:translateX(-140%)}100%{transform:translateX(360%)}}
+.mhacRiderSplash.hide{opacity:0;transition:opacity .55s ease;pointer-events:none}
+</style>
+<script>
+window.addEventListener("load",function(){
+  setTimeout(function(){
+    var x=document.getElementById("mhacRiderSplash");
+    if(x){
+      x.classList.add("hide");
+      setTimeout(function(){if(x.parentNode)x.parentNode.removeChild(x)},600);
+    }
+  },2200);
+});
+</script>
+<div id="mhacRiderEarningsFallback" style="margin:12px 0;padding:12px;border:1px solid #ddd;border-radius:12px;background:#fff">
+  <div style="font-weight:800">💰 EARNINGS</div>
+  <div id="mhacRiderEarningsValue" style="font-size:24px;font-weight:900;margin-top:4px">₱0.00</div>
+  <div style="font-size:12px;opacity:.7">Today's completed earnings</div>
+</div>
+
+
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>window.addEventListener("load",()=>setTimeout(()=>{const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}},2200));</script>
 
@@ -59,7 +97,7 @@
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="soundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
@@ -301,3 +339,18 @@ onAuthStateChanged(auth,async user=>{if(!user){if(unsub){unsub();unsub=null}$("a
 try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
+
+<script>
+(function(){
+  function hideSoundButtons(){
+    document.querySelectorAll("button").forEach(function(b){
+      if(/enable\s*sound/i.test((b.textContent||"").trim())){
+        b.classList.add("mhacAutoSoundHide");
+      }
+    });
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",hideSoundButtons);
+  else hideSoundButtons();
+  new MutationObserver(hideSoundButtons).observe(document.documentElement,{subtree:true,childList:true});
+})();
+</script>
