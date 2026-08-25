@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX</title>
-<meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.10 ADMIN LOGIN FIX + AUTO CHAT RINGTONE + FOOD PART FIX</title>
+<meta name="build-version" content="V4.1.10 ADMIN LOGIN FIX + AUTO CHAT RINGTONE + FOOD PART FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -653,8 +653,134 @@ async function autoEnableAdminSound(){
   }
 }
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
-$("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
+$("googleBtn").onclick=async()=>{
+  const b=$("googleBtn"); b.disabled=true; $("loginStatus").textContent="Opening Google sign-in…";
+  try{
+    // Android/GitHub Pages: prefer redirect because popup auth can silently fail or be blocked.
+    await signInWithRedirect(auth,gp);
+  }catch(e){
+    // Fallback to popup if redirect cannot start.
+    try{
+      const r=await signInWithPopup(auth,gp);
+      if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+        await signOut(auth); throw Error("Unauthorized admin account.");
+      }
+    }catch(x){ $("loginStatus").textContent="❌ "+err(x); b.disabled=false; }
+  }
+};
+
+// Complete redirect sign-in after Google sends the browser back to GitHub Pages.
+(async()=>{
+  try{
+    const r=await getRedirectResult(auth);
+    if(r?.user && r.user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+      await signOut(auth);
+      $("loginStatus").textContent="❌ Unauthorized admin account.";
+    }
+  }catch(e){ $("loginStatus").textContent="❌ "+err(e); }
+})();
 $("logout").onclick=()=>signOut(auth);
+
+// V4.1.11: RESTORE ADMIN AUTH STATE + APP INITIALIZATION.
+// The previous chat-fix build contained the login button handler but was
+// missing the auth-state bootstrap, so a successful Google sign-in could
+// leave the page stuck on ADMIN LOGIN.
+let adminOrdersUnsub=null, adminRidersUnsub=null, adminMenuUnsub=null, adminDraftUnsub=null;
+let adminStartedUid="";
+
+async function startAdminApp(user){
+  if(!user)return;
+  if(user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+    await signOut(auth);
+    loginView();
+    $("loginStatus").textContent="❌ Unauthorized admin account.";
+    return;
+  }
+  if(adminStartedUid===user.uid) return;
+  adminStartedUid=user.uid;
+  appView();
+
+  try{
+    // Restore the published menu.
+    const menuSnap=await getDoc(doc(db,"settings","menu"));
+    menu=normalizeMenu(menuSnap.exists()?menuSnap.data():{version:"final",stores:[]});
+
+    // Restore the admin draft. Local backup is used only when Firestore
+    // does not yet have a draft.
+    const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
+    if(draftSnap.exists()){
+      draft=normalizeMenu(draftSnap.data());
+      saveDraftLocal();
+    }else{
+      let restored=false;
+      try{
+        const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
+        if(raw){
+          const x=JSON.parse(raw);
+          if(x?.menu){draft=normalizeMenu(x.menu);restored=true;}
+        }
+      }catch(e){}
+      if(!restored) draft=normalizeMenu(menu);
+    }
+
+    renderStores();
+    renderRiders();
+    renderOrders();
+    calcStats();
+
+    // Live orders.
+    if(adminOrdersUnsub)adminOrdersUnsub();
+    adminOrdersUnsub=onSnapshot(collection(db,"orders"),snap=>{
+      orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderOrders();
+      calcStats();
+      syncAdminRiderChatWatchers();
+    },e=>{
+      console.error("Admin orders listener:",e);
+      toast("❌ ORDERS: "+err(e));
+    });
+
+    // Live riders.
+    if(adminRidersUnsub)adminRidersUnsub();
+    adminRidersUnsub=onSnapshot(collection(db,"riders"),snap=>{
+      riders=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderRiders();
+      renderOrders();
+      syncAdminRiderChatWatchers();
+    },e=>{
+      console.error("Admin riders listener:",e);
+      toast("❌ RIDERS: "+err(e));
+    });
+
+    // Keep published menu changes live without replacing the admin draft.
+    if(adminMenuUnsub)adminMenuUnsub();
+    adminMenuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
+      if(snap.exists()) menu=normalizeMenu(snap.data());
+      renderStores();
+    },e=>console.warn("Admin menu listener:",e));
+
+    // Prepare alert sound automatically. Browser autoplay may still require
+    // the first normal tap on the page to unlock audio.
+    autoEnableAdminSound().catch(()=>{});
+  }catch(e){
+    console.error("Admin startup failed",e);
+    loginView();
+    $("loginStatus").textContent="❌ "+err(e);
+    adminStartedUid="";
+  }
+}
+
+onAuthStateChanged(auth,user=>{
+  if(user) startAdminApp(user);
+  else{
+    adminStartedUid="";
+    if(adminOrdersUnsub){adminOrdersUnsub();adminOrdersUnsub=null}
+    if(adminRidersUnsub){adminRidersUnsub();adminRidersUnsub=null}
+    if(adminMenuUnsub){adminMenuUnsub();adminMenuUnsub=null}
+    if(adminDraftUnsub){adminDraftUnsub();adminDraftUnsub=null}
+    loginView();
+  }
+});
 
 function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function calcStats(){

@@ -1,0 +1,4 @@
+V4.1.11 ADMIN LOGIN REDIRECT FIX
+Use admin.html only for this fix.
+
+On Android/GitHub Pages the Admin login now uses Firebase redirect auth first, then restores the session and opens the Admin app automatically.
