@@ -26,6 +26,29 @@
 .riderChoice,.riderParts{margin-top:4px;font-size:17px;font-weight:700}
 .riderParts{padding:2px 0;display:block;border:0;background:#fff;font-size:18px;font-weight:700}
 </style>
+<style>
+/* V4.1.6 compact Admin ↔ Rider chat */
+.chatPanel{
+  position:fixed;left:50%;right:auto;
+  bottom:max(10px, var(--chat-bottom, 10px));
+  transform:translateX(-50%);
+  width:min(360px,calc(100vw - 28px));
+  max-height:min(60vh,500px);
+  display:flex;flex-direction:column;
+  background:#fff;border:3px solid #1976d2;border-radius:18px;
+  z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
+}
+.chatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.chatHead button{width:auto!important;margin:0!important;padding:8px 12px!important;background:#666!important}
+.chatMessages{height:175px;min-height:120px;max-height:28vh;overflow:auto;padding:8px;background:#f5f7fa}
+.chatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
+.chatMsg.rider{margin-left:auto;background:#d8f5df}
+.chatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
+.chatInput{flex:0 0 auto;display:flex;gap:6px;padding:7px;border-top:1px solid #ddd;background:#fff}
+.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:44px;padding:9px 10px!important}
+.chatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
+.riderChatBtn{background:#1976d2!important}
+</style>
 </head>
 <body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -37,11 +60,16 @@
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
 <div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
+<div id="riderChatPanel" class="chatPanel hidden">
+  <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
+  <div id="riderChatMessages" class="chatMessages"></div>
+  <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
+</div>
 </main>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
 const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
@@ -180,10 +208,53 @@ function render(arr){
        return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${addons}</div></div>`;
      }).join("")}
    </div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><div class="row"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICKED UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
+ return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button><div class="row"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICKED UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
-$("orders").addEventListener("click",async e=>{const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
+let riderChatUnsub=null,riderChatOrderId="";
+function openRiderChat(orderId){
+  riderChatOrderId=orderId;
+  $("riderChatTitle").textContent="💬 ADMIN CHAT";
+  $("riderChatPanel").classList.remove("hidden");
+  if(riderChatUnsub)riderChatUnsub();
+  riderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
+    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
+    $("riderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${esc(m.senderRole==="rider"?"YOU":"ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
+    $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
+  },e=>{alert("Unable to open rider chat:\n\n"+e.message)});
+}
+function closeRiderChat(){if(riderChatUnsub){riderChatUnsub();riderChatUnsub=null}riderChatOrderId="";$("riderChatPanel").classList.add("hidden")}
+$("riderChatClose").onclick=closeRiderChat;
+$("riderChatSend").onclick=async()=>{
+  const text=$("riderChatInput").value.trim();if(!text||!riderChatOrderId)return;
+  try{
+    await addDoc(collection(db,"orders",riderChatOrderId,"riderMessages"),{
+      text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent||"RIDER",createdAt:serverTimestamp()
+    });
+    $("riderChatInput").value="";
+  }catch(e){alert("Unable to send message:\n\n"+e.message)}
+};
+$("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("riderChatSend").click()}});
+
+(function setupRiderChatKeyboard(){
+  const panel=$("riderChatPanel"), input=$("riderChatInput");
+  if(!panel||!input||!window.visualViewport)return;
+  const adjust=()=>{
+    const vv=window.visualViewport;
+    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
+  };
+  window.visualViewport.addEventListener("resize",adjust);
+  window.visualViewport.addEventListener("scroll",adjust);
+  input.addEventListener("focus",()=>setTimeout(adjust,80));
+  input.addEventListener("blur",()=>setTimeout(adjust,120));
+  adjust();
+})();
+
+$("orders").addEventListener("click",async e=>{
+ const chat=e.target.closest("[data-rider-chat]");
+ if(chat){openRiderChat(chat.dataset.riderChat);return;}
+ const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
 function startOrdersListener(){
  if(unsub){unsub();unsub=null}
  const q=query(collection(db,"orders"),where("assignedRiderUid","==",uid));

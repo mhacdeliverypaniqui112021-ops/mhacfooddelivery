@@ -403,6 +403,8 @@
 .chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:44px;padding:9px 10px!important}
 .chatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
 .chatOpenBtn{background:#1976d2!important;margin-top:5px!important}
+.riderChatOpenBtn{background:#111!important}
+.chatMsg.rider{margin-right:auto;background:#fff;border:1px solid #ddd}
 @media(max-width:600px){
   .chatPanel{width:min(360px,calc(100vw - 28px));max-height:60vh}
   .chatMessages{height:175px;max-height:28vh}
@@ -484,6 +486,11 @@ window.setTimeout(function(){
   <div class="chatHead"><span id="adminChatTitle">💬 CUSTOMER CHAT</span><button id="adminChatClose" class="gray miniBtn">✕</button></div>
   <div id="adminChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="adminChatInput" placeholder="Type message…"><button id="adminChatSend" class="blue">SEND</button></div>
+</div>
+<div id="adminRiderChatPanel" class="chatPanel hidden">
+  <div class="chatHead"><span id="adminRiderChatTitle">🏍️ RIDER CHAT</span><button id="adminRiderChatClose" class="gray miniBtn">✕</button></div>
+  <div id="adminRiderChatMessages" class="chatMessages"></div>
+  <div class="chatInput"><input id="adminRiderChatInput" placeholder="Message rider…"><button id="adminRiderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
 <script type="module">
@@ -658,6 +665,7 @@ function renderOrders(){
     <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}</div>`}).join("")}</div>`).join("")})()}</div>
     <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
+    <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
     ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class=red data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
     ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
@@ -670,6 +678,8 @@ function renderOrders(){
 $("orders").onclick=async e=>{
  const chat=e.target.closest("[data-chat]");
  if(chat){openAdminChat(chat.dataset.chat);return;}
+ const riderChat=e.target.closest("[data-rider-chat]");
+ if(riderChat){openAdminRiderChat(riderChat.dataset.riderChat);return;}
  const v=e.target.closest("[data-view]");
  if(v){const d=$("details-"+v.dataset.view);if(d)d.classList.toggle("hidden");return;}
  const accept=e.target.closest("[data-accept]");
@@ -1409,6 +1419,44 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
 // V4.1.4: keep compact admin chat centered and above the Android keyboard.
 (function setupAdminChatKeyboard(){
   const panel=$("adminChatPanel"), input=$("adminChatInput");
+  if(!panel||!input||!window.visualViewport)return;
+  const adjust=()=>{
+    const vv=window.visualViewport;
+    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
+  };
+  window.visualViewport.addEventListener("resize",adjust);
+  window.visualViewport.addEventListener("scroll",adjust);
+  input.addEventListener("focus",()=>setTimeout(adjust,80));
+  input.addEventListener("blur",()=>setTimeout(adjust,120));
+  adjust();
+})();
+// V4.1.6: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
+let adminRiderChatUnsub=null,adminRiderChatOrderId="";
+function openAdminRiderChat(orderId){
+ const o=orders.find(x=>x.id===orderId);
+ if(!o?.assignedRiderUid){toast("Assign a rider to this order first.");return}
+ adminRiderChatOrderId=orderId;
+ const rider=riders.find(r=>(r.uid||r.id)===o.assignedRiderUid);
+ $("adminRiderChatTitle").textContent="🏍️ "+(rider?.nickname||rider?.name||"RIDER")+" — CHAT";
+ $("adminRiderChatPanel").classList.remove("hidden");
+ if(adminRiderChatUnsub)adminRiderChatUnsub();
+ adminRiderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
+   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
+   $("adminRiderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"rider"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"RIDER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
+   $("adminRiderChatMessages").scrollTop=$("adminRiderChatMessages").scrollHeight;
+ },e=>{toast(err(e))});
+}
+function closeAdminRiderChat(){if(adminRiderChatUnsub){adminRiderChatUnsub();adminRiderChatUnsub=null}adminRiderChatOrderId="";$("adminRiderChatPanel").classList.add("hidden")}
+$("adminRiderChatClose").onclick=closeAdminRiderChat;
+$("adminRiderChatSend").onclick=async()=>{
+ const text=$("adminRiderChatInput").value.trim();if(!text||!adminRiderChatOrderId)return;
+ try{await addDoc(collection(db,"orders",adminRiderChatOrderId,"riderMessages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminRiderChatInput").value=""}catch(e){toast(err(e))}
+};
+$("adminRiderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminRiderChatSend").click()}});
+
+(function setupRiderChatKeyboard(){
+  const panel=$("adminRiderChatPanel"), input=$("adminRiderChatInput");
   if(!panel||!input||!window.visualViewport)return;
   const adjust=()=>{
     const vv=window.visualViewport;

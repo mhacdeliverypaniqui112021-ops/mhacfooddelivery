@@ -1,1 +1,4 @@
 Upload this full replacement to the SAME GitHub repository. Commit changes. Live marker must show V4.1.2 COPY PARTS FIX. This version makes Copy All Parts/Paste All Parts robust on Android touch/click.
+
+
+V4.1.6: Upload/replace the updated admin.html, rider.html, firestore.rules, BUILD_VERSION.txt, and V4.1.6_CHANGELOG.txt. Publish Firestore rules after replacing them.

@@ -1,0 +1,14 @@
+V4.1.6 — ADMIN ↔ RIDER CHAT
+
+Added:
+- Separate Admin ↔ Rider chat per customer order.
+- Admin order cards now have CHAT RIDER.
+- Rider assigned orders now have CHAT ADMIN.
+- Chat uses orders/{orderId}/riderMessages so Customer ↔ Admin chat stays separate.
+- Firestore rules restrict rider chat to MHAC Admin and the approved rider assigned to that order.
+- Compact centered chat UI with Android keyboard-safe positioning.
+
+Unchanged:
+- Customer ↔ Admin chat
+- Customer direct cancel order
+- Existing order/menu/rider assignment flow

@@ -83,6 +83,32 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+
+
+    // V4.1.6: Admin <-> assigned Rider chat for a specific order.
+    // This is separate from Customer <-> Admin /messages.
+    match /orders/{orderId}/riderMessages/{messageId} {
+      allow read:
+        if isAdmin()
+        || (
+          isApprovedRider()
+          && get(/databases/$(database)/documents/orders/$(orderId))
+               .data.assignedRiderUid == request.auth.uid
+        );
+
+      allow create:
+        if isAdmin()
+        || (
+          isApprovedRider()
+          && get(/databases/$(database)/documents/orders/$(orderId))
+               .data.assignedRiderUid == request.auth.uid
+          && request.resource.data.senderRole == "rider"
+          && request.resource.data.senderUid == request.auth.uid
+        );
+
+      allow update, delete: if isAdmin();
+    }
+
     match /riders/{uid} {
       allow read:
         if isAdmin()
