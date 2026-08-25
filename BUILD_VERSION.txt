@@ -1,5 +1,6 @@
-V4.1.12 RIDER UI FIX
-- Removed earnings card from above the app header.
-- Kept earnings dashboard inside logged-in Rider App.
-- Splash loading line restored to red.
-- Google Rider Login card/button compacted for mobile.
+V4.1.13 RIDER UI + GOOGLE REDIRECT FIX
+- Removed stray earnings markup above Rider App header.
+- Kept the real earnings dashboard inside logged-in Rider App.
+- Google login now uses Firebase redirect first to avoid blocked popups.
+- Added getRedirectResult handling after Google returns.
+- Compact mobile Google login card/button.

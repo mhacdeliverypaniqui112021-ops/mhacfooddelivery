@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.8</title><meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
+<title>MHAC DELIVERY — RIDER V4.1.13</title><meta name="build-version" content="V4.1.13 RIDER UI + GOOGLE REDIRECT FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -29,6 +29,12 @@
   #login h2{font-size:23px!important}
   #login .google{width:90%!important;font-size:14px!important;padding:10px!important}
 }
+
+
+/* V4.1.13 mobile rider login */
+#login{padding:14px!important}
+#login .google{width:88%!important;max-width:430px!important;display:block!important;margin:8px auto!important;padding:10px 12px!important;font-size:14px!important}
+#login>p{margin:7px 0!important}
 
 </style>
 </style><style>
@@ -96,11 +102,6 @@ window.addEventListener("load",function(){
   },2200);
 });
 </script>
-<div id="mhacRiderEarningsValue" style="font-size:24px;font-weight:900;margin-top:4px">₱0.00</div>
-  <div style="font-size:12px;opacity:.7">Today's completed earnings</div>
-</div>
-
-
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>window.addEventListener("load",()=>setTimeout(()=>{const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}},2200));</script>
 
@@ -122,6 +123,20 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirec
 import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
+getRedirectResult(auth).then(async result=>{
+  if(!result||!result.user)return;
+  uid=result.user.uid;
+  $("googleStatus").textContent="✅ Google sign-in successful. Checking rider account…";
+  await afterLogin(result.user);
+}).catch(e=>{
+  console.error(e);
+  if(e?.code==="auth/unauthorized-domain"){
+    $("googleStatus").innerHTML='<span class="error">❌ This website is not authorized in Firebase.</span>';
+  }else if(e?.code!=="auth/no-auth-event"){
+    $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(e?.message||String(e))+"</span>";
+  }
+});
+
 const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
@@ -193,24 +208,20 @@ async function autoEnableRiderSound(){
  }
 }
 async function googleLogin(){
- $("googleBtn").disabled=true;$("googleStatus").textContent="Opening Google sign-in…";
- try{
-   const result=await signInWithPopup(auth,googleProvider);
-   uid=result.user.uid;
-   $("googleStatus").textContent="✅ Google sign-in successful. Checking rider account…";
-   await afterLogin(result.user);
- }catch(e){
-   console.error(e);
-   if(e?.code==="auth/popup-blocked"||e?.code==="auth/popup-timeout"||e?.code==="auth/cancelled-popup-request"){
-     try{await signInWithRedirect(auth,googleProvider);return}
-     catch(x){e=x}
-   }
-   let message=e?.message||String(e);
-   if(e?.code==="auth/popup-closed-by-user")message="Google sign-in was cancelled.";
-   if(e?.code==="auth/unauthorized-domain")message="This website is not authorized in Firebase. Add the GitHub Pages domain under Authentication → Settings → Authorized domains.";
-   if(e?.code==="auth/popup-blocked")message="Google sign-in popup was blocked. Tap the Google button again or allow popups.";
-   $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
- }finally{$("googleBtn").disabled=false}
+  $("googleBtn").disabled=true;
+  $("googleStatus").textContent="Opening Google sign-in…";
+  try{
+    await signInWithRedirect(auth,googleProvider);
+    return;
+  }catch(e){
+    console.error(e);
+    let message=e?.message||String(e);
+    if(e?.code==="auth/unauthorized-domain"){
+      message="This website is not authorized in Firebase. Add the GitHub Pages domain under Authentication → Settings → Authorized domains.";
+    }
+    $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
+    $("googleBtn").disabled=false;
+  }
 }
 async function legacyLogin(){$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{const result=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);uid=result.user.uid;await afterLogin(result.user)}catch(e){$("loginStatus").innerHTML='<span class="error">❌ '+esc(e.message)+"</span>"}finally{$("loginBtn").disabled=false}}
 async function afterLogin(user){
