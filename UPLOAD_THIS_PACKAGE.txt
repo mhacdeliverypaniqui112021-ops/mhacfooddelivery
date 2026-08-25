@@ -1,21 +1,20 @@
-MHAC DELIVERY V4.1.8 UPLOAD
+MHAC DELIVERY V4.1.9 — FIX ONLY
 
-Upload/replace:
+UPLOAD/REPLACE:
 - admin.html
 - rider.html
-- customer.html
-- mhac-logo.png
-- assets/mhac-order-alert.mp3
 
-Firestore Rules:
-- V4.1.6/V4.1.7 riderMessages rules remain valid; no new rules are required for V4.1.8.
+Customer.html is unchanged in this fix-only build.
 
-After GitHub Pages deploy:
-- Hard refresh / refresh each app.
-- Confirm red banner says V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX.
-- Test Admin -> Rider chat.
-- Test Rider -> Admin chat.
-- Test Customer -> Admin chat.
-- Test Customer Cancel Order.
-- Test 1x Chicken Solo: only one part piece.
-- Test 2x/3x Chicken Solo: same or different parts with numbered quantities.
+Firebase Rules do NOT need to change if V4.1.6+ riderMessages rules are already published.
+
+After upload:
+1. Wait for GitHub Pages deployment.
+2. Refresh Admin and Rider apps.
+3. Confirm the red banner says V4.1.9.
+4. Assign a rider to an active order.
+5. Admin sends a Rider Chat message.
+6. Rider chat should pop up automatically and play the ringtone.
+7. Rider replies.
+8. Admin chat should pop up automatically and play the ringtone.
+9. Type in each chat and confirm the keypad does not cover the input or SEND button.

@@ -49,6 +49,20 @@
 .chatInput button{width:auto!important;min-width:76px;height:40px!important;margin:0!important;padding:7px 10px!important}
 .riderChatBtn{background:#1976d2!important}
 </style>
+
+<style>
+/* V4.1.9 FIX: smaller rider chat + keyboard-safe */
+.chatPanel{
+  width:min(330px,calc(100vw - 18px)) !important;
+  max-height:min(36vh,300px) !important;
+  bottom:max(6px,var(--chat-bottom,6px)) !important;
+}
+.chatMessages{height:70px !important;min-height:50px !important;max-height:14vh !important}
+.chatHead{padding:8px 10px !important;font-size:15px !important}
+.chatInput{padding:4px !important;gap:4px !important}
+.chatInput input{height:38px !important;font-size:15px !important}
+.chatInput button{height:38px !important;min-width:68px !important;font-size:14px !important}
+</style>
 </head>
 <body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -125,6 +139,11 @@ async function playAlert(){
   catch(e){if(!makeRiderFallbackSound())$("soundState").textContent=" ❌ Alert playback failed — tap ENABLE SOUND again"}
 }
 $("soundBtn").onclick=async()=>{const b=$("soundBtn");b.disabled=true;try{await initRiderAlertSound();await prepareRiderAlertSound()}catch(e){console.error(e);$("soundState").textContent=" ❌ Sound could not be enabled — check phone media volume";soundReady=false}finally{b.disabled=false}};
+async function unlockRiderSoundOnInteraction(){
+  try{await prepareRiderAlertSound();$("soundState").textContent="🔊 AUTOMATIC SOUND — READY";}catch(e){}
+}
+window.addEventListener("pointerdown",unlockRiderSoundOnInteraction,{once:true,capture:true});
+window.addEventListener("touchstart",unlockRiderSoundOnInteraction,{once:true,capture:true,passive:true});
 async function autoEnableRiderSound(){
  try{
    await initRiderAlertSound();
@@ -230,20 +249,27 @@ function render(arr){
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
+const riderChatWatchers=new Map();
 async function playRiderChatAlert(){
   if(!soundReady)return;
-  try{const a=$("orderAlertAudio");if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;}catch(e){console.warn("Rider chat ringtone failed",e)}
+  try{const a=$("orderAlertAudio");if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;}catch(e){if(!makeRiderFallbackSound())console.warn("Rider chat ringtone failed",e)}
+}
+function adjustRiderChatKeyboard(){
+ const panel=$("riderChatPanel");if(!panel||!window.visualViewport)return;
+ const vv=window.visualViewport;
+ const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+ panel.style.setProperty("--chat-bottom",Math.max(6,keyboard+6)+"px");
 }
 function openRiderChat(orderId){
   riderChatOrderId=orderId; riderChatSnapshotReady=false;
   $("riderChatTitle").textContent="💬 ADMIN CHAT";
   $("riderChatPanel").classList.remove("hidden");
+  adjustRiderChatKeyboard();
   if(riderChatUnsub)riderChatUnsub();
   riderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
     $("riderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${esc(m.senderRole==="rider"?"YOU":"ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
     $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
-    if(riderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider"))playRiderChatAlert();
     riderChatSnapshotReady=true;
   },e=>{alert("Unable to open rider chat:\n\n"+e.message)});
 }
@@ -251,29 +277,28 @@ function closeRiderChat(){if(riderChatUnsub){riderChatUnsub();riderChatUnsub=nul
 $("riderChatClose").onclick=closeRiderChat;
 $("riderChatSend").onclick=async()=>{
   const text=$("riderChatInput").value.trim();if(!text||!riderChatOrderId)return;
-  try{
-    await addDoc(collection(db,"orders",riderChatOrderId,"riderMessages"),{
-      text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent||"RIDER",createdAt:serverTimestamp()
-    });
-    $("riderChatInput").value="";
-  }catch(e){alert("Unable to send message:\n\n"+e.message)}
+  try{await addDoc(collection(db,"orders",riderChatOrderId,"riderMessages"),{text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent||"RIDER",createdAt:serverTimestamp()});$("riderChatInput").value=""}catch(e){alert("Unable to send message:\n\n"+e.message)}
 };
 $("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("riderChatSend").click()}});
-
 (function setupRiderChatKeyboard(){
-  const panel=$("riderChatPanel"), input=$("riderChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
+ const panel=$("riderChatPanel"),input=$("riderChatInput");if(!panel||!input)return;
+ if(window.visualViewport){window.visualViewport.addEventListener("resize",adjustRiderChatKeyboard);window.visualViewport.addEventListener("scroll",adjustRiderChatKeyboard)}
+ input.addEventListener("focus",()=>setTimeout(adjustRiderChatKeyboard,60));input.addEventListener("blur",()=>setTimeout(adjustRiderChatKeyboard,120));adjustRiderChatKeyboard();
 })();
+function syncRiderChatWatchers(activeOrders){
+ const wanted=new Set(activeOrders.map(o=>o.id));
+ for(const [orderId,stop] of riderChatWatchers){if(!wanted.has(orderId)){stop();riderChatWatchers.delete(orderId)}}
+ for(const orderId of wanted){
+   if(riderChatWatchers.has(orderId))continue;
+   let primed=false;
+   const stop=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
+     if(!primed){primed=true;return}
+     const incoming=snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole==="admin");
+     if(incoming){playRiderChatAlert();openRiderChat(orderId)}
+   },e=>console.warn("Rider chat watcher:",e));
+   riderChatWatchers.set(orderId,stop);
+ }
+}
 
 $("orders").addEventListener("click",async e=>{
  const chat=e.target.closest("[data-rider-chat]");
@@ -284,7 +309,7 @@ function startOrdersListener(){
  const q=query(collection(db,"orders"),where("assignedRiderUid","==",uid));
  unsub=onSnapshot(q,s=>{
   const all=s.docs.map(d=>({id:d.id,...d.data()}));
-  const active=all.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");
+  const active=all.filter(o=>String(o.status||"").toUpperCase()!=="COMPLETED");syncRiderChatWatchers(active);
   const today=businessDayKey();
   const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0),sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);

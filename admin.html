@@ -458,6 +458,21 @@
 </style>
 <style>.soundBox{margin-top:10px;padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.soundBox button{margin-top:6px}</style>
 <style>.adminOrderPreview{border:2px solid #ddd;border-radius:12px;padding:9px;margin:8px 0;background:#fff;font-size:14px;line-height:1.35}.adminOrderPreview>div+div{margin-top:8px;border-top:1px solid #ddd;padding-top:8px}.adminOrderPreview span{font-weight:700}</style>
+
+<style>
+/* V4.1.9 FIX: smaller chat + keyboard-safe */
+.chatPanel{
+  width:min(330px,calc(100vw - 24px)) !important;
+  max-height:min(38vh,320px) !important;
+  bottom:max(6px,var(--chat-bottom,6px)) !important;
+}
+.chatMessages{height:78px !important;min-height:55px !important;max-height:16vh !important}
+.chatHead{padding:8px 10px !important;font-size:15px !important}
+.chatInput{padding:4px !important;gap:4px !important}
+.chatInput input{height:38px !important;font-size:15px !important}
+.chatInput button{height:38px !important;min-width:68px !important;font-size:14px !important}
+@media(max-width:600px){.chatPanel{width:calc(100vw - 18px) !important;max-height:36vh !important}.chatMessages{height:70px !important;max-height:14vh !important}}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -615,6 +630,11 @@ $("adminSoundBtn").onclick=async()=>{
   catch(e){console.error(e);$("adminSoundState").textContent="❌ Sound could not be enabled — check phone media volume";adminSoundReady=false}
   finally{b.disabled=false}
 };
+async function unlockAdminSoundOnInteraction(){
+  try{await prepareAdminAlertSound();$("adminSoundState").textContent="🔊 AUTOMATIC SOUND — READY";}catch(e){}
+}
+window.addEventListener("pointerdown",unlockAdminSoundOnInteraction,{once:true,capture:true});
+window.addEventListener("touchstart",unlockAdminSoundOnInteraction,{once:true,capture:true,passive:true});
 async function autoEnableAdminSound(){
   try{
     await initAdminAlertSound();
@@ -1461,8 +1481,9 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
   input.addEventListener("blur",()=>setTimeout(adjust,120));
   adjust();
 })();
-// V4.1.8: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
+// V4.1.9: Admin ↔ Rider chat popup + ringtone + keyboard-safe UI.
 let adminRiderChatUnsub=null,adminRiderChatOrderId="",adminRiderChatSnapshotReady=false;
+const adminRiderChatWatchers=new Map();
 function openAdminRiderChat(orderId){
  const o=orders.find(x=>x.id===orderId);
  if(!o?.assignedRiderUid){toast("Assign a rider to this order first.");return}
@@ -1471,12 +1492,12 @@ function openAdminRiderChat(orderId){
  const rider=riders.find(r=>(r.uid||r.id)===o.assignedRiderUid);
  $("adminRiderChatTitle").textContent="🏍️ "+(rider?.nickname||rider?.name||"RIDER")+" — CHAT";
  $("adminRiderChatPanel").classList.remove("hidden");
+ adjustAdminRiderChatKeyboard();
  if(adminRiderChatUnsub)adminRiderChatUnsub();
  adminRiderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
    $("adminRiderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"rider"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"RIDER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
    $("adminRiderChatMessages").scrollTop=$("adminRiderChatMessages").scrollHeight;
-   if(adminRiderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin"))playAdminChatAlert();
    adminRiderChatSnapshotReady=true;
  },e=>{toast(err(e))});
 }
@@ -1487,211 +1508,33 @@ $("adminRiderChatSend").onclick=async()=>{
  try{await addDoc(collection(db,"orders",adminRiderChatOrderId,"riderMessages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminRiderChatInput").value=""}catch(e){toast(err(e))}
 };
 $("adminRiderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminRiderChatSend").click()}});
-
+function adjustAdminRiderChatKeyboard(){
+ const panel=$("adminRiderChatPanel");if(!panel||!window.visualViewport)return;
+ const vv=window.visualViewport;
+ const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+ panel.style.setProperty("--chat-bottom",Math.max(6,keyboard+6)+"px");
+}
 (function setupRiderChatKeyboard(){
-  const panel=$("adminRiderChatPanel"), input=$("adminRiderChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
+ const panel=$("adminRiderChatPanel"),input=$("adminRiderChatInput");if(!panel||!input)return;
+ if(window.visualViewport){window.visualViewport.addEventListener("resize",adjustAdminRiderChatKeyboard);window.visualViewport.addEventListener("scroll",adjustAdminRiderChatKeyboard)}
+ input.addEventListener("focus",()=>setTimeout(adjustAdminRiderChatKeyboard,60));
+ input.addEventListener("blur",()=>setTimeout(adjustAdminRiderChatKeyboard,120));
+ adjustAdminRiderChatKeyboard();
 })();
-
-function withTimeout(promise, ms, label){
-  return Promise.race([
-    promise,
-    new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+" timed out. Check Firebase connection/rules.")),ms))
-  ]);
-}
-async function publishMenu(){
-  const si=Number(selectedStore);
-  const st=draft?.stores?.[si];
-  if(!st){ toast("Select a store first."); return false; }
-  if(!auth.currentUser){ toast("Admin session expired. Please log in again."); return false; }
-  const publishButton=document.querySelector('[data-publish-store="'+si+'"]');
-  if(publishButton){publishButton.disabled=true;publishButton.dataset.busy="1";publishButton.textContent="⏳ PUBLISHING...";}
-  try{
-    // IMPORTANT: publish the exact current ADMIN draft for this store.
-    // Do not depend on a separate draft write completing first.
-    const cleanStore=normalizeMenu({version:draft.version||"final",stores:[JSON.parse(JSON.stringify(st))]}).stores[0];
-    cleanStore.published=true;
-    cleanStore.publishedAt=Date.now();
-
-    const snap=await withTimeout(getDoc(doc(db,"settings","menu")),10000,"Loading published menu");
-    const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-    const others=(current.stores||[]).filter(x=>x.id!==cleanStore.id);
-    const nextMenu=normalizeMenu({...current,version:draft.version||current.version||"final",stores:[...others,cleanStore],publishVersion:Date.now()});
-
-    // Single authoritative write to the customer-facing menu.
-    await withTimeout(setDoc(doc(db,"settings","menu"),{
-      ...nextMenu,
-      updatedAt:serverTimestamp(),
-      updatedBy:auth.currentUser.email,
-      publishedAt:serverTimestamp(),
-      publishedBy:auth.currentUser.email
-    }),10000,"Publishing menu");
-
-    // Keep the editable ADMIN draft synchronized too, but failure here must not
-    // undo a successful customer publish.
-    try{
-      await withTimeout(setDoc(doc(db,"settings","menuDraft"),{
-        ...normalizeMenu(draft),
-        updatedAt:serverTimestamp(),
-        updatedBy:auth.currentUser.email
-      }),10000,"Saving admin draft");
-    }catch(e){ console.warn("Admin draft save after publish failed",e); }
-
-    menu=nextMenu;
-    renderStores();
-    toast("✅ "+cleanStore.name+" PUBLISHED — customer app updated.");
-    return true;
-  }catch(e){
-    console.error("PUBLISH FAILED",e);
-    const message=err(e);
-    toast("❌ PUBLISH FAILED: "+message);
-    alert("PUBLISH FAILED\n\n"+message);
-    if(publishButton){publishButton.disabled=false;publishButton.dataset.busy="0";publishButton.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP";}
-    return false;
-  }
-}
-async function unpublishStore(si){
-  try{
-    const st=draft?.stores?.[si]; if(!st)return false;
-    if(!auth.currentUser){toast("Admin session expired. Please log in again.");return false;}
-    const button=document.querySelector('[data-unpublish-store="'+si+'"]');
-    if(button){button.disabled=true;button.textContent="⏳ UNPUBLISHING...";}
-    const snap=await withTimeout(getDoc(doc(db,"settings","menu")),10000,"Loading published menu");
-    const current=normalizeMenu(snap.exists()?snap.data():{version:"final",stores:[]});
-    const next=normalizeMenu({...current,stores:(current.stores||[]).filter(x=>x.id!==st.id),publishVersion:Date.now()});
-    await withTimeout(setDoc(doc(db,"settings","menu"),{...next,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email}),10000,"Unpublishing menu");
-    menu=next;
-    try{await withTimeout(setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email}),10000,"Saving admin draft");}catch(e){console.warn("Draft save after unpublish failed",e)}
-    renderStores();
-    toast("🔴 "+st.name+" unpublished. Customer app will no longer show it.");
-    return true;
-  }catch(e){
-    console.error("UNPUBLISH FAILED",e);
-    toast("❌ UNPUBLISH FAILED: "+err(e));
-    alert("UNPUBLISH FAILED\n\n"+err(e));
-    renderStores();
-    return false;
-  }
-}
-async function loadMenu(){
-  const pubSnap=await getDoc(doc(db,"settings","menu"));
-  menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
-  const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
-  const hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
-
-  // Prefer the device's immediate backup when it exists. This protects Admin
-  // edits from disappearing after a refresh when Firestore draft rules/network
-  // are delayed or unavailable. Firestore remains the shared backup.
-  let localDraft=null,localDraftSavedAt=0;
-  try{
-    const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
-    if(raw){
-      const parsed=JSON.parse(raw);
-      localDraftSavedAt=Number(parsed?.savedAt||0);
-      if(parsed?.menu && Array.isArray(parsed.menu.stores)) localDraft=normalizeMenu(parsed.menu);
-    }
-  }catch(e){console.warn("Local draft recovery failed",e)}
-
-  // V4.1.8 RECOVERY RULE:
-  // Compare the local backup timestamp with Firestore menuDraft. If the phone
-  // has a newer saved draft, keep it and push it back to Firestore. This prevents
-  // a just-created food from disappearing after an HTML refresh/deploy.
-  const firestoreDraft = hasDraft ? normalizeMenu(draftSnap.data()) : null;
-  const firestoreDraftMs = Number(draftSnap.data()?.updatedAt?.toMillis?.()||0);
-  const localHasStores = !!(localDraft && Array.isArray(localDraft.stores) && localDraft.stores.length);
-  const firestoreDraftHasStores = !!(firestoreDraft && Array.isArray(firestoreDraft.stores) && firestoreDraft.stores.length);
-  const publishedHasStores = !!(menu && Array.isArray(menu.stores) && menu.stores.length);
-
-  if(localHasStores && (!firestoreDraftHasStores || localDraftSavedAt > firestoreDraftMs)){
-    draft = localDraft;
-    await flushDraftMenu().catch(e=>console.warn("Newer local draft recovery save failed",e));
-  }else if(firestoreDraftHasStores){
-    draft = firestoreDraft;
-  }else if(localHasStores){
-    draft = localDraft;
-    await flushDraftMenu().catch(e=>console.warn("Local draft recovery save failed",e));
-  }else{
-    draft = normalizeMenu(menu);
-  }
-
-  // Recovery: never erase customer-facing stores just because the editable draft
-  // is missing a published store. A real ADMIN DELETE removes the published store
-  // first, so this does not resurrect intentionally deleted stores.
-  const byId=new Map((draft.stores||[]).map(s=>[s.id,s]));
-  let recovered=false;
-  for(const ps of (menu.stores||[])){
-    if(!byId.has(ps.id)){draft.stores.push(JSON.parse(JSON.stringify(ps)));recovered=true;}
-  }
-
-  if(recovered){
-    await flushDraftMenu().catch(e=>console.warn("Draft recovery save failed",e));
-  }
-  saveDraftLocal();
-
-  renderStores();
-  $("editor").classList.add("hidden");
-  if(!publishedHasStores && !(draft.stores||[]).length){
-    console.warn("MHAC MENU RECOVERY: no stores found in local draft, Firestore draft, or published menu.");
-  }
-}
-let seenAdminOrders=new Set();let adminOrdersPrimed=false;
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
-getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
-onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start()});
-
-
-async function runMenuDiagnostic(){
-  const out=$("menuDiagnosticResult");
-  if(!out)return;
-  out.textContent="⏳ Checking Firebase menu data…";
-  try{
-    const pub=await getDoc(doc(db,"settings","menu"));
-    const dr=await getDoc(doc(db,"settings","menuDraft"));
-    let local=null;
-    try{local=JSON.parse(localStorage.getItem(DRAFT_LOCAL_KEY)||"null")}catch(e){}
-    const pm=pub.exists()?normalizeMenu(pub.data()):{stores:[]};
-    const dm=dr.exists()?normalizeMenu(dr.data()):{stores:[]};
-    const lm=local?.menu?normalizeMenu(local.menu):{stores:[]};
-    const lines=[];
-    lines.push("FIREBASE settings/menu: "+(pub.exists()?"FOUND":"NOT FOUND"));
-    lines.push("Published stores: "+(pm.stores||[]).length);
-    lines.push("Published names: "+((pm.stores||[]).map(x=>x.name).join(", ")||"—"));
-    lines.push("");
-    lines.push("FIREBASE settings/menuDraft: "+(dr.exists()?"FOUND":"NOT FOUND"));
-    lines.push("Draft stores: "+(dm.stores||[]).length);
-    lines.push("Draft names: "+((dm.stores||[]).map(x=>x.name).join(", ")||"—"));
-    lines.push("");
-    lines.push("PHONE LOCAL BACKUP: "+(local?.menu?"FOUND":"NOT FOUND"));
-    lines.push("Local stores: "+(lm.stores||[]).length);
-    lines.push("Local names: "+((lm.stores||[]).map(x=>x.name).join(", ")||"—"));
-    lines.push("");
-    lines.push("RESULT: "+(((pm.stores||[]).length+(dm.stores||[]).length+(lm.stores||[]).length)>0?"MENU DATA EXISTS somewhere above.":"NO MENU DATA FOUND in these 3 locations."));
-    out.textContent=lines.join("\n");
-  }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
+function syncAdminRiderChatWatchers(){
+ const wanted=new Set(orders.filter(o=>o.assignedRiderUid && !["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).map(o=>o.id));
+ for(const [orderId,stop] of adminRiderChatWatchers){if(!wanted.has(orderId)){stop();adminRiderChatWatchers.delete(orderId)}}
+ for(const orderId of wanted){
+   if(adminRiderChatWatchers.has(orderId))continue;
+   let primed=false;
+   const stop=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
+     if(!primed){primed=true;return}
+     const incoming=snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole==="rider");
+     if(incoming){playAdminChatAlert();openAdminRiderChat(orderId)}
+   },e=>console.warn("Admin rider chat watcher:",e));
+   adminRiderChatWatchers.set(orderId,stop);
+ }
 }
 
-window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
-try{
-  const badge=document.createElement("div");
-  badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";
-  badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
-  document.body.prepend(badge);
-}catch(e){console.warn("Build badge error",e)}
-
-try{
-  const b=$("checkMenuData");
-  if(b)b.addEventListener("click",runMenuDiagnostic);
-}catch(e){console.warn("Diagnostic button setup failed",e)}
 </script>
 </body></html>
