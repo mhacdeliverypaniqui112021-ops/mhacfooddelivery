@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.20 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
 </style>
@@ -480,65 +480,37 @@ async function placeOrder(){if(!isOpen())return alert("MHAC Delivery is closed."
 let customerChatUnsub=null,customerChatOrderId="";
 let customerChatSoundReady=false,customerChatSoundCtx=null,customerChatSoundSource=null,customerChatSoundGain=null;
 async function prepareCustomerChatSound(){
- const a=$("chatAlertAudio"); if(!a) throw new Error("Chat sound missing.");
- a.muted=true;a.volume=0;
- try{
-   const p=a.play(); if(p) await p; a.pause(); a.currentTime=0; a.muted=false;a.volume=1;
-   const AC=window.AudioContext||window.webkitAudioContext;
-   if(AC){
-     if(!customerChatSoundCtx)customerChatSoundCtx=new AC();
-     await customerChatSoundCtx.resume();
-     if(!customerChatSoundSource){
-       customerChatSoundSource=customerChatSoundCtx.createMediaElementSource(a);
-       customerChatSoundGain=customerChatSoundCtx.createGain();
-       customerChatSoundGain.gain.value=2.2;
-       customerChatSoundSource.connect(customerChatSoundGain);customerChatSoundGain.connect(customerChatSoundCtx.destination);
-     }
-   }
-   customerChatSoundReady=true;$("customerChatSoundState").textContent="🔊 Chat sound enabled";
- }catch(e){
-   customerChatSoundReady=false;$("customerChatSoundState").textContent="⚠️ Tap ENABLE CHAT SOUND again if no ringtone.";throw e;
- }
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC) throw new Error("Web Audio is not supported.");
+  if(!customerChatSoundCtx) customerChatSoundCtx=new AC();
+  if(customerChatSoundCtx.state==="suspended") await customerChatSoundCtx.resume();
+  customerChatSoundReady=true;
+  $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";
 }
-async function playCustomerChatAlert(){
- if(!customerChatSoundReady)return;
- try{
-   const a=$("chatAlertAudio"); if(customerChatSoundCtx)await customerChatSoundCtx.resume();
-   a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;
- }catch(e){console.warn("Customer chat ringtone failed",e)}
+function playCustomerChatAlert(){
+  if(!customerChatSoundReady||!customerChatSoundCtx)return;
+  try{
+    const ctx=customerChatSoundCtx;
+    if(ctx.state==="suspended") ctx.resume();
+    const now=ctx.currentTime;
+    [880,660,880].forEach((freq,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.value=freq;
+      const t=now+i*0.18;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.45,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.17);
+    });
+  }catch(e){console.warn("Customer chat ringtone failed",e)}
 }
 $("customerChatSoundBtn").onclick=async()=>{const b=$("customerChatSoundBtn");b.disabled=true;try{await prepareCustomerChatSound()}catch(e){}finally{b.disabled=false}};
 let customerChatSnapshotReady=false;
-async function autoEnableCustomerChatSound(){
-  try{
-    await prepareCustomerChatSound();
-    $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";
-  }catch(e){
-    console.warn("Automatic customer chat sound unlock pending user gesture.",e);
-    $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — waiting for browser audio permission";
-    const unlock=async()=>{
-      try{await prepareCustomerChatSound();$("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";}catch(x){}
-      window.removeEventListener("pointerdown",unlock);
-      window.removeEventListener("touchstart",unlock);
-    };
-    window.addEventListener("pointerdown",unlock,{once:true,passive:true});
-    window.addEventListener("touchstart",unlock,{once:true,passive:true});
-  }
-}
-// V4.1.20 CHAT AUDIO UNLOCK: browsers require a user gesture before future
-// Firebase-triggered chat alerts can play. Unlock once on any normal app tap.
+async function autoEnableCustomerChatSound(){try{await prepareCustomerChatSound()}catch(e){}}
 let customerChatUnlockInstalled=false;
 function installCustomerChatAudioUnlock(){
-  if(customerChatUnlockInstalled)return;
-  customerChatUnlockInstalled=true;
-  const unlock=async()=>{
-    if(customerChatSoundReady){document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchstart",unlock,true);return;}
-    try{
-      await prepareCustomerChatSound();
-      document.removeEventListener("pointerdown",unlock,true);
-      document.removeEventListener("touchstart",unlock,true);
-    }catch(_){ /* keep listening for the next user gesture */ }
-  };
+  if(customerChatUnlockInstalled)return; customerChatUnlockInstalled=true;
+  const unlock=async()=>{try{await prepareCustomerChatSound();document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchstart",unlock,true)}catch(_){} };
   document.addEventListener("pointerdown",unlock,true);
   document.addEventListener("touchstart",unlock,true);
 }
@@ -636,8 +608,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.20 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX";
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.20 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+window.__MHAC_BUILD__="V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>

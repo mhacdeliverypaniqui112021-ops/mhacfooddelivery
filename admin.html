@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.20 AUTO CHAT POPUP + RINGTONE FIX</title>
-<meta name="build-version" content="V4.1.20 AUTO CHAT POPUP + RINGTONE FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.21 AUTO CHAT POPUP + RINGTONE FIX</title>
+<meta name="build-version" content="V4.1.21 AUTO CHAT POPUP + RINGTONE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1646,7 +1646,7 @@ async function loadMenu(){
 }
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
 
-// V4.1.20 GLOBAL CHAT POPUP: incoming messages are watched even when
+// V4.1.21 GLOBAL CHAT POPUP: incoming messages are watched even when
 // no chat button/panel is open. The correct chat opens automatically.
 const adminChatWatchers=new Map();
 function syncAdminChatWatchers(){
@@ -1738,11 +1738,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.20 AUTO CHAT POPUP + RINGTONE FIX";
+window.__MHAC_BUILD__="V4.1.21 AUTO CHAT POPUP + RINGTONE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.20 AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.21 AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
