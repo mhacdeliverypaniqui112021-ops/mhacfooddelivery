@@ -7,7 +7,7 @@
 .card{border:1px solid var(--border);border-radius:14px;padding:12px;margin:10px 0;background:#fff}
 .section-title{font-size:19px;font-weight:800;margin:0 0 10px}
 .row{display:flex;gap:10px;flex-wrap:wrap}.stat{flex:1;min-width:130px;border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:14px}.stat b{display:block;font-size:19px;margin-top:4px}
-.btn{border:1px solid #222;background:#fff;color:#111;border-radius:9px;padding:10px 10px;font-weight:800;font-size:13px;line-height:1.15;cursor:pointer}.btn.red{border-color:var(--red);color:#a00}.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}.btn.green{border-color:var(--green);color:var(--green)}.btn.gray{color:#555}
+.btn{border:1px solid #222;background:#fff;color:#111;border-radius:9px;padding:10px 10px;font-weight:800;font-size:13px;line-height:1.15;cursor:pointer}.btn.red{border-color:var(--red);color:#a00;background:#fff}.btn.blue{background:#fff;border-color:var(--blue);color:#1769aa}.btn.green{border-color:var(--green);color:var(--green);background:#fff}.btn.gray{color:#555}
 input,select,textarea{width:100%;border:1px solid #ccc;border-radius:9px;padding:10px;font-size:14px;background:#fff;color:#111}
 .order{border:1px solid var(--border);border-radius:13px;padding:11px}.order-grid{display:grid;grid-template-columns:1fr 260px;gap:14px}.order-actions{display:grid;gap:8px;align-content:start}
 .item{border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:8px;font-size:14px;line-height:1.35}.muted{color:var(--muted)}.pill{display:inline-block;background:#eee;border-radius:999px;padding:7px 10px;font-weight:700}
@@ -29,3 +29,8 @@ input,select,textarea{width:100%;border:1px solid #ccc;border-radius:9px;padding
 .modal-backdrop.open{display:flex}.modal{width:min(620px,94vw);max-height:82vh;overflow:auto;background:#fff;border:1px solid #bbb;border-radius:14px;padding:14px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
 .modal-head{display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:800;border-bottom:1px solid #ddd;padding-bottom:9px;margin-bottom:10px}.close-btn{border:1px solid #777;background:#fff;border-radius:8px;padding:7px 12px;font-size:18px}
 .chat-backdrop{align-items:center!important;justify-content:center!important}.chat{width:min(680px,94vw)!important;height:min(560px,78vh)!important}
+
+.logout-btn{min-width:96px}
+.gcash-box{padding:10px}
+.gcash-box .two{align-items:end}
+@media(max-width:650px){.gcash-box{padding:10px}.gcash-box .two{grid-template-columns:1fr}}
