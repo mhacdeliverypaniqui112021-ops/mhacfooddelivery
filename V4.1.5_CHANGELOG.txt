@@ -1,0 +1,9 @@
+MHAC DELIVERY V4.1.5 — CUSTOMER CANCEL DIRECT
+
+FIXED:
+- Customer CANCEL ORDER now cancels immediately with no confirmation popup.
+- Customer order is removed from the active order list after cancellation.
+- Admin cancellation behavior was not changed.
+- Customer <-> Admin chat UI and Firebase chat logic preserved from V4.1.4.
+- Firestore rules preserved.
+- All other order, menu, rider, and accounting functions preserved.

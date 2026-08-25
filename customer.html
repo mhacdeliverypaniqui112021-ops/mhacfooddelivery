@@ -521,7 +521,6 @@ function startOrders(){
 }
 $("myOrders").onclick=async e=>{
  const b=e.target.closest("[data-cancel-order]");if(!b)return;
- if(!confirm("Cancel this order?"))return;
  const id=b.dataset.cancelOrder;b.disabled=true;
  try{await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});}
  catch(x){b.disabled=false;alert(x.message||x)}

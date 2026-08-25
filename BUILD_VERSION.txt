@@ -1,5 +1,1 @@
-V4.1.4 CHAT UI FIX
-Compact + centered Customer/Admin chatbox.
-Android keyboard-safe positioning using VisualViewport.
-Firebase chat rules and working Customer <-> Admin messaging preserved from V4.1.3.
-All other app functions are preserved.
+MHAC DELIVERY V4.1.5 — CUSTOMER CANCEL DIRECT
