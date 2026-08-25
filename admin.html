@@ -681,7 +681,7 @@ $("googleBtn").onclick=async()=>{
 })();
 $("logout").onclick=()=>signOut(auth);
 
-// V4.1.11: RESTORE ADMIN AUTH STATE + APP INITIALIZATION.
+// V4.1.12: RESTORE ADMIN AUTH STATE + APP INITIALIZATION.
 // The previous chat-fix build contained the login button handler but was
 // missing the auth-state bootstrap, so a successful Google sign-in could
 // leave the page stuck on ADMIN LOGIN.
@@ -701,26 +701,39 @@ async function startAdminApp(user){
   appView();
 
   try{
-    // Restore the published menu.
-    const menuSnap=await getDoc(doc(db,"settings","menu"));
-    menu=normalizeMenu(menuSnap.exists()?menuSnap.data():{version:"final",stores:[]});
+    // Restore the published menu. A denied optional settings document must
+    // NEVER kick an already-authenticated admin back to the login screen.
+    try{
+      const menuSnap=await getDoc(doc(db,"settings","menu"));
+      menu=normalizeMenu(menuSnap.exists()?menuSnap.data():{version:"final",stores:[]});
+    }catch(e){
+      console.warn("Published menu read denied/failed; keeping local menu.",e);
+      // Keep whatever menu is already in memory instead of logging the admin out.
+      menu=normalizeMenu(menu);
+    }
 
-    // Restore the admin draft. Local backup is used only when Firestore
-    // does not yet have a draft.
-    const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
-    if(draftSnap.exists()){
-      draft=normalizeMenu(draftSnap.data());
-      saveDraftLocal();
-    }else{
-      let restored=false;
+    // Draft is optional. If Rules do not grant read access to menuDraft,
+    // use the local draft backup and continue opening the Admin App.
+    let draftRestored=false;
+    try{
+      const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
+      if(draftSnap.exists()){
+        draft=normalizeMenu(draftSnap.data());
+        saveDraftLocal();
+        draftRestored=true;
+      }
+    }catch(e){
+      console.warn("menuDraft read denied/failed; using local draft.",e);
+    }
+    if(!draftRestored){
       try{
         const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
         if(raw){
           const x=JSON.parse(raw);
-          if(x?.menu){draft=normalizeMenu(x.menu);restored=true;}
+          if(x?.menu){draft=normalizeMenu(x.menu);draftRestored=true;}
         }
       }catch(e){}
-      if(!restored) draft=normalizeMenu(menu);
+      if(!draftRestored) draft=normalizeMenu(menu);
     }
 
     renderStores();
@@ -763,10 +776,11 @@ async function startAdminApp(user){
     // the first normal tap on the page to unlock audio.
     autoEnableAdminSound().catch(()=>{});
   }catch(e){
-    console.error("Admin startup failed",e);
-    loginView();
-    $("loginStatus").textContent="❌ "+err(e);
-    adminStartedUid="";
+    // Authentication is already valid. Do not send the admin back to login
+    // because an optional Firestore listener/document is denied.
+    console.error("Admin startup partial failure",e);
+    appView();
+    $("loginStatus").textContent="⚠️ Admin signed in — some Firestore data is unavailable.";
   }
 }
 
