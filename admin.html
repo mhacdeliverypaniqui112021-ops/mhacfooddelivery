@@ -1,6 +1,6 @@
 
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Admin</title><link rel="stylesheet" href="shared.css"></head>
-<body><div class="topbar">🛠️ MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app">
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Admin</title><link rel="stylesheet" href="shared-v431.css"></head>
+<body><div class="topbar">🛠️ V4.1.31 ADMIN FIX — UNIFIED WHITE UI</div><main class="app">
 <section class="hero"><h1>MHAC DELIVERY<br>ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></section>
 <section class="card"><div class="admin-head"><div class="admin-head-row"><h2 class="section-title">👑 MHAC ADMIN</h2><button class="btn logout-btn" onclick="logoutAdmin()">LOG OUT</button></div></div><div class="muted">Signed in as admin</div><div class="card" style="margin-bottom:0"><b>🔔 NEW ORDER + CHAT ALERT</b><span class="muted"> &nbsp;🔊 AUTOMATIC SOUND — READY</span></div></section>
 <section class="card"><h2 class="section-title">📊 DELIVERY & EARNINGS</h2><div class="row"><div class="stat">Today's Deliveries<b>1</b></div><div class="stat">Active Orders<b>1</b></div><div class="stat">Today's Admin 10% Earnings<b>₱26.00</b></div><div class="stat">Today's Rider Delivery Earnings<b>₱40.00</b></div></div><div class="item"><b>RIDER ACCOUNTING — TODAY</b><br>Mhac Delivery<br><span class="muted">Completed: 1 • Delivery earnings: ₱40.00 • Admin service fees to remit: ₱26.00</span></div></section>
@@ -28,17 +28,17 @@
 
 <div id="backdrop" class="chat-backdrop"><div class="chat"><div class="chat-head"><span id="chatTitle">💬 CUSTOMER — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages" id="messages"><div class="msg">ok nb</div><div class="msg me"><b>ADMIN</b><br>yes</div></div><div class="chat-compose"><input id="chatInput" placeholder="Type message..."><button class="btn blue" onclick="sendMsg()">SEND</button></div></div></div>
 <script>
-const AUTH='mhac_admin_auth_v430', ORDER='mhac_order_v430', CHAT='mhac_chat_v430', GCASH='mhac_gcash_v430';
+const AUTH='mhac_admin_auth_v431', ORDER='mhac_order_v431', CHAT='mhac_chat_v431', GCASH='mhac_gcash_v431';
 const defaultOrder={id:'MHAC-1787646547005',customer:'Xxxx',phone:'09812750101',location:'Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines',total:144.50,status:'ACCEPTED',minutes:30,rider:'Mhac Delivery'};
 function getOrder(){try{return JSON.parse(localStorage.getItem(ORDER))||defaultOrder}catch(e){return defaultOrder}}
 function saveOrder(o){localStorage.setItem(ORDER,JSON.stringify(o));renderOrder()}
 function renderOrder(){const o=getOrder();const live=o.status==='COMPLETED'||o.status==='CANCELLED'?0:1;const liveEl=document.querySelector('.pill'); if(liveEl) liveEl.innerHTML='🟢 LIVE — '+live+' active orders'; const time=document.querySelector('.order-actions input');if(time)time.value=o.minutes||30;const sel=document.querySelector('.order select');if(sel)sel.value=o.rider||'Mhac Delivery';}
 function logoutAdmin(){if(!confirm('Log out from MHAC Admin?'))return;localStorage.removeItem(AUTH);showLogin()}
-function showLogin(){document.body.innerHTML='<div class="topbar">🛠️ MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app"><section class="card login-box"><h2>ADMIN LOGGED OUT</h2><p class="muted">You are safely logged out.</p><button class="btn blue" style="width:100%" onclick="loginAdmin()">LOGIN AGAIN</button></section></main>'}
+function showLogin(){document.body.innerHTML='<div class="topbar">🛠️ V4.1.31 ADMIN FIX — UNIFIED WHITE UI</div><main class="app"><section class="card login-box"><h2>ADMIN LOGGED OUT</h2><p class="muted">You are safely logged out.</p><button class="btn blue" style="width:100%" onclick="loginAdmin()">LOGIN AGAIN</button></section></main>'}
 function loginAdmin(){localStorage.setItem(AUTH,'1');location.reload()}
-function openOrder(){document.getElementById('orderModal').classList.add('open')}
+function openOrder(){closeChat();document.getElementById('orderModal').classList.add('open')}
 function closeOrder(){document.getElementById('orderModal').classList.remove('open')}
-function openChat(who){document.getElementById('chatTitle').textContent=who==='rider'?'🏍️ RIDER — CHAT':'💬 CUSTOMER — CHAT';document.getElementById('backdrop').dataset.who=who;renderChat(who);document.getElementById('backdrop').classList.add('open');setTimeout(()=>document.getElementById('chatInput').focus(),80)}
+function openChat(who){closeOrder();document.getElementById('chatTitle').textContent=who==='rider'?'🏍️ RIDER — CHAT':'💬 CUSTOMER — CHAT';document.getElementById('backdrop').dataset.who=who;renderChat(who);document.getElementById('backdrop').classList.add('open');setTimeout(()=>document.getElementById('chatInput').focus(),80)}
 function closeChat(){document.getElementById('backdrop').classList.remove('open')}
 function renderChat(who){let a={};try{a=JSON.parse(localStorage.getItem(CHAT))||{}}catch(e){};let m=a[who]||[];document.getElementById('messages').innerHTML=m.length?m.map(x=>'<div class="msg '+(x.me?'me':'')+'"><b>'+ (x.me?'ADMIN':who.toUpperCase())+'</b><br>'+String(x.text).replace(/[<>]/g,'')+'</div>').join(''):'<div class="muted">No messages yet.</div>';document.getElementById('messages').scrollTop=999999}
 function sendMsg(){let i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;let who=document.getElementById('backdrop').dataset.who||'customer',a={};try{a=JSON.parse(localStorage.getItem(CHAT))||{}}catch(e){};a[who]=a[who]||[];a[who].push({me:true,text:t});localStorage.setItem(CHAT,JSON.stringify(a));i.value='';renderChat(who)}
@@ -53,5 +53,5 @@ function addStore(){const inputs=document.querySelectorAll('input');let i=[...in
 function saveGcash(){const i=[...document.querySelectorAll('input')].find(x=>x.placeholder==='09XXXXXXXXX');if(i)localStorage.setItem(GCASH,i.value);alert('GCash settings saved.')}
 function removeQR(){const f=document.querySelector('input[type=file]');if(f)f.value=''}
 window.addEventListener('click',e=>{if(e.target.id==='backdrop')closeChat();if(e.target.id==='orderModal')closeOrder()});
-window.addEventListener('load',()=>{if(localStorage.getItem(AUTH)!=='1')localStorage.setItem(AUTH,'1');renderOrder();});
+window.addEventListener('load',()=>{if(localStorage.getItem(AUTH)!=='1'){showLogin();return}renderOrder();});
 </script></body></html>
