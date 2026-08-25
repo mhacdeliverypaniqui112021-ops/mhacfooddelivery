@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX</title>
-<meta name="build-version" content="V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.10 ADMIN DIAGNOSTIC + GCASH COMPACT FIX</title>
+<meta name="build-version" content="V4.1.10 ADMIN DIAGNOSTIC + GCASH COMPACT FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -170,6 +170,18 @@
   font-size:19px !important;
   font-weight:700 !important;
 }
+
+/* V4.1.10 ADMIN FIX — compact GCash dashboard */
+#gcashDashboardCard{padding:12px!important}
+#gcashDashboardCard h2{margin:4px 0 6px!important;font-size:20px!important}
+#gcashDashboardCard>p{margin:4px 0 8px!important}
+#gcashDashboard{font-size:13px}
+#gcashDashboard .grid{gap:6px!important;margin-bottom:6px!important}
+#gcashDashboard .metric{padding:8px!important;border-radius:10px!important}
+#gcashDashboard .metric b{font-size:13px!important}
+#gcashDashboard .metric strong{font-size:20px!important}
+#gcashDashboard .item{padding:8px!important;margin:6px 0!important;border-radius:10px!important}
+
 </style>
 </style>
 </style>
@@ -1687,36 +1699,57 @@ async function runMenuDiagnostic(){
   if(!out)return;
   out.textContent="⏳ Checking Firebase menu data…";
   try{
+    // Published menu is intentionally public/readable.
+    // Draft menu is admin-only; if its rule is not deployed yet, do not
+    // make the whole diagnostic fail. Report that item separately.
     const pub=await getDoc(doc(db,"settings","menu"));
-    const dr=await getDoc(doc(db,"settings","menuDraft"));
+    let dr=null, draftError="";
+    try{
+      dr=await getDoc(doc(db,"settings","menuDraft"));
+    }catch(e){
+      draftError=err(e);
+    }
+
     let local=null;
     try{local=JSON.parse(localStorage.getItem(DRAFT_LOCAL_KEY)||"null")}catch(e){}
+
     const pm=pub.exists()?normalizeMenu(pub.data()):{stores:[]};
-    const dm=dr.exists()?normalizeMenu(dr.data()):{stores:[]};
+    const dm=dr && dr.exists()?normalizeMenu(dr.data()):{stores:[]};
     const lm=local?.menu?normalizeMenu(local.menu):{stores:[]};
+
     const lines=[];
     lines.push("FIREBASE settings/menu: "+(pub.exists()?"FOUND":"NOT FOUND"));
     lines.push("Published stores: "+(pm.stores||[]).length);
     lines.push("Published names: "+((pm.stores||[]).map(x=>x.name).join(", ")||"—"));
     lines.push("");
-    lines.push("FIREBASE settings/menuDraft: "+(dr.exists()?"FOUND":"NOT FOUND"));
-    lines.push("Draft stores: "+(dm.stores||[]).length);
-    lines.push("Draft names: "+((dm.stores||[]).map(x=>x.name).join(", ")||"—"));
+    if(draftError){
+      lines.push("FIREBASE settings/menuDraft: ACCESS CHECK FAILED");
+      lines.push("Draft check: "+draftError);
+      lines.push("NOTE: Published menu and local backup can still be checked.");
+    }else{
+      lines.push("FIREBASE settings/menuDraft: "+(dr.exists()?"FOUND":"NOT FOUND"));
+      lines.push("Draft stores: "+(dm.stores||[]).length);
+      lines.push("Draft names: "+((dm.stores||[]).map(x=>x.name).join(", ")||"—"));
+    }
     lines.push("");
     lines.push("PHONE LOCAL BACKUP: "+(local?.menu?"FOUND":"NOT FOUND"));
     lines.push("Local stores: "+(lm.stores||[]).length);
     lines.push("Local names: "+((lm.stores||[]).map(x=>x.name).join(", ")||"—"));
     lines.push("");
-    lines.push("RESULT: "+(((pm.stores||[]).length+(dm.stores||[]).length+(lm.stores||[]).length)>0?"MENU DATA EXISTS somewhere above.":"NO MENU DATA FOUND in these 3 locations."));
+    lines.push("RESULT: "+(((pm.stores||[]).length+(dm.stores||[]).length+(lm.stores||[]).length)>0
+      ?"MENU DATA EXISTS somewhere above."
+      :"NO MENU DATA FOUND in these 3 locations."));
     out.textContent=lines.join("\n");
-  }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
+  }catch(e){
+    out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);
+  }
 }
 
-window.__MHAC_BUILD__="V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX";
+window.__MHAC_BUILD__="V4.1.10 ADMIN DIAGNOSTIC + GCASH COMPACT FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.10 ADMIN DIAGNOSTIC + GCASH COMPACT FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
