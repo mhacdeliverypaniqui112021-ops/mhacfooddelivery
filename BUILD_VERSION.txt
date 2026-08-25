@@ -1,1 +1,2 @@
-Admin UI cleanup only. Existing Firebase/order/menu/chat logic retained.
+MHAC DELIVERY V4.1.29 — ADMIN COMPACT FIX
+Admin layout rebuilt around the supplied prospect: white header, compact black text, four earnings metrics, compact rider accounting, two-column incoming order on wider screens, compact action panel, and responsive mobile stacking.
