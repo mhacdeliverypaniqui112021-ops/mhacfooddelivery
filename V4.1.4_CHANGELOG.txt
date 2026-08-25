@@ -1,0 +1,10 @@
+MHAC DELIVERY V4.1.4 — CHAT UI FIX
+
+FIXED:
+- Customer chatbox is smaller and centered on mobile.
+- Admin chatbox is smaller and centered on mobile.
+- Chat message area is compact instead of excessively tall.
+- Chat input + SEND button remain visible when Android keyboard opens.
+- VisualViewport keyboard handling added for mobile browsers.
+- Customer <-> Admin Firebase chat logic was not changed.
+- Firestore rules were preserved from V4.1.3.

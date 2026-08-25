@@ -28,16 +28,34 @@
 </style>
 
 <style>
-/* V2.8 CUSTOMER CHAT */
-.customerChatPanel{position:fixed;right:12px;bottom:12px;width:min(390px,calc(100vw - 24px));background:#fff;border:3px solid #1976d2;border-radius:18px;z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden}
-.customerChatHead{background:#1976d2;color:#fff;padding:12px;font-weight:900;display:flex;justify-content:space-between;align-items:center}
-.customerChatMessages{height:280px;overflow:auto;padding:10px;background:#f5f7fa}
-.customerChatMsg{max-width:82%;padding:8px 10px;border-radius:12px;margin:6px 0;white-space:pre-wrap;word-break:break-word}
+/* V4.1.4 CHAT UI — compact, centered, keyboard-safe */
+.customerChatPanel{
+  position:fixed;left:50%;right:auto;
+  bottom:max(10px, var(--chat-bottom, 10px));
+  transform:translateX(-50%);
+  width:min(360px,calc(100vw - 28px));
+  max-height:min(68vh,520px);
+  display:flex;flex-direction:column;
+  background:#fff;border:3px solid #1976d2;border-radius:18px;
+  z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
+}
+.customerChatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;align-items:center}
+.customerChatMessages{height:190px;min-height:120px;max-height:35vh;overflow:auto;padding:8px;background:#f5f7fa}
+.customerChatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
 .customerChatMsg.customer{margin-left:auto;background:#d8f5df}
 .customerChatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
-.customerChatInput{display:flex;gap:6px;padding:8px;border-top:1px solid #ddd}
-.customerChatInput input{margin:0;flex:1;min-width:0}
-.customerChatInput button{width:auto!important;margin:0!important;padding:10px 13px!important}
+.customerChatInput{flex:0 0 auto;display:flex;gap:6px;padding:7px;border-top:1px solid #ddd;background:#fff}
+.customerChatInput input{margin:0;flex:1;min-width:0;height:44px;padding:9px 10px!important}
+.customerChatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
+@media(max-width:600px){
+  .customerChatPanel{width:min(360px,calc(100vw - 28px));max-height:60vh}
+  .customerChatMessages{height:175px;max-height:28vh}
+}
+@media(max-width:380px){
+  .customerChatPanel{width:calc(100vw - 20px)}
+  .customerChatMessages{height:160px}
+}
+
 .orderChatBtn{width:100%;margin-top:8px!important;background:#1976d2!important;color:#fff!important;border:0!important;border-radius:9px!important;padding:10px!important;font-weight:900}
 .orderCancelBtn{width:100%;margin-top:8px!important;background:#b00000!important;color:#fff!important;border:0!important;border-radius:9px!important;padding:10px!important;font-weight:900}
 .bucketSelectBox{border:2px solid #ddd;border-radius:12px;background:#fff;padding:8px;margin:8px 0}
@@ -458,6 +476,22 @@ $("customerChatSend").onclick=async()=>{
  try{await addDoc(collection(db,"orders",customerChatOrderId,"messages"),{text,senderRole:"customer",senderUid:currentUser.uid,senderName:currentUser.displayName||currentUser.email||"CUSTOMER",createdAt:serverTimestamp()});$("customerChatInput").value=""}catch(e){$("customerChatInput").value=text;alert(e.message||e)}
 };
 $("customerChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("customerChatSend").click()}});
+
+// V4.1.4: keep compact customer chat centered and above the Android keyboard.
+(function setupCustomerChatKeyboard(){
+  const panel=$("customerChatPanel"), input=$("customerChatInput");
+  if(!panel||!input||!window.visualViewport)return;
+  const adjust=()=>{
+    const vv=window.visualViewport;
+    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
+  };
+  window.visualViewport.addEventListener("resize",adjust);
+  window.visualViewport.addEventListener("scroll",adjust);
+  input.addEventListener("focus",()=>setTimeout(adjust,80));
+  input.addEventListener("blur",()=>setTimeout(adjust,120));
+  adjust();
+})();
 
 function orderCountdownText(o){
  const mins=Number(o.waitingMinutes||0);
