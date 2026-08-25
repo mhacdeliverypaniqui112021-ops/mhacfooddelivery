@@ -1,4 +1,21 @@
-MHAC DELIVERY V4.1.10 HOTFIX
-Replace the current admin.html with this package's admin.html.
-Customer and rider files are retained.
-Hard refresh the GitHub Pages Admin URL after upload.
+MHAC DELIVERY V4.1.8 UPLOAD
+
+Upload/replace:
+- admin.html
+- rider.html
+- customer.html
+- mhac-logo.png
+- assets/mhac-order-alert.mp3
+
+Firestore Rules:
+- V4.1.6/V4.1.7 riderMessages rules remain valid; no new rules are required for V4.1.8.
+
+After GitHub Pages deploy:
+- Hard refresh / refresh each app.
+- Confirm red banner says V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX.
+- Test Admin -> Rider chat.
+- Test Rider -> Admin chat.
+- Test Customer -> Admin chat.
+- Test Customer Cancel Order.
+- Test 1x Chicken Solo: only one part piece.
+- Test 2x/3x Chicken Solo: same or different parts with numbered quantities.
