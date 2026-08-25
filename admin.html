@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX</title>
-<meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX</title>
+<meta name="build-version" content="V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -474,7 +474,11 @@ window.setTimeout(function(){
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
 <div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
-<div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
+<div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div> <div class="card" id="gcashDashboardCard">
+<h2>📱 GCASH PAYMENT DASHBOARD</h2>
+<p class="status">GCash orders are tracked here. Payment stays <b>PENDING VERIFICATION</b> until Admin verifies the payment.</p>
+<div id="gcashDashboard">No GCash orders yet.</div>
+</div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
 <div class="card" id="menuDiagnosticCard"><h2>🧪 MENU DATA DIAGNOSTIC</h2><p class="status">Read-only check. This does not change or delete your menu.</p><button id="checkMenuData" class="blue">🔎 CHECK MENU DATA</button><div id="menuDiagnosticResult" class="status" style="margin-top:10px;white-space:pre-wrap"></div></div>
@@ -672,6 +676,35 @@ function orderDetailHtml(o){
  return `<div class="item" style="background:#f7f7f7"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}<hr><b>🛒 ORDER DETAILS</b>${rows}<hr><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>`;
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
+function renderGcashDashboard(){
+ const host=$("gcashDashboard");
+ if(!host)return;
+ const gcash=orders.filter(o=>String(o.payment||"").toLowerCase()==="gcash");
+ if(!gcash.length){
+   host.innerHTML='<div class="item">📱 No GCash orders yet.</div>';
+   return;
+ }
+ const pending=gcash.filter(o=>String(o.gcashPayment?.status||o.paymentStatus||"PENDING").toUpperCase()!=="PAID");
+ const paid=gcash.filter(o=>String(o.gcashPayment?.status||o.paymentStatus||"PENDING").toUpperCase()==="PAID");
+ host.innerHTML=
+   '<div class="grid" style="margin-bottom:10px">'+
+   '<div class="metric"><b>GCash Orders</b><strong>'+gcash.length+'</strong></div>'+
+   '<div class="metric"><b>Pending</b><strong>'+pending.length+'</strong></div>'+
+   '<div class="metric"><b>Verified Paid</b><strong>'+paid.length+'</strong></div>'+
+   '</div>'+
+   gcash.slice(0,20).map(o=>{
+     const status=String(o.gcashPayment?.status||o.paymentStatus||"PENDING").toUpperCase();
+     const ref=o.gcashPayment?.referenceNumber||o.paymentReference||"";
+     const screenshot=o.gcashPayment?.screenshotUrl||o.paymentScreenshotUrl||"";
+     return '<div class="item" style="margin-top:8px">'+
+       '<b>'+esc(o.orderNo||o.id)+'</b> — '+esc(o.customer?.name||"Customer")+
+       '<br>💰 '+peso(o.fees?.total)+
+       '<br>📱 <b>GCASH '+(status==="PAID"?'🟢 PAID':'🟡 PENDING VERIFICATION')+'</b>'+
+       (ref?'<br>🔢 Reference: '+esc(ref):'')+
+       (screenshot?'<br>📷 <a href="'+esc(screenshot)+'" target="_blank" rel="noopener">VIEW PAYMENT SCREENSHOT</a>':'')+
+       '</div>';
+   }).join("");
+}
 function renderOrders(){
  const active=orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"NEW").toUpperCase()));
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
@@ -1586,12 +1619,18 @@ async function unpublishStore(si){
 async function loadMenu(){
   const pubSnap=await getDoc(doc(db,"settings","menu"));
   menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
-  const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
-  const hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
 
-  // Prefer the device's immediate backup when it exists. This protects Admin
-  // edits from disappearing after a refresh when Firestore draft rules/network
-  // are delayed or unavailable. Firestore remains the shared backup.
+  // Draft access is optional for recovery: if old Firestore rules are still
+  // cached/pending publication, Admin must still be able to open the menu
+  // editor from the published menu/local backup instead of losing the editor.
+  let draftSnap=null, hasDraft=false;
+  try{
+    draftSnap=await getDoc(doc(db,"settings","menuDraft"));
+    hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
+  }catch(e){
+    console.warn("MENU DRAFT READ FAILED — using published/local recovery:",err(e));
+  }
+
   let localDraft=null,localDraftSavedAt=0;
   try{
     const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
@@ -1602,12 +1641,8 @@ async function loadMenu(){
     }
   }catch(e){console.warn("Local draft recovery failed",e)}
 
-  // V4.1.8 RECOVERY RULE:
-  // Compare the local backup timestamp with Firestore menuDraft. If the phone
-  // has a newer saved draft, keep it and push it back to Firestore. This prevents
-  // a just-created food from disappearing after an HTML refresh/deploy.
   const firestoreDraft = hasDraft ? normalizeMenu(draftSnap.data()) : null;
-  const firestoreDraftMs = Number(draftSnap.data()?.updatedAt?.toMillis?.()||0);
+  const firestoreDraftMs = Number(draftSnap?.data()?.updatedAt?.toMillis?.()||0);
   const localHasStores = !!(localDraft && Array.isArray(localDraft.stores) && localDraft.stores.length);
   const firestoreDraftHasStores = !!(firestoreDraft && Array.isArray(firestoreDraft.stores) && firestoreDraft.stores.length);
   const publishedHasStores = !!(menu && Array.isArray(menu.stores) && menu.stores.length);
@@ -1624,9 +1659,6 @@ async function loadMenu(){
     draft = normalizeMenu(menu);
   }
 
-  // Recovery: never erase customer-facing stores just because the editable draft
-  // is missing a published store. A real ADMIN DELETE removes the published store
-  // first, so this does not resurrect intentionally deleted stores.
   const byId=new Map((draft.stores||[]).map(s=>[s.id,s]));
   let recovered=false;
   for(const ps of (menu.stores||[])){
@@ -1645,7 +1677,7 @@ async function loadMenu(){
   }
 }
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
-function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
+function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();renderGcashDashboard();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start()});
 
@@ -1680,11 +1712,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
+window.__MHAC_BUILD__="V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}

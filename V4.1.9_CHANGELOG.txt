@@ -1,13 +1,13 @@
-MHAC DELIVERY V4.1.9 — FIX ONLY
+V4.1.9 ADMIN MENU + GCASH DASHBOARD FIX
 
-FIXES:
-- Admin and Rider chat panels reduced so Android keyboard does not cover the input/send buttons.
-- Admin <-> Rider chat now watches assigned active orders in the background.
-- Incoming Admin -> Rider message automatically opens the Rider chat panel and plays the existing alert ringtone.
-- Incoming Rider -> Admin message automatically opens the Admin chat panel and plays the existing alert ringtone.
-- Chat ringtone uses the same existing MHAC alert audio path.
-- No new business features added.
-- Customer app remains unchanged from V4.1.8.
+ADMIN FIXES
+- Fixed Store/Menu Manager recovery when settings/menuDraft permission is delayed or denied.
+- Added Firestore rules for settings/menuDraft (admin read/write).
+- Existing published/local menu is preserved during draft-read failures.
+- Added GCash Payment Dashboard to Admin.
+- GCash orders show pending/verified status, reference number, and screenshot link when supplied by Customer App.
 
-NOTE:
-Mobile browsers can block autoplay audio until the user has interacted with the page. The visible Enable Sound button remains hidden; the app attempts automatic sound setup and unlocks audio from the user's first normal screen touch/click.
+NOT CHANGED
+- No Rider App or Customer App behavior changed in this build.
+- No menu data is intentionally deleted.
+- Splash/logo behavior remains unchanged.

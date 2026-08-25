@@ -27,6 +27,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Admin editable menu draft. Required by the Store / Menu Manager.
+    match /settings/menuDraft {
+      allow read, write: if isAdmin();
+    }
+
     match /settings/businessHours {
       allow read: if true;
       allow write: if isAdmin();
