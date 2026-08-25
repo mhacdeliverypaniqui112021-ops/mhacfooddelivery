@@ -1,3 +1,3 @@
-MHAC DELIVERY V4.1.25 — UNIFIED CLEAN WHITE UI
-ADMIN + CUSTOMER + RIDER share the same clean white background, black text and compact controls.
-Existing application logic is retained; this package is the UI base pass.
+MHAC DELIVERY V4.1.26 — FINAL UNIFIED WHITE UI BASE
+Admin + Customer + Rider use the same clean white background, black typography, compact cards and controls.
+Colored buttons remain only for actions/statuses.

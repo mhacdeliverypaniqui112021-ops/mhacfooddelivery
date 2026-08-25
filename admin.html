@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.25 ADMIN UI COMPACT WHITE</title>
-<meta name="build-version" content="V4.1.25 ADMIN UI COMPACT WHITE">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.26 ADMIN UI COMPACT WHITE</title>
+<meta name="build-version" content="V4.1.26 ADMIN UI COMPACT WHITE">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -499,7 +499,7 @@ main{padding:12px!important}
 </style>
 
 <style id="v424-admin-compact-white">
-/* V4.1.25 ADMIN — compact white mobile UI */
+/* V4.1.26 ADMIN — compact white mobile UI */
 html,body{background:#fff!important;color:#111!important}
 main{padding:8px!important;max-width:900px!important}
 .card{background:#fff!important;border:2px solid #ddd!important;border-radius:14px!important;padding:10px!important;margin:7px 0!important;box-shadow:none!important}
@@ -558,22 +558,89 @@ header p{font-size:14px!important;margin:8px auto 0!important;color:#222!importa
 }
 </style>
 
-<style id="MHAC_UNIFIED_UI_V4_1_25">
-/* MHAC DELIVERY V4.1.25 — SAME CLEAN WHITE BASE FOR ADMIN / CUSTOMER / RIDER */
-html,body{background:#fff!important;color:#111!important}
-body{font-family:Arial,Helvetica,sans-serif!important}
-.card,.box,.panel,.section,.order-card,.chat-box{
- background:#fff!important;color:#111!important;
- border:1px solid #d8d8d8!important;box-shadow:none!important;
- border-radius:12px!important
+
+
+
+<style id="MHAC_FINAL_UNIFIED_UI_V4_1_26">
+/* FINAL BASE DESIGN: ADMIN + CUSTOMER + RIDER */
+html,body{
+  background:#fff!important;
+  color:#111!important;
 }
-button{border-radius:9px!important;min-height:34px!important;padding:6px 10px!important;font-weight:700!important}
-input,select,textarea{background:#fff!important;color:#111!important;border:1px solid #ccc!important;border-radius:9px!important}
-header{background:#fff!important;color:#111!important;border-bottom:1px solid #ddd!important}
-.logout,.logoutBtn{min-height:30px!important;padding:5px 9px!important;font-size:13px!important}
+body{
+  font-family:Arial,Helvetica,sans-serif!important;
+}
+header{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom:3px solid #e21d25!important;
+}
+header h1,header p{
+  color:#111!important;
+  text-align:center!important;
+}
+.card,.metric,.order,.item,.riderCompact,.foodCard,.editorBox,
+.soundBox,.gcSettings,.storeBox,.panel,.section,.chatPanel{
+  background:#fff!important;
+  color:#111!important;
+  box-shadow:none!important;
+}
+.card{
+  border:1px solid #d8d8d8!important;
+  border-radius:12px!important;
+  padding:12px!important;
+  margin:8px 0!important;
+}
+.metric{
+  border:1px solid #d8d8d8!important;
+  border-radius:10px!important;
+  padding:10px!important;
+}
+.metric span,.metric b{
+  color:#111!important;
+}
+.metric b{
+  font-size:22px!important;
+}
+.order,.item,.riderCompact,.foodCard,.storeBox{
+  border:1px solid #d8d8d8!important;
+  border-radius:10px!important;
+}
+.soundBox{
+  border:1px solid #222!important;
+  border-radius:10px!important;
+}
+.status,.small,.hint{
+  color:#555!important;
+}
+input,textarea,select{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #cfcfcf!important;
+  border-radius:9px!important;
+}
+button{
+  border-radius:9px!important;
+  min-height:34px!important;
+  padding:6px 10px!important;
+  font-weight:700!important;
+}
+.logout,.logoutBtn{
+  min-height:30px!important;
+  padding:5px 9px!important;
+  font-size:13px!important;
+}
+.brandName,.appName{
+  display:block!important;
+  text-align:center!important;
+  color:#111!important;
+}
 @media(max-width:600px){
- .card,.box,.panel,.section,.order-card{padding:10px!important;margin:7px 0!important}
- button{font-size:13px!important}
+  main{padding:10px!important}
+  .card{padding:10px!important}
+  .grid{gap:7px!important}
+  .metric{padding:9px!important}
+  .metric b{font-size:21px!important}
 }
 </style>
 
@@ -1920,11 +1987,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.25 ADMIN UI COMPACT WHITE";
+window.__MHAC_BUILD__="V4.1.26 ADMIN UI COMPACT WHITE";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.25 ADMIN UI COMPACT WHITE — NEW FILE";
+  badge.textContent="🛠️ V4.1.26 ADMIN UI COMPACT WHITE — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
