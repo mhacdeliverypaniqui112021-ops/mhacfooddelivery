@@ -1,7 +1,5 @@
-V4.1.14 RIDER GOOGLE + CENTERED HEADER FIX
-- Fixed JavaScript blocker caused by removed soundBtn.
-- Google button handler now initializes correctly.
-- Kept Google redirect sign-in flow.
-- Removed dash from MHAC DELIVERY title.
-- Centered MHAC DELIVERY with RIDER APP directly underneath.
-- Kept earnings inside the Rider App.
+V4.1.15 RIDER COMPACT + CANCEL FIX
+- Cancelled/CANCELED orders are immediately excluded from Rider active orders.
+- Compact Rider earnings dashboard and logout controls.
+- Compact order action layout: Navigate + Chat Admin on one row; Pick Up / On The Way / Delivered on one row.
+- Preserved V4.1.14 centered header and Google sign-in fix.
