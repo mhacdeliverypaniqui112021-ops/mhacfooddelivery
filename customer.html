@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER FINAL</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
 </style>
@@ -205,6 +205,9 @@
   background:#eee;border:2px solid #222;font-size:17px
 }
 .partBox.selected .partCount{background:#d71920;color:#fff;border-color:#d71920}
+
+.partBox .partMinus,.partBox .partPlus{width:38px!important;min-width:38px!important;height:38px!important;margin:0!important;padding:0!important;font-size:22px!important;font-weight:900!important;line-height:1!important}
+.partBox .partQty{min-width:28px;text-align:center;font-size:18px!important}
 .partTotal{
   margin-top:10px;padding:10px;border-radius:10px;background:#f2f2f2;
   font-size:17px;text-align:center
@@ -257,7 +260,7 @@ header{border-bottom:3px solid #111!important}
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
-<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status"></div></div>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px;display:none">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status">🔊 AUTOMATIC CHAT SOUND — preparing…</div></div>
 <main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
 <section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
 <section class="cart"><h2>📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
@@ -302,7 +305,7 @@ async function loadMenu(){
 async function boot(){await loadHours();await loadMenu();applyHours()}
 function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
 getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();await autoEnableCustomerChatSound();startOrders()});
 function renderStores(){
  const published=(data.stores||[]).filter(s=>s.published===true);
  $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("");
@@ -345,13 +348,15 @@ function customize(si,ci,fi){
  if(f.chickenParts?.length){
    h+=`<div class="field partSelectionField">
      <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
-     <p class="small">Tap the box for the part you want. The number selected appears on the box.</p>
+     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
      <div class="partGrid">${f.chickenParts.map((x,i)=>`
-       <label class="partBox" data-part-select="${i}">
-         <input class="partCheck" type="checkbox" data-part-check="${i}">
+       <div class="partBox" data-part-select="${i}">
          <span class="partName">${esc(x.name)}</span>
-       </label>`).join("")}</div>
-     <div class="partTotal">Selected parts: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
+         <b class="partQty" data-part-count="${i}">0</b>
+         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
+       </div>`).join("")}</div>
+     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
    </div>`;
  }
  if(f.choices?.length){
@@ -371,24 +376,42 @@ function customize(si,ci,fi){
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
- const selectedPartIndexes=()=>[...document.querySelectorAll("[data-part-check]")].filter(x=>x.checked).map(x=>+x.dataset.partCheck);
+ const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
  const update=()=>{
    $("foodQty").textContent=qty;
+   const top=$("foodQtyTop"); if(top) top.textContent=qty;
    const need=$("partNeed"); if(need) need.textContent=qty;
-   const selected=selectedPartIndexes();
-   const totalParts=selected.length;
-   const pt=$("partTotal"); if(pt) pt.textContent=totalParts;
-   document.querySelectorAll("[data-part-select]").forEach((b)=>{
-     const cb=b.querySelector("[data-part-check]");
-     b.classList.toggle("selected",!!cb?.checked);
+   const total=totalPartQty();
+   const pt=$("partTotal"); if(pt) pt.textContent=total;
+   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{
+     const n=Number(parts[i]||0);
+     b.classList.toggle("selected",n>0);
+     const c=b.querySelector("[data-part-count]"); if(c)c.textContent=n;
    });
  };
- $("qminus").onclick=()=>{qty=Math.max(1,qty-1);update()};
- $("qplus").onclick=()=>{qty++;update()};
- document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=(ev)=>{
-   if(ev.target?.matches("input")){}
-   else{const cb=b.querySelector("[data-part-check]");if(cb)cb.checked=!cb.checked;}
+ function changePart(i,d){
+   if(!f.chickenParts?.length)return;
+   const current=Number(parts[i]||0);
+   if(d>0 && totalPartQty()>=qty)return;
+   parts[i]=Math.max(0,current+d);
    update();
+ }
+ $("qminus").onclick=()=>{
+   qty=Math.max(1,qty-1);
+   while(totalPartQty()>qty){
+     const i=parts.findIndex(n=>Number(n||0)>0);
+     if(i<0)break;
+     parts[i]--;
+   }
+   update();
+ };
+ $("qplus").onclick=()=>{qty++;update()};
+ document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
+ document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=(ev)=>{
+   if(ev.target?.closest("button"))return;
+   const i=Number(b.dataset.partSelect);
+   if(totalPartQty()>=qty && Number(parts[i]||0)===0)return;
+   changePart(i,Number(parts[i]||0)>0?-1:1);
  });
  document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
    const k=b.dataset.style,d=Number(b.dataset.d);
@@ -396,14 +419,9 @@ function customize(si,ci,fi){
    const el=$("style-"+k);if(el)el.textContent=styleSel[k];
  });
  $("addConfigured").onclick=()=>{
-   const selectedParts=selectedPartIndexes();
-   if(f.chickenParts?.length && !selectedParts.length)return alert("Please select at least one chicken part.");
-   if(f.chickenParts?.length && selectedParts.length>qty)return alert("You can select at most one part type per ordered piece.");
-   parts=(f.chickenParts||[]).map((_,i)=>selectedParts.includes(i)?1:0);
-   if(f.chickenParts?.length && selectedParts.length<qty && selectedParts.length===1) parts[selectedParts[0]]=qty;
-   else if(f.chickenParts?.length && selectedParts.length<qty){
-     let remain=qty-selectedParts.length;
-     while(remain>0){parts[selectedParts[0]]++;remain--;}
+   const totalSelectedParts=totalPartQty();
+   if(f.chickenParts?.length && totalSelectedParts!==qty){
+     return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
    }
    const ch=document.querySelector('input[name=choice]:checked');
    const choice=ch?f.choices[+ch.value]:null;
@@ -463,9 +481,9 @@ let customerChatUnsub=null,customerChatOrderId="";
 let customerChatSoundReady=false,customerChatSoundCtx=null,customerChatSoundSource=null,customerChatSoundGain=null;
 async function prepareCustomerChatSound(){
  const a=$("chatAlertAudio"); if(!a) throw new Error("Chat sound missing.");
- a.muted=false;a.volume=1;
+ a.muted=true;a.volume=0;
  try{
-   const p=a.play(); if(p) await p; a.pause(); a.currentTime=0;
+   const p=a.play(); if(p) await p; a.pause(); a.currentTime=0; a.muted=false;a.volume=1;
    const AC=window.AudioContext||window.webkitAudioContext;
    if(AC){
      if(!customerChatSoundCtx)customerChatSoundCtx=new AC();
@@ -491,6 +509,22 @@ async function playCustomerChatAlert(){
 }
 $("customerChatSoundBtn").onclick=async()=>{const b=$("customerChatSoundBtn");b.disabled=true;try{await prepareCustomerChatSound()}catch(e){}finally{b.disabled=false}};
 let customerChatSnapshotReady=false;
+async function autoEnableCustomerChatSound(){
+  try{
+    await prepareCustomerChatSound();
+    $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";
+  }catch(e){
+    console.warn("Automatic customer chat sound unlock pending user gesture.",e);
+    $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — waiting for browser audio permission";
+    const unlock=async()=>{
+      try{await prepareCustomerChatSound();$("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";}catch(x){}
+      window.removeEventListener("pointerdown",unlock);
+      window.removeEventListener("touchstart",unlock);
+    };
+    window.addEventListener("pointerdown",unlock,{once:true,passive:true});
+    window.addEventListener("touchstart",unlock,{once:true,passive:true});
+  }
+}
 function openCustomerChat(orderId){
  customerChatOrderId=orderId; customerChatSnapshotReady=false;
  $("customerChatPanel").style.display="block";
@@ -560,8 +594,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.7 CHAT RINGTONE";
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>

@@ -1,0 +1,18 @@
+MHAC DELIVERY V4.1.8
+AUTO CHAT RINGTONE + FOOD PART SELECTION FIX + MENU DRAFT RECOVERY
+
+CHANGES
+1. Admin ↔ Rider chat remains separate from Customer ↔ Admin chat.
+2. Admin and Rider assignment/chat alerts now prepare automatically after login; no ENABLE SOUND button is required.
+3. Customer chat ringtone also attempts automatic audio preparation; browser audio restrictions may still require the first normal user interaction.
+4. Admin/Rider chatbox is smaller on mobile and moves above the Android keyboard.
+5. Chicken part selection now uses per-part quantities:
+   - 1x food: exactly one part piece.
+   - 2x food: two pieces may be the same part or different parts.
+   - 3x food: three pieces may be distributed across parts.
+   Example: Leg 1, Thigh 2.
+6. Drinks are optional in Food Editor. Copy Drinks stores them only in the clipboard; they are never automatically added to another food. Paste Drinks is required.
+7. Pasting drinks replaces the target food's current drink list instead of duplicating it.
+8. Admin menu draft recovery now compares local backup time with Firestore draft time so a newer food edit is not lost after refresh/deploy.
+9. Build banner updated to V4.1.8.
+10. Existing Customer ↔ Admin chat and direct Customer Cancel Order behavior preserved.

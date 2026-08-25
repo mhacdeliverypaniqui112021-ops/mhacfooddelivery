@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.0</title>
+<title>MHAC DELIVERY — RIDER V4.1.8</title><meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -27,26 +27,26 @@
 .riderParts{padding:2px 0;display:block;border:0;background:#fff;font-size:18px;font-weight:700}
 </style>
 <style>
-/* V4.1.6 compact Admin ↔ Rider chat */
+/* V4.1.8 compact Admin ↔ Rider chat */
 .chatPanel{
   position:fixed;left:50%;right:auto;
   bottom:max(10px, var(--chat-bottom, 10px));
   transform:translateX(-50%);
   width:min(360px,calc(100vw - 28px));
-  max-height:min(60vh,500px);
+  max-height:min(46vh,390px);
   display:flex;flex-direction:column;
   background:#fff;border:3px solid #1976d2;border-radius:18px;
   z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
 }
 .chatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
 .chatHead button{width:auto!important;margin:0!important;padding:8px 12px!important;background:#666!important}
-.chatMessages{height:175px;min-height:120px;max-height:28vh;overflow:auto;padding:8px;background:#f5f7fa}
+.chatMessages{height:105px;min-height:80px;max-height:22vh;overflow:auto;padding:8px;background:#f5f7fa}
 .chatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
 .chatMsg.rider{margin-left:auto;background:#d8f5df}
 .chatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
-.chatInput{flex:0 0 auto;display:flex;gap:6px;padding:7px;border-top:1px solid #ddd;background:#fff}
-.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:44px;padding:9px 10px!important}
-.chatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
+.chatInput{flex:0 0 auto;display:flex;gap:5px;padding:5px;border-top:1px solid #ddd;background:#fff}
+.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:40px;padding:7px 9px!important}
+.chatInput button{width:auto!important;min-width:76px;height:40px!important;margin:0!important;padding:7px 10px!important}
 .riderChatBtn{background:#1976d2!important}
 </style>
 </head>
@@ -59,7 +59,7 @@
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="soundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
@@ -103,9 +103,9 @@ function makeRiderFallbackSound(){
 async function prepareRiderAlertSound(){
   const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound element missing.");
   if(!a.src||a.src==="")await initRiderAlertSound();
-  a.muted=false;a.volume=1;
+  a.muted=true;a.volume=0;
   try{
-    const p=a.play();if(p)await p;a.pause();a.currentTime=0;
+    const p=a.play();if(p)await p;a.pause();a.currentTime=0;a.muted=false;a.volume=1;
     try{
       const AC=window.AudioContext||window.webkitAudioContext;if(AC){
         if(!soundCtx)soundCtx=new AC();await soundCtx.resume();
@@ -125,6 +125,23 @@ async function playAlert(){
   catch(e){if(!makeRiderFallbackSound())$("soundState").textContent=" ❌ Alert playback failed — tap ENABLE SOUND again"}
 }
 $("soundBtn").onclick=async()=>{const b=$("soundBtn");b.disabled=true;try{await initRiderAlertSound();await prepareRiderAlertSound()}catch(e){console.error(e);$("soundState").textContent=" ❌ Sound could not be enabled — check phone media volume";soundReady=false}finally{b.disabled=false}};
+async function autoEnableRiderSound(){
+ try{
+   await initRiderAlertSound();
+   await prepareRiderAlertSound();
+   $("soundState").textContent="🔊 AUTOMATIC SOUND — READY";
+ }catch(e){
+   console.warn("Automatic rider sound unlock pending user gesture.",e);
+   $("soundState").textContent="🔊 AUTOMATIC SOUND — waiting for browser audio permission";
+   const unlock=async()=>{
+     try{await prepareRiderAlertSound();$("soundState").textContent="🔊 AUTOMATIC SOUND — READY";}catch(x){}
+     window.removeEventListener("pointerdown",unlock);
+     window.removeEventListener("touchstart",unlock);
+   };
+   window.addEventListener("pointerdown",unlock,{once:true,passive:true});
+   window.addEventListener("touchstart",unlock,{once:true,passive:true});
+ }
+}
 async function googleLogin(){
  $("googleBtn").disabled=true;$("googleStatus").textContent="Opening Google sign-in…";
  try{
@@ -177,6 +194,7 @@ async function afterLogin(user){
    if(riderData.approved===false){showPending();return}
    await loadProfile();
    showApp();
+   await autoEnableRiderSound();
    $("conn").textContent="🟢 LIVE — waiting for assigned orders";
    startOrdersListener();
    startHoursTimer();
@@ -280,6 +298,6 @@ async function logout(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterva
 $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();if(riderOpen())showLogin();else showClosed()};
 getRedirectResult(auth).catch(e=>{if(e) $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(e.message||e)+"</span>"});
 onAuthStateChanged(auth,async user=>{if(!user){if(unsub){unsub();unsub=null}$("app").classList.add("hidden");$("pending").classList.add("hidden");if($("closed").classList.contains("hidden"))$("login").classList.remove("hidden");return}if($("app").classList.contains("hidden")){try{await afterLogin(user)}catch(e){console.error(e)}}});
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>

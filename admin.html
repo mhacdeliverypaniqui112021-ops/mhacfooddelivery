@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.5 CUSTOMER CANCEL DIRECT — CHAT UI FIX</title>
-<meta name="build-version" content="V4.1.5 CUSTOMER CANCEL DIRECT — CHAT UI FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX</title>
+<meta name="build-version" content="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -389,29 +389,29 @@
   bottom:max(10px, var(--chat-bottom, 10px));
   transform:translateX(-50%);
   width:min(360px,calc(100vw - 28px));
-  max-height:min(68vh,520px);
+  max-height:min(46vh,390px);
   display:flex;flex-direction:column;
   background:#fff;border:3px solid #1976d2;border-radius:18px;
   z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
 }
 .chatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
-.chatMessages{height:190px;min-height:120px;max-height:35vh;overflow:auto;padding:8px;background:#f5f7fa}
+.chatMessages{height:105px;min-height:80px;max-height:22vh;overflow:auto;padding:8px;background:#f5f7fa}
 .chatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
 .chatMsg.admin{margin-left:auto;background:#d8f5df}
 .chatMsg.customer{margin-right:auto;background:#fff;border:1px solid #ddd}
-.chatInput{flex:0 0 auto;display:flex;gap:6px;padding:7px;border-top:1px solid #ddd;background:#fff}
-.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:44px;padding:9px 10px!important}
-.chatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
+.chatInput{flex:0 0 auto;display:flex;gap:5px;padding:5px;border-top:1px solid #ddd;background:#fff}
+.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:40px;padding:7px 9px!important}
+.chatInput button{width:auto!important;min-width:76px;height:40px!important;margin:0!important;padding:7px 10px!important}
 .chatOpenBtn{background:#1976d2!important;margin-top:5px!important}
 .riderChatOpenBtn{background:#111!important}
 .chatMsg.rider{margin-right:auto;background:#fff;border:1px solid #ddd}
 @media(max-width:600px){
-  .chatPanel{width:min(360px,calc(100vw - 28px));max-height:60vh}
-  .chatMessages{height:175px;max-height:28vh}
+  .chatPanel{width:min(360px,calc(100vw - 28px));max-height:46vh}
+  .chatMessages{height:95px;max-height:20vh}
 }
 @media(max-width:380px){
-  .chatPanel{width:calc(100vw - 20px)}
-  .chatMessages{height:160px}
+  .chatPanel{width:calc(100vw - 20px);max-height:44vh}
+  .chatMessages{height:85px}
 }
 </style>
 
@@ -473,7 +473,7 @@ window.setTimeout(function(){
 <header><h1>MHAC DELIVERY — ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
-<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER ALERT</b><button id="adminSoundBtn" class="blue">🔊 ENABLE SOUND</button><span id="adminSoundState" class="status"></span></div></div>
+<div class="card"><div class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
@@ -561,11 +561,12 @@ async function prepareAdminAlertSound(){
   const a=$("orderAlertAudio");
   if(!a)throw new Error("Alert audio element missing.");
   if(!adminAlertUrl)await initAdminAlertSound();
-  a.muted=false;a.volume=1;
+  a.muted=true;a.volume=0;
   try{
     const p=a.play();
     if(p)await p;
     a.pause();a.currentTime=0;
+    a.muted=false;a.volume=1;
     try{
       const AC=window.AudioContext||window.webkitAudioContext;
       if(AC){
@@ -614,6 +615,23 @@ $("adminSoundBtn").onclick=async()=>{
   catch(e){console.error(e);$("adminSoundState").textContent="❌ Sound could not be enabled — check phone media volume";adminSoundReady=false}
   finally{b.disabled=false}
 };
+async function autoEnableAdminSound(){
+  try{
+    await initAdminAlertSound();
+    await prepareAdminAlertSound();
+    $("adminSoundState").textContent="🔊 AUTOMATIC SOUND — READY";
+  }catch(e){
+    console.warn("Automatic admin sound unlock pending user gesture.",e);
+    $("adminSoundState").textContent="🔊 AUTOMATIC SOUND — waiting for browser audio permission";
+    const unlock=async()=>{
+      try{await prepareAdminAlertSound();$("adminSoundState").textContent="🔊 AUTOMATIC SOUND — READY";}catch(x){}
+      window.removeEventListener("pointerdown",unlock);
+      window.removeEventListener("touchstart",unlock);
+    };
+    window.addEventListener("pointerdown",unlock,{once:true,passive:true});
+    window.addEventListener("touchstart",unlock,{once:true,passive:true});
+  }
+}
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
 $("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
@@ -1170,8 +1188,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    <p class="hint">Optional. Every drink can have its own size/add price. Example: Coke Regular ₱0, Medium +₱35, Large +₱45.</p>
    <div class="drinkRows"></div>
    <div class="copyPasteRow">
-     <button type="button" class="blue smallBtn copyDrinks">📋 COPY ALL DRINKS</button>
-     <button type="button" class="blue smallBtn pasteDrinks">📥 PASTE ALL DRINKS</button>
+     <button type="button" class="blue smallBtn copyDrinks">📋 COPY DRINKS ONLY</button>
+     <button type="button" class="blue smallBtn pasteDrinks">📥 PASTE DRINKS HERE</button>
    </div>
    <button type="button" class="blue addDrink">➕ ADD DRINK / CHOICE</button>
 
@@ -1341,13 +1359,18 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  ed.querySelector(".pasteParts").onclick=()=>foodClipboard.parts.forEach(addPartRow);
 
  ed.querySelector(".copyDrinks").onclick=()=>{
-   foodClipboard.choices=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".drinkName")).map(r=>[
-     r.querySelector(".drinkName").value.trim(),Number(r.querySelector(".drinkPrice").value||0)
+   foodClipboard.choices=[...ed.querySelectorAll(".drinkRows .editorRow")].map(r=>[
+     r.querySelector(".drinkName")?.value.trim()||"",Number(r.querySelector(".drinkPrice")?.value||0)
    ]).filter(x=>x[0]);
    saveFoodClipboard();
-   toast("Drinks copied.");
+   toast("📋 DRINKS COPIED — they will NOT appear in another food until you tap PASTE DRINKS HERE.");
  };
- ed.querySelector(".pasteDrinks").onclick=()=>foodClipboard.choices.forEach(x=>addDrinkRow(x[0],x[1]));
+ ed.querySelector(".pasteDrinks").onclick=()=>{
+   if(!foodClipboard.choices.length){toast("No drinks copied yet.");return}
+   ed.querySelector(".drinkRows").innerHTML="";
+   foodClipboard.choices.forEach(x=>addDrinkRow(x[0],x[1]));
+   toast("📥 DRINKS PASTED HERE — review then SAVE FOOD.");
+ };
 
  ed.querySelector(".copyAddons").onclick=()=>{
    foodClipboard.addOns=[...ed.querySelectorAll(".editorRow")].filter(r=>r.querySelector(".addonName")).map(r=>[
@@ -1438,7 +1461,7 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
   input.addEventListener("blur",()=>setTimeout(adjust,120));
   adjust();
 })();
-// V4.1.6: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
+// V4.1.8: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
 let adminRiderChatUnsub=null,adminRiderChatOrderId="",adminRiderChatSnapshotReady=false;
 function openAdminRiderChat(orderId){
  const o=orders.find(x=>x.id===orderId);
@@ -1569,33 +1592,33 @@ async function loadMenu(){
   // Prefer the device's immediate backup when it exists. This protects Admin
   // edits from disappearing after a refresh when Firestore draft rules/network
   // are delayed or unavailable. Firestore remains the shared backup.
-  let localDraft=null;
+  let localDraft=null,localDraftSavedAt=0;
   try{
     const raw=localStorage.getItem(DRAFT_LOCAL_KEY);
     if(raw){
       const parsed=JSON.parse(raw);
+      localDraftSavedAt=Number(parsed?.savedAt||0);
       if(parsed?.menu && Array.isArray(parsed.menu.stores)) localDraft=normalizeMenu(parsed.menu);
     }
   }catch(e){console.warn("Local draft recovery failed",e)}
 
-  // IMPORTANT RECOVERY RULE:
-  // Never let an empty/stale localStorage draft hide a real Firestore menu.
-  // The old build used `localDraft || ...`, and an empty local draft is truthy,
-  // so it could replace a valid Firestore draft/menu and make all edited stores
-  // appear to have disappeared.
+  // V4.1.8 RECOVERY RULE:
+  // Compare the local backup timestamp with Firestore menuDraft. If the phone
+  // has a newer saved draft, keep it and push it back to Firestore. This prevents
+  // a just-created food from disappearing after an HTML refresh/deploy.
   const firestoreDraft = hasDraft ? normalizeMenu(draftSnap.data()) : null;
+  const firestoreDraftMs = Number(draftSnap.data()?.updatedAt?.toMillis?.()||0);
   const localHasStores = !!(localDraft && Array.isArray(localDraft.stores) && localDraft.stores.length);
   const firestoreDraftHasStores = !!(firestoreDraft && Array.isArray(firestoreDraft.stores) && firestoreDraft.stores.length);
   const publishedHasStores = !!(menu && Array.isArray(menu.stores) && menu.stores.length);
 
-  // FIRESTORE DRAFT IS AUTHORITATIVE when it exists and contains stores.
-  // The phone backup is only a fallback. This prevents an older local copy from
-  // overwriting newer menu edits that were already saved in Firebase.
-  if(firestoreDraftHasStores){
+  if(localHasStores && (!firestoreDraftHasStores || localDraftSavedAt > firestoreDraftMs)){
+    draft = localDraft;
+    await flushDraftMenu().catch(e=>console.warn("Newer local draft recovery save failed",e));
+  }else if(firestoreDraftHasStores){
     draft = firestoreDraft;
   }else if(localHasStores){
     draft = localDraft;
-    // Recover a local-only draft into Firestore once permission is available.
     await flushDraftMenu().catch(e=>console.warn("Local draft recovery save failed",e));
   }else{
     draft = normalizeMenu(menu);
@@ -1624,7 +1647,7 @@ async function loadMenu(){
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
 function start(){if(ru)ru();ru=onSnapshot(collection(db,"riders"),s=>{riders=s.docs.map(d=>({id:d.id,...d.data(),uid:d.data().uid||d.id}));renderRiders();calcStats();if(ou)ou();ou=onSnapshot(collection(db,"orders"),x=>{const incoming=x.docs.map(d=>({id:d.id,...d.data()}));if(!adminOrdersPrimed){incoming.forEach(o=>seenAdminOrders.add(o.id));adminOrdersPrimed=true;}else{incoming.forEach(o=>{if(!seenAdminOrders.has(o.id)){seenAdminOrders.add(o.id);if(String(o.status||"NEW").toUpperCase()==="NEW")playAdminAlert()}})}orders=incoming;orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));$("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";renderOrders();calcStats()})})}
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
-onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;loadMenu();start()});
+onAuthStateChanged(auth,u=>{if(!u){loginView();return}if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start()});
 
 
 async function runMenuDiagnostic(){
@@ -1657,11 +1680,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.7 CHAT RINGTONE";
+window.__MHAC_BUILD__="V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";
+  badge.textContent="🛠️ V4.1.8 AUTO CHAT RINGTONE + FOOD PART FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
