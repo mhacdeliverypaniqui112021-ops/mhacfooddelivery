@@ -1,5 +1,3 @@
-V4.1.15 RIDER COMPACT + CANCEL FIX
-- Cancelled/CANCELED orders are immediately excluded from Rider active orders.
-- Compact Rider earnings dashboard and logout controls.
-- Compact order action layout: Navigate + Chat Admin on one row; Pick Up / On The Way / Delivered on one row.
-- Preserved V4.1.14 centered header and Google sign-in fix.
+MHAC DELIVERY V4.1.25 — UNIFIED CLEAN UI BASE
+Admin + Customer + Rider unified white/black compact UI.
+UI-only pass; business-hours logic unchanged.
