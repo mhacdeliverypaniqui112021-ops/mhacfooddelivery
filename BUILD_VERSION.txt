@@ -1,3 +1,5 @@
-V4.1.11 RIDER INTRO + EARNINGS + AUTO SOUND FIX
-Rider-only fix build based on V4.1.8.
-Admin and Customer files are retained from the baseline.
+V4.1.12 RIDER UI FIX
+- Removed earnings card from above the app header.
+- Kept earnings dashboard inside logged-in Rider App.
+- Splash loading line restored to red.
+- Google Rider Login card/button compacted for mobile.
