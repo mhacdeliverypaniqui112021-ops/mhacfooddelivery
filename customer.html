@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
 </style>
@@ -262,7 +262,7 @@ header{border-bottom:3px solid #111!important}
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
 <div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px;display:none">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status">🔊 AUTOMATIC CHAT SOUND — preparing…</div></div>
 <main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
-<section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
+<section class="cart"><div class="cartHeader"><h2>🛒 YOUR CART <span id="count" style="font-size:14px">0</span></h2><button id="addMoreOrderBtn" class="addOrderBtn" onclick="window.scrollTo({top:document.querySelector('.title')?.offsetTop||0,behavior:'smooth'})">＋ ADD ORDER</button></div><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
 <section class="cart"><h2>📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
 
 <audio id="chatAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
@@ -273,7 +273,16 @@ header{border-bottom:3px solid #111!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select><button type="button" id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="gcashPanel" class="gcashPanel">
+  <b>💳 GCASH PAYMENT</b>
+  <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
+  <img id="gcashQrDisplay" class="hidden" alt="GCash QR Code">
+  <p class="status">Send the exact Total Amount to this GCash account, then upload your payment screenshot below.</p>
+  <input id="gcashScreenshot" type="file" accept="image/*">
+  <p id="gcashUploadStatus" class="status"></p>
+</div>
+<button type="button" id="sendOrderBtn" class="add" onclick="placeOrder()">📤 SEND ORDER</button><div id="sendStatus" class="status"></div></div></div>
 <script>
 function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.classList.add("hide");setTimeout(()=>x.remove(),650)}}window.addEventListener("load",()=>setTimeout(hideSplash,2200));
 </script>
@@ -281,12 +290,14 @@ function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.clas
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import{getFirestore,doc,getDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import{getStorage,ref as storageRef,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-storage.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null,menuUnsub=null;
+let gcashSettings={number:"",qrUrl:""},gcashSettingsUnsub=null;
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function isOpen(){if(businessHours.enabled===false)return false;const n=new Date(),c=n.getHours()*60+n.getMinutes(),o=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return o<=cl?c>=o&&c<cl:(c>=o||c<cl)}
 async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...businessHours,...s.data()}}catch(e){}}function applyHours(){const op=isOpen();$("scheduleBar").textContent=`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
@@ -305,7 +316,27 @@ async function loadMenu(){
 async function boot(){await loadHours();await loadMenu();applyHours()}
 function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
 getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();await autoEnableCustomerChatSound();startOrders()});
+
+function renderGcashSettings(){
+  $("gcashNumberDisplay").textContent=gcashSettings.number||"GCash number not set yet.";
+  if(gcashSettings.qrUrl){$("gcashQrDisplay").src=gcashSettings.qrUrl;$("gcashQrDisplay").classList.remove("hidden")}
+  else{$("gcashQrDisplay").classList.add("hidden");$("gcashQrDisplay").src=""}
+}
+function startGcashSettingsWatch(){
+  if(gcashSettingsUnsub)gcashSettingsUnsub();
+  gcashSettingsUnsub=onSnapshot(doc(db,"settings","payment"),s=>{
+    gcashSettings=s.exists()?{number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||"")}:{number:"",qrUrl:""};
+    renderGcashSettings();
+  },e=>console.warn("GCash settings:",e));
+}
+function stopGcashSettingsWatch(){if(gcashSettingsUnsub){gcashSettingsUnsub();gcashSettingsUnsub=null}}
+$("payment").onchange=()=>{
+  const isG=String($("payment").value).toUpperCase()==="GCASH";
+  $("gcashPanel").classList.toggle("show",isG);
+  if(isG)renderGcashSettings();
+};
+
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound();startOrders()});
 function renderStores(){
  const published=(data.stores||[]).filter(s=>s.published===true);
  $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("");
@@ -442,9 +473,51 @@ function customize(si,ci,fi){
  update();
 }
 function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
-function renderCart(){const names=[...new Set(draftCart.map(x=>x.store))];$("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);$("storeCount").textContent=`Stores selected: ${names.length}/2`;if(!draftCart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return}$("checkoutBtn").disabled=false;$("cart").innerHTML=draftCart.map((x,i)=>`<div class=row><b>${x.qty} × ${esc(x.store)} — ${esc(x.name)}</b><br><small>${esc(x.choice)}${x.addOns?.length?" • "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}</small><div class=qty><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`).join("");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("totals").innerHTML=`Food: <b>${peso(sub)}</b><br>10% SF: <b>${peso(sf)}</b><br>Delivery: <b>${distanceKm===null?"—":peso(deliveryFee)}</b><br>2nd Store: <b>${peso(second)}</b><br><span class=total>GRAND TOTAL ${peso(total)}</span>`}
+function renderCart(){
+ const names=[...new Set(draftCart.map(x=>x.store))];
+ $("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);
+ $("storeCount").textContent=`Stores selected: ${names.length}/2`;
+ if(!draftCart.length){
+   $("cart").innerHTML="No items yet.";
+   $("totals").innerHTML="";
+   $("checkoutBtn").disabled=true;
+   return;
+ }
+ $("checkoutBtn").disabled=false;
+ $("cart").innerHTML=draftCart.map((x,i)=>{
+   const drinkParts=[];
+   if(x.choice)drinkParts.push(x.choice);
+   if(x.bucketChoice)drinkParts.push(x.bucketChoice);
+   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);
+   if(addNames.length)drinkParts.push(addNames.join(", "));
+   const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);
+   return `<div class="cartLine">
+     <div class="cartStore">${esc(x.store)}</div>
+     <div class="cartFood">${x.qty}x ${esc(x.name)}${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div>
+     ${drinkParts.length?`<div class="cartDrinks">Drinks / Choices</div><div>${drinkParts.map(esc).join(", ")}</div>`:""}
+     <div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div>
+   </div>`;
+ }).join("");
+ const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
+ $("totals").innerHTML=`<div class="cartTotals">
+   <div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div>
+   <div class="cartTotalRow"><b>Service Fee</b><span>10% <span>${peso(sf)}</span></span></div>
+   <div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div>
+   <div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div>
+   <div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div>
+ </div>`;
+}
 function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}</small></div>`).join("");updateTotals()}
-function updateTotals(){const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;$("checkoutTotals").innerHTML=`Food: ${peso(sub)}<br>10% SF: ${peso(sf)}<br>Delivery: ${distanceKm===null?"—":peso(deliveryFee)}<br>2nd Store: ${peso(second)}<br><b class=total>TOTAL ${peso(total)}</b>`}
+function updateTotals(){
+ const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
+ $("checkoutTotals").innerHTML=`<div class="cartTotals">
+ <div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div>
+ <div class="cartTotalRow"><b>Service Fee</b><span>10% ${peso(sf)}</span></div>
+ <div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div>
+ <div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div>
+ <div class="cartTotalRow" style="font-size:20px"><b>Total Amount</b><b>${peso(total)}</b></div>
+ </div>`;
+}
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
 async function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
@@ -475,7 +548,40 @@ async function calculateByGPS(e){
  });
 }
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
-async function placeOrder(){if(!isOpen())return alert("MHAC Delivery is closed.");const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact)return alert("Complete name and contact.");if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(draftCart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;const o={orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value};try{const ref=await addDoc(collection(db,"orders"),o);$("sendStatus").textContent="✅ ORDER SENT: "+ref.id;draftCart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,800)}catch(e){$("sendStatus").textContent="❌ "+e.message}}
+async function placeOrder(){
+ if(!isOpen())return alert("MHAC Delivery is closed.");
+ const name=$("custName").value.trim(),contact=$("custContact").value.trim();
+ if(!name||!contact)return alert("Complete name and contact.");
+ if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");
+ const payment=String($("payment").value||"Cash on Delivery");
+ const isGcash=payment.toUpperCase()==="GCASH";
+ const screenshot=$("gcashScreenshot")?.files?.[0];
+ if(isGcash && !screenshot)return alert("For GCash payment, upload your payment screenshot first.");
+ const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(draftCart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;
+ $("sendOrderBtn").disabled=true;
+ try{
+   let paymentScreenshotUrl="";
+   if(isGcash && screenshot){
+     $("gcashUploadStatus").textContent="Uploading payment screenshot…";
+     const path=`payments/${currentUser.uid}/${Date.now()}-${screenshot.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+     const up=await uploadBytes(storageRef(storage,path),screenshot,{contentType:screenshot.type||"image/jpeg"});
+     paymentScreenshotUrl=await getDownloadURL(up.ref);
+   }
+   const o={
+     orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",
+     customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},
+     items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},
+     payment,paymentStatus:isGcash?"PENDING":"COD",paymentScreenshotUrl,paymentSubmittedAt:isGcash?serverTimestamp():null
+   };
+   const ref=await addDoc(collection(db,"orders"),o);
+   $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
+   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
+   $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
+   renderCart();setTimeout(closeCheckout,1000);
+ }catch(e){
+   $("sendStatus").textContent="❌ "+e.message;
+ }finally{$("sendOrderBtn").disabled=false}
+}
 
 let customerChatUnsub=null,customerChatOrderId="";
 let customerChatSoundReady=false,customerChatSoundCtx=null,customerChatSoundSource=null,customerChatSoundGain=null;
@@ -593,7 +699,7 @@ function startOrders(){
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span><br>${(o.items||[]).map(i=>`${esc(i.store)} — ${esc(i.name)} ×${i.qty}`).join("<br>")}<br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<br>${(o.items||[]).map(i=>`${esc(i.store)} — ${esc(i.name)} ×${i.qty}`).join("<br>")}<br><b>Grand Total: ${peso(o.fees?.total)}</b>
       ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
       ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
@@ -608,8 +714,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX";
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.21 CUSTOMER AUTO CHAT POPUP + RINGTONE FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+window.__MHAC_BUILD__="V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>

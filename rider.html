@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.18</title><meta name="build-version" content="V4.1.21 RIDER AUTO CHAT POPUP + RINGTONE FIX">
+<title>MHAC DELIVERY — RIDER V4.1.18</title><meta name="build-version" content="V4.1.22 RIDER LOGIN + WHITE UI + CANCEL FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -241,7 +241,7 @@ function installRiderChatAudioUnlock(){
 }
 installRiderChatAudioUnlock();
 
-function playAlert(){
+async function playAlert(){
   if(!soundReady)return;
   try{const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound missing");if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p}
   catch(e){if(!makeRiderFallbackSound())$("soundState").textContent=" ❌ Alert playback failed — tap ENABLE SOUND again"}
@@ -264,36 +264,33 @@ async function autoEnableRiderSound(){
  }
 }
 async function googleLogin(){
-  const btn=$("googleBtn");
-  const status=$("googleStatus");
-  if(btn.disabled)return;
-  btn.disabled=true;
-  status.textContent="Opening Google sign-in…";
-  try{
-    await setPersistence(auth,browserLocalPersistence);
-    // Mobile-friendly: try popup first from the user's tap. If the browser
-    // blocks the popup, immediately fall back to Firebase redirect.
-    try{
-      const result=await signInWithPopup(auth,googleProvider);
-      await afterLogin(result.user);
-      return;
-    }catch(popupErr){
-      // Android/Chrome can reject Firebase popups for several reasons.
-      // Always fall back to the full-page Google redirect so login cannot get stuck.
-      console.warn("Google popup failed; using redirect",popupErr);
-      status.textContent="Opening Google sign-in…";
-      await signInWithRedirect(auth,googleProvider);
-    }
-  }catch(e){
-    console.error("Google sign-in:",e);
-    const code=e?.code||"";
-    let message=e?.message||String(e);
-    if(code==="auth/unauthorized-domain")message="GitHub Pages domain is not authorized in Firebase Authentication.";
-    else if(code==="auth/operation-not-supported-in-this-environment")message="Google sign-in is not supported in this browser.";
-    else if(code==="auth/network-request-failed")message="Network error. Check your internet connection.";
-    status.innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
-    btn.disabled=false;
-  }
+ const btn=$("googleBtn"),status=$("googleStatus");
+ if(btn.disabled)return;
+ btn.disabled=true;status.textContent="Opening Google sign-in…";
+ try{
+   await setPersistence(auth,browserLocalPersistence);
+   const isAndroid=/Android/i.test(navigator.userAgent);
+   if(isAndroid){
+     // Redirect is more reliable than a popup inside Android Chrome/GitHub Pages.
+     await signInWithRedirect(auth,googleProvider);
+     return;
+   }
+   try{
+     const result=await signInWithPopup(auth,googleProvider);
+     await afterLogin(result.user);return;
+   }catch(popupErr){
+     console.warn("Google popup failed; using redirect",popupErr);
+     await signInWithRedirect(auth,googleProvider);
+   }
+ }catch(e){
+   console.error("Google sign-in:",e);
+   const code=e?.code||"";let message=e?.message||String(e);
+   if(code==="auth/unauthorized-domain")message="GitHub Pages domain is not authorized in Firebase Authentication.";
+   else if(code==="auth/operation-not-supported-in-this-environment")message="Google sign-in is not supported in this browser.";
+   else if(code==="auth/network-request-failed")message="Network error. Check your internet connection.";
+   status.innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
+   btn.disabled=false;
+ }
 }
 async function legacyLogin(){$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{const result=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);uid=result.user.uid;await afterLogin(result.user)}catch(e){$("loginStatus").innerHTML='<span class="error">❌ '+esc(e.message)+"</span>"}finally{$("loginBtn").disabled=false}}
 async function afterLogin(user){
@@ -491,7 +488,7 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.21 RIDER AUTO CHAT POPUP + RINGTONE FIX";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.22 RIDER LOGIN + WHITE UI + CANCEL FIX";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
 
