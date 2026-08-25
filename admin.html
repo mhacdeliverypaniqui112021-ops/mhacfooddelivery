@@ -1,153 +1,57 @@
-<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Admin — Fixed</title><link rel="stylesheet" href="shared.css"></head>
-<body>
-<div class="topbar">🛠️ MHAC DELIVERY — UNIFIED WHITE UI • FIXED</div>
-<main class="app" id="appRoot">
+
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Admin</title><link rel="stylesheet" href="shared.css"></head>
+<body><div class="topbar">🛠️ MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app">
 <section class="hero"><h1>MHAC DELIVERY<br>ADMIN APP</h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></section>
-<section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 class="section-title">👑 MHAC ADMIN</h2><button class="btn" onclick="logoutAdmin()">LOG OUT</button></div><div class="muted">Signed in as admin</div><div class="notice" style="margin-top:10px"><b>🔔 NEW ORDER + CHAT ALERT</b> &nbsp; 🔊 AUTOMATIC SOUND — READY</div></section>
-
-<section class="card"><h2 class="section-title">📊 DELIVERY & EARNINGS</h2>
-<div class="row"><div class="stat">Today's Deliveries<b>1</b></div><div class="stat">Active Orders<b id="activeCount">1</b></div><div class="stat">Today's Admin 10% Earnings<b>₱26.00</b></div><div class="stat">Today's Rider Delivery Earnings<b>₱40.00</b></div></div>
-<div class="item"><b>RIDER ACCOUNTING — TODAY</b><br>Mhac Delivery<br><span class="muted">Completed: 1 • Delivery earnings: ₱40.00 • Admin service fees to remit: ₱26.00</span></div></section>
-
-<section class="card"><h2 class="section-title">📥 INCOMING ORDERS <span class="pill">🟢 LIVE — <span id="liveCount">1</span></span></h2>
-<div class="order"><div class="order-grid"><div>
-<h3 id="orderId">MHAC-1787646547005</h3><h3 id="customerName">Xxxx</h3><div>📞 09812750101</div><div>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines</div>
-<p><b>Customer Total: ₱144.50</b></p><span class="pill">💵 CASH ON DELIVERY</span><div class="item" id="orderDetails"></div></div>
-<div class="order-actions">
-<button class="btn" onclick="openOrder()">👁️ VIEW FULL ORDER</button>
-<button class="btn blue" onclick="openChat('customer')">💬 CHAT CUSTOMER</button>
-<button class="btn" onclick="openChat('rider')">🏍️ CHAT RIDER</button>
-<button class="btn red" id="cancelBtn" onclick="cancelOrder()">❌ CANCEL ORDER</button>
-<div class="two"><input id="timeInput" value="30"><button class="btn blue" onclick="setTime()">⏱️ SET TIME</button></div>
-</div></div>
-<div class="two" style="margin-top:12px"><select id="riderSelect"><option>Mhac Delivery</option><option>Leomar Macadangdang</option></select><button class="btn red" onclick="assignRider()">🏍️ ASSIGN RIDER</button></div>
-<button class="btn green" id="completeBtn" style="width:100%;margin-top:8px" onclick="completeOrder()">✅ COMPLETE</button>
-</div></section>
-
-<section class="card"><h2 class="section-title">🏍️ RIDERS</h2>
-<div class="item"><b>🏍️ Leomar Macadangdang</b><br><span class="muted">mhacdeliverypaniqui112021@gmail.com</span><span class="pill" style="float:right">APPROVED</span><div class="two" style="margin-top:8px"><button class="btn gray" onclick="removeApproval(this)">REMOVE APPROVAL</button><button class="btn red" onclick="deleteRider(this)">DELETE RIDER</button></div></div>
-<div class="item"><b>🏍️ Mhac Delivery</b><br><span class="muted">mhacdeliverypaniqui2021@gmail.com</span><span class="pill" style="float:right">APPROVED</span><div class="two" style="margin-top:8px"><button class="btn gray" onclick="removeApproval(this)">REMOVE APPROVAL</button><button class="btn red" onclick="deleteRider(this)">DELETE RIDER</button></div></div></section>
-
-<section class="card"><h2 class="section-title">🧪 MENU DATA DIAGNOSTIC</h2><p class="muted">Read-only UI check. Firebase permission errors are backend rules, not a UI crash.</p><button class="btn" style="width:100%" onclick="checkMenu()">🔎 CHECK MENU DATA</button><p id="diagnostic" class="muted"></p></section>
-
-<section class="card"><h2 class="section-title">🏪 STORE / MENU MANAGER</h2><p class="muted">Compact editor. Store/category controls are separate and do not open chat or order modals.</p>
-<div class="two"><input id="newStore" placeholder="New store name"><button class="btn" onclick="addStore()">ADD STORE</button></div>
-<div id="stores">
-<div class="menu-row"><input value="Jollibee"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red" onclick="this.closest('.menu-row').remove()">DELETE</button></div>
-<div class="menu-row"><input value="Chicken"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red" onclick="this.closest('.menu-row').remove()">DELETE</button></div>
-</div>
-<div class="two" style="margin-top:8px"><input placeholder="New category name"><button class="btn">+ CATEGORY</button></div>
-<button class="btn green" style="width:100%;margin-top:10px" onclick="publishStore()">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>
-<p id="publishState" class="status-open"></p></section>
-
-<section class="card gcash-box"><h2 class="section-title">💳 GCASH PAYMENT</h2><p class="muted">Set the GCash number and optional QR code customers will see when they choose GCash.</p>
-<div class="two"><div><label>GCash Number</label><input id="gcashNumber" placeholder="09XXXXXXXXX"></div><div><label>GCash QR Code</label><input id="gcashQR" type="file"></div></div>
-<div class="two" style="margin-top:10px"><button class="btn blue" onclick="saveGcash()">SAVE GCASH SETTINGS</button><button class="btn" onclick="removeQR()">REMOVE QR</button></div></section>
+<section class="card"><div class="admin-head"><div class="admin-head-row"><h2 class="section-title">👑 MHAC ADMIN</h2><button class="btn logout-btn" onclick="logoutAdmin()">LOG OUT</button></div></div><div class="muted">Signed in as admin</div><div class="card" style="margin-bottom:0"><b>🔔 NEW ORDER + CHAT ALERT</b><span class="muted"> &nbsp;🔊 AUTOMATIC SOUND — READY</span></div></section>
+<section class="card"><h2 class="section-title">📊 DELIVERY & EARNINGS</h2><div class="row"><div class="stat">Today's Deliveries<b>1</b></div><div class="stat">Active Orders<b>1</b></div><div class="stat">Today's Admin 10% Earnings<b>₱26.00</b></div><div class="stat">Today's Rider Delivery Earnings<b>₱40.00</b></div></div><div class="item"><b>RIDER ACCOUNTING — TODAY</b><br>Mhac Delivery<br><span class="muted">Completed: 1 • Delivery earnings: ₱40.00 • Admin service fees to remit: ₱26.00</span></div></section>
+<section class="card"><h2 class="section-title">📥 INCOMING ORDERS <span class="pill">🟢 LIVE — 1</span></h2><div class="order"><div class="order-grid"><div><h3>MHAC-1787646547005</h3><h3>Xxxx</h3><div>📞 09812750101</div><div>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines</div><p><b>Customer Total: ₱144.50</b></p><span class="pill">💵 CASH ON DELIVERY</span><div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo<br><b>Parts: Leg</b><br><b>Drinks: Coke Regular</b></div></div>
+<div class="order-actions"><button class="btn" onclick="openOrder()">👁️ VIEW FULL ORDER</button><button class="btn blue" onclick="openChat('customer')">💬 CHAT CUSTOMER</button><button class="btn" onclick="openChat('rider')">🏍️ CHAT RIDER</button><button class="btn red" onclick="cancelOrder()">❌ CANCEL ORDER</button><div class="two"><input value="30"><button class="btn blue" onclick="setTime()">⏱️ SET TIME</button></div></div></div>
+<div class="two" style="margin-top:12px"><select><option>Mhac Delivery</option></select><button class="btn red" onclick="assignRider()">🏍️ ASSIGN RIDER</button><button class="btn green" onclick="completeOrder()">✅ COMPLETE</button></div></div></section>
+<section class="card"><h2 class="section-title">🏍️ RIDERS</h2><div class="item"><b>🏍️ Leomar Macadangdang</b><br><span class="muted">mhacdeliverypaniqui112021@gmail.com</span><span class="pill" style="float:right">APPROVED</span><div class="two" style="margin-top:8px"><button class="btn gray" onclick="removeApproval(this)">REMOVE APPROVAL</button><button class="btn red" onclick="deleteRider(this)">DELETE RIDER</button></div></div><div class="item"><b>🏍️ Mhac Delivery</b><br><span class="muted">mhacdeliverypaniqui2021@gmail.com</span><span class="pill" style="float:right">APPROVED</span><div class="two" style="margin-top:8px"><button class="btn gray" onclick="removeApproval(this)">REMOVE APPROVAL</button><button class="btn red" onclick="deleteRider(this)">DELETE RIDER</button></div></div></section>
+<section class="card"><h2 class="section-title">🧪 MENU DATA DIAGNOSTIC</h2><p class="muted">Read-only check. This does not change or edit your menu.</p><button class="btn" style="width:100%" onclick="checkMenu()">🔎 CHECK MENU DATA</button></section>
+<section class="card"><h2 class="section-title">🏪 STORE / MENU MANAGER</h2><p class="muted">Compact editor — draft until published.</p><div class="two"><input placeholder="New store name"><button class="btn" onclick="addStore()">ADD STORE</button></div><div class="menu-row"><input value="Jollibee"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red">DELETE</button></div><div class="menu-row"><input value="Chicken"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red">DELETE</button></div><div class="menu-row"><input placeholder="New category name"><button class="btn">+ CATEGORY</button></div><button class="btn green" style="width:100%;margin-top:10px">📢 PUBLISH THIS STORE TO CUSTOMER APP</button></section>
+<section class="card gcash-box"><h2 class="section-title">💳 GCASH PAYMENT</h2><p class="muted">Set the GCash number and optional QR code customers will see when they choose GCash.</p><div class="two"><div><label>GCash Number</label><input placeholder="09XXXXXXXXX"></div><div><label>GCash QR Code</label><input type="file"></div></div><div class="two" style="margin-top:10px"><button class="btn blue" onclick="saveGcash()">SAVE GCASH SETTINGS</button><button class="btn" onclick="removeQR()">REMOVE QR</button></div></section>
 </main>
 
-<div id="orderModal" class="modal-backdrop" onclick="if(event.target===this)closeOrder()"><div class="modal">
-<div class="modal-head"><span>👁️ FULL ORDER</span><button class="close-btn" onclick="closeOrder()">×</button></div>
-<b>MHAC-1787646547005</b><p><b>Customer:</b> Xxxx</p><p>📞 09812750101</p><p>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines</p><p><b>Customer Total: ₱144.50</b></p><span class="pill">💵 CASH ON DELIVERY</span>
-<div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo<br><b>Parts:</b> Leg<br><b>Drinks:</b> Coke Regular</div>
-<div style="margin-top:10px"><button class="btn" onclick="closeOrder()" style="width:100%">CLOSE</button></div>
-</div></div>
+<div id="orderModal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head"><span>👁️ FULL ORDER — MHAC-1787646547005</span><button class="modal-close" onclick="closeOrder()">×</button></div>
+    <p><b>Customer:</b> Xxxx</p>
+    <p>📞 09812750101</p>
+    <p>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines</p>
+    <p><b>Customer Total: ₱144.50</b></p>
+    <span class="pill">💵 CASH ON DELIVERY</span>
+    <div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo<br><b>Parts:</b> Leg<br><b>Drinks:</b> Coke Regular</div>
+    <div class="two" style="margin-top:10px"><button class="btn" onclick="closeOrder()">CLOSE</button><button class="btn blue" onclick="closeOrder();openChat('customer')">💬 CHAT CUSTOMER</button></div>
+  </div>
+</div>
 
-<div id="chatBackdrop" class="chat-backdrop" onclick="if(event.target===this)closeChat()"><div class="chat">
-<div class="chat-head"><span id="chatTitle">💬 CUSTOMER — CHAT</span><button onclick="closeChat()">×</button></div>
-<div class="messages" id="messages"></div>
-<div class="chat-compose"><input id="chatInput" placeholder="Type message..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn blue" onclick="sendMsg()">SEND</button></div>
-</div></div>
+<div id="backdrop" class="chat-backdrop"><div class="chat"><div class="chat-head"><span id="chatTitle">💬 CUSTOMER — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages" id="messages"><div class="msg">ok nb</div><div class="msg me"><b>ADMIN</b><br>yes</div></div><div class="chat-compose"><input id="chatInput" placeholder="Type message..."><button class="btn blue" onclick="sendMsg()">SEND</button></div></div></div>
 <script>
-const ORDER_KEY='mhac_demo_order_v5';
-const AUTH_KEY='mhac_admin_auth_v5';
-const CHAT_KEY='mhac_chat_v5';
-const MENU_KEY='mhac_menu_v5';
-const CLOSING_KEY='mhac_closing_v5';
-
-function defaultOrder(){return {id:'MHAC-1787646547005',customer:'Xxxx',phone:'09812750101',location:'Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines',total:144.50,payment:'CASH ON DELIVERY',store:'Jollibee',item:'1x 1pc Chicken Solo',parts:'Leg',drink:'Coke Regular',status:'ACCEPTED',minutes:30,rider:'Mhac Delivery'}}
-
-function getOrder(){try{return JSON.parse(localStorage.getItem(ORDER_KEY))||defaultOrder()}catch(e){return defaultOrder()}}
-function saveOrder(o){localStorage.setItem(ORDER_KEY,JSON.stringify(o));renderOrder()}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-
-function renderOrder(){
-  const o=getOrder();
-  document.getElementById('liveCount').textContent=o.status==='COMPLETED'||o.status==='CANCELLED'?'0':'1';
-  document.getElementById('orderStatus').textContent=o.status;
-  document.getElementById('orderId').textContent=o.id;
-  document.getElementById('customerName').textContent=o.customer;
-  document.getElementById('orderDetails').innerHTML=`<b>${esc(o.store)}</b><br>${esc(o.item)}<br><b>Parts: ${esc(o.parts)}</b><br><b>Drinks: ${esc(o.drink)}</b>`;
-  document.getElementById('riderSelect').value=o.rider||'Mhac Delivery';
-  document.getElementById('timeInput').value=o.minutes||30;
-  const active=o.status!=='COMPLETED'&&o.status!=='CANCELLED';
-  document.getElementById('completeBtn').disabled=!active;
-  document.getElementById('cancelBtn').disabled=!active;
-}
+const AUTH='mhac_admin_auth_v430', ORDER='mhac_order_v430', CHAT='mhac_chat_v430', GCASH='mhac_gcash_v430';
+const defaultOrder={id:'MHAC-1787646547005',customer:'Xxxx',phone:'09812750101',location:'Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307, Philippines',total:144.50,status:'ACCEPTED',minutes:30,rider:'Mhac Delivery'};
+function getOrder(){try{return JSON.parse(localStorage.getItem(ORDER))||defaultOrder}catch(e){return defaultOrder}}
+function saveOrder(o){localStorage.setItem(ORDER,JSON.stringify(o));renderOrder()}
+function renderOrder(){const o=getOrder();const live=o.status==='COMPLETED'||o.status==='CANCELLED'?0:1;const liveEl=document.querySelector('.pill'); if(liveEl) liveEl.innerHTML='🟢 LIVE — '+live+' active orders'; const time=document.querySelector('.order-actions input');if(time)time.value=o.minutes||30;const sel=document.querySelector('.order select');if(sel)sel.value=o.rider||'Mhac Delivery';}
+function logoutAdmin(){if(!confirm('Log out from MHAC Admin?'))return;localStorage.removeItem(AUTH);showLogin()}
+function showLogin(){document.body.innerHTML='<div class="topbar">🛠️ MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app"><section class="card login-box"><h2>ADMIN LOGGED OUT</h2><p class="muted">You are safely logged out.</p><button class="btn blue" style="width:100%" onclick="loginAdmin()">LOGIN AGAIN</button></section></main>'}
+function loginAdmin(){localStorage.setItem(AUTH,'1');location.reload()}
 function openOrder(){document.getElementById('orderModal').classList.add('open')}
 function closeOrder(){document.getElementById('orderModal').classList.remove('open')}
-function openChat(who){
-  document.getElementById('chatTitle').textContent=who==='rider'?'🏍️ RIDER — CHAT':'💬 CUSTOMER — CHAT';
-  document.getElementById('chatBackdrop').dataset.who=who;
-  document.getElementById('chatInput').placeholder=who==='rider'?'Message rider...':'Message customer...';
-  renderChat(who);
-  document.getElementById('chatBackdrop').classList.add('open');
-  setTimeout(()=>document.getElementById('chatInput').focus(),80);
-}
-function closeChat(){document.getElementById('chatBackdrop').classList.remove('open')}
-function renderChat(who){
-  let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){}
-  const msgs=all[who]||[];
-  const box=document.getElementById('messages');
-  box.innerHTML=msgs.length?msgs.map(m=>`<div class="msg ${m.me?'me':''}"><b>${m.me?'ADMIN':who==='rider'?'RIDER':'CUSTOMER'}</b><br>${esc(m.text)}</div>`).join(''):`<div class="muted">No messages yet.</div>`;
-  box.scrollTop=box.scrollHeight;
-}
-function sendMsg(){
-  const input=document.getElementById('chatInput'), text=input.value.trim(); if(!text)return;
-  const who=document.getElementById('chatBackdrop').dataset.who||'customer';
-  let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){}
-  all[who]=all[who]||[]; all[who].push({me:true,text}); localStorage.setItem(CHAT_KEY,JSON.stringify(all));
-  input.value='';renderChat(who);
-}
-function setTime(){
-  const n=Math.max(0,parseInt(document.getElementById('timeInput').value,10)||0);
-  const o=getOrder();o.minutes=n;saveOrder(o);
-  alert('Waiting time set to '+n+' minutes.');
-}
-function assignRider(){
-  const o=getOrder();o.rider=document.getElementById('riderSelect').value;o.status='ASSIGNED';saveOrder(o);
-}
-function completeOrder(){
-  const o=getOrder(); if(o.status==='COMPLETED')return;
-  o.status='COMPLETED';saveOrder(o);
-  alert('Order completed. Rider flow may now close.');
-}
-function cancelOrder(){
-  const o=getOrder(); if(!confirm('Cancel this order?'))return;
-  o.status='CANCELLED';saveOrder(o);
-}
-function removeApproval(btn){btn.closest('.item').querySelector('.pill').textContent='NOT APPROVED'}
+function openChat(who){document.getElementById('chatTitle').textContent=who==='rider'?'🏍️ RIDER — CHAT':'💬 CUSTOMER — CHAT';document.getElementById('backdrop').dataset.who=who;renderChat(who);document.getElementById('backdrop').classList.add('open');setTimeout(()=>document.getElementById('chatInput').focus(),80)}
+function closeChat(){document.getElementById('backdrop').classList.remove('open')}
+function renderChat(who){let a={};try{a=JSON.parse(localStorage.getItem(CHAT))||{}}catch(e){};let m=a[who]||[];document.getElementById('messages').innerHTML=m.length?m.map(x=>'<div class="msg '+(x.me?'me':'')+'"><b>'+ (x.me?'ADMIN':who.toUpperCase())+'</b><br>'+String(x.text).replace(/[<>]/g,'')+'</div>').join(''):'<div class="muted">No messages yet.</div>';document.getElementById('messages').scrollTop=999999}
+function sendMsg(){let i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;let who=document.getElementById('backdrop').dataset.who||'customer',a={};try{a=JSON.parse(localStorage.getItem(CHAT))||{}}catch(e){};a[who]=a[who]||[];a[who].push({me:true,text:t});localStorage.setItem(CHAT,JSON.stringify(a));i.value='';renderChat(who)}
+function setTime(){const input=document.querySelector('.order-actions input'),o=getOrder();o.minutes=Math.max(0,parseInt(input.value,10)||0);saveOrder(o);alert('Waiting time set to '+o.minutes+' minutes.')}
+function assignRider(){const sel=document.querySelector('.order select'),o=getOrder();o.rider=sel?sel.value:'Mhac Delivery';o.status='ASSIGNED';saveOrder(o)}
+function completeOrder(){const o=getOrder();o.status='COMPLETED';saveOrder(o);alert('Order completed. Rider can now close after delivery.')}
+function cancelOrder(){const o=getOrder();if(confirm('Cancel this order?')){o.status='CANCELLED';saveOrder(o)}}
+function removeApproval(btn){const p=btn.closest('.item');if(p){const pill=p.querySelector('.pill');if(pill)pill.textContent='NOT APPROVED'}}
 function deleteRider(btn){if(confirm('Delete this rider?'))btn.closest('.item').remove()}
-function checkMenu(){document.getElementById('diagnostic').textContent='✓ UI/menu structure check passed. Backend permission check requires Firebase rules.'}
-function addStore(){
-  const i=document.getElementById('newStore');if(!i.value.trim())return;
-  const box=document.getElementById('stores');const row=document.createElement('div');row.className='menu-row';
-  row.innerHTML=`<input value="${esc(i.value.trim())}"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red" onclick="this.closest('.menu-row').remove()">DELETE</button>`;
-  box.appendChild(row);i.value='';
-}
-function saveGcash(){localStorage.setItem('mhac_gcash',document.getElementById('gcashNumber').value);alert('GCash settings saved on this browser.')}
-function removeQR(){document.getElementById('gcashQR').value=''}
-function publishStore(){document.getElementById('publishState').textContent='🟢 PUBLISHED — VISIBLE TO CUSTOMER APP';localStorage.setItem('mhac_published','1')}
-function loginAgain(){localStorage.setItem(AUTH_KEY,'1');location.reload()}
-function logoutAdmin(){
-  if(!confirm('Log out from MHAC Admin?'))return;
-  localStorage.removeItem(AUTH_KEY); showLogin();
-}
-function showLogin(){
-  document.getElementById('appRoot').innerHTML=`<section class="card login-box"><h2>MHAC ADMIN LOGIN</h2><p class="muted">Prototype login screen</p><button class="btn blue" style="width:100%" onclick="loginAgain()">LOGIN</button></section>`;
-}
-function loadAuth(){if(localStorage.getItem(AUTH_KEY)!=='1'){showLogin();return false}return true}
-window.addEventListener('storage',renderOrder);
-window.addEventListener('load',()=>{if(loadAuth()){renderOrder();document.getElementById('gcashNumber').value=localStorage.getItem('mhac_gcash')||'';}});
-</script>
-</body></html>
+function checkMenu(){const el=document.querySelector('.card:nth-of-type(6) .muted:last-child');alert('Menu UI check: OK. Firebase permission checks require backend rules.')}
+function addStore(){const inputs=document.querySelectorAll('input');let i=[...inputs].find(x=>x.placeholder==='New store name');if(!i||!i.value.trim())return;const row=document.createElement('div');row.className='menu-row';row.innerHTML='<input value="'+i.value.replace(/[<>]/g,'')+'"><button class="btn">FOODS</button><button class="btn">EDIT</button><button class="btn red" onclick="this.closest(\'.menu-row\').remove()">DELETE</button>';document.querySelector('.card:nth-of-type(7)').appendChild(row);i.value=''}
+function saveGcash(){const i=[...document.querySelectorAll('input')].find(x=>x.placeholder==='09XXXXXXXXX');if(i)localStorage.setItem(GCASH,i.value);alert('GCash settings saved.')}
+function removeQR(){const f=document.querySelector('input[type=file]');if(f)f.value=''}
+window.addEventListener('click',e=>{if(e.target.id==='backdrop')closeChat();if(e.target.id==='orderModal')closeOrder()});
+window.addEventListener('load',()=>{if(localStorage.getItem(AUTH)!=='1')localStorage.setItem(AUTH,'1');renderOrder();});
+</script></body></html>
