@@ -1,3 +1,13 @@
-MHAC DELIVERY V4.1.31 — ADMIN FLOW FIX
+MHAC DELIVERY — UNIFIED WHITE UI PROTOTYPE
 
-Fixes: logout persistence, mobile logout alignment, non-sticky admin header/topbar, separate order/chat layers, and cache-busted CSS filename. Customer/rider files included as base UI.
+Files:
+- admin.html
+- customer.html
+- rider.html
+- shared.css
+
+This package is the UI/base-design prototype only. It applies the agreed:
+white background, black text, compact cards/buttons, limited red/blue/green accents,
+compact menu editor, and centered larger chatbox.
+
+It does not replace the existing Firebase/backend logic yet.
