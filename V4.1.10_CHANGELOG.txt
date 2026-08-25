@@ -1,0 +1,12 @@
+MHAC DELIVERY V4.1.10 — ADMIN LOGIN HOTFIX
+
+FIX ONLY:
+- Restores Admin Firebase auth state handling.
+- Google sign-in now opens the Admin app after successful authorized sign-in.
+- Mobile redirect sign-in result is handled.
+- Login persistence is enabled.
+- Existing Admin↔Rider chat keyboard/ringtone work is retained.
+- Customer and Rider files are otherwise unchanged from V4.1.9.
+
+IMPORTANT:
+Use this admin.html together with the existing customer.html and rider.html.

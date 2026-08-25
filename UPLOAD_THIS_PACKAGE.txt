@@ -1,20 +1,4 @@
-MHAC DELIVERY V4.1.9 — FIX ONLY
-
-UPLOAD/REPLACE:
-- admin.html
-- rider.html
-
-Customer.html is unchanged in this fix-only build.
-
-Firebase Rules do NOT need to change if V4.1.6+ riderMessages rules are already published.
-
-After upload:
-1. Wait for GitHub Pages deployment.
-2. Refresh Admin and Rider apps.
-3. Confirm the red banner says V4.1.9.
-4. Assign a rider to an active order.
-5. Admin sends a Rider Chat message.
-6. Rider chat should pop up automatically and play the ringtone.
-7. Rider replies.
-8. Admin chat should pop up automatically and play the ringtone.
-9. Type in each chat and confirm the keypad does not cover the input or SEND button.
+MHAC DELIVERY V4.1.10 HOTFIX
+Replace the current admin.html with this package's admin.html.
+Customer and rider files are retained.
+Hard refresh the GitHub Pages Admin URL after upload.
