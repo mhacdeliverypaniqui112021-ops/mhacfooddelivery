@@ -1,9 +1,24 @@
-
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Rider</title><link rel="stylesheet" href="shared.css"></head>
-<body><div class="topbar">🏍️ MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app">
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Rider — Fixed</title><link rel="stylesheet" href="shared.css"></head><body>
+<div class="topbar">🏍️ MHAC DELIVERY — UNIFIED WHITE UI • FIXED</div><main class="app" id="appRoot">
 <section class="hero"><h1>MHAC DELIVERY<br>RIDER APP</h1><p>DELIVERIES • NAVIGATION • CHAT • EARNINGS</p></section>
-<section class="card"><h2 class="section-title">🏍️ RIDER DASHBOARD</h2><div class="row"><div class="stat">Active Orders<b>1</b></div><div class="stat">Today's Earnings<b>₱40.00</b></div></div></section>
-<section class="card"><h2 class="section-title">📦 ASSIGNED ORDER</h2><div class="order"><h3>MHAC-1787646547005</h3><b>Xxxx</b><p>📞 09812750101</p><p>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307</p><div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo<br>Parts: Leg<br>Drinks: Coke Regular</div><div class="two" style="margin-top:10px"><button class="btn blue">🧭 NAVIGATION</button><button class="btn" onclick="openChat()">💬 CHAT ADMIN</button></div><button class="btn green" style="width:100%;margin-top:8px">✅ COMPLETE DELIVERY</button></div></section>
+<section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 class="section-title">🏍️ RIDER DASHBOARD</h2><button class="btn" onclick="logout()">LOG OUT</button></div><div class="row"><div class="stat">Active Orders<b>1</b></div><div class="stat">Today's Earnings<b>₱40.00</b></div></div></section>
+<section class="card"><h2 class="section-title">📦 ASSIGNED ORDER</h2><div class="order"><h3 id="orderId">MHAC-1787646547005</h3><b>Xxxx</b><p>📞 09812750101</p><p>📍 Poblacion Sur, Coral, Paniqui, Tarlac, Central Luzon, 2307</p><div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo<br>Parts: Leg<br>Drinks: Coke Regular</div><div class="two" style="margin-top:10px"><button class="btn blue" onclick="navigate()">🧭 NAVIGATION</button><button class="btn" onclick="openChat()">💬 CHAT ADMIN</button></div><button class="btn green" id="completeBtn" style="width:100%;margin-top:8px" onclick="completeDelivery()">✅ COMPLETE DELIVERY</button><p id="completeNotice" class="status-open"></p><p>Waiting time: <b id="time">30 min</b> • Status: <b id="status">—</b></p></div></section>
 <section class="card"><h2 class="section-title">💰 TODAY'S REMIT & EARNINGS</h2><div class="row"><div class="stat">Deliveries<b>1</b></div><div class="stat">Delivery Earnings<b>₱40.00</b></div><div class="stat">Remit<b>₱144.50</b></div></div></section>
-</main><div id="backdrop" class="chat-backdrop"><div class="chat"><div class="chat-head"><span>💬 ADMIN — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages"><div class="msg">Nasa delivery na ako.</div><div class="msg me"><b>ADMIN</b><br>Okay, ingat.</div></div><div class="chat-compose"><input placeholder="Message admin..."><button class="btn blue">SEND</button></div></div></div>
-<script>function openChat(){backdrop.classList.add('open')}function closeChat(){backdrop.classList.remove('open')}</script></body></html>
+</main>
+<div id="chatBackdrop" class="chat-backdrop" onclick="if(event.target===this)closeChat()"><div class="chat"><div class="chat-head"><span>💬 ADMIN — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages" id="messages"></div><div class="chat-compose"><input id="chatInput" placeholder="Message admin..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn blue" onclick="sendMsg()">SEND</button></div></div></div>
+<script>
+const ORDER_KEY='mhac_demo_order_v5', AUTH_KEY='mhac_rider_auth_v5', CHAT_KEY='mhac_chat_v5';
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function getOrder(){try{return JSON.parse(localStorage.getItem(ORDER_KEY))||null}catch(e){return null}}
+function render(){let o=getOrder();if(!o)return;document.getElementById('status').textContent=o.status;document.getElementById('time').textContent=(o.minutes||30)+' min';document.getElementById('orderId').textContent=o.id}
+function navigate(){const o=getOrder();if(!o)return;const q=encodeURIComponent(o.location);window.open('https://www.google.com/maps/search/?api=1&query='+q,'_blank')}
+function completeDelivery(){const o=getOrder();if(!o||o.status==='COMPLETED')return;o.status='COMPLETED';localStorage.setItem(ORDER_KEY,JSON.stringify(o));render();document.getElementById('completeNotice').textContent='✅ DELIVERY COMPLETED — RIDER APP CAN NOW CLOSE';document.getElementById('completeBtn').disabled=true}
+function openChat(){renderChat();document.getElementById('chatBackdrop').classList.add('open');setTimeout(()=>document.getElementById('chatInput').focus(),80)}
+function closeChat(){document.getElementById('chatBackdrop').classList.remove('open')}
+function renderChat(){let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){};let msgs=all.rider||[];document.getElementById('messages').innerHTML=msgs.length?msgs.map(m=>`<div class="msg ${m.me?'me':''}"><b>${m.me?'RIDER':'ADMIN'}</b><br>${esc(m.text)}</div>`).join(''):'<div class="muted">No messages yet.</div>';document.getElementById('messages').scrollTop=999999}
+function sendMsg(){let i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){};all.rider=all.rider||[];all.rider.push({me:true,text:t});localStorage.setItem(CHAT_KEY,JSON.stringify(all));i.value='';renderChat()}
+function login(){localStorage.setItem(AUTH_KEY,'1');location.reload()}
+function logout(){localStorage.removeItem(AUTH_KEY);showLogin()}
+function showLogin(){document.getElementById('appRoot').innerHTML='<section class="card login-box"><h2>MHAC RIDER LOGIN</h2><button class="btn blue" style="width:100%" onclick="login()">LOGIN</button></section>'}
+window.addEventListener('storage',render);window.addEventListener('load',()=>{if(localStorage.getItem(AUTH_KEY)!=='1')showLogin();else render()})
+</script></body></html>

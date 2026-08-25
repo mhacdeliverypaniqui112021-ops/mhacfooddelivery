@@ -1,10 +1,25 @@
-
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Customer</title><link rel="stylesheet" href="shared.css"></head>
-<body><div class="topbar">🍔 MHAC DELIVERY — UNIFIED WHITE UI</div><main class="app">
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC Customer — Fixed</title><link rel="stylesheet" href="shared.css"></head><body>
+<div class="topbar">🍔 MHAC DELIVERY — UNIFIED WHITE UI • FIXED</div><main class="app" id="appRoot">
 <section class="hero"><h1>MHAC DELIVERY<br>CUSTOMER APP</h1><p>FOOD ORDERING • CHAT • ORDER TRACKING</p></section>
-<section class="card"><h2 class="section-title">🍔 STORES</h2><div class="two"><button class="btn">🏪 Jollibee</button><button class="btn">🏪 McDonald's</button></div></section>
-<section class="card"><h2 class="section-title">🍗 JOLLIBEE MENU</h2><div class="item"><b>1pc Chicken Solo</b><br>₱99.00<br><span class="muted">Parts and drink choices</span><div class="two" style="margin-top:8px"><select><option>Leg</option><option>Breast</option></select><select><option>Coke Regular</option><option>Sprite Regular</option></select></div><button class="btn blue" style="width:100%;margin-top:8px">ADD TO CART</button></div></section>
-<section class="card"><h2 class="section-title">🛒 CART</h2><div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo • Leg • Coke Regular<br><b>₱99.00</b></div><div class="two" style="margin-top:10px"><button class="btn">CALCULATE DELIVERY</button><button class="btn blue">PLACE ORDER</button></div></section>
-<section class="card"><h2 class="section-title">📦 ACTIVE ORDER</h2><div class="item"><b>MHAC-1787646547005</b><br>Status: <span class="pill">ACCEPTED</span><p>Estimated waiting time: <b>30 min</b></p><button class="btn blue" onclick="openChat()">💬 CHAT ADMIN</button></div></section>
-</main><div id="backdrop" class="chat-backdrop"><div class="chat"><div class="chat-head"><span>💬 ADMIN — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages"><div class="msg me">Hello admin</div><div class="msg"><b>ADMIN</b><br>yes</div></div><div class="chat-compose"><input placeholder="Type message..."><button class="btn blue">SEND</button></div></div></div>
-<script>function openChat(){backdrop.classList.add('open')}function closeChat(){backdrop.classList.remove('open')}</script></body></html>
+<section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 class="section-title">🍔 CUSTOMER</h2><button class="btn" onclick="logout()">LOG OUT</button></div><p class="muted">Choose a published store and build your order.</p></section>
+<section class="card"><h2 class="section-title">🏪 STORES</h2><div class="two"><button class="btn">🏪 Jollibee</button><button class="btn">🏪 McDonald's</button></div></section>
+<section class="card"><h2 class="section-title">🍗 JOLLIBEE MENU</h2><div class="item"><b>1pc Chicken Solo</b><br>₱99.00<div class="two" style="margin-top:8px"><select><option>Leg</option><option>Breast</option></select><select><option>Coke Regular</option><option>Sprite Regular</option></select></div><button class="btn blue" style="width:100%;margin-top:8px">ADD TO CART</button></div></section>
+<section class="card"><h2 class="section-title">🛒 CART</h2><div class="item"><b>Jollibee</b><br>1x 1pc Chicken Solo • Leg • Coke Regular<br><b>₱99.00</b></div><div class="two" style="margin-top:10px"><button class="btn">CALCULATE DELIVERY</button><button class="btn blue" onclick="placeOrder()">PLACE ORDER</button></div></section>
+<section class="card"><h2 class="section-title">📦 ACTIVE ORDER</h2><div class="item"><b>MHAC-1787646547005</b><br>Status: <span class="pill" id="orderStatus">—</span><p>Estimated waiting time: <b id="orderTime">—</b></p><button class="btn blue" style="width:100%" onclick="openChat()">💬 CHAT ADMIN</button></div></section>
+</main>
+<div id="chatBackdrop" class="chat-backdrop" onclick="if(event.target===this)closeChat()"><div class="chat"><div class="chat-head"><span>💬 ADMIN — CHAT</span><button onclick="closeChat()">×</button></div><div class="messages" id="messages"></div><div class="chat-compose"><input id="chatInput" placeholder="Type message..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn blue" onclick="sendMsg()">SEND</button></div></div></div>
+<script>
+const ORDER_KEY='mhac_demo_order_v5', AUTH_KEY='mhac_customer_auth_v5', CHAT_KEY='mhac_chat_v5';
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function getOrder(){try{return JSON.parse(localStorage.getItem(ORDER_KEY))||null}catch(e){return null}}
+function openChat(){renderChat();document.getElementById('chatBackdrop').classList.add('open');setTimeout(()=>document.getElementById('chatInput').focus(),80)}
+function closeChat(){document.getElementById('chatBackdrop').classList.remove('open')}
+function renderChat(){let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){};let msgs=all.customer||[];document.getElementById('messages').innerHTML=msgs.length?msgs.map(m=>`<div class="msg ${m.me?'me':''}"><b>${m.me?'CUSTOMER':'ADMIN'}</b><br>${esc(m.text)}</div>`).join(''):'<div class="muted">No messages yet.</div>';document.getElementById('messages').scrollTop=999999}
+function sendMsg(){let i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;let all={};try{all=JSON.parse(localStorage.getItem(CHAT_KEY))||{}}catch(e){};all.customer=all.customer||[];all.customer.push({me:true,text:t});localStorage.setItem(CHAT_KEY,JSON.stringify(all));i.value='';renderChat()}
+function placeOrder(){let o=getOrder()||{id:'MHAC-'+Date.now(),customer:'Customer',phone:'',location:'Set location',total:99,payment:'CASH ON DELIVERY',store:'Jollibee',item:'1x 1pc Chicken Solo',parts:'Leg',drink:'Coke Regular',status:'PENDING',minutes:30,rider:''};o.status='PENDING';localStorage.setItem(ORDER_KEY,JSON.stringify(o));render()}
+function render(){let o=getOrder();document.getElementById('orderStatus').textContent=o?o.status:'NO ACTIVE ORDER';document.getElementById('orderTime').textContent=o?(o.minutes+' min'):'—'}
+function login(){localStorage.setItem(AUTH_KEY,'1');location.reload()}
+function logout(){localStorage.removeItem(AUTH_KEY);showLogin()}
+function showLogin(){document.getElementById('appRoot').innerHTML='<section class="card login-box"><h2>MHAC CUSTOMER LOGIN</h2><button class="btn blue" style="width:100%" onclick="login()">LOGIN</button></section>'}
+window.addEventListener('load',()=>{if(localStorage.getItem(AUTH_KEY)!=='1')showLogin();else render()})
+</script></body></html>
