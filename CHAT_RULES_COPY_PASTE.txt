@@ -1,0 +1,8 @@
+CHAT FIX FOR FIREBASE FIRESTORE RULES
+
+Use the complete firestore.rules file in this package.
+It keeps the existing Admin/Customer/Rider rules and adds permission for:
+/orders/{orderId}/messages/{messageId}
+
+After publishing the rules in Firebase, refresh both Customer and Admin apps.
+Then test Customer -> Admin message and Admin -> Customer reply.

@@ -1,3 +1,1 @@
-Upload this full replacement to the SAME GitHub repository.
-V4.1.3 keeps the MHAC DELIVERY rider introduction/splash for the first visit of a browser tab, then skips it on refresh using sessionStorage.
-Rider Login, orders, customer location, navigation, and the V4.1.2 menu/admin files are otherwise unchanged.
+Upload this full replacement to the SAME GitHub repository. Commit changes. Live marker must show V4.1.2 COPY PARTS FIX. This version makes Copy All Parts/Paste All Parts robust on Android touch/click.

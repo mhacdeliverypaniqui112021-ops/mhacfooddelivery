@@ -1,3 +1,2 @@
-V4.1.6 RIDER INTRO LAYOUT FIX
-
-Fixed malformed CSS so the Rider loading introduction is a full-screen centered overlay, matching the Admin loading presentation. Rider functionality unchanged.
+V4.1.3 CHAT PERMISSION FIX
+Customer <-> Admin chat Firestore subcollection rules added. App files unchanged.

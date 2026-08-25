@@ -1,29 +1,146 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() { return request.auth != null && request.auth.token.email == "mhacdeliverypaniqui112021@gmail.com"; }
-    function isRider() { return request.auth != null && exists(/databases/$(database)/documents/riders/$(request.auth.uid)); }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email == "mhacdeliverypaniqui112021@gmail.com";
+    }
+
+    function isApprovedRider() {
+      return isSignedIn()
+        && exists(
+          /databases/$(database)/documents/riders/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/riders/$(request.auth.uid)
+        ).data.approved == true;
+    }
 
     match /settings/menu {
       allow read: if true;
       allow write: if isAdmin();
     }
+
     match /settings/businessHours {
       allow read: if true;
       allow write: if isAdmin();
     }
+
     match /orders/{orderId} {
-      allow create: if request.auth != null && request.resource.data.customer.uid == request.auth.uid;
-      allow read: if isAdmin() || isRider() || (request.auth != null && resource.data.customer.uid == request.auth.uid);
-      allow update: if isAdmin() || (isRider() && resource.data.assignedRiderUid == request.auth.uid);
+      allow create:
+        if isSignedIn()
+        && request.resource.data.customer.uid == request.auth.uid;
+
+      allow read:
+        if isAdmin()
+        || (
+          isApprovedRider()
+          && resource.data.assignedRiderUid == request.auth.uid
+        )
+        || (
+          isSignedIn()
+          && resource.data.customer.uid == request.auth.uid
+        );
+
+      allow update:
+        if isAdmin()
+        || (
+          isApprovedRider()
+          && resource.data.assignedRiderUid == request.auth.uid
+        );
     }
+
+    // CUSTOMER <-> ADMIN CHAT
+    // Chat messages live at:
+    // /orders/{orderId}/messages/{messageId}
+    match /orders/{orderId}/messages/{messageId} {
+
+      allow read:
+        if isSignedIn()
+        && (
+          isAdmin()
+          || (
+            get(
+              /databases/$(database)/documents/orders/$(orderId)
+            ).data.customer.uid == request.auth.uid
+          )
+        );
+
+      allow create:
+        if isSignedIn()
+        && (
+          isAdmin()
+          || (
+            get(
+              /databases/$(database)/documents/orders/$(orderId)
+            ).data.customer.uid == request.auth.uid
+            && request.resource.data.senderRole == "customer"
+            && request.resource.data.senderUid == request.auth.uid
+          )
+        );
+
+      allow update, delete:
+        if isAdmin();
+    }
+
     match /riders/{uid} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
+      allow read:
+        if isAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+        );
+
+      allow create:
+        if isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.approved == false;
+
+      allow update:
+        if isAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+          && request.resource.data.uid == uid
+          && request.resource.data.approved == resource.data.approved
+        );
+
+      allow delete:
+        if isAdmin();
     }
+
+    match /riderApplications/{uid} {
+      allow create:
+        if isSignedIn()
+        && request.auth.uid == uid;
+
+      allow read:
+        if isAdmin()
+        || (
+          isSignedIn()
+          && request.auth.uid == uid
+        );
+
+      allow update:
+        if isAdmin();
+
+      allow delete:
+        if isAdmin();
+    }
+
     match /menuSeedLogs/{id} {
-      allow create: if isAdmin();
-      allow read: if isAdmin();
+      allow create:
+        if isAdmin();
+
+      allow read:
+        if isAdmin();
     }
   }
 }
