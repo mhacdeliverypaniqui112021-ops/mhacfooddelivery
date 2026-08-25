@@ -257,11 +257,12 @@ header{border-bottom:3px solid #111!important}
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
-<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status"></div></div>
 <main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
 <section class="cart"><h2>🛒 YOUR CART <span id="count" style="float:right">0</span></h2><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
 <section class="cart"><h2>📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
 
+<audio id="chatAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
 <div id="customerChatPanel" class="customerChatPanel" style="display:none">
   <div class="customerChatHead"><span id="customerChatTitle">💬 MHAC ADMIN CHAT</span><button id="customerChatClose" class="mini">✕</button></div>
   <div id="customerChatMessages" class="customerChatMessages"></div>
@@ -459,14 +460,47 @@ async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textCont
 async function placeOrder(){if(!isOpen())return alert("MHAC Delivery is closed.");const name=$("custName").value.trim(),contact=$("custContact").value.trim();if(!name||!contact)return alert("Complete name and contact.");if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,names=[...new Set(draftCart.map(x=>x.store))],second=names.length>1?5:0,total=sub+sf+deliveryFee+second;const o={orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},payment:$("payment").value};try{const ref=await addDoc(collection(db,"orders"),o);$("sendStatus").textContent="✅ ORDER SENT: "+ref.id;draftCart=[];distanceKm=null;deliveryFee=null;renderCart();setTimeout(closeCheckout,800)}catch(e){$("sendStatus").textContent="❌ "+e.message}}
 
 let customerChatUnsub=null,customerChatOrderId="";
+let customerChatSoundReady=false,customerChatSoundCtx=null,customerChatSoundSource=null,customerChatSoundGain=null;
+async function prepareCustomerChatSound(){
+ const a=$("chatAlertAudio"); if(!a) throw new Error("Chat sound missing.");
+ a.muted=false;a.volume=1;
+ try{
+   const p=a.play(); if(p) await p; a.pause(); a.currentTime=0;
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(AC){
+     if(!customerChatSoundCtx)customerChatSoundCtx=new AC();
+     await customerChatSoundCtx.resume();
+     if(!customerChatSoundSource){
+       customerChatSoundSource=customerChatSoundCtx.createMediaElementSource(a);
+       customerChatSoundGain=customerChatSoundCtx.createGain();
+       customerChatSoundGain.gain.value=2.2;
+       customerChatSoundSource.connect(customerChatSoundGain);customerChatSoundGain.connect(customerChatSoundCtx.destination);
+     }
+   }
+   customerChatSoundReady=true;$("customerChatSoundState").textContent="🔊 Chat sound enabled";
+ }catch(e){
+   customerChatSoundReady=false;$("customerChatSoundState").textContent="⚠️ Tap ENABLE CHAT SOUND again if no ringtone.";throw e;
+ }
+}
+async function playCustomerChatAlert(){
+ if(!customerChatSoundReady)return;
+ try{
+   const a=$("chatAlertAudio"); if(customerChatSoundCtx)await customerChatSoundCtx.resume();
+   a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;
+ }catch(e){console.warn("Customer chat ringtone failed",e)}
+}
+$("customerChatSoundBtn").onclick=async()=>{const b=$("customerChatSoundBtn");b.disabled=true;try{await prepareCustomerChatSound()}catch(e){}finally{b.disabled=false}};
+let customerChatSnapshotReady=false;
 function openCustomerChat(orderId){
- customerChatOrderId=orderId;
+ customerChatOrderId=orderId; customerChatSnapshotReady=false;
  $("customerChatPanel").style.display="block";
  if(customerChatUnsub)customerChatUnsub();
  customerChatUnsub=onSnapshot(collection(db,"orders",orderId,"messages"),snap=>{
    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
    $("customerChatMessages").innerHTML=arr.map(m=>`<div class="customerChatMsg ${m.senderRole==="customer"?"customer":"admin"}"><b>${esc(m.senderRole==="customer"?"YOU":"MHAC ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
    $("customerChatMessages").scrollTop=$("customerChatMessages").scrollHeight;
+   if(customerChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="customer"))playCustomerChatAlert();
+   customerChatSnapshotReady=true;
  });
 }
 function closeCustomerChat(){if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}customerChatOrderId="";$("customerChatPanel").style.display="none"}
@@ -526,6 +560,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
+window.__MHAC_BUILD__="V4.1.7 CHAT RINGTONE";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>

@@ -1,0 +1,7 @@
+V4.1.7 CHAT RINGTONE
+- Added chat ringtone for Customer↔Admin, Admin↔Rider, and Rider↔Admin chat.
+- Ringtone only plays for newly received messages, not the sender and not the initial chat history.
+- Reuses the existing MHAC order alert MP3.
+- Added customer Enable Chat Sound button because browsers require user interaction before audio playback.
+- Added V4.1.7 build banner to customer, admin, and rider pages.
+- Existing order/menu/chat/cancel functionality preserved.

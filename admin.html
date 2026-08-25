@@ -604,6 +604,10 @@ async function playAdminAlert(){
     if(!makeAdminFallbackSound())$("adminSoundState").textContent="❌ Alert playback failed — tap ENABLE SOUND again";
   }
 }
+async function playAdminChatAlert(){
+  if(!adminSoundReady)return;
+  try{const a=$("orderAlertAudio");if(adminAudioCtx)await adminAudioCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;}catch(e){if(!makeAdminFallbackSound())console.warn("Admin chat ringtone failed",e)}
+}
 $("adminSoundBtn").onclick=async()=>{
   const b=$("adminSoundBtn");b.disabled=true;
   try{await prepareAdminAlertSound()}
@@ -1395,9 +1399,10 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  };
 }
 
-let adminChatUnsub=null,adminChatOrderId="";
+let adminChatUnsub=null,adminChatOrderId="",adminChatSnapshotReady=false;
 function openAdminChat(orderId){
  adminChatOrderId=orderId;
+ adminChatSnapshotReady=false;
  const o=orders.find(x=>x.id===orderId);
  $("adminChatTitle").textContent="💬 "+(o?.customer?.name||"CUSTOMER")+" — CHAT";
  $("adminChatPanel").classList.remove("hidden");
@@ -1406,6 +1411,8 @@ function openAdminChat(orderId){
    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
    $("adminChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"customer"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"CUSTOMER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
    $("adminChatMessages").scrollTop=$("adminChatMessages").scrollHeight;
+   if(adminChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin"))playAdminChatAlert();
+   adminChatSnapshotReady=true;
  });
 }
 function closeAdminChat(){if(adminChatUnsub){adminChatUnsub();adminChatUnsub=null}adminChatOrderId="";$("adminChatPanel").classList.add("hidden")}
@@ -1432,11 +1439,12 @@ $("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
   adjust();
 })();
 // V4.1.6: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
-let adminRiderChatUnsub=null,adminRiderChatOrderId="";
+let adminRiderChatUnsub=null,adminRiderChatOrderId="",adminRiderChatSnapshotReady=false;
 function openAdminRiderChat(orderId){
  const o=orders.find(x=>x.id===orderId);
  if(!o?.assignedRiderUid){toast("Assign a rider to this order first.");return}
  adminRiderChatOrderId=orderId;
+ adminRiderChatSnapshotReady=false;
  const rider=riders.find(r=>(r.uid||r.id)===o.assignedRiderUid);
  $("adminRiderChatTitle").textContent="🏍️ "+(rider?.nickname||rider?.name||"RIDER")+" — CHAT";
  $("adminRiderChatPanel").classList.remove("hidden");
@@ -1445,6 +1453,8 @@ function openAdminRiderChat(orderId){
    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
    $("adminRiderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"rider"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"RIDER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
    $("adminRiderChatMessages").scrollTop=$("adminRiderChatMessages").scrollHeight;
+   if(adminRiderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin"))playAdminChatAlert();
+   adminRiderChatSnapshotReady=true;
  },e=>{toast(err(e))});
 }
 function closeAdminRiderChat(){if(adminRiderChatUnsub){adminRiderChatUnsub();adminRiderChatUnsub=null}adminRiderChatOrderId="";$("adminRiderChatPanel").classList.add("hidden")}
@@ -1647,11 +1657,11 @@ async function runMenuDiagnostic(){
   }catch(e){out.textContent="❌ DIAGNOSTIC FAILED\n"+err(e);}
 }
 
-window.__MHAC_BUILD__="V4.1.5 CUSTOMER CANCEL DIRECT — CHAT UI FIX";
+window.__MHAC_BUILD__="V4.1.7 CHAT RINGTONE";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🧪 V4.1.5 CUSTOMER CANCEL DIRECT — CHAT UI FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}

@@ -59,7 +59,7 @@
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><div id="riderAccounting" class="sound">💰 <b>MY EARNINGS</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span class="status">Tap ENABLE SOUND once on this device.</span><button id="soundBtn" class="blue">🔊 ENABLE SOUND</button><span id="soundState" class="status"></span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
@@ -211,9 +211,13 @@ function render(arr){
  return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE TO CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button><div class="row"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICKED UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
-let riderChatUnsub=null,riderChatOrderId="";
+let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
+async function playRiderChatAlert(){
+  if(!soundReady)return;
+  try{const a=$("orderAlertAudio");if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;}catch(e){console.warn("Rider chat ringtone failed",e)}
+}
 function openRiderChat(orderId){
-  riderChatOrderId=orderId;
+  riderChatOrderId=orderId; riderChatSnapshotReady=false;
   $("riderChatTitle").textContent="💬 ADMIN CHAT";
   $("riderChatPanel").classList.remove("hidden");
   if(riderChatUnsub)riderChatUnsub();
@@ -221,6 +225,8 @@ function openRiderChat(orderId){
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
     $("riderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${esc(m.senderRole==="rider"?"YOU":"ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
     $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
+    if(riderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider"))playRiderChatAlert();
+    riderChatSnapshotReady=true;
   },e=>{alert("Unable to open rider chat:\n\n"+e.message)});
 }
 function closeRiderChat(){if(riderChatUnsub){riderChatUnsub();riderChatUnsub=null}riderChatOrderId="";$("riderChatPanel").classList.add("hidden")}
@@ -274,5 +280,6 @@ async function logout(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterva
 $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();if(riderOpen())showLogin();else showClosed()};
 getRedirectResult(auth).catch(e=>{if(e) $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(e.message||e)+"</span>"});
 onAuthStateChanged(auth,async user=>{if(!user){if(unsub){unsub();unsub=null}$("app").classList.add("hidden");$("pending").classList.add("hidden");if($("closed").classList.contains("hidden"))$("login").classList.remove("hidden");return}if($("app").classList.contains("hidden")){try{await afterLogin(user)}catch(e){console.error(e)}}});
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.7 CHAT RINGTONE — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
