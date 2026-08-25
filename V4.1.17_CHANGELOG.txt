@@ -1,0 +1,3 @@
+V4.1.17 RIDER GOOGLE SIGN-IN FIX
+
+Primary fix: Google redirect login now uses local persistence, one redirect-result handler only, clearer errors, and does not bounce to login because of a temporary business-hours settings read failure.
