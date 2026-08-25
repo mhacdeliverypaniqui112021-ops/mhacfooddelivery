@@ -1,6 +1,7 @@
-V4.1.13 RIDER UI + GOOGLE REDIRECT FIX
-- Removed stray earnings markup above Rider App header.
-- Kept the real earnings dashboard inside logged-in Rider App.
-- Google login now uses Firebase redirect first to avoid blocked popups.
-- Added getRedirectResult handling after Google returns.
-- Compact mobile Google login card/button.
+V4.1.14 RIDER GOOGLE + CENTERED HEADER FIX
+- Fixed JavaScript blocker caused by removed soundBtn.
+- Google button handler now initializes correctly.
+- Kept Google redirect sign-in flow.
+- Removed dash from MHAC DELIVERY title.
+- Centered MHAC DELIVERY with RIDER APP directly underneath.
+- Kept earnings inside the Rider App.
