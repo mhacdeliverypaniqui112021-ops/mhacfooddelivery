@@ -1,0 +1,10 @@
+MHAC DELIVERY V4.1.65 SESSION FIX
+
+Deep-check findings:
+- Admin had no explicit auth persistence call, although Firebase web auth normally defaults to local persistence. V4.1.65 now explicitly sets browserLocalPersistence.
+- Customer also explicitly sets browserLocalPersistence for consistency.
+- Rider already used browserLocalPersistence, but its login flow explicitly called signOut(auth) whenever business hours were closed. That made a time-based business rule look like an automatic logout.
+- Rider V4.1.65 no longer signs out when business hours end. Business hours now control new assignments only; the authenticated rider session remains active and existing assigned orders stay accessible.
+- Admin remains accessible even when the business is closed.
+
+UI/business rules were otherwise preserved.
