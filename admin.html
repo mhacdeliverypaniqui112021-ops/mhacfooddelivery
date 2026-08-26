@@ -1463,13 +1463,13 @@ window.setTimeout(function(){
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,initializeAuth,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import{getFirestore,doc,getDoc,setDoc,addDoc,collection,onSnapshot,updateDoc,deleteDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import{getStorage,ref as storageRef,uploadBytes,getDownloadURL,deleteObject}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-storage.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
-const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence,popupRedirectResolver:browserPopupRedirectResolver}),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
+const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
 // V4.1.67: explicitly keep Admin Firebase auth persistent across refresh/browser restarts.
 setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Admin auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
@@ -1655,7 +1655,7 @@ async function autoEnableAdminSound(){
   }
 }
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
-$("googleBtn").onclick=async()=>{try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
+$("googleBtn").onclick=async()=>{const btn=$("googleBtn"),st=$("loginStatus");if(!btn||btn.disabled)return;btn.disabled=true;st.textContent="🔵 Opening Google sign-in…";try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);const email=(r.user.email||"").toLowerCase();if(email!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account: "+(r.user.email||"unknown"))}st.textContent="🟢 Google sign-in successful. Loading Admin…"}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request","auth/operation-not-supported-in-this-environment"].includes(e?.code)){try{st.textContent="🔵 Redirecting to Google sign-in…";await signInWithRedirect(auth,gp);return}catch(x){e=x}}st.textContent="❌ "+err(e);btn.disabled=false}};
 $("logout").onclick=()=>signOut(auth);
 
 
