@@ -1,0 +1,10 @@
+MHAC DELIVERY V4.1.58
+
+Added the missing Admin Business Time Control panel.
+- OPEN TIME and CLOSE TIME inputs
+- SAVE TIME sets customer ordering OPEN
+- CLOSED / DAY OFF toggle
+- Live status from settings/businessHours
+- Admin remains accessible regardless of business status
+- Uses the existing settings/businessHours Firestore document and existing rules
+- No changes to customer/rider order flow or approved UI baseline beyond the new control panel.

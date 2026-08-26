@@ -1346,6 +1346,13 @@ main{max-width:980px!important;padding:10px 12px!important}
 }
 </style>
 
+<style>
+.businessTimeGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.businessTimeGrid input{width:100%;min-height:54px;font-size:20px;padding:12px;box-sizing:border-box}
+#businessTimeCard .row{flex-wrap:wrap}
+#businessTimeCard button{flex:1;min-width:150px}
+@media(max-width:500px){.businessTimeGrid{grid-template-columns:1fr}}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1375,6 +1382,19 @@ window.setTimeout(function(){
 <div class="row"><button id="saveGcashSettings" class="blue">SAVE GCASH SETTINGS</button><button id="removeGcashQr" class="gray">REMOVE QR</button></div>
 <p id="gcashSettingsStatus" class="status"></p>
 </div></div>
+<div class="card" id="businessTimeCard">
+<h2>⏰ BUSINESS TIME CONTROL</h2>
+<p class="status">Set the customer ordering hours. Admin stays OPEN and accessible even when the business is closed.</p>
+<div class="businessTimeGrid">
+  <div><label class="label">OPEN TIME</label><input id="businessOpenTime" type="time" value="09:00"></div>
+  <div><label class="label">CLOSE TIME</label><input id="businessCloseTime" type="time" value="19:30"></div>
+</div>
+<div class="row" style="margin-top:10px">
+  <button id="saveBusinessHours" class="blue">💾 SAVE TIME</button>
+  <button id="toggleDayOff" class="red">🔴 CLOSED / DAY OFF</button>
+</div>
+<p id="businessHoursStatus" class="status">Loading business schedule…</p>
+</div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
 <div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish. Unpublish hides a store from customers; it does NOT delete your foods.</p>
@@ -1403,6 +1423,57 @@ const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomai
 const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
+let businessHours={openTime:"09:00",closeTime:"19:30",enabled:true,manualClosed:false},businessHoursUnsub=null;
+
+function renderBusinessHours(){
+  const o=$("businessOpenTime"),c=$("businessCloseTime"),st=$("businessHoursStatus"),b=$("toggleDayOff");
+  if(!o||!c||!st)return;
+  o.value=businessHours.openTime||"09:00";
+  c.value=businessHours.closeTime||"19:30";
+  if(b){
+    b.textContent=businessHours.manualClosed?"🟢 OPEN BUSINESS":"🔴 CLOSED / DAY OFF";
+    b.classList.toggle("green",!!businessHours.manualClosed);
+    b.classList.toggle("red",!businessHours.manualClosed);
+  }
+  const closed=businessHours.manualClosed===true||businessHours.enabled===false;
+  st.textContent=closed
+    ?"🔴 CURRENT STATUS: CLOSED / DAY OFF — Customer cannot place new orders."
+    :`🟢 CURRENT STATUS: OPEN — ${businessHours.openTime||"09:00"} to ${businessHours.closeTime||"19:30"}`;
+}
+function startBusinessHoursAdmin(){
+  if(businessHoursUnsub){businessHoursUnsub();businessHoursUnsub=null}
+  try{
+    businessHoursUnsub=onSnapshot(doc(db,"settings","businessHours"),snap=>{
+      if(snap.exists()) businessHours={...businessHours,...snap.data()};
+      renderBusinessHours();
+    },e=>{
+      console.warn("Business hours listener failed",e);
+      $("businessHoursStatus").textContent="❌ Unable to load business schedule: "+err(e);
+    });
+  }catch(e){console.warn(e)}
+}
+$("saveBusinessHours")?.addEventListener("click",async()=>{
+  const open=$("businessOpenTime")?.value||"09:00", close=$("businessCloseTime")?.value||"19:30";
+  if(open===close){toast("Open and close time cannot be the same.");return}
+  try{
+    await setDoc(doc(db,"settings","businessHours"),{
+      openTime:open,closeTime:close,enabled:true,manualClosed:false,
+      updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.email||"ADMIN"
+    },{merge:true});
+    toast("Business hours saved. Customer ordering is OPEN.");
+  }catch(e){toast(err(e))}
+});
+$("toggleDayOff")?.addEventListener("click",async()=>{
+  const next=!businessHours.manualClosed;
+  try{
+    await setDoc(doc(db,"settings","businessHours"),{
+      manualClosed:next,enabled:true,
+      updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.email||"ADMIN"
+    },{merge:true});
+    toast(next?"Business marked CLOSED / DAY OFF.":"Business OPEN again.");
+  }catch(e){toast(err(e))}
+});
+
 // Food editor clipboard. Keep this in memory for Copy/Paste buttons.
 const FOOD_CLIPBOARD_KEY="mhac_food_editor_clipboard_v412";
 const foodClipboard={bucketChoices:[],parts:[],choices:[],addOns:[],foodName:"",foodTemplate:null};
@@ -2799,7 +2870,7 @@ getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{
  if(!u){stopAdminChatWatchers();if(ou){ou();ou=null}if(ru){ru();ru=null}loginView();return}
  if((u.email||"").toLowerCase()!==ADMIN_EMAIL){stopAdminChatWatchers();signOut(auth);loginView();return}
- appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadAdminGcash();loadMenu();start();
+ appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();startBusinessHoursAdmin();loadAdminGcash();loadMenu();start();
 });
 
 
