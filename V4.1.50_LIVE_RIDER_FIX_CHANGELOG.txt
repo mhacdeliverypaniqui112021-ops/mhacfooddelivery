@@ -1,0 +1,16 @@
+MHAC DELIVERY V4.1.50 — LIVE RIDER SYNC FIX
+
+LOCKED UI PRESERVED.
+No Food Editor, Customer UI, GCash UI, chat UI, or Rider UI redesign.
+
+LIVE SYNC:
+- Admin assignment writes riderAssignments/{riderUid}/orders/{orderId}
+- Admin stamps orders/{orderId} with assignedRiderUid/Email/Name and riderUid/Email/Name
+- Rider listens to the private rider inbox and canonical assignedRiderUid order query
+- Rider keeps legacy email/UID fallback listeners for older orders
+- Rider inbox errors are shown in the LIVE connection line
+- Firebase rules included from V4.1.49
+
+IMPORTANT:
+If your live Firestore Rules are older than the included firestore.rules,
+deploy the included rules before testing.

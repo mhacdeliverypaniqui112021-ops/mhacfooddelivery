@@ -1772,6 +1772,15 @@ $("orders").onclick=async e=>{
   const riderEmail=(rr.email||"").trim().toLowerCase();
   const riderName=rr.nickname||rr.name||rr.email||u;
   const nextStatus=String(current.status||"NEW").toUpperCase()==="NEW"?"ASSIGNED":(current.status||"ASSIGNED");
+  // LIVE RIDER SYNC: write the private rider inbox first, then stamp the order.
+  await setDoc(doc(db,"riderAssignments",u,"orders",id),{
+    orderId:id,
+    assignedRiderUid:u,
+    assignedRiderEmail:riderEmail,
+    assignedRiderName:riderName,
+    assignedAt:serverTimestamp(),
+    updatedAt:serverTimestamp()
+  },{merge:true});
   await updateDoc(doc(db,"orders",id),{
     assignedRiderUid:u,
     assignedRiderEmail:riderEmail,
@@ -1782,14 +1791,6 @@ $("orders").onclick=async e=>{
     status:nextStatus,
     updatedAt:serverTimestamp()
   });
-  await setDoc(doc(db,"riderAssignments",u,"orders",id),{
-    orderId:id,
-    assignedRiderUid:u,
-    assignedRiderEmail:riderEmail,
-    assignedRiderName:riderName,
-    assignedAt:serverTimestamp(),
-    updatedAt:serverTimestamp()
-  },{merge:true});
   toast("Order assigned to "+(rr.nickname||rr.name||rr.email||"rider")+".");
 }catch(x){toast(err(x))}return;}
  const c=e.target.closest("[data-c]");
