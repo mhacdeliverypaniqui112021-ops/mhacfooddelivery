@@ -1,11 +1,8 @@
-MHAC DELIVERY V4.1.56 — CENTERED RIDER CHAT
+V4.1.57 FINAL BUSINESS TIME CONTROL
 
-Upload/replace rider.html from this package.
-Firestore rules and the rest of the package are unchanged from V4.1.55.
+Replace the three HTML files and firestore.rules from this package in the existing deployment.
+Publish firestore.rules in Firebase if changed.
 
-After publishing:
-1. Open Rider app.
-2. Hard refresh / close and reopen Chrome.
-3. Confirm BUILD V4.1.56.
-4. Open CHAT ADMIN from any assigned order.
-5. Chatbox should remain horizontally centered.
+Admin: always accessible.
+Customer: automatic schedule + manual CLOSED/DAY OFF.
+Rider: no new assignments while closed; existing orders can still be completed.

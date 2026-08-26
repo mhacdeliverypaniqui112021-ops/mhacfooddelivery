@@ -1,0 +1,11 @@
+MHAC DELIVERY V4.1.57 — FINAL BUSINESS TIME CONTROL
+
+- Admin-only Business Time / Day Off controls.
+- Admin remains accessible even when business is closed.
+- Configurable OPEN and CLOSE time stored in settings/businessHours.
+- Manual CLOSED / DAY OFF override stored in settings/businessHours.manualClosed.
+- Customer app automatically blocks new ordering outside schedule or during manual Day Off.
+- Customer app listens live for schedule/status changes.
+- Rider app is not logged out or destroyed by business hours; existing assigned orders remain available for completion.
+- Rider app shows CLOSED FOR NEW ASSIGNMENTS when closed, so active orders can still be completed.
+- Existing order sync, chat, UI, and Firebase rider inbox flow preserved.

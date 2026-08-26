@@ -498,7 +498,7 @@ button:disabled{opacity:.5!important}
 }
 </style>
 <style>
-/* V4.1.56 CENTERED RIDER CHAT LOCK */
+/* V4.1.57 CENTERED RIDER CHAT LOCK */
 #riderChatPanel.chatPanel{
   position:fixed!important;
   left:50%!important;
@@ -564,25 +564,25 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.56 • LIVE RIDER SYNC ACTIVE • TIME LIMIT TEST MODE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.57 • LIVE RIDER SYNC ACTIVE • TIME LIMIT TEST MODE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.56";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.57";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
-const TEST_MODE=true,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
+const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
-async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()}}catch(e){console.warn("Business hours settings unavailable:",e)}}
-function showLogin(){$("login").classList.remove("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden")}function showClosed(){$("login").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden");$("closed").classList.remove("hidden");$("closedText").textContent="🔒 Rider app is closed now. Please try again during business hours."}function showPending(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("app").classList.add("hidden");$("pending").classList.remove("hidden")}function showApp(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.remove("hidden")}
+function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.manualClosed===true)return false;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
+let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()};updateRiderBusinessStatus()})}catch(e){console.warn("Business hours settings unavailable:",e)}}
+function showLogin(){$("login").classList.remove("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden")}function showClosed(){$("closed").classList.remove("hidden");$("closedText").textContent="🔒 CLOSED FOR NEW ASSIGNMENTS — existing orders can still be completed."}function showPending(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("app").classList.add("hidden");$("pending").classList.remove("hidden")}function showApp(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.remove("hidden")}
 async function initRiderAlertSound(){
   const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound element missing.");
   let url=new URL("assets/mhac-order-alert.mp3",document.baseURI).href;
@@ -861,7 +861,7 @@ function startOrdersListener(){
  const riderUidForSync=uid;
  const buckets=new Map(),orderWatchers=new Map(),listeners=[];
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel)buildLabel.textContent="BUILD V4.1.56 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ if(buildLabel)buildLabel.textContent="BUILD V4.1.57 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
  function stopOrderWatcher(id){const u=orderWatchers.get(id);if(u){try{u()}catch(_){}orderWatchers.delete(id)}}
  function watchAssignedOrder(id){
    if(!id||orderWatchers.has(id))return;
@@ -905,7 +905,7 @@ function startOrdersListener(){
  unsub=()=>{for(const u of listeners){try{u()}catch(_){}}for(const id of [...orderWatchers.keys()])stopOrderWatcher(id)};
 }
 
-function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(()=>{if(!riderOpen())lockRider()},30000)}async function lockRider(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}try{await signOut(auth)}catch(_){}showClosed()}
+function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(updateRiderBusinessStatus,30000)}function updateRiderBusinessStatus(){const closed=!riderOpen();const app=document.getElementById("app");if(app&&!app.classList.contains("hidden")){if(closed)showClosed();else $("closed").classList.add("hidden")}}async function lockRider(){updateRiderBusinessStatus()}
 async function logout(){if(unsub){unsub();unsub=null}stopRiderChatWatchers();if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}uid="";seenAssigned.clear();try{await signOut(auth)}catch(_){}showLogin()}
 $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();if(riderOpen())showLogin();else showClosed()};
 getRedirectResult(auth).then(async result=>{
@@ -933,7 +933,7 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.56 LIVE RIDER SYNC + TIME LIMIT TEST MODE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.57 LIVE RIDER SYNC + TIME LIMIT TEST MODE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
 
