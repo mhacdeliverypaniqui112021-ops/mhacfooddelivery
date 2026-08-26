@@ -545,14 +545,14 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.50 • LIVE RIDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.51 • LIVE RIDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.50";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.51";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -844,7 +844,7 @@ function startOrdersListener(){
  const orderWatchers=new Map();
  const riderUidForSync=uid;
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel) buildLabel.textContent="BUILD V4.1.50 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ if(buildLabel) buildLabel.textContent="BUILD V4.1.51 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
  const listeners=[];
 
  function stopOrderWatcher(id){
@@ -906,8 +906,11 @@ function startOrdersListener(){
    for(const id of [...orderWatchers.keys()]) if(!wanted.has(id)) stopOrderWatcher(id);
    paint();
  },e=>{
-   console.warn("Rider inbox listener:",e);
-   $("conn").innerHTML='<span class="error">❌ Rider inbox sync: '+esc(e.message)+"</span>";
+   // The private inbox is only an index. Keep canonical order listeners alive
+   // so an older rules deployment cannot hide an otherwise valid assignment.
+   console.warn("Rider inbox listener unavailable; using canonical order sync:",e);
+   $("conn").innerHTML='<span class="status">🟡 PRIVATE INBOX SYNC UNAVAILABLE — LIVE ORDER SYNC ACTIVE</span>';
+   paint();
  }));
 
  // V4.1.42: listen to canonical AND legacy assignment keys.
@@ -955,7 +958,7 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.50 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.51 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
 

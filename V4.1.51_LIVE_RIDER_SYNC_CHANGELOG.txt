@@ -1,0 +1,22 @@
+MHAC DELIVERY V4.1.51 — LIVE RIDER SYNC HARDENED
+
+UI:
+- Rider/Admin UI preserved. No redesign.
+
+RIDER SYNC:
+- Admin now stamps orders/{orderId} with the rider UID/email/name FIRST.
+- Private riderAssignments/{riderUid}/orders/{orderId} is written as an optional live inbox index.
+- If an older Firestore Rules deployment blocks the private inbox index, assignment is no longer aborted.
+- Rider keeps canonical assignedRiderUid/riderUid/email listeners active.
+- Private inbox permission errors are shown as a non-fatal warning instead of hiding the live order sync.
+
+FIRESTORE:
+- Included firestore.rules already allows the signed-in rider to read their own riderAssignments subcollection.
+- Deploy the included firestore.rules to Firebase for full private inbox live sync.
+
+TEST:
+1. Customer places order.
+2. Admin accepts order.
+3. Admin assigns APPROVED rider.
+4. Rider should receive the order through LIVE ORDER SYNC.
+5. After firestore.rules deployment, the private rider inbox should also sync without the warning.

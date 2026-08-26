@@ -14,3 +14,6 @@ LIVE SYNC:
 IMPORTANT:
 If your live Firestore Rules are older than the included firestore.rules,
 deploy the included rules before testing.
+
+
+V4.1.51 follow-up: canonical order assignment is now written first; private inbox failure is non-fatal.
