@@ -427,7 +427,7 @@ async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
   menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
     data=snap.exists()?snap.data():{stores:[]};
-    const count=(data.stores||[]).length;
+    const count=(data.stores||[]).filter(s=>s.published!==false).length;
     $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
     renderStores();
     renderCart();
@@ -472,12 +472,12 @@ $("payment").onchange=()=>{
 
 onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound();startOrders()});
 function renderStores(){
- const published=(data.stores||[]).filter(s=>s.published===true);
+ const published=(data.stores||[]).filter(s=>s.published!==false);
  $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})">${s.icon||"🍽️"} ${esc(s.name)}</button>`).join("");
  if(!published.length) $("stores").innerHTML='<div class="small">No published food stores available right now.</div>';
 }
 function openStore(si){
- const published=(data.stores||[]).filter(s=>s.published===true);
+ const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si];
  let h=`<button class=back onclick="closeMenu()">← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`;
  h+=`<div class="catTabs">${(s.categories||[]).map((c,i)=>`<button class="catTab ${i===0?"active":""}" onclick="openCat(${si},${i})">${esc(c.name)}</button>`).join("")}</div>`;
@@ -487,7 +487,7 @@ function openStore(si){
  if((s.categories||[]).length) openCat(si,0);
 }
 function openCat(si,ci){
- const published=(data.stores||[]).filter(s=>s.published===true);
+ const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si],c=s?.categories?.[ci];
  if(!s||!c){closeMenu();return;}
  let h=`<button class=back onclick="openStore(${si})">← ${esc(s.name)}</button>`;
@@ -506,7 +506,7 @@ function openCat(si,ci){
  $("menuModal").style.display="block";
 }
 function customize(si,ci,fi){
- const published=(data.stores||[]).filter(s=>s.published===true);
+ const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;

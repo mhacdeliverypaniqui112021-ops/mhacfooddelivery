@@ -12,3 +12,9 @@ IMPORTANT: Deploy/save firestore.rules in Firebase Console. GitHub Pages does NO
 Test with a NEW order: Customer -> Admin receives -> Admin assigns approved Rider -> Rider receives automatically.
 
 Do not change the approved UI/design.
+
+V4.1.41 FIXES
+- Hardened Admin menu loading so a draft read error does not crash the menu editor; local backup remains available.
+- Fixed legacy published-menu compatibility: customer now displays stores from settings/menu unless explicitly marked published:false.
+- This fixes the case where Admin contains foods/stores but Customer shows no food because older menu records have no published:true field.
+- Approved Admin/Customer/Rider UI was preserved.

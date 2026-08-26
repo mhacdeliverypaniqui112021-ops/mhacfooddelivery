@@ -2355,10 +2355,27 @@ async function unpublishStore(si){
   }
 }
 async function loadMenu(){
-  const pubSnap=await getDoc(doc(db,"settings","menu"));
-  menu=normalizeMenu(pubSnap.exists()?pubSnap.data():{version:"final",stores:[]});
-  const draftSnap=await getDoc(doc(db,"settings","menuDraft"));
-  const hasDraft=draftSnap.exists() && Array.isArray(draftSnap.data()?.stores);
+  let pubSnap=null, draftSnap=null, pubError=null, draftError=null;
+  try{
+    pubSnap=await withTimeout(getDoc(doc(db,"settings","menu")),10000,"Loading published menu");
+  }catch(e){
+    pubError=e;
+    console.warn("Published menu load failed:",e);
+  }
+  menu=normalizeMenu(pubSnap?.exists()?pubSnap.data():{version:"final",stores:[]});
+  try{
+    draftSnap=await withTimeout(getDoc(doc(db,"settings","menuDraft")),10000,"Loading admin draft");
+  }catch(e){
+    draftError=e;
+    console.warn("Admin draft load failed:",e);
+  }
+  const hasDraft=!!draftSnap?.exists() && Array.isArray(draftSnap.data()?.stores);
+  if(pubError){
+    toast("⚠️ Published menu could not be loaded: "+err(pubError));
+  }
+  if(draftError){
+    toast("⚠️ Admin draft could not be loaded. Local backup will be used.");
+  }
 
   // Prefer the device's immediate backup when it exists. This protects Admin
   // edits from disappearing after a refresh when Firestore draft rules/network
