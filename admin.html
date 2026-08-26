@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.70 ADMIN LOGIN BOOT FIX</title>
-<meta name="build-version" content="V4.1.70 ADMIN LOGIN BOOT FIX">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.64 LIVE RIDER SYNC HARDENED</title>
+<meta name="build-version" content="V4.1.64 LIVE RIDER SYNC HARDENED">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1393,10 +1393,10 @@ window.setTimeout(function(){
   if(!splash) return;
   splash.classList.add("hide");
   window.setTimeout(function(){ if(splash.parentNode) splash.parentNode.removeChild(splash); },650);
-},1200);
+},2200);
 </script>
 <header><h1><span class="brandName">MHAC DELIVERY</span><span class="appName">ADMIN APP</span></h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
-<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn" type="button" onclick="try{this.dataset.clicked='1';var s=document.getElementById('loginStatus');if(s)s.textContent='🔵 Opening Google sign-in…';if(window.__MHAC_ADMIN_LOGIN)window.__MHAC_ADMIN_LOGIN();else if(window.__mhacLogin)window.__mhacLogin();}catch(e){var s=document.getElementById('loginStatus');if(s)s.textContent='❌ Login boot error: '+(e&&e.message||e)}">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
+<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
 <div class="card"><div id="logoutRow" class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
@@ -1461,66 +1461,15 @@ window.setTimeout(function(){
   window.addEventListener('load',function(){setTimeout(safeHide,2400);});
 })();
 </script>
-<script>
-/* V4.1.70 ADMIN LOGIN BOOT FIX — independent of the Firebase module boot. */
-(function(){
-  var ADMIN="mhacdeliverypaniqui112021@gmail.com";
-  var CFG={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2"};
-  function el(id){return document.getElementById(id)}
-  function status(t){var s=el("loginStatus");if(s)s.textContent=t}
-  function busy(v){var b=el("googleBtn");if(!b)return;b.disabled=!!v;b.style.opacity=v?".72":"1";b.style.pointerEvents=v?"none":"auto"}
-  window.__MHAC_ADMIN_LOGIN=async function(){
-    var b=el("googleBtn");if(!b||b.dataset.busy==="1")return;
-    b.dataset.busy="1";busy(true);status("🔵 Opening Google sign-in…");
-    try{
-      var A=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js");
-      var F=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js");
-      var app;try{app=A.getApp()}catch(_){app=A.initializeApp(CFG)}
-      var auth=F.getAuth(app);await F.setPersistence(auth,F.browserLocalPersistence);
-      var provider=new F.GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});
-      var result;
-      try{result=await F.signInWithPopup(auth,provider)}
-      catch(e){
-        var fb=["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request","auth/operation-not-supported-in-this-environment","auth/web-storage-unsupported"];
-        if(fb.indexOf(e&&e.code)>=0){status("🔵 Redirecting to Google sign-in…");await F.signInWithRedirect(auth,provider);return}
-        throw e
-      }
-      var email=((result.user&&result.user.email)||"").toLowerCase();
-      if(email!==ADMIN.toLowerCase()){await F.signOut(auth);throw new Error("Unauthorized admin account: "+(result.user&&result.user.email||"unknown"))}
-      status("🟢 Google sign-in successful. Loading Admin…");setTimeout(function(){location.reload()},400)
-    }catch(e){
-      status("❌ "+((e&&e.message)||"Google sign-in failed")+(e&&e.code?" ["+e.code+"]":""));
-      b.dataset.busy="0";busy(false)
-    }
-  };
-  window.__mhacLogin=window.__MHAC_ADMIN_LOGIN;
-  function bind(){
-    var b=el("googleBtn");if(!b)return;
-    b.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();window.__MHAC_ADMIN_LOGIN()},true);
-    b.addEventListener("pointerup",function(){if(b.dataset.clicked!=="1")window.__MHAC_ADMIN_LOGIN()},true)
-  }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind()
-})();
-</script>
-<script>
-setTimeout(function(){
-  try{
-    var s=document.getElementById("loginStatus");
-    if(s && s.textContent==="Authorized admin account required.") s.textContent="🟢 Admin login ready — tap Continue with Google.";
-  }catch(_){}
-},1800);
-</script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import{getFirestore,doc,getDoc,setDoc,addDoc,collection,onSnapshot,updateDoc,deleteDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import{getStorage,ref as storageRef,uploadBytes,getDownloadURL,deleteObject}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-storage.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
 const ADMIN_EMAIL="mhacdeliverypaniqui112021@gmail.com",app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
-// V4.1.67: explicitly keep Admin Firebase auth persistent across refresh/browser restarts.
-setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Admin auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 let orders=[],riders=[],menu={version:"final",stores:[]},draft={version:"final",stores:[]},selectedStore=0,ou=null,ru=null;
 let businessHours={openTime:"09:00",closeTime:"19:30",enabled:true,manualClosed:false},businessHoursUnsub=null;
@@ -1704,7 +1653,7 @@ async function autoEnableAdminSound(){
   }
 }
 function loginView(){$("login").classList.remove("hidden");$("app").classList.add("hidden")}function appView(){$("login").classList.add("hidden");$("app").classList.remove("hidden")}
-$("googleBtn").onclick=async()=>{const btn=$("googleBtn"),st=$("loginStatus");if(!btn||btn.disabled)return;btn.disabled=true;st.textContent="🔵 Opening Google sign-in…";try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);const email=(r.user.email||"").toLowerCase();if(email!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account: "+(r.user.email||"unknown"))}st.textContent="🟢 Google sign-in successful. Loading Admin…"}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request","auth/operation-not-supported-in-this-environment"].includes(e?.code)){try{st.textContent="🔵 Redirecting to Google sign-in…";await signInWithRedirect(auth,gp);return}catch(x){e=x}}st.textContent="❌ "+err(e);btn.disabled=false}};
+$("googleBtn").onclick=async()=>{try{const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
 
 
@@ -2220,40 +2169,82 @@ function renderStores(){
    list.classList.toggle("hidden");
    if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
-  // Publish/unpublish controls use event delegation so taps remain reliable
-  // after the store accordion is re-rendered. This is intentionally UI-neutral.
-  if(!host.dataset.publishDelegation){
-    host.dataset.publishDelegation="1";
-    host.addEventListener("click",async ev=>{
-      const b=ev.target.closest("[data-publish-store],[data-unpublish-store]");
-      if(!b || !host.contains(b)) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      if(b.dataset.busy==="1") return;
-      const isUnpublish=b.hasAttribute("data-unpublish-store");
-      const si=Number(isUnpublish?b.dataset.unpublishStore:b.dataset.publishStore);
-      if(!Number.isInteger(si) || si<0) return;
-      b.dataset.busy="1";
-      b.disabled=true;
-      b.textContent=isUnpublish?"⏳ UNPUBLISHING...":"⏳ PUBLISHING...";
-      selectedStore=si;
-      try{
-        if(isUnpublish) await unpublishStore(si);
-        else await publishMenu();
-      }catch(e){
-        console.error("STORE PUBLISH ACTION FAILED",e);
-        const msg=err(e);
-        toast("❌ STORE ACTION FAILED: "+msg);
-        alert("STORE ACTION FAILED\n\n"+msg);
-      }finally{
-        if(document.body.contains(b)){
-          b.dataset.busy="0";
-          b.disabled=false;
-        }
-      }
-    });
-  }
-  saveDraftMenu(); renderStores(); renderEditor();
+ host.querySelectorAll("[data-publish-store]").forEach(b=>b.onclick=async()=>{
+   if(b.dataset.busy==="1")return;
+   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ PUBLISHING...";
+   selectedStore=+b.dataset.publishStore;
+   const ok=await publishMenu();
+   b.dataset.busy="0";
+   if(!ok){ b.disabled=false; b.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP"; }
+ });
+ host.querySelectorAll("[data-unpublish-store]").forEach(b=>b.onclick=async()=>{
+   if(b.dataset.busy==="1")return;
+   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ UNPUBLISHING...";
+   selectedStore=+b.dataset.unpublishStore;
+   try{ await unpublishStore(selectedStore); } finally { b.dataset.busy="0"; }
+ });
+ saveDraftMenu();
+}
+function renderNestedFoods(si,ci,list){
+ const s=draft.stores[si],c=s.categories[ci];
+ list.innerHTML=(c.items||[]).map((f,fi)=>`
+  <div class="storeFoodItem">
+   <div class="foodLine">
+    <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
+    <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
+    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
+    <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
+   </div>
+  </div>`).join("")+
+  `<div class="addFoodInline">
+    <input class="nestedFoodName" placeholder="Food name">
+    <input class="nestedFoodPrice" type="number" min="0" step="0.01" placeholder="Base price">
+    <button class="red nestedAddFood">➕ ADD FOOD</button>
+   </div>`;
+ list.querySelector(".nestedAddFood").onclick=()=>{
+   const n=list.querySelector(".nestedFoodName").value.trim();
+   const p=Number(list.querySelector(".nestedFoodPrice").value);
+   if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
+   c.items=c.items||[];
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
+   renderNestedFoods(si,ci,list); saveDraftMenu();
+ };
+ list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
+   const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
+   const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
+   ed.classList.toggle("hidden");
+   if(!ed.classList.contains("hidden") && typeof renderDirectFoodEditor==="function"){
+     renderDirectFoodEditor(y,z,ed,list);
+   }
+ });
+}
+function renderEditor(){
+ const s=draft.stores[selectedStore];
+ if(!s){$("editor").classList.add("hidden");return}
+ $("editor").classList.remove("hidden");
+ $("editor").innerHTML=`
+ <div class="directStoreEditor">
+   <label class="label">🏪 STORE NAME</label>
+   <input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
+   <button class="red" id="saveStoreName">SAVE STORE NAME</button>
+
+   <h3>📂 FOOD CATEGORIES</h3>
+   <p class="hint">Tap a category to see all foods. Food name, price, parts, drinks and add-ons are edited together in one box.</p>
+   <div id="directCategories"></div>
+
+   <div class="newCategoryBox">
+     <input id="newCat" placeholder="New category name">
+     <button class="blue" id="addCat">ADD CATEGORY</button>
+   </div>
+
+   <div class="publishBar">
+     <button type="button" class="green" id="publish">📢 PUBLISH / UNPUBLISH STORE</button>
+     <p class="small">Only this selected store will be published. Other stores stay unchanged.</p>
+   </div>
+ </div>`;
+ $("saveStoreName").onclick=()=>{
+   s.name=$("editStoreName").value.trim()||s.name;
+   saveDraftMenu(); renderStores(); renderEditor();
  };
  $("addCat").onclick=()=>{
    const n=$("newCat").value.trim();
@@ -2297,6 +2288,7 @@ function renderStores(){
    };
  });
  $("publish").onclick=async()=>{if(publishedStoreIds().has(s.id)) await unpublishStore(selectedStore); else await publishMenu();};
+}
 
 function renderDirectFoodList(ci,list){
  const s=draft.stores[selectedStore],c=s.categories[ci];
@@ -2987,7 +2979,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.70 ADMIN LOGIN BOOT DEEP FIX + UNIFIED WHITE UI + BUSINESS TIME CONTROL";
+window.__MHAC_BUILD__="V4.1.64 ADMIN MASTER UNIFIED WHITE UI + BUSINESS TIME CONTROL";
 </script>
 <script>
 setTimeout(function(){
