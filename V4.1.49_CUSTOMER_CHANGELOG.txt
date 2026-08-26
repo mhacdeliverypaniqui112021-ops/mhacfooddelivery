@@ -1,0 +1,24 @@
+MHAC DELIVERY V4.1.49 — CUSTOMER MASTER UNIFIED WHITE UI
+
+BASELINE:
+Admin V4.1.49 Master Unified White UI.
+
+CUSTOMER UI:
+- White background / black typography.
+- White outlined buttons with black borders.
+- Destructive actions use white + red outline/text.
+- Success/status accents remain green.
+- Store cards, cart, checkout, GCash, active orders and menu panels use the same compact white-card baseline.
+- Customer/Admin chat is centered and follows the same white/black UI.
+- Customer header now follows the same centered app-title pattern.
+
+FUNCTIONALITY:
+- Firebase configuration and order flow preserved.
+- Menu publishing/read logic preserved.
+- Cart and 2-store rule preserved.
+- GPS and route-fee calculation preserved.
+- GCash number/QR loading and screenshot upload preserved.
+- Active orders, cancellation, waiting countdown and chat preserved.
+
+NEXT:
+Lock Customer UI, then apply the same baseline to Rider before live three-app Firebase testing.

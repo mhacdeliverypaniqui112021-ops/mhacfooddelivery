@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.8</title><meta name="build-version" content="V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX">
+<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.49</title><meta name="build-version" content="V4.1.49 CUSTOMER MASTER UNIFIED WHITE UI">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:grid;grid-template-columns:1fr 1fr;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}
 </style>
@@ -377,11 +377,432 @@ input,select,textarea{background:#fff!important;color:#111!important;border:1px 
 }
 </style>
 
+
+<style id="MHAC_CUSTOMER_MASTER_UNIFIED_UI_V4_1_49">
+/* =========================================================
+   MHAC CUSTOMER V4.1.49 — MASTER UNIFIED WHITE UI
+   Appearance-only layer. Firebase/order/GPS/GCash logic untouched.
+   Matches the locked Admin V4.1.49 baseline.
+   ========================================================= */
+
+html,body{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  background:#fff!important;
+  color:#111!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+}
+
+header{
+  background:#fff!important;
+  color:#111!important;
+  text-align:center!important;
+  padding:18px 12px!important;
+  border-bottom:3px solid #e21d25!important;
+}
+header .logo,
+header .logo b,
+header .appName,
+header .tag{
+  color:#111!important;
+  text-align:center!important;
+}
+header .logo{
+  font-size:30px!important;
+  font-weight:900!important;
+  line-height:1.05!important;
+}
+header .appName{
+  display:block!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  line-height:1.05!important;
+  margin-top:2px!important;
+}
+header .tag{
+  font-size:13px!important;
+  margin-top:8px!important;
+}
+
+.wrap{
+  max-width:980px!important;
+  margin:0 auto!important;
+  padding:10px 14px 35px!important;
+}
+
+.rate,.area,.schedule{
+  max-width:980px!important;
+  margin:8px auto!important;
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #d7d7d7!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+.rate{padding:11px 12px!important}
+.rate h2{
+  color:#111!important;
+  font-size:20px!important;
+  margin:0 0 5px!important;
+}
+.rate p{margin:3px!important}
+.reminder{
+  background:#fff!important;
+  color:#555!important;
+  border:1px solid #ddd!important;
+  border-radius:9px!important;
+}
+
+.title{
+  color:#111!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  margin:15px 0 8px!important;
+}
+.status,.small{
+  color:#555!important;
+}
+.greenText{color:#138a36!important}
+
+.stores{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:8px 0!important;
+}
+.store{
+  min-height:58px!important;
+  padding:9px!important;
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:10px!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  box-shadow:none!important;
+}
+.store:active{transform:none!important}
+
+.cart{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #d7d7d7!important;
+  border-radius:12px!important;
+  padding:11px!important;
+  margin:8px 0!important;
+  box-shadow:none!important;
+}
+.cart h2{
+  font-size:20px!important;
+  margin:3px 0 8px!important;
+}
+.cartHeader{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+.cartHeader h2{flex:1!important}
+.addOrderBtn{
+  width:auto!important;
+  min-width:0!important;
+  margin:0!important;
+}
+
+button,
+.add,
+.close,
+.back,
+.mini,
+.qty button,
+.choice button,
+.productPlus,
+.orderChatBtn,
+#checkoutBtn,
+#sendOrderBtn,
+#gpsBtn,
+#calculateFeeBtn{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:9px!important;
+  box-shadow:none!important;
+  font-weight:800!important;
+}
+
+button{
+  min-height:34px!important;
+  padding:6px 10px!important;
+}
+.add{
+  width:100%!important;
+  padding:9px 10px!important;
+  font-weight:900!important;
+}
+.productPlus{
+  width:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:0!important;
+  border-radius:50%!important;
+  font-size:23px!important;
+}
+.close{
+  background:#fff!important;
+  color:#111!important;
+}
+.orderCancelBtn,
+[data-cancel-order]{
+  background:#fff!important;
+  color:#a00000!important;
+  border:1px solid #a00000!important;
+}
+.publish,
+.success,
+.greenAction{
+  background:#fff!important;
+  color:#138a36!important;
+  border-color:#138a36!important;
+}
+
+input,textarea,select{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #cfcfcf!important;
+  border-radius:9px!important;
+  box-shadow:none!important;
+}
+input::placeholder,textarea::placeholder{color:#777!important;opacity:1!important}
+
+.catTabs{
+  border-bottom:1px solid #ddd!important;
+  gap:5px!important;
+}
+.catTab{
+  background:#fff!important;
+  color:#111!important;
+  border:0!important;
+  border-bottom:2px solid transparent!important;
+  border-radius:0!important;
+  padding:8px 11px!important;
+}
+.catTab.active{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom-color:#111!important;
+}
+
+.panel,
+.checkout-panel{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+}
+.modal,.checkout{
+  background:rgba(0,0,0,.45)!important;
+}
+.food{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #d7d7d7!important;
+  border-radius:10px!important;
+}
+.productRow{
+  border-bottom:1px solid #eee!important;
+  padding:11px 2px!important;
+}
+.productName,.productPrice{color:#111!important}
+
+.field,
+.bucketSelectBox,
+.partSelectionField,
+.orderCard{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+.partBox{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:9px!important;
+}
+.partBox.selected{
+  background:#f7f7f7!important;
+  border-color:#111!important;
+}
+.partBox.selected .partCount{
+  background:#111!important;
+  color:#fff!important;
+  border-color:#111!important;
+}
+
+.cartLine{
+  border-bottom:1px solid #eee!important;
+  padding:8px 0!important;
+}
+.cartStore{
+  color:#111!important;
+  font-weight:900!important;
+}
+.cartTotals{
+  border-top:1px solid #ddd!important;
+  margin-top:8px!important;
+  padding-top:6px!important;
+}
+.cartTotalRow{
+  display:flex!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  padding:4px 0!important;
+  color:#111!important;
+}
+
+.gcashPanel{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  padding:10px!important;
+}
+.gcashPanel.show{display:block!important}
+#gcashQrDisplay{
+  display:block!important;
+  max-width:120px!important;
+  max-height:120px!important;
+  margin:8px auto!important;
+  border:1px solid #ddd!important;
+  border-radius:8px!important;
+}
+.hidden{display:none!important}
+
+#checkoutBtn:disabled,
+#sendOrderBtn:disabled,
+#calculateFeeBtn:disabled,
+#gpsBtn:disabled{
+  opacity:.5!important;
+}
+
+.customerChatPanel{
+  left:50%!important;
+  right:auto!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(360px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  max-height:min(520px,calc(100vh - 60px))!important;
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+  border-radius:16px!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;
+}
+.customerChatHead{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom:1px solid #ddd!important;
+  padding:10px 12px!important;
+}
+.customerChatHead .mini{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+.customerChatMessages{
+  background:#fff!important;
+  color:#111!important;
+}
+.customerChatMsg{
+  color:#111!important;
+  background:#fff!important;
+  border:1px solid #ddd!important;
+}
+.customerChatMsg.admin{
+  background:#f1f1f1!important;
+  color:#111!important;
+  border:1px solid #ccc!important;
+}
+.customerChatMsg.customer{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+}
+.customerChatInput{
+  background:#fff!important;
+  border-top:1px solid #ddd!important;
+}
+.customerChatInput input{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #bbb!important;
+}
+.customerChatInput button{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+
+.authGate{
+  background:#fff!important;
+}
+.authBox{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+}
+.googleBtn{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:9px!important;
+}
+
+.closed{
+  background:#fff!important;
+  color:#111!important;
+}
+.closed .box{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:14px!important;
+}
+
+.account{color:#555!important}
+
+.mhacSplash{
+  background:#000!important;
+}
+.mhacSplash h1{color:#fff!important}
+
+@media(max-width:600px){
+  .wrap{padding:8px 8px 30px!important}
+  .stores{gap:7px!important}
+  .store{min-height:54px!important;font-size:14px!important;padding:8px!important}
+  .cart{padding:9px!important}
+  .cart h2{font-size:19px!important}
+  .title{font-size:22px!important}
+  .rate,.area,.schedule{margin:7px 0!important}
+  header{padding:16px 10px!important}
+  header .logo{font-size:27px!important}
+  header .appName{font-size:21px!important}
+  header .tag{font-size:12px!important}
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
-<header><div class="logo">MHAC <b>DELIVERY</b></div><div class="tag">FAST • SAFE • ON TIME</div></header>
+<header><div class="logo">MHAC DELIVERY</div><div class="appName">CUSTOMER APP</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
 <div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px;display:none">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status">🔊 AUTOMATIC CHAT SOUND — preparing…</div></div>
 <main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
@@ -848,8 +1269,8 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX";
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.22 CUSTOMER CART + GCASH PAYMENT FIX — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+window.__MHAC_BUILD__="V4.1.49 CUSTOMER MASTER UNIFIED WHITE UI";
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.49 CUSTOMER MASTER UNIFIED WHITE UI — NEW FILE";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 
 </body></html>
