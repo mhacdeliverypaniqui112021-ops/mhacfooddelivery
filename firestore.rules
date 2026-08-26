@@ -12,9 +12,13 @@ service cloud.firestore {
         && request.auth.token.email == "mhacdeliverypaniqui112021@gmail.com";
     }
 
-    function isApprovedRider() {
+    function isRider() {
       return isSignedIn()
-        && exists(/databases/$(database)/documents/riders/$(request.auth.uid))
+        && exists(/databases/$(database)/documents/riders/$(request.auth.uid));
+    }
+
+    function isApprovedRider() {
+      return isRider()
         && get(/databases/$(database)/documents/riders/$(request.auth.uid)).data.approved == true;
     }
 
@@ -22,120 +26,100 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
-
     match /settings/menuDraft {
       allow read, write: if isAdmin();
     }
-
     match /settings/payment {
       allow read: if true;
       allow write: if isAdmin();
     }
-
     match /settings/businessHours {
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /orders/{orderId} {
-      allow create:
-        if isSignedIn()
+      allow create: if isSignedIn()
         && request.resource.data.customer.uid == request.auth.uid;
 
-      allow read:
-        if isAdmin()
-        || (isApprovedRider() && (
-       resource.data.assignedRiderUid == request.auth.uid
-       || resource.data.assignedRiderEmail == request.auth.token.email
-       || resource.data.riderUid == request.auth.uid
-       || resource.data.riderEmail == request.auth.token.email
-     ))
+      allow read: if isAdmin()
+        || (isRider() && (
+          resource.data.assignedRiderUid == request.auth.uid
+          || resource.data.riderUid == request.auth.uid
+          || resource.data.assignedRiderEmail == request.auth.token.email
+          || resource.data.riderEmail == request.auth.token.email
+        ))
         || (isSignedIn() && resource.data.customer.uid == request.auth.uid);
 
-      allow update:
-        if isAdmin()
-        || (isApprovedRider() && (
-       resource.data.assignedRiderUid == request.auth.uid
-       || resource.data.assignedRiderEmail == request.auth.token.email
-       || resource.data.riderUid == request.auth.uid
-       || resource.data.riderEmail == request.auth.token.email
-     ));
+      allow update: if isAdmin()
+        || (isRider() && (
+          resource.data.assignedRiderUid == request.auth.uid
+          || resource.data.riderUid == request.auth.uid
+          || resource.data.assignedRiderEmail == request.auth.token.email
+          || resource.data.riderEmail == request.auth.token.email
+        ));
     }
 
     match /orders/{orderId}/messages/{messageId} {
-      allow read:
-        if isSignedIn()
-        && (
-          isAdmin()
-          || get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
-        );
-
-      allow create:
-        if isSignedIn()
-        && (
-          isAdmin()
-          || (
-            get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
-            && request.resource.data.senderRole == "customer"
-            && request.resource.data.senderUid == request.auth.uid
-          )
-        );
-
+      allow read: if isSignedIn() && (
+        isAdmin()
+        || get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
+      );
+      allow create: if isSignedIn() && (
+        isAdmin()
+        || (
+          get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
+          && request.resource.data.senderRole == "customer"
+          && request.resource.data.senderUid == request.auth.uid
+        )
+      );
       allow update, delete: if isAdmin();
     }
 
+    // Legacy rider assignment index.
     match /riderAssignments/{riderUid}/orders/{orderId} {
       allow read: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
       allow create, update, delete: if isAdmin();
     }
 
-    // V4.1.52 dedicated rider inbox
+    // PRIMARY LIVE RIDER INBOX.
+    // The rider UID is the security boundary, so an authenticated rider can
+    // read only his/her own inbox. Admin can create/update/delete assignments.
     match /riderInbox/{riderUid}/orders/{orderId} {
       allow read: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
+      // Admin creates/assigns inbox entries. The assigned rider may update
+      // the mirrored order status inside his/her own inbox entry.
       allow create: if isAdmin();
       allow update: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
       allow delete: if isAdmin();
     }
 
     match /orders/{orderId}/riderMessages/{messageId} {
-      allow read:
-        if isAdmin()
+      allow read: if isAdmin()
+        || (isRider() && get(/databases/$(database)/documents/orders/$(orderId)).data.assignedRiderUid == request.auth.uid);
+      allow create: if isAdmin()
         || (
-          isApprovedRider()
-          && get(/databases/$(database)/documents/orders/$(orderId)).data.assignedRiderUid == request.auth.uid
-        );
-
-      allow create:
-        if isAdmin()
-        || (
-          isApprovedRider()
+          isRider()
           && get(/databases/$(database)/documents/orders/$(orderId)).data.assignedRiderUid == request.auth.uid
           && request.resource.data.senderRole == "rider"
           && request.resource.data.senderUid == request.auth.uid
         );
-
       allow update, delete: if isAdmin();
     }
 
     match /riders/{uid} {
-      allow read:
-        if isAdmin() || (isSignedIn() && request.auth.uid == uid);
-
-      allow create:
-        if isSignedIn()
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+      allow create: if isSignedIn()
         && request.auth.uid == uid
         && request.resource.data.uid == uid
         && request.resource.data.approved == false;
-
-      allow update:
-        if isAdmin()
+      allow update: if isAdmin()
         || (
           isSignedIn()
           && request.auth.uid == uid
           && request.resource.data.uid == uid
           && request.resource.data.approved == resource.data.approved
         );
-
       allow delete: if isAdmin();
     }
 

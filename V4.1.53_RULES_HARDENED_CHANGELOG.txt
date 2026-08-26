@@ -1,0 +1,29 @@
+MHAC DELIVERY V4.1.53 — DEDICATED LIVE RIDER INBOX
+
+ROOT FIX:
+- Added riderInbox/{riderUid}/orders/{orderId} as the PRIMARY live rider delivery channel.
+- Admin writes a complete order snapshot to the assigned rider's inbox.
+- Rider listens directly to that inbox; it does not depend on a Firestore query over /orders.
+- Legacy riderAssignments and canonical assignedRiderUid/riderUid queries remain as compatibility fallbacks.
+- Rider status changes are mirrored back to the rider inbox.
+
+FIRESTORE RULES:
+- Added riderInbox rules: rider can read/update only their own inbox; admin can create/write.
+
+DEPLOY:
+- Upload admin.html, rider.html, customer.html and firestore.rules from this package.
+- IMPORTANT: deploy firestore.rules to Firebase before testing assignment.
+
+TEST:
+1. Customer places a NEW order.
+2. Admin accepts the order.
+3. Admin assigns the APPROVED rider.
+4. Rider app should show the assigned order immediately.
+5. Test PICK UP -> ON THE WAY -> DELIVERED.
+
+V4.1.53 RULES HARDENING:
+- Primary riderInbox remains isolated by rider UID.
+- Rider read access no longer depends on the approved flag for the inbox path.
+- Canonical /orders rider access also recognizes any rider document, while still requiring the order to be assigned to that UID/email.
+- Admin remains the only account allowed to write riderInbox assignments.
+IMPORTANT: firestore.rules MUST be deployed in Firebase project mhac-delivery-53099. Updating GitHub Pages alone does not update Firebase Rules.

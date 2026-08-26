@@ -1772,9 +1772,10 @@ $("orders").onclick=async e=>{
   const riderEmail=(rr.email||"").trim().toLowerCase();
   const riderName=rr.nickname||rr.name||rr.email||u;
   const nextStatus=String(current.status||"NEW").toUpperCase()==="NEW"?"ASSIGNED":(current.status||"ASSIGNED");
-  // V4.1.52 ROBUST RIDER SYNC:
-  // Stamp the canonical order FIRST so rider order-query sync still works
-  // even if an older live Firestore Rules deployment blocks the private inbox index.
+  // V4.1.54 ROBUST RIDER SYNC:
+  // 1) Stamp the canonical order.
+  // 2) Re-read the just-updated order so the rider inbox receives the FULL latest snapshot.
+  // 3) Write the same order under riderInbox/{UID}/orders/{ORDER_ID}.
   await updateDoc(doc(db,"orders",id),{
     assignedRiderUid:u,
     assignedRiderEmail:riderEmail,
@@ -1785,21 +1786,26 @@ $("orders").onclick=async e=>{
     status:nextStatus,
     updatedAt:serverTimestamp()
   });
+  const freshSnap=await getDoc(doc(db,"orders",id));
+  if(!freshSnap.exists()) throw new Error("Order disappeared after assignment update.");
+  const fresh={id:freshSnap.id,...freshSnap.data()};
 
-  // Legacy private index (optional compatibility path).
+  // Legacy private index remains as a compatibility path.
   try{
     await setDoc(doc(db,"riderAssignments",u,"orders",id),{orderId:id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,assignedAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
   }catch(inboxErr){console.warn("Legacy riderAssignments write unavailable; continuing with dedicated riderInbox.",inboxErr)}
 
-  // V4.1.52 PRIMARY RIDER INBOX: complete order snapshot under rider UID.
-  // This is independent of the legacy inbox, so one blocked path cannot stop delivery.
+  // V4.1.54 PRIMARY LIVE RIDER INBOX. This write is intentionally awaited and verified.
+  const inboxRef=doc(db,"riderInbox",u,"orders",id);
+  const inboxOrder={...fresh,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,riderUid:u,riderEmail:riderEmail,riderName:riderName,status:nextStatus};
   try{
-    const inboxOrder={...current,id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,riderUid:u,riderEmail:riderEmail,riderName:riderName,status:nextStatus};
-    await setDoc(doc(db,"riderInbox",u,"orders",id),{orderId:id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,order:inboxOrder,assignedAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
-    toast("Order assigned to "+(rr.nickname||rr.name||rr.email||"rider")+". LIVE inbox sent.");
+    await setDoc(inboxRef,{orderId:id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,order:inboxOrder,assignedAt:serverTimestamp(),updatedAt:serverTimestamp(),syncVersion:"V4.1.54"},{merge:true});
+    const verify=await getDoc(inboxRef);
+    if(!verify.exists()) throw new Error("Rider inbox write returned successfully but the inbox document was not found.");
+    toast("✅ Order assigned + LIVE inbox verified for "+(rr.nickname||rr.name||rr.email||"rider")+".");
   }catch(inboxErr){
-    console.warn("Dedicated riderInbox write failed; canonical sync remains active.",inboxErr);
-    toast("Order assigned. LIVE inbox write failed — deploy V4.1.52 firestore.rules.");
+    console.error("V4.1.54 riderInbox write/verify failed",inboxErr);
+    toast("❌ Rider inbox FAILED: "+(inboxErr?.message||String(inboxErr)));
   }
 }catch(x){toast(err(x))}return;}
  const c=e.target.closest("[data-c]");

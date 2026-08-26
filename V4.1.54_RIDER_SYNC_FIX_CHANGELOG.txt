@@ -1,0 +1,17 @@
+MHAC DELIVERY V4.1.54 — RIDER SYNC FIX
+
+FIXES:
+- Rider build label updated to V4.1.54.
+- Admin assignment now re-reads the freshly updated order before creating the rider inbox snapshot.
+- Primary inbox write is awaited and verified with getDoc().
+- Admin now shows the actual Firebase error if riderInbox write/verification fails.
+- Rider now displays the dedicated riderInbox listener error instead of silently falling back.
+- Rider inbox rules allow the assigned rider to update the mirrored status in their own inbox.
+- Locked Rider UI/design is preserved; only sync diagnostics and assignment logic were changed.
+
+PRIMARY PATH:
+Admin -> orders/{ORDER_ID} assignment -> riderInbox/{RIDER_UID}/orders/{ORDER_ID} -> Rider LIVE listener
+
+IMPORTANT:
+Deploy firestore.rules in Firebase project mhac-delivery-53099 before testing.
+GitHub Pages deployment alone does NOT update Firestore Rules.

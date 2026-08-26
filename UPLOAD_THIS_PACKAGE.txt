@@ -1,18 +1,22 @@
-MHAC DELIVERY V4.1.52
+MHAC DELIVERY V4.1.54 RIDER SYNC FIX
 
-UPLOAD these files to the GitHub Pages site:
+UPLOAD TO GITHUB PAGES:
 - admin.html
 - rider.html
 - customer.html
 - mhac-logo.png
-- firestore.rules is for Firebase Rules deployment (not just GitHub upload).
 
-IMPORTANT FIREBASE STEP:
-Deploy firestore.rules in this package to the Firebase project:
-MHAC DELIVERY (project mhac-delivery-53099).
+FIREBASE RULES:
+- Deploy firestore.rules in Firebase Console -> Firestore Database -> Rules
+- Project: mhac-delivery-53099
 
-The new primary rider sync path is:
-riderInbox/{RIDER_UID}/orders/{ORDER_ID}
+TEST FLOW:
+1. Customer places a NEW order.
+2. Admin accepts the order.
+3. Admin selects APPROVED rider Leomar.
+4. Click ASSIGN RIDER.
+5. Admin should show: "Order assigned + LIVE inbox verified".
+6. Rider should change to LIVE INBOX and show the order.
+7. Test PICK UP -> ON THE WAY -> DELIVERED.
 
-After deployment:
-Customer -> Order -> Admin Accept -> Assign Approved Rider -> Rider receives LIVE order.
+If assignment fails, copy the exact red/Toast Firebase error. It is now surfaced instead of being hidden.
