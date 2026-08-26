@@ -1,18 +1,2 @@
-MHAC DELIVERY V4.1.44
-
-ADMIN FIXES
-- GCash QR persistence hardened after refresh.
-- Firebase GCash save is verified by a read-back after write.
-- Existing GCash field aliases are supported for compatibility.
-- Local confirmed GCash backup is retained if Firebase read temporarily fails.
-- The browser file picker resetting after refresh is normal; the saved QR preview remains persistent.
-- Food Editor inner sections are forced to a clean white background while button colors/borders remain unchanged.
-- Existing menu/food Firebase sync and Firestore rules are preserved.
-
-DEPLOY
-Replace admin.html with this version. Firestore rules do not need to be changed again if V4.1.42 rules are already published.
-
-V4.1.45 FUNCTIONAL FIX
-- Fixed the missing loadAdminGcash() call after Admin authentication.
-- Saved GCash QR/number are now loaded from Firestore on every Admin login/refresh.
-- Existing Admin UI, banner, Store/Menu Manager, and Food Editor appearance are unchanged.
+V4.1.47
+Upload admin.html only. This is a UI-only Food Editor baseline patch. No Firebase rules change.

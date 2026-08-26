@@ -1,0 +1,5 @@
+V4.1.47 — ADMIN FOOD EDITOR BASELINE UI ONLY
+
+- Preserved the existing V4.1.44 Admin UI and functionality.
+- Food Editor outer/inner boxes now match the dashboard card baseline: white background, light gray 2px border, rounded corners, no blue editor border.
+- No GCash, Firebase rules, menu data, banner, or order logic changes.
