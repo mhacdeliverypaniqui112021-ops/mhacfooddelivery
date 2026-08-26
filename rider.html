@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.49</title><meta name="build-version" content="V4.1.49 RIDER MASTER UNIFIED WHITE UI">
+<title>MHAC DELIVERY — RIDER V4.1.64</title><meta name="build-version" content="V4.1.64 RIDER MASTER UNIFIED WHITE UI">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -252,9 +252,9 @@ input,select,textarea{background:#fff!important;color:#111!important;border:1px 
 
 <style id="MHAC_RIDER_MASTER_UNIFIED_UI_V4_1_49">
 /* =========================================================
-   MHAC RIDER V4.1.49 — MASTER UNIFIED WHITE UI
+   MHAC RIDER V4.1.64 — MASTER UNIFIED WHITE UI
    Appearance-only layer. Rider Firebase/order logic untouched.
-   Matches the locked Admin V4.1.49 baseline.
+   Matches the locked Admin V4.1.64 baseline.
    ========================================================= */
 
 html,body{
@@ -498,7 +498,7 @@ button:disabled{opacity:.5!important}
 }
 </style>
 <style>
-/* V4.1.57 CENTERED RIDER CHAT LOCK */
+/* V4.1.64 CENTERED RIDER CHAT LOCK */
 #riderChatPanel.chatPanel{
   position:fixed!important;
   left:50%!important;
@@ -577,14 +577,33 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.57 • LIVE RIDER SYNC ACTIVE • TIME LIMIT TEST MODE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.64 • LIVE RIDER SYNC ACTIVE • TIME LIMIT TEST MODE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.57";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.64";</script>
+<script>
+(function(){
+  var started=Date.now();
+  function safeHide(){
+    var ids=['mhacSplash','mhacRiderSplash'];
+    ids.forEach(function(id){var el=document.getElementById(id);if(el){el.classList.add('hide');setTimeout(function(){if(el&&el.parentNode)el.parentNode.removeChild(el)},700);}});
+  }
+  window.addEventListener('error',function(e){
+    window.__MHAC_BOOT_ERROR__=(e&&e.message)||'JavaScript loading error';
+    setTimeout(safeHide,50);
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    window.__MHAC_BOOT_ERROR__=(e&&e.reason&&e.reason.message)||'Firebase/module loading error';
+    setTimeout(safeHide,50);
+  });
+  setTimeout(safeHide,3000);
+  window.addEventListener('load',function(){setTimeout(safeHide,2400);});
+})();
+</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -874,7 +893,7 @@ function startOrdersListener(){
  const riderUidForSync=uid;
  const buckets=new Map(),orderWatchers=new Map(),listeners=[];
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel)buildLabel.textContent="BUILD V4.1.57 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ if(buildLabel)buildLabel.textContent="BUILD V4.1.64 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
  function stopOrderWatcher(id){const u=orderWatchers.get(id);if(u){try{u()}catch(_){}orderWatchers.delete(id)}}
  function watchAssignedOrder(id){
    if(!id||orderWatchers.has(id))return;
@@ -946,6 +965,21 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
+</script>
+<script>
+setTimeout(function(){
+  try{
+    var visible=document.body && Array.from(document.body.children).some(function(el){
+      var st=getComputedStyle(el); return st.display!=='none' && st.visibility!=='hidden' && el.id!=='mhacSplash' && el.id!=='mhacRiderSplash' && el.textContent.trim().length>0;
+    });
+    if(!visible){
+      var box=document.createElement('div'); box.id='mhacBootRepair';
+      box.style='position:fixed;inset:0;background:#fff;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:22px;font-family:Arial,sans-serif;text-align:center;color:#111';
+      box.innerHTML='<div style="max-width:520px;border:2px solid #222;border-radius:18px;padding:22px"><h2 style="margin-top:0;color:#e21d25">MHAC DELIVERY</h2><p>App loading is taking too long.</p><p style="font-size:13px;color:#666">Please refresh this page once. If it remains blank, the Firebase connection or browser cache needs attention.</p><button onclick="location.reload()" style="border:0;border-radius:10px;padding:12px 18px;background:#e21d25;color:#fff;font-weight:900">REFRESH APP</button></div>';
+      document.body.appendChild(box);
+    }
+  }catch(_){}
+},4500);
 </script>
 </body></html>
 

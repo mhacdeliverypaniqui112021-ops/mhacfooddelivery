@@ -1,0 +1,3 @@
+MHAC DELIVERY V4.1.64 REPAIR BUILD
+
+Repair-only build. Existing UI and business flows were preserved. Added boot watchdog/error recovery, splash fallback, and root index page. Firebase SDK remains 12.17.1.

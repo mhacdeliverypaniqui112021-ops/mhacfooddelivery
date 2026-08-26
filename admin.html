@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.52 LIVE RIDER SYNC HARDENED</title>
-<meta name="build-version" content="V4.1.52 LIVE RIDER SYNC HARDENED">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.64 LIVE RIDER SYNC HARDENED</title>
+<meta name="build-version" content="V4.1.64 LIVE RIDER SYNC HARDENED">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -178,7 +178,7 @@
 }
 
 /* =========================================================
-   V4.1.49 — MHAC MASTER UNIFIED UI BASELINE
+   V4.1.64 — MHAC MASTER UNIFIED UI BASELINE
    UI ONLY: preserves Firebase/data/order logic.
    Baseline: V4.1.35 screenshot supplied by owner.
    ========================================================= */
@@ -1442,6 +1442,25 @@ window.setTimeout(function(){
   <div class="chatInput"><input id="adminRiderChatInput" placeholder="Message rider…"><button id="adminRiderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
+<script>
+(function(){
+  var started=Date.now();
+  function safeHide(){
+    var ids=['mhacSplash','mhacRiderSplash'];
+    ids.forEach(function(id){var el=document.getElementById(id);if(el){el.classList.add('hide');setTimeout(function(){if(el&&el.parentNode)el.parentNode.removeChild(el)},700);}});
+  }
+  window.addEventListener('error',function(e){
+    window.__MHAC_BOOT_ERROR__=(e&&e.message)||'JavaScript loading error';
+    setTimeout(safeHide,50);
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    window.__MHAC_BOOT_ERROR__=(e&&e.reason&&e.reason.message)||'Firebase/module loading error';
+    setTimeout(safeHide,50);
+  });
+  setTimeout(safeHide,3000);
+  window.addEventListener('load',function(){setTimeout(safeHide,2400);});
+})();
+</script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -2960,6 +2979,21 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.57 ADMIN MASTER UNIFIED WHITE UI + BUSINESS TIME CONTROL";
+window.__MHAC_BUILD__="V4.1.64 ADMIN MASTER UNIFIED WHITE UI + BUSINESS TIME CONTROL";
+</script>
+<script>
+setTimeout(function(){
+  try{
+    var visible=document.body && Array.from(document.body.children).some(function(el){
+      var st=getComputedStyle(el); return st.display!=='none' && st.visibility!=='hidden' && el.id!=='mhacSplash' && el.id!=='mhacRiderSplash' && el.textContent.trim().length>0;
+    });
+    if(!visible){
+      var box=document.createElement('div'); box.id='mhacBootRepair';
+      box.style='position:fixed;inset:0;background:#fff;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:22px;font-family:Arial,sans-serif;text-align:center;color:#111';
+      box.innerHTML='<div style="max-width:520px;border:2px solid #222;border-radius:18px;padding:22px"><h2 style="margin-top:0;color:#e21d25">MHAC DELIVERY</h2><p>App loading is taking too long.</p><p style="font-size:13px;color:#666">Please refresh this page once. If it remains blank, the Firebase connection or browser cache needs attention.</p><button onclick="location.reload()" style="border:0;border-radius:10px;padding:12px 18px;background:#e21d25;color:#fff;font-weight:900">REFRESH APP</button></div>';
+      document.body.appendChild(box);
+    }
+  }catch(_){}
+},4500);
 </script>
 </body></html>
