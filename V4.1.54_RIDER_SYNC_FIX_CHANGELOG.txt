@@ -1,7 +1,7 @@
-MHAC DELIVERY V4.1.54 — RIDER SYNC FIX
+MHAC DELIVERY V4.1.55 — RIDER SYNC FIX
 
 FIXES:
-- Rider build label updated to V4.1.54.
+- Rider build label updated to V4.1.55.
 - Admin assignment now re-reads the freshly updated order before creating the rider inbox snapshot.
 - Primary inbox write is awaited and verified with getDoc().
 - Admin now shows the actual Firebase error if riderInbox write/verification fails.

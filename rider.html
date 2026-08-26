@@ -552,7 +552,7 @@ window.addEventListener("load",function(){
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.54";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.55";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -842,7 +842,7 @@ function startOrdersListener(){
  const riderUidForSync=uid;
  const buckets=new Map(),orderWatchers=new Map(),listeners=[];
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel)buildLabel.textContent="BUILD V4.1.54 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ if(buildLabel)buildLabel.textContent="BUILD V4.1.55 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
  function stopOrderWatcher(id){const u=orderWatchers.get(id);if(u){try{u()}catch(_){}orderWatchers.delete(id)}}
  function watchAssignedOrder(id){
    if(!id||orderWatchers.has(id))return;

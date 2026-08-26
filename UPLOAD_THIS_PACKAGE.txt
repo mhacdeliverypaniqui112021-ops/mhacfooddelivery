@@ -1,8 +1,8 @@
-MHAC DELIVERY V4.1.54 RIDER SYNC FIX
+MHAC DELIVERY V4.1.55 RIDER SYNC FIX
 
 IMPORTANT CORRECTION:
-This package now has ALL Rider version labels set to V4.1.54.
-The previous V4.1.54 package accidentally kept a V4.1.52 top banner label.
+This package now has ALL Rider version labels set to V4.1.55.
+The previous V4.1.55 package accidentally kept a V4.1.52 top banner label.
 
 UPLOAD TO GITHUB PAGES:
 - admin.html
@@ -17,7 +17,7 @@ FIREBASE RULES:
 AFTER GITHUB UPLOAD:
 - Wait for GitHub Pages deployment to finish.
 - On the phone, open the site in an Incognito/Private tab OR clear site data/cache, then reload.
-- Confirm the top banner says V4.1.54 before testing.
+- Confirm the top banner says V4.1.55 before testing.
 
 TEST FLOW:
 1. Customer places a NEW order.
