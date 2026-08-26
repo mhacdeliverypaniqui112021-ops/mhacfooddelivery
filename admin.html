@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR</title>
-<meta name="build-version" content="V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.49 ADMIN MASTER UNIFIED WHITE UI</title>
+<meta name="build-version" content="V4.1.49 ADMIN MASTER UNIFIED WHITE UI">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -176,6 +176,154 @@
   font-size:19px !important;
   font-weight:700 !important;
 }
+
+/* =========================================================
+   V4.1.49 — MHAC MASTER UNIFIED UI BASELINE
+   UI ONLY: preserves Firebase/data/order logic.
+   Baseline: V4.1.35 screenshot supplied by owner.
+   ========================================================= */
+:root{
+  --mhac-black:#111;
+  --mhac-border:#cfcfcf;
+  --mhac-red:#9d0000;
+  --mhac-green:#187a38;
+  --mhac-white:#fff;
+}
+body{
+  background:#fff!important;
+  color:var(--mhac-black)!important;
+}
+.card,.order,.item,.storeBox,.foodCard,.foodEditorWrap,.directStoreEditor,
+.directCategoryCard,.foodLine,.gcSettings,.storeFoodBox,.oneFoodBox,
+.directFoodList,.categoryCard,.categoryPanel{
+  background:#fff!important;
+  border-color:var(--mhac-border)!important;
+}
+input,textarea,select{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #bbb!important;
+}
+button{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+  font-weight:900!important;
+  box-shadow:none!important;
+}
+button:hover,button:focus{
+  background:#fff!important;
+  color:#111!important;
+}
+button.red,.red{
+  background:#fff!important;
+  color:#9d0000!important;
+  border:2px solid #9d0000!important;
+}
+button.green,.green{
+  background:#fff!important;
+  color:#187a38!important;
+  border:2px solid #187a38!important;
+}
+button.blue,.blue,
+button.gray,.gray{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+}
+button.danger,.danger{
+  background:#fff!important;
+  color:#9d0000!important;
+  border:2px solid #9d0000!important;
+}
+.metric{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #ddd!important;
+  border-radius:14px!important;
+}
+.metric b{color:#111!important}
+.pill{
+  background:#f5f5f5!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+}
+.storeBox.selected{border-color:#9d0000!important}
+.editorBox,
+.foodEditorWrapInner,
+.oneFoodBox{
+  background:#fff!important;
+  border-color:#222!important;
+}
+.foodEditorWrap{
+  background:#fff!important;
+  border-color:#222!important;
+}
+.publishBar{
+  background:#fff!important;
+  border-color:#187a38!important;
+}
+.pubState{
+  background:#fff!important;
+  border:1px solid #ddd!important;
+}
+.pubState.published{
+  background:#fff!important;
+  color:#187a38!important;
+  border-color:#187a38!important;
+}
+.pubState.draft{
+  background:#fff!important;
+  color:#8a6500!important;
+  border-color:#ddd!important;
+}
+.paymentBadge{
+  background:#f5f5f5!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+}
+.paymentBadge.pending{
+  background:#fff!important;
+  color:#7a5a00!important;
+  border-color:#c9a500!important;
+}
+.paymentBadge.received{
+  background:#fff!important;
+  color:#137333!important;
+  border-color:#137333!important;
+}
+.paymentBadge.cod{
+  background:#fff!important;
+  color:#333!important;
+  border-color:#aaa!important;
+}
+.status,.small,.hint{color:#666!important}
+.error{color:#9d0000!important}
+.foodBoxHeader,.categoryHeader{background:#fff!important}
+.addFoodInline{border-top-color:#ccc!important}
+.choiceRow button,
+.copyPasteRow button,
+.smallBtn,
+.miniBtn,
+.saveFoodBtn,
+.deleteFoodBtn,
+.addFoodInline button{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+}
+.deleteFoodBtn,
+.deleteDirectFood{
+  color:#9d0000!important;
+  border-color:#9d0000!important;
+  background:#fff!important;
+}
+.saveDirectFood{
+  color:#111!important;
+  border-color:#222!important;
+  background:#fff!important;
+}
+
 </style>
 </style>
 </style>
@@ -2660,11 +2808,11 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR";
+window.__MHAC_BUILD__="V4.1.49 ADMIN MASTER UNIFIED WHITE UI";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR — NEW FILE";
+  badge.textContent="🛠️ V4.1.49 ADMIN MASTER UNIFIED WHITE UI — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}

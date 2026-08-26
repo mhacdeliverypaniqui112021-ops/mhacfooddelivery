@@ -1,0 +1,18 @@
+MHAC DELIVERY V4.1.49 — ADMIN MASTER UNIFIED WHITE UI
+
+BASELINE:
+V4.1.35 Admin screenshot supplied by owner.
+
+UI changes only:
+- Locked white background / black typography baseline.
+- White outlined buttons with black borders.
+- Delete/destructive buttons: white with red outline/text.
+- Publish/success buttons: white with green outline/text.
+- Removed blue/gray filled button appearance from Admin UI.
+- Delivery & Earnings metric cards returned to white/black style.
+- Food Editor, Store/Menu Manager, GCash, orders, riders and related cards use the same white baseline.
+- Food editor borders changed from blue to black.
+- Firebase/order/menu/GCash logic was not intentionally changed.
+
+NEXT:
+After Admin UI is approved, apply the same visual baseline to Customer and Rider, then perform live three-app Firebase testing.
