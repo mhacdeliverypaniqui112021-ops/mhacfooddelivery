@@ -1,0 +1,9 @@
+MHAC DELIVERY V4.1.62
+Based on V4.1.61 STORE CLICK FLOW.
+
+ONLY CHANGE:
+- Customer App Chicken Part Selection rows are aligned into fixed columns:
+  Part Name | Minus | Quantity | Plus
+- All original Admin, Rider, Customer, Firebase, ordering, GPS, Business Time,
+  Store/Menu, Cart, Checkout and Chat files/logic are preserved from V4.1.61.
+- No demo/test replacement page is included.
