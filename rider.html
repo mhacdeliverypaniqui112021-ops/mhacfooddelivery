@@ -234,7 +234,10 @@ input,select,textarea{background:#fff!important;color:#111!important;border:1px 
 }
 </style>
 
-</head>
+<style id="V4_1_30_CONTACT_FIX">
+.customerPhone{color:inherit!important;font-weight:800;text-decoration:underline;text-underline-offset:2px}
+.customerPhone:active{opacity:.55}
+</style></head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">
   <div class="mhacRiderSplashInner">
@@ -480,7 +483,7 @@ function render(arr){
        return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${addons}</div></div>`;
      }).join("")}
    </div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>📞 ${esc(o.customer?.contact||"")}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
+ return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
