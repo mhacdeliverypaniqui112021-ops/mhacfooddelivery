@@ -1,0 +1,11 @@
+MHAC DELIVERY V4.1.61 — STORE CLICK / COLLAPSE FOOD EDITOR
+
+Food Editor flow:
+- Store names are clickable accordion headers.
+- Stores are collapsed by default to save vertical space.
+- Example: Jollibee / KFC / McDo / Mang Inasal / Greenwich.
+- Tap Jollibee: Jollibee opens and its categories + food names/prices/options appear immediately.
+- Tap Jollibee again: it closes and the food list disappears.
+- Only one store stays open at a time to keep the Admin page compact.
+- Food/category editing and existing Firebase/menu publishing flow remain in place.
+- Customer, Rider, and Business Time Control code are not intentionally changed by this UI patch.

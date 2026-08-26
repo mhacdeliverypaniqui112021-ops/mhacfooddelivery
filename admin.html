@@ -677,7 +677,19 @@ button.danger,.danger{
 .storeBox .label{margin-top:4px!important}
 .storeBox .storeNameInline{margin:3px 0!important}
 </style>
-<style>.publishBar{position:relative!important;z-index:20!important;pointer-events:auto!important}.publishBar button{position:relative!important;z-index:21!important;pointer-events:auto!important;cursor:pointer!important}</style><style>
+<style>
+/* V4.1.61 STORE ACCORDION FLOW — stores collapsed by default; one store opens at a time */
+.storeInner{display:block!important}
+.storeInner.storeCollapsed{display:none!important}
+.storeBox.storeOpen{border-color:#222!important}
+.storeBoxHeader{cursor:pointer!important;user-select:none}
+.storeBoxHeader b{cursor:pointer!important}
+.storeBoxHeader .storeToggleIcon{display:inline-block;width:22px;font-size:18px}
+.storeBoxHeader .storeDelete{cursor:pointer!important}
+.storeCategories{max-height:520px;overflow-y:auto;padding-right:2px}
+.storeCategories::-webkit-scrollbar{width:6px}
+.storeCategories::-webkit-scrollbar-thumb{background:#ccc;border-radius:8px}
+</style><style>.publishBar{position:relative!important;z-index:20!important;pointer-events:auto!important}.publishBar button{position:relative!important;z-index:21!important;pointer-events:auto!important;cursor:pointer!important}</style><style>
 [data-cancel-order]{width:100%;min-height:52px;margin-top:7px;font-size:17px;font-weight:900;border-radius:10px;touch-action:manipulation}
 </style>
 <style>.soundBox{margin-top:10px;padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.soundBox button{margin-top:6px}</style>
@@ -1983,11 +1995,11 @@ function renderStores(){
  const host=$("stores");
  host.innerHTML=(draft.stores||[]).map((st,si)=>`
   <div class="storeBox" data-store-card="${si}">
-   <div class="storeBoxHeader">
-    <b>🏪 ${esc(st.name)}</b>
+   <div class="storeBoxHeader" data-store-toggle="${si}" role="button" tabindex="0" aria-expanded="false">
+    <b><span class="storeToggleIcon">▶</span> 🏪 ${esc(st.name)}</b>
     <button class="danger storeDelete" data-store-delete="${si}">🗑️ DELETE STORE</button>
    </div>
-   <div class="storeInner">
+   <div class="storeInner storeCollapsed">
     <label class="label">🏪 STORE NAME</label>
     <input class="storeNameInline" data-store="${si}" value="${esc(st.name)}" placeholder="Store name">
     <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
@@ -2023,7 +2035,42 @@ function renderStores(){
    </div>
   </div>`).join("");
 
- host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
+ host.querySelectorAll("[data-store-toggle]").forEach(h=>{
+   const toggle=()=>{
+     const si=+h.dataset.storeToggle;
+     const card=h.closest(".storeBox");
+     const inner=card.querySelector(".storeInner");
+     const willOpen=inner.classList.contains("storeCollapsed");
+     // Keep the admin page compact: only one store is expanded at a time.
+     host.querySelectorAll(".storeBox").forEach(other=>{
+       const oi=other.querySelector("[data-store-toggle]");
+       const otherInner=other.querySelector(".storeInner");
+       if(other!==card){
+         otherInner.classList.add("storeCollapsed");
+         other.classList.remove("storeOpen");
+         if(oi) oi.setAttribute("aria-expanded","false");
+         const ic=oi?.querySelector(".storeToggleIcon"); if(ic) ic.textContent="▶";
+       }
+     });
+     inner.classList.toggle("storeCollapsed",!willOpen);
+     card.classList.toggle("storeOpen",willOpen);
+     h.setAttribute("aria-expanded",String(willOpen));
+     const ic=h.querySelector(".storeToggleIcon"); if(ic) ic.textContent=willOpen?"▼":"▶";
+     if(willOpen){
+       // Opening the store reveals its food names/prices/options immediately.
+       card.querySelectorAll(".storeCategory").forEach((catCard)=>{
+         const m=catCard.dataset.categoryCard.split("-").map(Number), ci=m[1];
+         const list=catCard.querySelector(".storeFoodList");
+         list.classList.remove("hidden");
+         renderNestedFoods(si,ci,list);
+       });
+     }
+   };
+   h.onclick=(e)=>{ if(e.target.closest("[data-store-delete]")) return; toggle(); };
+   h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("[data-store-delete]")){e.preventDefault();toggle();} };
+ });
+
+ host.querySelectorAll("[data-store-save]").forEach(b=>{
    const si=+b.dataset.storeSave, inp=host.querySelector(`[data-store="${si}"]`);
    const n=inp.value.trim(); if(n)draft.stores[si].name=n;
    renderStores();
