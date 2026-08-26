@@ -606,10 +606,10 @@ window.addEventListener("load",function(){
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import {getAuth,initializeAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {getAuth,initializeAuth,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
-const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence}),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
+const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence,popupRedirectResolver:browserPopupRedirectResolver}),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
 const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.manualClosed===true)return false;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}

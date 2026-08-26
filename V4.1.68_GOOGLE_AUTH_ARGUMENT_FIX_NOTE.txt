@@ -1,0 +1,11 @@
+MHAC DELIVERY V4.1.68 — GOOGLE AUTH ARGUMENT FIX
+
+Repair-only update from V4.1.67.
+
+Root cause found during deep check:
+V4.1.67 switched to initializeAuth() with browserLocalPersistence but did not provide browserPopupRedirectResolver. Firebase documents that when initializeAuth() is manually configured and popup/redirect auth is used, browserPopupRedirectResolver must be supplied (either at initialization or at the sign-in call). This caused auth/argument-error when Continue with Google was pressed.
+
+Fix:
+- Added browserPopupRedirectResolver to Firebase Auth imports.
+- Added popupRedirectResolver: browserPopupRedirectResolver to initializeAuth() for Customer/Admin/Rider.
+- Existing UI, order flow, business rules, persistence, and delivered-status fix are unchanged.
