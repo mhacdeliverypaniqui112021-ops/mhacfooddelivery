@@ -1,0 +1,7 @@
+V4.1.59 — COMPACT BUSINESS TIME CONTROL UI
+
+- Keeps the Business Time Control functionality unchanged.
+- Makes the card more compact to save vertical space on mobile.
+- Keeps OPEN TIME and CLOSE TIME side-by-side.
+- Reduces input/button heights and internal spacing.
+- Keeps Admin accessible while customer ordering closes.
