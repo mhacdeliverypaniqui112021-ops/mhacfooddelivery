@@ -1,0 +1,26 @@
+MHAC DELIVERY V4.1.49 — RIDER MASTER UNIFIED WHITE UI
+
+BASELINE:
+Locked Admin V4.1.49 Master Unified White UI.
+
+RIDER UI:
+- White background and black typography.
+- White outlined buttons with black borders.
+- Red outline for destructive/login actions.
+- Green outline for success actions.
+- Compact white cards with light gray borders.
+- Header follows the same centered MHAC DELIVERY / RIDER APP layout.
+- Earnings, sound, orders, login, pending and chat panels use the same baseline.
+- No cream/yellow dashboard panels.
+
+FUNCTIONALITY:
+- Rider Firebase authentication preserved.
+- Admin approval flow preserved.
+- Live assigned-order listener preserved.
+- Order sync/navigation/customer location preserved.
+- Rider earnings and service-fee accounting preserved.
+- Rider/admin chat preserved.
+- Sound alert behavior preserved.
+
+NEXT:
+Deploy this rider.html as the Rider V4.1.49 baseline, verify visual match with Admin and Customer, then proceed to three-app LIVE Firebase testing.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.38</title><meta name="build-version" content="V4.1.42 RIDER ORDER SYNC HARDENED + WHITE UI">
+<title>MHAC DELIVERY — RIDER V4.1.49</title><meta name="build-version" content="V4.1.49 RIDER MASTER UNIFIED WHITE UI">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -245,6 +245,255 @@ input,select,textarea{background:#fff!important;color:#111!important;border:1px 
   .callCustomerBtn{min-height:40px!important;width:100%!important}
 }
 </style>
+
+<style id="MHAC_RIDER_MASTER_UNIFIED_UI_V4_1_49">
+/* =========================================================
+   MHAC RIDER V4.1.49 — MASTER UNIFIED WHITE UI
+   Appearance-only layer. Rider Firebase/order logic untouched.
+   Matches the locked Admin V4.1.49 baseline.
+   ========================================================= */
+
+html,body{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  background:#fff!important;
+  color:#111!important;
+  font-family:Arial,Helvetica,sans-serif!important;
+}
+
+header{
+  background:#fff!important;
+  color:#111!important;
+  text-align:center!important;
+  padding:18px 12px!important;
+  border-bottom:3px solid #e21d25!important;
+}
+header h1{
+  margin:0 0 8px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  color:#111!important;
+}
+header h1 .brandName,
+header h1 .appName{
+  color:#111!important;
+  display:block!important;
+  text-align:center!important;
+  line-height:1.05!important;
+}
+header h1 .brandName{font-size:30px!important;font-weight:900!important}
+header h1 .appName{font-size:30px!important;font-weight:900!important}
+header p{
+  color:#111!important;
+  font-size:15px!important;
+  margin:8px 0 0!important;
+}
+
+main{
+  max-width:980px!important;
+  margin:0 auto!important;
+  padding:10px 14px 30px!important;
+}
+
+.card{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #d7d7d7!important;
+  border-radius:12px!important;
+  padding:12px!important;
+  margin:8px 0!important;
+  box-shadow:none!important;
+}
+
+#app>.card{
+  border-color:#d7d7d7!important;
+}
+
+#login,#closed,#pending{
+  max-width:680px!important;
+  margin:8px auto!important;
+}
+
+#app .row{
+  align-items:center!important;
+}
+#app .row h2{
+  color:#111!important;
+  font-size:24px!important;
+  line-height:1.1!important;
+}
+#logout{
+  width:auto!important;
+  min-width:120px!important;
+  margin:0!important;
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  border-radius:9px!important;
+}
+
+input,button{
+  border-radius:9px!important;
+  box-shadow:none!important;
+}
+input{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #cfcfcf!important;
+  padding:10px 12px!important;
+  min-height:42px!important;
+}
+input::placeholder{color:#777!important;opacity:1!important}
+
+button{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+  min-height:34px!important;
+  padding:6px 10px!important;
+  font-weight:800!important;
+}
+button:disabled{opacity:.5!important}
+
+.google{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+.green{
+  background:#fff!important;
+  color:#138a36!important;
+  border-color:#138a36!important;
+}
+.red{
+  background:#fff!important;
+  color:#a00000!important;
+  border-color:#a00000!important;
+}
+.blue{
+  background:#fff!important;
+  color:#111!important;
+  border-color:#222!important;
+}
+.nav{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+
+.status{
+  color:#555!important;
+}
+.error{color:#a00000!important}
+.success{color:#138a36!important}
+
+.sound{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  padding:10px!important;
+  box-shadow:none!important;
+}
+#riderAccounting{
+  background:#fff!important;
+  border:1px solid #ddd!important;
+}
+
+.order{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #d7d7d7!important;
+  border-radius:10px!important;
+  padding:11px!important;
+  margin:8px 0!important;
+  box-shadow:none!important;
+}
+.pill{
+  background:#f2f2f2!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+  border-radius:20px!important;
+}
+.riderOrderGroup{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+.riderStoreName,
+.riderFoodName,
+.riderFoodQty{
+  color:#111!important;
+}
+.riderFoodRow{
+  border-top:1px solid #eee!important;
+}
+.riderParts{
+  background:#fff!important;
+  color:#111!important;
+}
+
+.chatPanel{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+  border-radius:16px!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;
+}
+.chatHead{
+  background:#fff!important;
+  color:#111!important;
+  border-bottom:1px solid #ddd!important;
+}
+.chatHead .miniBtn{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+.chatMessages{
+  background:#fff!important;
+  color:#111!important;
+}
+.chatMsg{
+  color:#111!important;
+}
+.chatInput{
+  background:#fff!important;
+  border-top:1px solid #ddd!important;
+}
+.chatInput input{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #bbb!important;
+}
+.chatInput button{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #222!important;
+}
+
+.mhacRiderSplash{
+  background:#000!important;
+}
+
+@media(max-width:600px){
+  main{padding:8px!important}
+  .card{padding:10px!important}
+  header{padding:16px 10px!important}
+  header h1 .brandName,
+  header h1 .appName{font-size:27px!important}
+  header p{font-size:13px!important}
+  #app .row h2{font-size:22px!important}
+  #logout{min-width:105px!important}
+}
+</style>
+
 </head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">
@@ -296,14 +545,14 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.38 • ORDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.49 • ORDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.38";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.49";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
