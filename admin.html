@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.29 ADMIN COMPACT FIX + CENTER CHAT</title>
-<meta name="build-version" content="V4.1.29 ADMIN COMPACT FIX + CENTER CHAT">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.35 ADMIN TRUE UNIFIED UI</title>
+<meta name="build-version" content="V4.1.35 ADMIN TRUE UNIFIED UI">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1088,6 +1088,61 @@ main{max-width:980px!important;padding:10px 12px!important}
     height:min(520px,calc(100vh - 60px))!important;
     max-height:calc(100vh - 60px)!important;
   }
+}
+</style>
+
+<style id="MHAC_V4_1_35_ADMIN_TRUE_UNIFIED_UI">
+/* V4.1.35 — Admin-wide unified UI: white background, black typography, compact controls. */
+:root{--mhac-black:#111;--mhac-border:#222;--mhac-muted:#666;--mhac-red:#a40000;--mhac-green:#147a32;}
+html,body{background:#fff!important;color:var(--mhac-black)!important}
+header{background:#fff!important;color:var(--mhac-black)!important;border-bottom:3px solid #111!important;box-shadow:none!important}
+header *{color:var(--mhac-black)!important}
+main{background:#fff!important;color:var(--mhac-black)!important}
+.card,.storeBox,.storeInner,.storeCategory,.oneFoodBox,.selectionBox,.item,.orderCard,.riderCard{background:#fff!important;color:var(--mhac-black)!important;border-color:#ddd!important;box-shadow:none!important}
+input,textarea,select{background:#fff!important;color:#111!important;border:1.5px solid #bbb!important}
+input::placeholder,textarea::placeholder{color:#777!important;opacity:1!important}
+button,.blue,.gray,.green,.danger,.red,.chatOpenBtn{background:#fff!important;color:#111!important;border:1.5px solid #222!important;box-shadow:none!important;font-weight:800!important}
+button:hover,.blue:hover,.gray:hover,.green:hover,.danger:hover,.red:hover,.chatOpenBtn:hover{background:#f5f5f5!important;color:#111!important}
+.danger,.red{color:var(--mhac-red)!important;border-color:var(--mhac-red)!important}
+.green{color:var(--mhac-green)!important;border-color:var(--mhac-green)!important}
+.pubState{background:#fff!important;color:#111!important;border:1px solid #ddd!important}
+.pubState.published{color:var(--mhac-green)!important}
+.pubState.draft{color:#555!important}
+/* Store/menu manager */
+.card:has(#newStore){background:#fff!important;border:1.5px solid #ddd!important;padding:14px!important}
+.card:has(#newStore) .storeBox{background:#fff!important;border:1.5px solid #ddd!important;border-radius:14px!important;padding:10px!important}
+.card:has(#newStore) .storeBoxHeader{background:#fff!important;color:#111!important}
+.card:has(#newStore) .storeCategory{background:#fff!important;border:1.5px solid #ddd!important;border-radius:12px!important}
+.storeBoxHeader button,.storeCategoryHeader button{min-height:42px!important}
+.categoryBtns{gap:6px!important}
+/* Food editor */
+.oneFoodBox{background:#fff!important;border:2px solid #222!important;border-radius:14px!important;color:#111!important}
+.oneFoodBox h3,.oneFoodBox h4,.oneFoodBox label,.oneFoodBox .label{color:#111!important}
+.copyPasteRow{gap:8px!important}
+.copyPasteRow button{min-height:46px!important;background:#fff!important;color:#111!important;border:1.5px solid #222!important}
+.foodEditorModeNote{background:#fff!important;color:#666!important;border:0!important}
+/* Order controls keep semantic accents but no filled color blocks. */
+.orderActions{gap:8px!important}
+.orderActions .blue,.orderActions .chatOpenBtn,.orderActions .riderChatOpenBtn{background:#fff!important;color:#111!important;border:1.5px solid #222!important}
+.orderActions .red{background:#fff!important;color:var(--mhac-red)!important;border-color:var(--mhac-red)!important}
+.orderActions .green{background:#fff!important;color:var(--mhac-green)!important;border-color:var(--mhac-green)!important}
+/* Chat remains centered and now matches the same UI. */
+.chatPanel{background:#fff!important;color:#111!important;border:2px solid #222!important;box-shadow:0 8px 28px rgba(0,0,0,.18)!important}
+.chatHead{background:#fff!important;color:#111!important;border-bottom:1px solid #ddd!important}
+.chatHead *{color:#111!important}
+.chatMessages{background:#fff!important;color:#111!important}
+.chatMsg,.chatMsg.admin,.chatMsg.customer,.chatMsg.rider{background:#fff!important;color:#111!important;border:1px solid #ddd!important}
+.chatMsg.admin{background:#f5f5f5!important}
+.chatInput{background:#fff!important;border-top:1px solid #ddd!important}
+.chatInput input,.chatInput button{background:#fff!important;color:#111!important;border:1.5px solid #222!important}
+/* Compact mobile spacing */
+@media(max-width:600px){
+ main{padding:12px!important}
+ .card{padding:12px!important;border-radius:15px!important}
+ button,input,select,textarea{font-size:14px!important}
+ .storeBox{padding:9px!important}
+ .storeBoxHeader,.storeCategoryHeader{gap:7px!important}
+ .copyPasteRow{grid-template-columns:1fr 1fr!important}
 }
 </style>
 </head><body>
@@ -2475,11 +2530,11 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.34 CHAT UNIFIED UI + FIREBASE FIX";
+window.__MHAC_BUILD__="V4.1.35 ADMIN TRUE UNIFIED UI + FIREBASE FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.34 CHAT UNIFIED UI + FIREBASE FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.35 ADMIN TRUE UNIFIED UI + FIREBASE FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
