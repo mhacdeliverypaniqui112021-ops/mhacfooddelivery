@@ -1,0 +1,21 @@
+MHAC DELIVERY V4.1.63 — FULL SAFE BUILD
+
+BASE: V4.1.61 STORE CLICK FLOW uploaded by the user.
+ONLY CHANGE: Customer App Chicken Part Selection alignment.
+
+IMPORTANT:
+Upload/replace the FULL contents of this ZIP in the GitHub Pages repository.
+Do NOT upload the old ALIGNMENT_PATCH demo ZIP.
+
+Preserved:
+- Admin App
+- Customer App
+- Rider App
+- Firebase logic/config
+- Business Time Control
+- Store Click Flow
+- Food Editor
+- Cart / Checkout
+- GPS / Delivery Fee
+- Orders / Chat
+- Firestore rules
