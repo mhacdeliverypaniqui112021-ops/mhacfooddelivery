@@ -1,972 +1,302 @@
 <!doctype html>
 <html lang="en">
-<head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.49</title><meta name="build-version" content="V4.1.49 RIDER MASTER UNIFIED WHITE UI">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>MHAC DELIVERY — RIDER V4.1.49</title>
+<meta name="build-version" content="V4.1.49 RIDER MASTER UNIFIED WHITE UI">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
-
-.mhacSplash{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .55s ease}
-.mhacSplash.hide{opacity:0;pointer-events:none}
-.mhacSplash img{width:min(72vw,330px);height:auto;animation:mhacIn .8s ease both}
-.mhacSplash h1{color:#fff;margin:16px 0 5px;font-size:30px;letter-spacing:2px}
-.mhacSplash p{color:#e21d25;font-weight:900;letter-spacing:2px}
-.mhacLoader{height:4px;width:150px;background:#333;margin:20px auto;overflow:hidden;border-radius:9px}
-.mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
-@keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
-.mhacAutoSoundHide{display:none!important}
-
-/* V4.1.12 Rider login compact UI */
-#login{max-width:560px;margin-left:auto;margin-right:auto;padding:18px!important}
-#login h2{margin:0 0 12px!important;font-size:26px!important}
-#login>p{font-size:15px!important;line-height:1.35!important;margin:8px 0!important}
-#login .google{width:92%!important;margin:10px auto!important;padding:11px 12px!important;font-size:15px!important}
-#login .status{font-size:12px!important}
-#login hr{margin:10px 0!important}
-@media (max-width:480px){
-  #login{padding:15px!important}
-  #login h2{font-size:23px!important}
-  #login .google{width:90%!important;font-size:14px!important;padding:10px!important}
-}
-
-
-/* V4.1.13 mobile rider login */
-#login{padding:14px!important}
-#login .google{width:88%!important;max-width:430px!important;display:block!important;margin:8px auto!important;padding:10px 12px!important;font-size:14px!important}
-#login>p{margin:7px 0!important}
-
-
-/* V4.1.14 centered rider header */
-header h1{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
-header h1 .brandName,header h1 .appName{display:block;text-align:center;line-height:1.05}
-header h1 .brandName{font-size:30px}
-header h1 .appName{font-size:30px}
-@media(max-width:480px){
-  header{padding:20px 10px!important}
-  header h1 .brandName,header h1 .appName{font-size:28px!important}
-}
-
+*{box-sizing:border-box}html,body{margin:0;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+#badge{position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px}
+header{text-align:center;padding:18px 10px;border-bottom:3px solid #e21d25}
+header h1{margin:0 0 8px;line-height:1.03;font-size:30px;font-weight:900}
+header h1 span{display:block}header p{margin:0;font-size:15px}
+main{max-width:980px;margin:auto;padding:10px 14px 30px}
+.card,.order{background:#fff;border:1px solid #d7d7d7;border-radius:12px;padding:12px;margin:8px 0}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.row>*{min-width:0}
+button,.nav,input{font:inherit;border-radius:9px}
+button,.nav{border:1px solid #222;background:#fff;color:#111;min-height:38px;padding:8px 11px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button:disabled{opacity:.5}input{width:100%;border:1px solid #bbb;padding:10px;min-height:42px}
+.status{color:#555;font-size:13px;line-height:1.4}.hidden{display:none!important}
+#logout{min-width:105px}.google{width:100%;margin:8px 0}
+#riderAccounting,.sound{border:1px solid #ddd;border-radius:10px;padding:9px;margin-top:7px;line-height:1.3}
+.order h2{font-size:22px;margin:8px 0}.pill{background:#f2f2f2;border:1px solid #ddd;border-radius:20px;padding:5px 8px;font-weight:900}
+.riderOrderGroup{border:1px solid #ddd;border-radius:10px;padding:9px 11px;margin:8px 0}
+.riderStoreName{font-size:20px;font-weight:900;margin-bottom:5px}
+.riderFoodRow{padding:6px 0;border-top:1px solid #eee}.riderFoodRow:first-child{border-top:0}
+.riderFoodName{font-size:17px;font-weight:900;line-height:1.25}.riderChoice,.riderParts{font-size:14px;font-weight:700;margin-top:2px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.actions3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px}
+.actions>*{width:100%}.actions3>*{width:100%}
+.chatPanel{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);width:min(380px,calc(100vw - 24px));max-height:48vh;display:flex;flex-direction:column;background:#fff;border:2px solid #222;border-radius:16px;z-index:10000;box-shadow:0 8px 28px #0004;overflow:hidden}
+.chatHead{padding:9px 11px;font-weight:900;border-bottom:1px solid #ddd;display:flex;justify-content:space-between}
+.chatMessages{height:150px;overflow:auto;padding:8px}.chatMsg{max-width:82%;padding:7px 9px;border-radius:11px;margin:5px 0;white-space:pre-wrap;word-break:break-word}.chatMsg.rider{margin-left:auto;background:#dff5e4}.chatMsg.admin{border:1px solid #ddd}
+.chatInput{display:flex;gap:5px;padding:5px;border-top:1px solid #ddd}.chatInput input{min-width:0}.chatInput button{width:auto}
+.splash{position:fixed;inset:0;background:#000;z-index:2147483647;display:flex;align-items:center;justify-content:center;text-align:center;transition:opacity .5s}
+.splash.hide{opacity:0;pointer-events:none}.splash img{width:min(55vw,230px);max-height:34vh;object-fit:contain}.splashTitle{color:#fff;font-size:24px;font-weight:900;margin-top:14px}.splashTag{color:#fff;font-size:13px;letter-spacing:1.5px;margin-top:5px}
+.track{width:min(72vw,260px);height:5px;background:#5a0000;border-radius:8px;overflow:hidden;margin:20px auto}.bar{height:100%;width:40%;background:#e21d25;animation:load 1.5s infinite}
+@keyframes load{0%{transform:translateX(-150%)}100%{transform:translateX(360%)}}
+@media(max-width:600px){main{padding:8px}.card{padding:10px}header h1{font-size:27px}header p{font-size:13px}.actions3 button{font-size:11px;padding:8px 3px}.actions button,.actions .nav{font-size:12px;padding:8px 4px}}
 </style>
-<style>
-.riderOrderGroup{margin:12px 0;padding:12px 14px;border:2px solid #222;border-radius:14px;background:#fff}
-.riderStoreName{font-size:24px;font-weight:900;margin-bottom:8px}
-.riderFoodRow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid #ddd}
-.riderFoodRow:first-child{border-top:0}
-.riderFoodQty{min-width:42px;font-size:21px;font-weight:900;line-height:1.2}
-.riderFoodName{font-size:20px;font-weight:900;line-height:1.25}
-.riderChoice,.riderParts{margin-top:4px;font-size:17px;font-weight:700}
-.riderParts{padding:2px 0;display:block;border:0;background:#fff;font-size:18px;font-weight:700}
-</style>
-<style>
-/* V4.1.8 compact Admin ↔ Rider chat */
-.chatPanel{
-  position:fixed;left:50%;right:auto;
-  bottom:max(10px, var(--chat-bottom, 10px));
-  transform:translateX(-50%);
-  width:min(360px,calc(100vw - 28px));
-  max-height:min(46vh,390px);
-  display:flex;flex-direction:column;
-  background:#fff;border:3px solid #1976d2;border-radius:18px;
-  z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
-}
-.chatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
-.chatHead button{width:auto!important;margin:0!important;padding:8px 12px!important;background:#666!important}
-.chatMessages{height:105px;min-height:80px;max-height:22vh;overflow:auto;padding:8px;background:#f5f7fa}
-.chatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
-.chatMsg.rider{margin-left:auto;background:#d8f5df}
-.chatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
-.chatInput{flex:0 0 auto;display:flex;gap:5px;padding:5px;border-top:1px solid #ddd;background:#fff}
-.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:40px;padding:7px 9px!important}
-.chatInput button{width:auto!important;min-width:76px;height:40px!important;margin:0!important;padding:7px 10px!important}
-.riderChatBtn{background:#1976d2!important}
-</style>
-<style>
-/* V4.1.15 RIDER compact dashboard + order controls */
-#app>.card{padding:12px!important;margin:8px 0!important}
-#app>.card>.row{align-items:center!important;gap:6px!important}
-#app>.card>.row h2{font-size:21px!important;line-height:1.05!important}
-#logout,#pendingLogout{width:auto!important;min-width:92px!important;max-width:120px!important;padding:9px 10px!important;margin:0!important;font-size:13px!important;border-radius:10px!important}
-#conn{font-size:11px!important;margin:5px 0!important}
-#riderAccounting{margin-top:6px!important;padding:7px 9px!important;font-size:12px!important;line-height:1.25!important}
-#riderAccounting b:first-child{font-size:14px!important}
-#app>.card>.sound{padding:7px 9px!important;margin-top:6px!important;font-size:12px!important;line-height:1.25!important}
-#app>.card>.sound .status{font-size:10px!important}
-.order{padding:10px!important;margin:8px 0!important;border-radius:12px!important}
-.order>.row:first-child b,.order>.row:first-child .pill{font-size:13px!important}
-.order h2{font-size:24px!important;margin:8px 0!important}
-.order>p{font-size:14px!important;line-height:1.3!important}
-.riderOrderGroup{margin:8px 0!important;padding:9px 11px!important}
-.riderStoreName{font-size:20px!important;margin-bottom:5px!important}
-.riderFoodRow{gap:7px!important;padding:6px 0!important}
-.riderFoodName{font-size:17px!important;line-height:1.2!important}
-.riderChoice,.riderParts{font-size:14px!important;margin-top:2px!important}
-.riderActionTop,.riderActionBottom{display:grid!important;gap:6px!important}
-.riderActionTop{grid-template-columns:1fr 1fr!important}
-.riderActionBottom{grid-template-columns:1fr 1fr 1fr!important;margin-top:6px!important}
-.riderActionTop .nav,.riderActionTop button,.riderActionBottom button{margin:0!important;width:100%!important;padding:10px 5px!important;border-radius:11px!important;font-size:12px!important;line-height:1.05!important}
-@media(max-width:480px){
-  #app>.card>.row h2{font-size:19px!important}
-  #logout{min-width:86px!important;padding:8px!important}
-  .riderActionTop .nav,.riderActionTop button,.riderActionBottom button{font-size:11px!important;padding:9px 3px!important}
-}
-</style>
-
-
-
-
-
-<style id="MHAC_FINAL_UNIFIED_UI_V4_1_26">
-/* FINAL BASE DESIGN: ADMIN + CUSTOMER + RIDER */
-html,body{
-  background:#fff!important;
-  color:#111!important;
-}
-body{
-  font-family:Arial,Helvetica,sans-serif!important;
-}
-header{
-  background:#fff!important;
-  color:#111!important;
-  border-bottom:3px solid #e21d25!important;
-}
-header h1,header p{
-  color:#111!important;
-  text-align:center!important;
-}
-.card,.metric,.order,.item,.riderCompact,.foodCard,.editorBox,
-.soundBox,.gcSettings,.storeBox,.panel,.section,.chatPanel{
-  background:#fff!important;
-  color:#111!important;
-  box-shadow:none!important;
-}
-.card{
-  border:1px solid #d8d8d8!important;
-  border-radius:12px!important;
-  padding:12px!important;
-  margin:8px 0!important;
-}
-.metric{
-  border:1px solid #d8d8d8!important;
-  border-radius:10px!important;
-  padding:10px!important;
-}
-.metric span,.metric b{
-  color:#111!important;
-}
-.metric b{
-  font-size:22px!important;
-}
-.order,.item,.riderCompact,.foodCard,.storeBox{
-  border:1px solid #d8d8d8!important;
-  border-radius:10px!important;
-}
-.soundBox{
-  border:1px solid #222!important;
-  border-radius:10px!important;
-}
-.status,.small,.hint{
-  color:#555!important;
-}
-input,textarea,select{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #cfcfcf!important;
-  border-radius:9px!important;
-}
-button{
-  border-radius:9px!important;
-  min-height:34px!important;
-  padding:6px 10px!important;
-  font-weight:700!important;
-}
-.logout,.logoutBtn{
-  min-height:30px!important;
-  padding:5px 9px!important;
-  font-size:13px!important;
-}
-.brandName,.appName{
-  display:block!important;
-  text-align:center!important;
-  color:#111!important;
-}
-@media(max-width:600px){
-  main{padding:10px!important}
-  .card{padding:10px!important}
-  .grid{gap:7px!important}
-  .metric{padding:9px!important}
-  .metric b{font-size:21px!important}
-}
-</style>
-
-
-<style id="MHAC_PROSPECT_UI_V4_1_27">
-/* Prospect layout: clean white, compact, desktop-style grid that collapses on phones */
-body{background:#fff!important;color:#111!important;font-family:Arial,Helvetica,sans-serif!important}
-main,#app{max-width:980px!important;margin:0 auto!important;padding:10px 14px!important}
-.card,.panel,.section,.box{background:#fff!important;color:#111!important;border:1px solid #d7d7d7!important;border-radius:12px!important;box-shadow:none!important}
-button{border-radius:8px!important;min-height:34px!important;padding:6px 10px!important;font-weight:700!important}
-input,select,textarea{background:#fff!important;color:#111!important;border:1px solid #cfcfcf!important;border-radius:8px!important}
-.logout,.logoutBtn{min-height:30px!important;padding:5px 9px!important;font-size:12px!important}
-#deliveryEarnings,.deliveryEarnings,.earnings,.earningsDashboard{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
-#deliveryEarnings .metric,.deliveryEarnings .metric,.earnings .metric,.earningsDashboard .metric{margin:0!important;padding:10px!important;border:1px solid #ddd!important;background:#fff!important;color:#111!important;border-radius:9px!important}
-.metric{background:#fff!important;color:#111!important}
-.metric *{color:#111!important}
-.metric b{font-size:20px!important}
-.riderAccounting{background:#fff!important;border:1px solid #ddd!important;border-radius:9px!important;padding:9px!important}
-.order-card,.order,.incoming-order{background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important}
-.order-actions,.orderActions{display:flex!important;flex-direction:column!important;gap:7px!important}
-.order-layout{display:grid!important;grid-template-columns:minmax(0,1fr) 260px!important;gap:9px!important}
-.order-actions button{width:100%!important}
-.rider-list{display:grid!important;gap:7px!important}
-.rider-row{display:grid!important;grid-template-columns:1fr auto auto!important;gap:7px!important;align-items:center!important}
-.store-manager-row,.gcash-row{display:grid!important;grid-template-columns:1fr auto!important;gap:8px!important;align-items:center!important}
-@media(max-width:700px){
- main,#app{padding:8px!important}
- #deliveryEarnings,.deliveryEarnings,.earnings,.earningsDashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- .order-layout{grid-template-columns:1fr!important}
- .order-actions{display:grid!important;grid-template-columns:1fr 1fr!important}
- .order-actions button{width:100%!important}
- .rider-row{grid-template-columns:1fr 1fr!important}
- .store-manager-row,.gcash-row{grid-template-columns:1fr!important}
-}
-@media(min-width:1000px){
- .incoming-orders .order-card,.incoming-orders .order,.incoming-orders .incoming-order{display:block!important}
-}
-</style>
-
-<style id="V4_1_30_CONTACT_FIX">
-.customerPhone{color:inherit!important;font-weight:800;text-decoration:underline;text-underline-offset:2px}
-.customerPhone:active{opacity:.55}
-</style><style id="MHAC_V4_1_32_FIXES">
-.callCustomerBtn{display:inline-flex!important;align-items:center;justify-content:center;text-decoration:none!important;box-sizing:border-box}
-.callCustomerBtn[aria-disabled="true"]{opacity:.5;pointer-events:none}
-.customerPhone{font-weight:800!important;text-decoration:underline!important}
-@media(max-width:600px){
-  .callCustomerBtn{min-height:40px!important;width:100%!important}
-}
-</style>
-
-<style id="MHAC_RIDER_MASTER_UNIFIED_UI_V4_1_49">
-/* =========================================================
-   MHAC RIDER V4.1.49 — MASTER UNIFIED WHITE UI
-   Appearance-only layer. Rider Firebase/order logic untouched.
-   Matches the locked Admin V4.1.49 baseline.
-   ========================================================= */
-
-html,body{
-  width:100%!important;
-  max-width:100%!important;
-  overflow-x:hidden!important;
-  background:#fff!important;
-  color:#111!important;
-  font-family:Arial,Helvetica,sans-serif!important;
-}
-
-header{
-  background:#fff!important;
-  color:#111!important;
-  text-align:center!important;
-  padding:18px 12px!important;
-  border-bottom:3px solid #e21d25!important;
-}
-header h1{
-  margin:0 0 8px!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:2px!important;
-  color:#111!important;
-}
-header h1 .brandName,
-header h1 .appName{
-  color:#111!important;
-  display:block!important;
-  text-align:center!important;
-  line-height:1.05!important;
-}
-header h1 .brandName{font-size:30px!important;font-weight:900!important}
-header h1 .appName{font-size:30px!important;font-weight:900!important}
-header p{
-  color:#111!important;
-  font-size:15px!important;
-  margin:8px 0 0!important;
-}
-
-main{
-  max-width:980px!important;
-  margin:0 auto!important;
-  padding:10px 14px 30px!important;
-}
-
-.card{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #d7d7d7!important;
-  border-radius:12px!important;
-  padding:12px!important;
-  margin:8px 0!important;
-  box-shadow:none!important;
-}
-
-#app>.card{
-  border-color:#d7d7d7!important;
-}
-
-#login,#closed,#pending{
-  max-width:680px!important;
-  margin:8px auto!important;
-}
-
-#app .row{
-  align-items:center!important;
-}
-#app .row h2{
-  color:#111!important;
-  font-size:24px!important;
-  line-height:1.1!important;
-}
-#logout{
-  width:auto!important;
-  min-width:120px!important;
-  margin:0!important;
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-  border-radius:9px!important;
-}
-
-input,button{
-  border-radius:9px!important;
-  box-shadow:none!important;
-}
-input{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #cfcfcf!important;
-  padding:10px 12px!important;
-  min-height:42px!important;
-}
-input::placeholder{color:#777!important;opacity:1!important}
-
-button{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-  min-height:34px!important;
-  padding:6px 10px!important;
-  font-weight:800!important;
-}
-button:disabled{opacity:.5!important}
-
-.google{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-.green{
-  background:#fff!important;
-  color:#138a36!important;
-  border-color:#138a36!important;
-}
-.red{
-  background:#fff!important;
-  color:#a00000!important;
-  border-color:#a00000!important;
-}
-.blue{
-  background:#fff!important;
-  color:#111!important;
-  border-color:#222!important;
-}
-.nav{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-
-.status{
-  color:#555!important;
-}
-.error{color:#a00000!important}
-.success{color:#138a36!important}
-
-.sound{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #ddd!important;
-  border-radius:10px!important;
-  padding:10px!important;
-  box-shadow:none!important;
-}
-#riderAccounting{
-  background:#fff!important;
-  border:1px solid #ddd!important;
-}
-
-.order{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #d7d7d7!important;
-  border-radius:10px!important;
-  padding:11px!important;
-  margin:8px 0!important;
-  box-shadow:none!important;
-}
-.pill{
-  background:#f2f2f2!important;
-  color:#111!important;
-  border:1px solid #ddd!important;
-  border-radius:20px!important;
-}
-.riderOrderGroup{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #ddd!important;
-  border-radius:10px!important;
-  box-shadow:none!important;
-}
-.riderStoreName,
-.riderFoodName,
-.riderFoodQty{
-  color:#111!important;
-}
-.riderFoodRow{
-  border-top:1px solid #eee!important;
-}
-.riderParts{
-  background:#fff!important;
-  color:#111!important;
-}
-
-.chatPanel{
-  background:#fff!important;
-  color:#111!important;
-  border:2px solid #222!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;
-}
-.chatHead{
-  background:#fff!important;
-  color:#111!important;
-  border-bottom:1px solid #ddd!important;
-}
-.chatHead .miniBtn{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-.chatMessages{
-  background:#fff!important;
-  color:#111!important;
-}
-.chatMsg{
-  color:#111!important;
-}
-.chatInput{
-  background:#fff!important;
-  border-top:1px solid #ddd!important;
-}
-.chatInput input{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #bbb!important;
-}
-.chatInput button{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-
-.mhacRiderSplash{
-  background:#000!important;
-}
-
-@media(max-width:600px){
-  main{padding:8px!important}
-  .card{padding:10px!important}
-  header{padding:16px 10px!important}
-  header h1 .brandName,
-  header h1 .appName{font-size:27px!important}
-  header p{font-size:13px!important}
-  #app .row h2{font-size:22px!important}
-  #logout{min-width:105px!important}
-}
-</style>
-
 </head>
 <body>
-<div id="mhacRiderSplash" class="mhacRiderSplash">
-  <div class="mhacRiderSplashInner">
+<div id="badge">🛠️ V4.1.49 RIDER MASTER UNIFIED WHITE UI</div>
+<div id="splash" class="splash">
+  <div>
     <img src="mhac-logo.png" alt="MHAC DELIVERY">
-    <div class="mhacRiderSplashTitle">MHAC DELIVERY</div>
-    <div class="mhacRiderSplashTag">FAST • SAFE • ON TIME</div>
-    <div class="mhacRiderSplashTrack"><div class="mhacRiderSplashBar"></div></div>
+    <div class="splashTitle">MHAC DELIVERY</div>
+    <div class="splashTag">FAST • SAFE • ON TIME</div>
+    <div class="track"><div class="bar"></div></div>
   </div>
 </div>
-<style>
-.mhacRiderSplash{position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;opacity:1}
-.mhacRiderSplashInner{width:min(86vw,420px);display:flex;flex-direction:column;align-items:center;justify-content:center}
-.mhacRiderSplashInner img{width:min(58vw,260px);height:auto;object-fit:contain;display:block}
-.mhacRiderSplashTitle{color:#fff;font-weight:800;font-size:24px;margin-top:14px}
-.mhacRiderSplashTag{color:#fff;font-size:13px;letter-spacing:1.5px;margin-top:6px}
-.mhacRiderSplashTrack{width:min(72vw,280px);height:5px;background:#5a0000;border-radius:8px;overflow:hidden;margin-top:22px}
-.mhacRiderSplashBar{width:40%;height:100%;background:#e21d25;border-radius:8px;animation:mhacRiderSplashLoad 1.6s infinite}
-@keyframes mhacRiderSplashLoad{0%{transform:translateX(-140%)}100%{transform:translateX(360%)}}
-.mhacRiderSplash.hide{opacity:0;transition:opacity .55s ease;pointer-events:none}
-</style>
-<style>
-/* V4.1.18 splash/layout safety fix */
-html,body{width:100%;max-width:100%;overflow-x:hidden}
-.mhacRiderSplash{width:100vw;height:100dvh;overflow:hidden}
-.mhacRiderSplashInner{width:100%;max-width:100%;padding:20px;box-sizing:border-box}
-.mhacRiderSplashInner img{width:min(52vw,230px);max-width:230px;max-height:34vh;object-fit:contain;margin:0 auto}
-.mhacRiderSplashTitle{font-size:24px;text-align:center;white-space:nowrap}
-.mhacRiderSplashTag{text-align:center}
-.mhacRiderSplashTrack{max-width:260px}
-/* compact rider dashboard */
-#riderAccounting{font-size:11px!important;line-height:1.18!important}
-#riderAccounting b:first-child{font-size:13px!important}
-#logout{min-width:78px!important;max-width:100px!important;padding:7px 8px!important;font-size:12px!important}
-</style>
-<script>
-window.addEventListener("load",function(){
-  setTimeout(function(){
-    var x=document.getElementById("mhacRiderSplash");
-    if(x){
-      x.classList.add("hide");
-      setTimeout(function(){if(x.parentNode)x.parentNode.removeChild(x)},600);
-    }
-  },2200);
-});
-</script>
-<header><h1><span class="brandName">MHAC DELIVERY</span><span class="appName">RIDER APP</span></h1><p>ORDER • CUSTOMER LOCATION • NAVIGATION</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
+
+<header>
+  <h1><span>MHAC DELIVERY</span><span>RIDER APP</span></h1>
+  <p>ORDER • CUSTOMER LOCATION • NAVIGATION</p>
+</header>
+
 <main>
-<div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
-<div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
-<div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.49 • ORDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<section id="login" class="card">
+  <h2>🔐 RIDER LOGIN</h2>
+  <p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p>
+  <button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button>
+  <p id="googleStatus" class="status">Google sign-in is required for new riders.</p>
+  <hr>
+  <details>
+    <summary><b>Legacy rider login</b></summary>
+    <input id="email" type="email" placeholder="Rider Email" autocomplete="email">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">LOGIN</button>
+    <p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p>
+  </details>
+</section>
+
+<section id="closed" class="card hidden">
+  <h2>🔒 MHAC DELIVERY CLOSED</h2>
+  <p>🔒 Rider app is closed now. Please try again during business hours.</p>
+  <p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p>
+  <button id="retryBtn">🔄 CHECK AGAIN</button>
+</section>
+
+<section id="pending" class="card hidden">
+  <h2>⏳ RIDER ACCOUNT PENDING</h2>
+  <p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p>
+  <p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p>
+  <button id="pendingLogout">LOG OUT</button>
+</section>
+
+<section id="app" class="hidden">
+  <div class="card">
+    <div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div>
+    <p id="conn" class="status">Connecting…</p>
+    <p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.49 • ORDER SYNC ACTIVE</p>
+    <div id="riderAccounting">
+      💰 <b>MY EARNINGS DASHBOARD</b><br>
+      Today's Completed Deliveries: <b id="doneCount">0</b><br>
+      Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>
+      Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b>
+    </div>
+    <div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — READY</span></div>
+  </div>
+  <div id="orders"></div>
+</section>
+
 <div id="riderChatPanel" class="chatPanel hidden">
-  <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
+  <div class="chatHead"><span>💬 ADMIN CHAT</span><button id="riderChatClose">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
-  <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
+  <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.49";</script>
+
+<audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
+
+<script>
+window.MHAC_RIDER_BUILD="V4.1.49";
+setTimeout(()=>{const s=document.getElementById("splash");if(s){s.classList.add("hide");setTimeout(()=>s.remove(),600)}},1800);
+</script>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
-const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set();
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
-async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()}}catch(e){console.warn("Business hours settings unavailable:",e)}}
-function showLogin(){$("login").classList.remove("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden")}function showClosed(){$("login").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.add("hidden");$("closed").classList.remove("hidden");$("closedText").textContent="🔒 Rider app is closed now. Please try again during business hours."}function showPending(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("app").classList.add("hidden");$("pending").classList.remove("hidden")}function showApp(){$("login").classList.add("hidden");$("closed").classList.add("hidden");$("pending").classList.add("hidden");$("app").classList.remove("hidden")}
-async function initRiderAlertSound(){
-  const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound element missing.");
-  let url=new URL("assets/mhac-order-alert.mp3",document.baseURI).href;
-  try{
-    const resp=await fetch(url,{cache:"force-cache"});
-    if(!resp.ok)throw new Error("HTTP "+resp.status);
-    const blob=await resp.blob();url=URL.createObjectURL(blob);
-  }catch(e){console.warn("Alert preload failed; using direct audio URL.",e)}
-  a.src=url;a.preload="auto";a.loop=false;a.muted=false;a.volume=1;
-  try{a.load()}catch(e){}
-}
-function makeRiderFallbackSound(){
-  try{
-    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
-    if(!soundCtx)soundCtx=new AC();const ctx=soundCtx;
-    if(ctx.state==="suspended")ctx.resume();const now=ctx.currentTime;
-    for(let i=0;i<12;i++){
-      const o=ctx.createOscillator(),g=ctx.createGain();o.type=i%2?"square":"sawtooth";o.frequency.value=i%2?880:660;
-      g.gain.setValueAtTime(0.0001,now+i*0.28);g.gain.exponentialRampToValueAtTime(0.55,now+i*0.28+0.02);g.gain.exponentialRampToValueAtTime(0.0001,now+i*0.28+0.22);
-      o.connect(g);g.connect(ctx.destination);o.start(now+i*0.28);o.stop(now+i*0.28+0.24);
-    }return true;
-  }catch(e){console.warn("Fallback sound failed",e);return false}
-}
-async function prepareRiderAlertSound(){
-  const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound element missing.");
-  if(!a.src||a.src==="")await initRiderAlertSound();
-  a.muted=true;a.volume=0;
-  try{
-    const p=a.play();if(p)await p;a.pause();a.currentTime=0;a.muted=false;a.volume=1;
-    try{
-      const AC=window.AudioContext||window.webkitAudioContext;if(AC){
-        if(!soundCtx)soundCtx=new AC();await soundCtx.resume();
-        if(!soundMediaSource){soundMediaSource=soundCtx.createMediaElementSource(a);soundGain=soundCtx.createGain();soundGain.gain.value=2.5;soundMediaSource.connect(soundGain);soundGain.connect(soundCtx.destination)}
-      }
-    }catch(e){console.warn("Volume amplifier unavailable; using normal HTML audio.",e)}
-    soundReady=true;$("soundState").textContent=" 🔊 Sound enabled — alert ready";return;
-  }catch(e){
-    console.warn("MP3 playback unavailable",e);
-    if(makeRiderFallbackSound()){soundReady=true;$("soundState").textContent=" 🔊 Sound enabled — backup alert ready";return}
-    throw e;
-  }
-}
-// V4.1.21 CHAT AUDIO UNLOCK: keep a user-gesture listener installed so
-// incoming Admin messages can ring automatically after the first tap.
-let riderChatUnlockInstalled=false;
-function installRiderChatAudioUnlock(){
-  if(riderChatUnlockInstalled)return;
-  riderChatUnlockInstalled=true;
-  const unlock=async()=>{
-    if(soundReady){document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchstart",unlock,true);return;}
-    try{
-      await prepareRiderAlertSound();
-      document.removeEventListener("pointerdown",unlock,true);
-      document.removeEventListener("touchstart",unlock,true);
-    }catch(_){ /* wait for another gesture */ }
-  };
-  document.addEventListener("pointerdown",unlock,true);
-  document.addEventListener("touchstart",unlock,true);
-}
-installRiderChatAudioUnlock();
 
-async function playAlert(){
-  if(!soundReady)return;
-  try{const a=$("orderAlertAudio");if(!a)throw new Error("Alert sound missing");if(soundCtx)await soundCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p}
-  catch(e){if(!makeRiderFallbackSound())$("soundState").textContent=" ❌ Alert playback failed — tap ENABLE SOUND again"}
+const firebaseConfig={
+ apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",
+ authDomain:"mhac-delivery-53099.firebaseapp.com",
+ projectId:"mhac-delivery-53099",
+ storageBucket:"mhac-delivery-53099.firebasestorage.app",
+ messagingSenderId:"878081137607",
+ appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",
+ measurementId:"G-7NZEK618YC"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();
+googleProvider.setCustomParameters({prompt:"select_account"});
+const DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};
+let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,authBusy=false;
+let seenAssigned=new Set(),orderWatchers=new Map(),riderChatWatchers=new Map(),buckets=new Map(),chatUnsub=null,chatOrderId="",chatPrimed=false;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const peso=n=>"₱"+Number(n||0).toFixed(2);
+const mins=t=>{const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m};
+const dayKey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+function riderOpen(){
+ if(businessHours.enabled===false)return false;
+ const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);
+ return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl);
 }
-async function autoEnableRiderSound(){
- try{
-   await initRiderAlertSound();
-   await prepareRiderAlertSound();
-   $("soundState").textContent="🔊 AUTOMATIC SOUND — READY";
- }catch(e){
-   console.warn("Automatic rider sound unlock pending user gesture.",e);
-   $("soundState").textContent="🔊 AUTOMATIC SOUND — waiting for browser audio permission";
-   const unlock=async()=>{
-     try{await prepareRiderAlertSound();$("soundState").textContent="🔊 AUTOMATIC SOUND — READY";}catch(x){}
-     window.removeEventListener("pointerdown",unlock);
-     window.removeEventListener("touchstart",unlock);
-   };
-   window.addEventListener("pointerdown",unlock,{once:true,passive:true});
-   window.addEventListener("touchstart",unlock,{once:true,passive:true});
- }
-}
+async function loadHours(){try{const s=await getDoc(doc(db,"settings","businessHours"));if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()}}catch(e){console.warn(e)}}
+function show(which){["login","closed","pending","app"].forEach(x=>$(x).classList.add("hidden"));$(which).classList.remove("hidden")}
+
 async function googleLogin(){
- const btn=$("googleBtn"),status=$("googleStatus");
- if(btn.disabled)return;
- btn.disabled=true;status.textContent="Opening Google sign-in…";
+ const b=$("googleBtn");if(b.disabled)return;b.disabled=true;$("googleStatus").textContent="Opening Google sign-in…";
  try{
    await setPersistence(auth,browserLocalPersistence);
-   // Popup-first keeps Android Chrome on the same page and lets us immediately
-   // continue into the rider approval/dashboard flow. If popup is blocked or
-   // unsupported, fall back to Firebase redirect.
-   try{
-     const result=await signInWithPopup(auth,googleProvider);
-     await afterLogin(result.user);
-     return;
-   }catch(popupErr){
-     console.warn("Google popup failed; using redirect",popupErr);
-     await signInWithRedirect(auth,googleProvider);
-     return;
-   }
+   try{const r=await signInWithPopup(auth,googleProvider);await afterLogin(r.user);return}
+   catch(e){console.warn("popup failed; redirect",e);await signInWithRedirect(auth,googleProvider)}
  }catch(e){
-   console.error("Google sign-in:",e);
-   const code=e?.code||"";let message=e?.message||String(e);
-   if(code==="auth/unauthorized-domain")message="GitHub Pages domain is not authorized in Firebase Authentication.";
-   else if(code==="auth/operation-not-supported-in-this-environment")message="Google sign-in is not supported in this browser.";
-   else if(code==="auth/network-request-failed")message="Network error. Check your internet connection.";
-   status.innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
- } finally {
-   btn.disabled=false;
+   $("googleStatus").innerHTML='<span style="color:#a00000;font-weight:700">❌ '+esc(e.message||e)+'</span>';
+   b.disabled=false;
  }
 }
-async function legacyLogin(){$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{const result=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);uid=result.user.uid;await afterLogin(result.user)}catch(e){$("loginStatus").innerHTML='<span class="error">❌ '+esc(e.message)+"</span>"}finally{$("loginBtn").disabled=false}}
+async function legacyLogin(){
+ $("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";
+ try{const r=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);await afterLogin(r.user)}
+ catch(e){$("loginStatus").innerHTML='<span style="color:#a00000;font-weight:700">❌ '+esc(e.message)+'</span>'}
+ finally{$("loginBtn").disabled=false}
+}
 async function afterLogin(user){
- if(!user)return;
- if(authFlowBusy && authFlowUid===user.uid)return;
- authFlowBusy=true; authFlowUid=user.uid;
+ if(!user||authBusy)return;authBusy=true;
  try{
-   // A temporary/denied settings read must not throw the rider back to login.
-   try{await loadHours()}catch(e){console.warn("Hours read skipped:",e)}
-   if(!riderOpen()){await signOut(auth);showClosed();return}
-   uid=user.uid;
-
-   // Automatically create a rider profile on first Google sign-in.
-   // The profile starts as approved:false so MHAC Admin must approve it.
-   const riderRef=doc(db,"riders",uid);
-   const riderSnap=await getDoc(riderRef);
-   if(!riderSnap.exists()){
-     const profile={
-       uid:user.uid,
-       email:user.email||"",
-       name:user.displayName||"",
-       nickname:user.displayName||"RIDER",
-       approved:false,
-       role:"rider",
-       createdAt:serverTimestamp(),
-       updatedAt:serverTimestamp()
-     };
-     await setDoc(riderRef,profile);
-     $("googleStatus").textContent="✅ Rider account created. Waiting for MHAC Admin approval…";
-     showPending();
-     return;
-   }
-
-   const riderData=riderSnap.data();
-   if(riderData.approved===false){showPending();return}
-   await loadProfile();
-   showApp();
-   await autoEnableRiderSound();
-   $("conn").textContent="🟢 LIVE — waiting for assigned orders";
-   startOrdersListener();
-   startHoursTimer();
+  await loadHours();
+  if(!riderOpen()){await signOut(auth);show("closed");return}
+  uid=user.uid;
+  const ref=doc(db,"riders",uid),snap=await getDoc(ref);
+  if(!snap.exists()){
+   await setDoc(ref,{uid:user.uid,email:user.email||"",name:user.displayName||"",nickname:user.displayName||"RIDER",approved:false,role:"rider",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+   show("pending");return;
+  }
+  const p=snap.data();if(p.approved===false){show("pending");return}
+  $("nickname").textContent=p.nickname||p.name||"RIDER";
+  $("riderBuild").textContent="BUILD V4.1.49 • UID "+uid+(user.email?" • "+user.email:"")+" • ORDER SYNC ACTIVE";
+  show("app");startOrdersListener();startHoursTimer();
+  $("conn").textContent="🟢 LIVE — waiting for assigned orders";
  }catch(e){
-   console.error("afterLogin:",e);
-   const msg=e?.code==="permission-denied"
-      ?"Firebase denied creation/read of the rider profile. Firestore Rules must allow a signed-in rider to create/read only their own riders/{uid} document."
-      :(e?.message||String(e));
-   $("googleStatus").innerHTML='<span class="error">❌ Rider account check failed: '+esc(msg)+"</span>";
-   // Keep the Google session alive so the real Firebase error remains visible.
-   // Do not silently sign the rider out; this made successful Google login look like it failed.
-   showLogin();
- } finally {
-   authFlowBusy=false;
- }
+  console.error(e);
+  $("googleStatus").innerHTML='<span style="color:#a00000;font-weight:700">❌ Rider account check failed: '+esc(e.message||e)+'</span>';
+  show("login");
+ }finally{authBusy=false}
 }
-async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||p.name||"RIDER"}
-function maps(o){const g=o.customer?.gps;let d="";if(g&&typeof g.lat==="number"&&typeof g.lon==="number")d=g.lat+","+g.lon;else d=[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
-function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+
+function maps(o){
+ const g=o.customer?.gps;
+ const d=g&&typeof g.lat==="number"&&typeof g.lon==="number"?g.lat+","+g.lon:[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");
+ return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving";
+}
 function render(arr){
  if(!arr.length){$("orders").innerHTML='<div class="card"><h3>No assigned orders.</h3><p class="status">New assigned orders will appear here automatically.</p></div>';return}
  $("orders").innerHTML=arr.map(o=>{
- const grouped={};(o.items||[]).forEach(i=>{const s=String(i.store||"").trim()||"Store";(grouped[s] ||= []).push(i);});
- const items=Object.entries(grouped).map(([store,arr])=>`
-   <div class="riderOrderGroup">
-     <div class="riderStoreName">${esc(store)}</div>
-     ${arr.map(i=>{
-       const qty=Math.max(1,Number(i.qty||0));
-       const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div class="riderParts">${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
-       const choice=i.choice?`<div class="riderChoice">Drinks: ${esc(i.choice)}</div>`:"";
-       const addons=i.addOns?.length?`<div class="riderChoice">Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
-       return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${addons}</div></div>`;
-     }).join("")}
-   </div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
- }).join("")
+  const grouped={};
+  (o.items||[]).forEach(i=>{const s=String(i.store||"").trim()||"Store";(grouped[s] ||= []).push(i)});
+  const items=Object.entries(grouped).map(([store,items])=>`
+   <div class="riderOrderGroup"><div class="riderStoreName">${esc(store)}</div>
+   ${items.map(i=>{
+    const qty=Math.max(1,Number(i.qty||0));
+    const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div class="riderParts">${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
+    const choice=i.choice?`<div class="riderChoice">Drinks: ${esc(i.choice)}</div>`:"";
+    const addons=i.addOns?.length?`<div class="riderChoice">Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
+    return `<div class="riderFoodRow"><div class="riderFoodName">${qty}x ${esc(i.name||"Food")}${parts}${choice}${addons}</div></div>`
+   }).join("")}</div>`).join("");
+  const phone=String(o.customer?.contact||"").replace(/[^0-9+]/g,"");
+  return `<div class="order">
+   <div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div>
+   <h2>${esc(o.customer?.name||"")}</h2>
+   <p>${phone?`<a class="customerPhone" href="tel:${esc(phone)}">📞 ${esc(o.customer.contact)}</a>`:"📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||o.customer?.address||"Customer location")}</p>
+   ${items}
+   <p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
+   <div class="actions"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav" href="tel:${esc(phone)}">📞 CALL CUSTOMER</a></div>
+   <div class="actions"><button data-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div>
+   <div class="actions3"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button data-status="COMPLETED" data-id="${esc(o.id)}">✅ DELIVERED</button></div>
+  </div>`
+ }).join("");
 }
-let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
-let authFlowBusy=false,authFlowUid="";
-async function playRiderChatAlert(){
-  if(!soundReady||!soundCtx)return;
-  try{
-    const ctx=soundCtx;
-    if(ctx.state==="suspended") ctx.resume();
-    const now=ctx.currentTime;
-    [880,660,880].forEach((freq,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type="sine"; o.frequency.value=freq;
-      const t=now+i*0.18;
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.exponentialRampToValueAtTime(0.45,t+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
-      o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+0.17);
-    });
-  }catch(e){console.warn("Rider chat ringtone failed",e)}
-}
-function openRiderChat(orderId){
-  riderChatOrderId=orderId; riderChatSnapshotReady=false;
-  $("riderChatTitle").textContent="💬 ADMIN CHAT";
-  $("riderChatPanel").classList.remove("hidden");
-  if(riderChatUnsub)riderChatUnsub();
-  riderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
-    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
-    $("riderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${esc(m.senderRole==="rider"?"YOU":"ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
-    $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
-    if(riderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider"))playRiderChatAlert();
-    riderChatSnapshotReady=true;
-  },e=>{alert("Unable to open rider chat:\n\n"+e.message)});
-}
-function closeRiderChat(){if(riderChatUnsub){riderChatUnsub();riderChatUnsub=null}riderChatOrderId="";$("riderChatPanel").classList.add("hidden")}
-$("riderChatClose").onclick=closeRiderChat;
-$("riderChatSend").onclick=async()=>{
-  const text=$("riderChatInput").value.trim();if(!text||!riderChatOrderId)return;
-  try{
-    await addDoc(collection(db,"orders",riderChatOrderId,"riderMessages"),{
-      text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent||"RIDER",createdAt:serverTimestamp()
-    });
-    $("riderChatInput").value="";
-  }catch(e){alert("Unable to send message:\n\n"+e.message)}
-};
-$("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("riderChatSend").click()}});
 
-(function setupRiderChatKeyboard(){
-  const panel=$("riderChatPanel"), input=$("riderChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
-})();
-
-$("orders").addEventListener("click",async e=>{
- const chat=e.target.closest("[data-rider-chat]");
- if(chat){openRiderChat(chat.dataset.riderChat);return;}
- const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
-const riderChatWatchers=new Map();
-function syncRiderChatWatchers(active){
-  const ids=new Set(active.map(o=>o.id));
-  for(const [id,unsub] of riderChatWatchers){
-    if(!ids.has(id)){try{unsub()}catch(_){}riderChatWatchers.delete(id);}
-  }
-  for(const o of active){
-    if(riderChatWatchers.has(o.id))continue;
-    let primed=false;
-    const unsub=onSnapshot(collection(db,"orders",o.id,"riderMessages"),snap=>{
-      const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider");
-      if(!primed){primed=true;return;}
-      if(!incoming.length)return;
-      openRiderChat(o.id);
-      playRiderChatAlert();
-    },e=>console.warn("Rider global chat watcher:",e));
-    riderChatWatchers.set(o.id,unsub);
-  }
+function paint(){
+ const all=[...buckets.values()];
+ const active=all.filter(o=>!["COMPLETED","CANCELLED","CANCELED"].includes(String(o.status||"NEW").toUpperCase()));
+ const today=dayKey(),done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED"&&o.completedBusinessDay===today);
+ $("doneCount").textContent=done.length;
+ $("myEarnings").textContent=peso(done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0));
+ $("toRemit").textContent=peso(done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0));
+ render(active);syncChatWatchers(active);
+ $("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
 }
-function stopRiderChatWatchers(){for(const unsub of riderChatWatchers.values()){try{unsub()}catch(_){}}riderChatWatchers.clear();}
-
+function watchAssigned(id){
+ if(!id||orderWatchers.has(id))return;
+ orderWatchers.set(id,onSnapshot(doc(db,"orders",id),s=>{
+  if(!s.exists()){buckets.delete(id);paint();return}
+  const o={id:s.id,...s.data()},email=(auth.currentUser?.email||"").toLowerCase();
+  const au=String(o.assignedRiderUid||o.riderUid||""),ae=String(o.assignedRiderEmail||o.riderEmail||"").toLowerCase();
+  if(au===uid||(email&&ae===email))buckets.set(id,o);else{buckets.delete(id);const u=orderWatchers.get(id);if(u)u();orderWatchers.delete(id)}
+  paint();
+ },e=>console.warn("order",id,e)));
+}
 function startOrdersListener(){
- if(unsub){try{unsub()}catch(_){ }unsub=null}
- stopRiderChatWatchers();
-
- const riderEmail=(auth.currentUser?.email||"").trim().toLowerCase();
- const buckets=new Map();
- const orderWatchers=new Map();
- const riderUidForSync=uid;
- const buildLabel=document.getElementById("riderBuild");
- if(buildLabel) buildLabel.textContent="BUILD V4.1.40 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
- const listeners=[];
-
- function stopOrderWatcher(id){
-   const u=orderWatchers.get(id);
-   if(u){try{u()}catch(_){}orderWatchers.delete(id);}
- }
- function watchAssignedOrder(id){
-   if(!id || orderWatchers.has(id))return;
-   const u=onSnapshot(doc(db,"orders",id),snap=>{
-     if(!snap.exists()){buckets.delete(id);paint();return;}
-     const o={id:snap.id,...snap.data()};
-     const assignedUid=String(o.assignedRiderUid||o.riderUid||"");
-     const assignedEmail=String(o.assignedRiderEmail||o.riderEmail||"").trim().toLowerCase();
-     if(assignedUid===riderUidForSync || (riderEmail && assignedEmail===riderEmail)) buckets.set(id,o);
-     else { buckets.delete(id); stopOrderWatcher(id); }
-     paint();
-   },e=>{ console.warn("Rider assigned-order read failed",id,e); buckets.delete(id); paint(); });
-   orderWatchers.set(id,u);
- }
-
- function paint(){
-   const all=[...buckets.values()];
-   const active=all.filter(o=>{
-     const st=String(o.status||"NEW").trim().toUpperCase();
-     return st!=="COMPLETED"&&st!=="CANCELLED"&&st!=="CANCELED";
-   });
-   const today=businessDayKey();
-   const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
-   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
-   const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
-   $("doneCount").textContent=done.length;
-   $("myEarnings").textContent=peso(df);
-   $("toRemit").textContent=peso(sf);
-   for(const o of active){
-     if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
-   }
-   render(active);
-   syncRiderChatWatchers(active);
-   $("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
- }
-
- function watch(q){
-   return onSnapshot(q,snap=>{
-     snap.docs.forEach(d=>buckets.set(d.id,{id:d.id,...d.data()}));
-     paint();
-   },e=>{
-     $("conn").innerHTML='<span class="error">❌ Firebase order listener: '+esc(e.message)+"</span>";
-   });
- }
-
- // V4.1.40: dedicated rider inbox. Admin writes one private index document
- // per assignment, so Rider delivery no longer depends on a multi-field query.
- listeners.push(onSnapshot(collection(db,"riderAssignments",uid,"orders"),snap=>{
-   const wanted=new Set();
-   snap.docs.forEach(d=>{
-     const a=d.data()||{};
-     if(String(a.assignedRiderUid||"")===riderUidForSync){wanted.add(d.id);watchAssignedOrder(d.id);}
-   });
-   for(const id of [...orderWatchers.keys()]) if(!wanted.has(id)) stopOrderWatcher(id);
-   paint();
- },e=>console.warn("Rider inbox listener:",e)));
-
- // V4.1.42: listen to canonical AND legacy assignment keys.
- const syncQueries=[
-   ["assignedRiderUid",uid],
-   ["assignedRiderEmail",riderEmail],
-   ["riderUid",uid],
-   ["riderEmail",riderEmail]
- ];
- for(const [field,value] of syncQueries){
-   if(!value)continue;
-   listeners.push(watch(query(collection(db,"orders"),where(field,"==",value))));
- }
-
- unsub=()=>{
-   for(const u of listeners){try{u()}catch(_){}}
- };
+ if(unsub)unsub();buckets.clear();orderWatchers.forEach(u=>u());orderWatchers.clear();
+ const email=(auth.currentUser?.email||"").trim().toLowerCase(),listeners=[];
+ listeners.push(onSnapshot(collection(db,"riderAssignments",uid,"orders"),s=>{
+  const wanted=new Set();
+  s.docs.forEach(d=>{const a=d.data()||{};if(String(a.assignedRiderUid||"")===uid){wanted.add(d.id);watchAssigned(d.id)}});
+  for(const id of [...orderWatchers.keys()])if(!wanted.has(id)){orderWatchers.get(id)();orderWatchers.delete(id);buckets.delete(id)}
+  paint();
+ },e=>console.warn("rider inbox",e)));
+ [["assignedRiderUid",uid],["assignedRiderEmail",email],["riderUid",uid],["riderEmail",email]].forEach(([f,v])=>{
+  if(v)listeners.push(onSnapshot(query(collection(db,"orders"),where(f,"==",v)),s=>{s.docs.forEach(d=>buckets.set(d.id,{id:d.id,...d.data()}));paint()},e=>console.warn("sync",f,e)));
+ });
+ unsub=()=>{listeners.forEach(u=>u());orderWatchers.forEach(u=>u());orderWatchers.clear()};
 }
+function syncChatWatchers(active){
+ const ids=new Set(active.map(o=>o.id));
+ for(const [id,u] of riderChatWatchers){if(!ids.has(id)){u();riderChatWatchers.delete(id)}}
+ for(const o of active)if(!riderChatWatchers.has(o.id)){
+  let primed=false;
+  const u=onSnapshot(collection(db,"orders",o.id,"riderMessages"),s=>{
+   if(!primed){primed=true;return}
+   if(s.docChanges().some(c=>c.type==="added"&&c.doc.data()?.senderRole!=="rider")){openChat(o.id);beep()}
+  });
+  riderChatWatchers.set(o.id,u);
+ }
+}
+function beep(){try{const A=window.AudioContext||window.webkitAudioContext,c=new A(),n=c.currentTime;[880,660,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=n+i*.18;o.frequency.value=f;g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.4,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.15);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.16)})}catch(e){}}
+function openChat(id){
+ chatOrderId=id;chatPrimed=false;$("riderChatPanel").classList.remove("hidden");if(chatUnsub)chatUnsub();
+ chatUnsub=onSnapshot(collection(db,"orders",id,"riderMessages"),s=>{
+  const a=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
+  $("riderChatMessages").innerHTML=a.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${m.senderRole==="rider"?"YOU":"ADMIN"}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=status>No messages yet.</div>";
+  $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
+  if(chatPrimed&&s.docChanges().some(c=>c.type==="added"&&c.doc.data()?.senderRole!=="rider"))beep();chatPrimed=true;
+ });
+}
+function closeChat(){if(chatUnsub)chatUnsub();chatUnsub=null;chatOrderId="";$("riderChatPanel").classList.add("hidden")}
+function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(()=>{if(!riderOpen())logout()},30000)}
+async function logout(){if(unsub)unsub();riderChatWatchers.forEach(u=>u());riderChatWatchers.clear();if(hoursTimer)clearInterval(hoursTimer);uid="";buckets.clear();seenAssigned.clear();try{await signOut(auth)}catch(e){}show("login")}
 
-function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(()=>{if(!riderOpen())lockRider()},30000)}async function lockRider(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}try{await signOut(auth)}catch(_){}showClosed()}
-async function logout(){if(unsub){unsub();unsub=null}stopRiderChatWatchers();if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}uid="";seenAssigned.clear();try{await signOut(auth)}catch(_){}showLogin()}
-$("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();if(riderOpen())showLogin();else showClosed()};
-getRedirectResult(auth).then(async result=>{
-  if(result?.user){
-    $("googleStatus").textContent="✅ Google sign-in successful. Checking rider account…";
-    await afterLogin(result.user);
-  }
-}).catch(e=>{
-  console.error("Google redirect result:",e);
-  if(e?.code!=="auth/no-auth-event"){
-    $("googleStatus").innerHTML='<span class="error">❌ Google sign-in failed: '+esc(e?.message||String(e))+"</span>";
-  }
-  $("googleBtn").disabled=false;
+$("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();show(riderOpen()?"login":"closed")};
+$("riderChatClose").onclick=closeChat;
+$("riderChatSend").onclick=async()=>{const text=$("riderChatInput").value.trim();if(!text||!chatOrderId)return;try{await addDoc(collection(db,"orders",chatOrderId,"riderMessages"),{text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent,createdAt:serverTimestamp()});$("riderChatInput").value=""}catch(e){alert(e.message)}};
+$("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("riderChatSend").click()}});
+$("orders").addEventListener("click",async e=>{
+ const c=e.target.closest("[data-chat]");if(c){openChat(c.dataset.chat);return}
+ const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;
+ try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:dayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}
+ catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}
 });
-onAuthStateChanged(auth,async user=>{
-  if(!user){
-    authFlowBusy=false; authFlowUid="";
-    if(unsub){unsub();unsub=null}
-    $("app").classList.add("hidden");
-    $("pending").classList.add("hidden");
-    if($("closed").classList.contains("hidden"))$("login").classList.remove("hidden");
-    return;
-  }
-  if($("app").classList.contains("hidden") && !authFlowBusy){
-    try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
-  }
-});
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.42 RIDER ORDER SYNC HARDENED + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
-</script>
-</body></html>
 
-<script>
-(function(){
-  function hideSoundButtons(){
-    document.querySelectorAll("button").forEach(function(b){
-      if(/enable\s*sound/i.test((b.textContent||"").trim())){
-        b.classList.add("mhacAutoSoundHide");
-      }
-    });
-  }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",hideSoundButtons);
-  else hideSoundButtons();
-  new MutationObserver(hideSoundButtons).observe(document.documentElement,{subtree:true,childList:true});
-})();
+getRedirectResult(auth).then(r=>{if(r?.user)afterLogin(r.user)}).catch(e=>{if(e?.code!=="auth/no-auth-event")$("googleStatus").textContent="❌ "+(e.message||e)});
+onAuthStateChanged(auth,u=>{if(u&&!authBusy&&$("app").classList.contains("hidden"))afterLogin(u)});
 </script>
+</body>
+</html>
