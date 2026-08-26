@@ -1,0 +1,14 @@
+MHAC DELIVERY V4.1.64 CLEAN UI PATCH
+
+Removed from Customer, Rider and Admin:
+- visible red V4.1.57 TEST/LIVE build banner
+- Rider's visible BUILD / TIME LIMIT TEST MODE line
+
+Preserved:
+- existing UI/layout and functionality
+- Firebase, orders, menu, GPS, chat, rider sync and admin controls
+- PWA manifests and MHAC logo icons
+
+Upload/replace the files in the existing GitHub Pages repository.
+After publishing, refresh the apps. Existing Home Screen shortcuts may need
+to be recreated separately to refresh their icon/cache.
