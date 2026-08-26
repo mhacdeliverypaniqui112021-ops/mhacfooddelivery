@@ -1,0 +1,1 @@
+V4.1.55 temporary test build. Business-hours time limit is bypassed for Rider and Customer apps so end-to-end testing can continue outside normal hours. Set TEST_MODE=false in rider.html and customer.html to restore the time limit after testing. Firebase firestore.rules remains included unchanged from V4.1.54.
