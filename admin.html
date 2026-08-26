@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.64 LIVE RIDER SYNC HARDENED</title>
-<meta name="build-version" content="V4.1.64 LIVE RIDER SYNC HARDENED">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.70 ADMIN LOGIN BOOT FIX</title>
+<meta name="build-version" content="V4.1.70 ADMIN LOGIN BOOT FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1393,10 +1393,10 @@ window.setTimeout(function(){
   if(!splash) return;
   splash.classList.add("hide");
   window.setTimeout(function(){ if(splash.parentNode) splash.parentNode.removeChild(splash); },650);
-},2200);
+},1200);
 </script>
 <header><h1><span class="brandName">MHAC DELIVERY</span><span class="appName">ADMIN APP</span></h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
-<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
+<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn" type="button" onclick="try{this.dataset.clicked='1';var s=document.getElementById('loginStatus');if(s)s.textContent='🔵 Opening Google sign-in…';if(window.__MHAC_ADMIN_LOGIN)window.__MHAC_ADMIN_LOGIN();else if(window.__mhacLogin)window.__mhacLogin();}catch(e){var s=document.getElementById('loginStatus');if(s)s.textContent='❌ Login boot error: '+(e&&e.message||e)}">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
 <div class="card"><div id="logoutRow" class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
@@ -1460,6 +1460,55 @@ window.setTimeout(function(){
   setTimeout(safeHide,3000);
   window.addEventListener('load',function(){setTimeout(safeHide,2400);});
 })();
+</script>
+<script>
+/* V4.1.70 ADMIN LOGIN BOOT FIX — independent of the Firebase module boot. */
+(function(){
+  var ADMIN="mhacdeliverypaniqui112021@gmail.com";
+  var CFG={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2"};
+  function el(id){return document.getElementById(id)}
+  function status(t){var s=el("loginStatus");if(s)s.textContent=t}
+  function busy(v){var b=el("googleBtn");if(!b)return;b.disabled=!!v;b.style.opacity=v?".72":"1";b.style.pointerEvents=v?"none":"auto"}
+  window.__MHAC_ADMIN_LOGIN=async function(){
+    var b=el("googleBtn");if(!b||b.dataset.busy==="1")return;
+    b.dataset.busy="1";busy(true);status("🔵 Opening Google sign-in…");
+    try{
+      var A=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js");
+      var F=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js");
+      var app;try{app=A.getApp()}catch(_){app=A.initializeApp(CFG)}
+      var auth=F.getAuth(app);await F.setPersistence(auth,F.browserLocalPersistence);
+      var provider=new F.GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});
+      var result;
+      try{result=await F.signInWithPopup(auth,provider)}
+      catch(e){
+        var fb=["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request","auth/operation-not-supported-in-this-environment","auth/web-storage-unsupported"];
+        if(fb.indexOf(e&&e.code)>=0){status("🔵 Redirecting to Google sign-in…");await F.signInWithRedirect(auth,provider);return}
+        throw e
+      }
+      var email=((result.user&&result.user.email)||"").toLowerCase();
+      if(email!==ADMIN.toLowerCase()){await F.signOut(auth);throw new Error("Unauthorized admin account: "+(result.user&&result.user.email||"unknown"))}
+      status("🟢 Google sign-in successful. Loading Admin…");setTimeout(function(){location.reload()},400)
+    }catch(e){
+      status("❌ "+((e&&e.message)||"Google sign-in failed")+(e&&e.code?" ["+e.code+"]":""));
+      b.dataset.busy="0";busy(false)
+    }
+  };
+  window.__mhacLogin=window.__MHAC_ADMIN_LOGIN;
+  function bind(){
+    var b=el("googleBtn");if(!b)return;
+    b.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();window.__MHAC_ADMIN_LOGIN()},true);
+    b.addEventListener("pointerup",function(){if(b.dataset.clicked!=="1")window.__MHAC_ADMIN_LOGIN()},true)
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind()
+})();
+</script>
+<script>
+setTimeout(function(){
+  try{
+    var s=document.getElementById("loginStatus");
+    if(s && s.textContent==="Authorized admin account required.") s.textContent="🟢 Admin login ready — tap Continue with Google.";
+  }catch(_){}
+},1800);
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -2938,7 +2987,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.64 ADMIN MASTER UNIFIED WHITE UI + BUSINESS TIME CONTROL";
+window.__MHAC_BUILD__="V4.1.70 ADMIN LOGIN BOOT DEEP FIX + UNIFIED WHITE UI + BUSINESS TIME CONTROL";
 </script>
 <script>
 setTimeout(function(){
