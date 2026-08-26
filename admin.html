@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.43 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT</title>
-<meta name="build-version" content="V4.1.43 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR</title>
+<meta name="build-version" content="V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -386,6 +386,7 @@
 .oneFoodBox .compactField input{min-height:50px!important;font-size:17px!important}
 .oneFoodBox .sectionTitle{margin:12px 0 4px!important;font-size:18px!important}
 .oneFoodBox .selectionBox{border:2px solid #ddd;border-radius:12px;background:#fff;padding:8px;margin:7px 0}
+.oneFoodBox .editorRow,.oneFoodBox .partsRows,.oneFoodBox .drinkRows,.oneFoodBox .addonRows,.oneFoodBox .bucketRows,.oneFoodBox .compactField,.oneFoodBox .foodEditorModeNote{background:#fff!important}
 .oneFoodBox .selectionRow{display:grid;grid-template-columns:minmax(0,1fr) 42px 45px 42px;gap:5px;align-items:center;margin:5px 0}
 .oneFoodBox .selectionRow button{min-height:44px!important;margin:0!important}
 .oneFoodBox .selectionRow b{text-align:center}
@@ -1114,6 +1115,7 @@ window.setTimeout(function(){
 <input id="adminGcashNumber" placeholder="09XXXXXXXXX" inputmode="tel">
 <label class="label">GCash QR Code</label>
 <input id="adminGcashQr" type="file" accept="image/*">
+<div class="small">Saved QR stays in Firebase after refresh. The file picker itself resets automatically for security.</div>
 <img id="adminGcashQrPreview" class="hidden" alt="GCash QR preview">
 <div class="row"><button id="saveGcashSettings" class="blue">SAVE GCASH SETTINGS</button><button id="removeGcashQr" class="gray">REMOVE QR</button></div>
 <p id="gcashSettingsStatus" class="status"></p>
@@ -1291,19 +1293,39 @@ function loadGcashLocal(){
 }
 function showGcashSettings(){
   $("adminGcashNumber").value=adminGcash.number||"";
-  if(adminGcash.qrUrl){$("adminGcashQrPreview").src=adminGcash.qrUrl;$("adminGcashQrPreview").classList.remove("hidden")}
-  else{$("adminGcashQrPreview").src="";$("adminGcashQrPreview").classList.add("hidden")}
+  // The browser file input MUST reset after refresh for security, but the saved
+  // QR itself must remain visible from Firebase/local backup.
+  const preview=$("adminGcashQrPreview");
+  if(adminGcash.qrUrl){
+    preview.src=adminGcash.qrUrl;
+    preview.classList.remove("hidden");
+  }else{
+    preview.src="";
+    preview.classList.add("hidden");
+  }
 }
 async function loadAdminGcash(){
+  const local=loadGcashLocal();
   try{
-    const s=await getDoc(doc(db,"settings","payment"));
-    if(s.exists()){
-      adminGcash={number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||"")};
+    const snap=await withTimeout(getDoc(doc(db,"settings","payment")),10000,"Loading GCash settings");
+    if(snap.exists()){
+      const d=snap.data()||{};
+      // Accept the current field plus older field names so a previous save
+      // can never make the QR disappear after an Admin refresh.
+      const firebaseData={
+        number:String(d.gcashNumber||d.number||local.number||""),
+        qrUrl:String(d.gcashQrUrl||d.gcashQr||d.qrUrl||local.qrUrl||"")
+      };
+      adminGcash=firebaseData;
       saveGcashLocal();
-    }else adminGcash=loadGcashLocal();
+    }else{
+      adminGcash=local;
+    }
   }catch(e){
-    // Do not show a Firestore/Storage permission error in the UI.
-    adminGcash=loadGcashLocal();
+    // Firebase read failure: retain the last confirmed local copy instead of
+    // clearing the saved QR from the screen.
+    console.warn("GCash load failed; using local backup",e);
+    adminGcash=local;
   }
   showGcashSettings();
 }
@@ -1342,6 +1364,17 @@ $("saveGcashSettings").onclick=async()=>{
     adminGcash={number,qrUrl};
     saveGcashLocal();
     await withTimeout(setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true}),10000,"Saving GCash settings");
+    // Verify the actual Firestore document before reporting success.
+    const verify=await withTimeout(getDoc(doc(db,"settings","payment")),10000,"Verifying GCash settings");
+    const vd=verify.data()||{};
+    const savedQr=String(vd.gcashQrUrl||vd.gcashQr||vd.qrUrl||"");
+    const savedNumber=String(vd.gcashNumber||"");
+    if(savedNumber!==number || (qrUrl && savedQr!==qrUrl)){
+      throw new Error("Firebase saved data could not be verified after write.");
+    }
+    adminGcash={number:savedNumber,qrUrl:savedQr};
+    saveGcashLocal();
+    showGcashSettings();
     $("gcashSettingsStatus").textContent="✅ GCASH SAVED TO FIREBASE — customer app updated.";
   }catch(e){
     saveGcashLocal();
@@ -2520,11 +2553,11 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.43 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT";
+window.__MHAC_BUILD__="V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.43 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT — NEW FILE";
+  badge.textContent="🛠️ V4.1.44 ADMIN GCash PERSISTENCE + WHITE FOOD EDITOR — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
