@@ -1,20 +1,14 @@
-MHAC DELIVERY V4.1.40 — UPLOAD THIS PACKAGE
+MHAC DELIVERY V4.1.42 ADMIN SYNC FIX
 
-Replace these files in the GitHub Pages repository:
-- rider.html
-- admin.html
-- firestore.rules
+ADMIN FIXES
+- Admin menu draft writes now go immediately to Firestore instead of relying on a delayed timer.
+- Local draft backup remains enabled.
+- Food edits explicitly report Firestore failures instead of looking successfully synced.
+- GCash save now writes to settings/payment with a timeout and explicit Firebase error.
+- GCash QR is compressed smaller to avoid Firestore document-size failures.
+- Included firestore.rules allows Admin writes to settings/menu, settings/menuDraft, and settings/payment.
 
-Also keep mhac-logo.png.
-
-IMPORTANT: Deploy/save firestore.rules in Firebase Console. GitHub Pages does NOT deploy Firestore Rules.
-
-Test with a NEW order: Customer -> Admin receives -> Admin assigns approved Rider -> Rider receives automatically.
-
-Do not change the approved UI/design.
-
-V4.1.41 FIXES
-- Hardened Admin menu loading so a draft read error does not crash the menu editor; local backup remains available.
-- Fixed legacy published-menu compatibility: customer now displays stores from settings/menu unless explicitly marked published:false.
-- This fixes the case where Admin contains foods/stores but Customer shows no food because older menu records have no published:true field.
-- Approved Admin/Customer/Rider UI was preserved.
+DEPLOYMENT
+- Upload admin.html, customer.html, rider.html to GitHub Pages.
+- Deploy firestore.rules in Firebase Console.
+- After deployment, hard-refresh Admin and test GCash Save first, then edit one food and refresh.

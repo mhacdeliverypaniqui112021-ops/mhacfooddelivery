@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT</title>
-<meta name="build-version" content="V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.42 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT</title>
+<meta name="build-version" content="V4.1.42 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1307,7 +1307,7 @@ async function loadAdminGcash(){
   }
   showGcashSettings();
 }
-function readImageAsDataUrl(file,maxSize=700){
+function readImageAsDataUrl(file,maxSize=500){
   return new Promise((resolve,reject)=>{
     if(!file)return resolve("");
     const reader=new FileReader();
@@ -1319,7 +1319,7 @@ function readImageAsDataUrl(file,maxSize=700){
         const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
         const c=document.createElement("canvas");c.width=w;c.height=h;
         const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
-        resolve(c.toDataURL("image/jpeg",0.78));
+        resolve(c.toDataURL("image/jpeg",0.65));
       };
       img.onerror=()=>resolve(String(reader.result||""));
       img.src=String(reader.result||"");
@@ -1338,14 +1338,16 @@ $("saveGcashSettings").onclick=async()=>{
     const f=$("adminGcashQr").files?.[0];
     let qrUrl=adminGcash.qrUrl||"";
     if(f)qrUrl=await readImageAsDataUrl(f);
+    if(qrUrl && qrUrl.length>900000) throw new Error("GCash QR image is too large. Please choose a smaller image.");
     adminGcash={number,qrUrl};
     saveGcashLocal();
-    await setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true});
-    $("gcashSettingsStatus").textContent="✅ GCASH SAVED — customer app updated.";
+    await withTimeout(setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true}),10000,"Saving GCash settings");
+    $("gcashSettingsStatus").textContent="✅ GCASH SAVED TO FIREBASE — customer app updated.";
   }catch(e){
-    // Keep the settings on this Admin phone even if a Firebase rule is temporarily unavailable.
     saveGcashLocal();
-    $("gcashSettingsStatus").textContent="⚠️ SAVED ON THIS ADMIN PHONE — Firebase sync unavailable.";
+    const msg=err(e);
+    $("gcashSettingsStatus").textContent="❌ FIREBASE SAVE FAILED — "+msg;
+    alert("GCASH FIREBASE SAVE FAILED\n\n"+msg+"\n\nIf this says permission denied, deploy the included firestore.rules to Firebase.");
   }finally{btn.disabled=false}
 };
 $("removeGcashQr").onclick=async()=>{
@@ -1569,16 +1571,17 @@ function saveDraftLocal(){
 async function saveDraftMenu(){
   try{
     if(!draft)return;
-    // Always save locally FIRST so a refresh can never wipe a just-edited menu.
+    // Always save locally FIRST. Then immediately write the same draft to Firestore
+    // so Admin edits survive refresh and are shared with the account.
     saveDraftLocal();
     if(!auth.currentUser)return;
     clearTimeout(draftSaveTimer);
-    draftSaveTimer=setTimeout(async()=>{
-      try{
-        await setDoc(doc(db,"settings","menuDraft"),{...normalizeMenu(draft),updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email});
-      }catch(e){console.warn("Draft Firestore save failed; local backup remains available",e)}
-    },250);
-  }catch(e){console.warn("Draft save failed",e)}
+    const clean=normalizeMenu(draft);
+    await withTimeout(setDoc(doc(db,"settings","menuDraft"),{...clean,updatedAt:serverTimestamp(),updatedBy:auth.currentUser.email}),10000,"Saving admin menu draft");
+  }catch(e){
+    console.error("Draft Firestore save failed",e);
+    throw e;
+  }
 }
 async function flushDraftMenu(){
   if(!draft)return;
@@ -2171,7 +2174,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    }).catch(e=>{
      console.error("Food save failed",e);
      // Local backup is already saved, so the edit survives a refresh on this Admin device.
-     toast("⚠️ SAVED TO ADMIN BACKUP — Firestore save failed: "+err(e));
+     toast("❌ FOOD FIREBASE SAVE FAILED — local backup kept: "+err(e));
      renderStores();
      setTimeout(()=>{
        const openBtn=document.querySelector(`[data-cat-open="${selectedStore}-${ci}"]`);
@@ -2517,11 +2520,11 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT";
+window.__MHAC_BUILD__="V4.1.42 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT — NEW FILE";
+  badge.textContent="🛠️ V4.1.42 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
