@@ -1,9 +1,6 @@
-V4.1.35 ADMIN TRUE UNIFIED UI + FIREBASE FIX
+V4.1.35 RIDER GOOGLE LOGIN SYNTAX FIX
 
-Admin UI is now globally normalized to the agreed white background / black typography style.
-- Store/Menu Manager: compact white/black controls
-- Food Editor: removes blue filled styling and uses unified controls
-- Delete/cancel remain red outline; complete/publish remain green outline
-- Inputs/selects standardized
-- Chat remains centered and follows the same white/black UI
-- Existing functionality and Firebase rules retained from V4.1.34
+Fixed the Rider App JavaScript syntax error that prevented the entire Firebase module from running.
+The invalid "async // ..." line was corrected to a normal comment followed by the variable declaration.
+Removed the obsolete LocalStorage rider block appended after the Firebase Rider App.
+No intentional UI redesign was made.
