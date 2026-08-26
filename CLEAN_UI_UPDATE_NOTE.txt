@@ -1,0 +1,4 @@
+MHAC DELIVERY V4.1.63 CLEAN UI
+Removed the generated V4.1.57 red build/banner from Customer, Rider, and Admin.
+Cleaned the top dashboard header to white/black with a subtle gray divider.
+Existing ordering, Firebase, chat, rider sync, earnings, menu, and chicken-part logic preserved.
