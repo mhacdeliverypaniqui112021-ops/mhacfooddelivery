@@ -1,3 +1,8 @@
-MHAC DELIVERY V4.1.30 — CONTACT + EARNINGS + DIAGNOSTIC FIX
-Base: V4.1.29 ADMIN COMPACT + CENTER CHAT.
-Fixes: customer phone numbers are tap-to-call in Admin and Rider; earnings are one compact 3-column row (Total Deliveries / Rider Earnings / Admin Earnings); menu diagnostic no longer directly queries Firestore settings documents, preventing the permission-denied diagnostic error while still checking loaded/local menu data.
+MHAC DELIVERY V4.1.31 FINAL
+- Customer contact is clickable for rider call
+- Admin/rider chat centered on mobile
+- Earnings shown in one row: Total Deliveries / Rider Earnings / Admin Earnings
+- Menu diagnostic hidden from UI to eliminate permission-error confusion
+- Removed old CHICKEN / REGULAR ITEM selector from food editor
+- Food edits immediately refresh the menu manager and show parts/drinks/add-ons summary
+- Draft persistence retained; publish remains required for customer app
