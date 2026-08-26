@@ -2248,7 +2248,6 @@ function renderStores(){
    };
  });
  $("publish").onclick=async()=>{if(publishedStoreIds().has(s.id)) await unpublishStore(selectedStore); else await publishMenu();};
-}
 
 function renderDirectFoodList(ci,list){
  const s=draft.stores[selectedStore],c=s.categories[ci];
