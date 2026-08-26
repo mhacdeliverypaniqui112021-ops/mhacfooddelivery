@@ -1,13 +1,28 @@
-MHAC DELIVERY — UNIFIED WHITE UI PROTOTYPE
+MHAC DELIVERY — HOME SCREEN ICON PATCH
 
-Files:
-- admin.html
-- customer.html
-- rider.html
-- shared.css
+This package contains:
+- mhac-icon-192.png
+- mhac-icon-512.png
+- manifest-customer.webmanifest
+- manifest-rider.webmanifest
+- manifest-admin.webmanifest
 
-This package is the UI/base-design prototype only. It applies the agreed:
-white background, black text, compact cards/buttons, limited red/blue/green accents,
-compact menu editor, and centered larger chatbox.
+IMPORTANT:
+The existing customer.html, rider.html and admin.html should each link to
+their matching manifest in the <head>:
 
-It does not replace the existing Firebase/backend logic yet.
+Customer:
+<link rel="manifest" href="manifest-customer.webmanifest">
+
+Rider:
+<link rel="manifest" href="manifest-rider.webmanifest">
+
+Admin:
+<link rel="manifest" href="manifest-admin.webmanifest">
+
+Also add in each <head>:
+<link rel="icon" type="image/png" sizes="192x192" href="mhac-icon-192.png">
+<meta name="theme-color" content="#e21d25">
+
+After uploading, remove the old Home Screen shortcuts and install/create
+the shortcuts again so Chrome refreshes the app icons.
