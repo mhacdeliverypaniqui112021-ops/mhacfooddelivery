@@ -1,0 +1,18 @@
+MHAC DELIVERY V4.1.38 — RIDER ORDER SYNC FIX
+
+PURPOSE:
+Fix Rider app receiving assigned orders while preserving the locked UI.
+
+CHANGES:
+- Build indicator is now V4.1.38 so cached/old Rider files are obvious.
+- Rider dashboard shows BUILD V4.1.38 + current Firebase UID/email in tiny status text.
+- Rider order listener remains UID-based and email-compatible.
+- Admin assignment keeps UID/email/name on the order.
+- Existing Rider Google login is preserved.
+- Existing UI, call button, chat, navigation and earnings are preserved.
+
+IMPORTANT UPLOAD:
+Replace rider.html with this V4.1.38 file.
+If Admin assignment code is also being updated, replace admin.html too.
+After GitHub upload, open the Rider URL in a new/incognito tab or clear the site's cached data.
+The top red build banner MUST show V4.1.38.
