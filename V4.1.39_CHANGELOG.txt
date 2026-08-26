@@ -1,0 +1,18 @@
+MHAC DELIVERY V4.1.39 — RIDER ORDER SYNC HARDENED
+
+PURPOSE:
+Harden Admin → Rider order assignment while preserving the locked Rider/Admin UI.
+
+CHANGES:
+- Admin assignment writes canonical assignedRiderUid / assignedRiderEmail / assignedRiderName.
+- Admin also writes riderUid / riderEmail / riderName compatibility aliases.
+- Rider listens to both canonical and legacy assignment fields.
+- Duplicate results are merged by order ID.
+- Firestore rules allow approved riders to read/update orders through either assignment key set.
+- Existing Google login, white UI, call button, chat, navigation and earnings UI are preserved.
+- Build badge/status updated to V4.1.39.
+
+UPLOAD:
+1. rider.html
+2. admin.html
+3. firestore.rules

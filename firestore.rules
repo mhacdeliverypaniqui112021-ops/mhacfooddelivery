@@ -47,6 +47,8 @@ service cloud.firestore {
         || (isApprovedRider() && (
        resource.data.assignedRiderUid == request.auth.uid
        || resource.data.assignedRiderEmail == request.auth.token.email
+       || resource.data.riderUid == request.auth.uid
+       || resource.data.riderEmail == request.auth.token.email
      ))
         || (isSignedIn() && resource.data.customer.uid == request.auth.uid);
 
@@ -55,6 +57,8 @@ service cloud.firestore {
         || (isApprovedRider() && (
        resource.data.assignedRiderUid == request.auth.uid
        || resource.data.assignedRiderEmail == request.auth.token.email
+       || resource.data.riderUid == request.auth.uid
+       || resource.data.riderEmail == request.auth.token.email
      ));
     }
 

@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.29 ADMIN COMPACT FIX + CENTER CHAT</title>
-<meta name="build-version" content="V4.1.29 ADMIN COMPACT FIX + CENTER CHAT">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT</title>
+<meta name="build-version" content="V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1395,7 +1395,7 @@ function renderOrders(){
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
  $("orders").innerHTML=active.map((o,idx)=>{
    const opts='<option value="">Assign rider</option>'+riders.filter(r=>r.approved!==false).map(r=>{
-     const u=r.uid||r.id;return `<option value="${esc(u)}" ${o.assignedRiderUid===u?"selected":""}>${esc(r.nickname||r.name||r.email||u)}</option>`;
+     const u=r.uid||r.id;const selected=(o.assignedRiderUid===u||o.riderUid===u||String(o.assignedRiderEmail||"").toLowerCase()===String(r.email||"").toLowerCase());return `<option value="${esc(u)}" ${selected?"selected":""}>${esc(r.nickname||r.name||r.email||u)}</option>`;
    }).join("");
    return `<div class="order">
     <div class="orderInfo">
@@ -1479,10 +1479,15 @@ $("orders").onclick=async e=>{
  if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u){toast("Select rider first.");return;}try{
   const rr=riders.find(r=>(r.uid||r.id)===u)||{};
   const current=orders.find(o=>o.id===id)||{};
+  const riderEmail=(rr.email||"").trim().toLowerCase();
+  const riderName=rr.nickname||rr.name||rr.email||u;
   await updateDoc(doc(db,"orders",id),{
     assignedRiderUid:u,
-    assignedRiderEmail:(rr.email||"").trim().toLowerCase(),
-    assignedRiderName:rr.nickname||rr.name||rr.email||u,
+    assignedRiderEmail:riderEmail,
+    assignedRiderName:riderName,
+    riderUid:u,
+    riderEmail:riderEmail,
+    riderName:riderName,
     status:String(current.status||"NEW").toUpperCase()==="NEW"?"ASSIGNED":(current.status||"ASSIGNED"),
     updatedAt:serverTimestamp()
   });
@@ -2486,11 +2491,11 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.34 CHAT UNIFIED UI + FIREBASE FIX";
+window.__MHAC_BUILD__="V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.34 CHAT UNIFIED UI + FIREBASE FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.39 ADMIN ORDER ASSIGNMENT HARDENED + CENTER CHAT — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}

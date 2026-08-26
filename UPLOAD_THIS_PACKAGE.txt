@@ -1,13 +1,17 @@
-MHAC DELIVERY V4.1.36 RIDER FIX
+MHAC DELIVERY V4.1.39 — UPLOAD THIS PACKAGE
 
-Upload/replace rider.html in the Rider App repository.
-Keep the existing mhac-logo.png and assets folder.
-If you manage Firestore rules from this package, deploy firestore.rules too.
+Replace these files in the GitHub Pages repository:
+- rider.html
+- admin.html
+- firestore.rules
 
-TEST:
-1. Open Rider App.
-2. Tap CONTINUE WITH GOOGLE.
-3. Complete Google sign-in.
-4. Existing approved rider should enter dashboard.
-5. New rider should show RIDER ACCOUNT PENDING.
-6. Do not change the locked UI unless explicitly requested.
+Also keep mhac-logo.png.
+
+After upload:
+1. Deploy/save Firestore Rules.
+2. Open Admin and Rider in fresh tabs.
+3. Create a NEW test order.
+4. Admin assigns the approved Rider.
+5. Rider should receive it automatically.
+
+Do not change the approved UI/design.
