@@ -552,7 +552,7 @@ window.addEventListener("load",function(){
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.52";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.54";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -914,7 +914,7 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.52 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.54 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
 

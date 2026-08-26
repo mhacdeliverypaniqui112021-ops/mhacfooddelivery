@@ -1,5 +1,9 @@
 MHAC DELIVERY V4.1.54 RIDER SYNC FIX
 
+IMPORTANT CORRECTION:
+This package now has ALL Rider version labels set to V4.1.54.
+The previous V4.1.54 package accidentally kept a V4.1.52 top banner label.
+
 UPLOAD TO GITHUB PAGES:
 - admin.html
 - rider.html
@@ -10,6 +14,11 @@ FIREBASE RULES:
 - Deploy firestore.rules in Firebase Console -> Firestore Database -> Rules
 - Project: mhac-delivery-53099
 
+AFTER GITHUB UPLOAD:
+- Wait for GitHub Pages deployment to finish.
+- On the phone, open the site in an Incognito/Private tab OR clear site data/cache, then reload.
+- Confirm the top banner says V4.1.54 before testing.
+
 TEST FLOW:
 1. Customer places a NEW order.
 2. Admin accepts the order.
@@ -19,4 +28,4 @@ TEST FLOW:
 6. Rider should change to LIVE INBOX and show the order.
 7. Test PICK UP -> ON THE WAY -> DELIVERED.
 
-If assignment fails, copy the exact red/Toast Firebase error. It is now surfaced instead of being hidden.
+If assignment fails, copy the exact red/Toast Firebase error. It is surfaced instead of being hidden.
