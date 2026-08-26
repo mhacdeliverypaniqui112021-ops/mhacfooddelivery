@@ -1,28 +1,25 @@
-MHAC DELIVERY — HOME SCREEN ICON PATCH
+MHAC DELIVERY — CLEAN APPS UPLOAD
 
-This package contains:
-- mhac-icon-192.png
-- mhac-icon-512.png
-- manifest-customer.webmanifest
-- manifest-rider.webmanifest
-- manifest-admin.webmanifest
+Purpose:
+Clean wrapper pages for the existing Customer, Rider, and Admin apps.
+The wrappers remove only the old V4.1.x/test/build banners.
+The existing Firebase/order/GPS/chat/menu/accounting logic remains in the original app pages.
 
-IMPORTANT:
-The existing customer.html, rider.html and admin.html should each link to
-their matching manifest in the <head>:
+Upload:
+1. Extract this ZIP.
+2. Upload the whole "clean" folder to the ROOT of the GitHub repository.
+3. Do NOT delete the existing customer.html, rider.html, or admin.html yet.
+4. After GitHub Pages publishes, use:
 
 Customer:
-<link rel="manifest" href="manifest-customer.webmanifest">
+https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/customer.html
 
 Rider:
-<link rel="manifest" href="manifest-rider.webmanifest">
+https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/rider.html
 
 Admin:
-<link rel="manifest" href="manifest-admin.webmanifest">
+https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/admin.html
 
-Also add in each <head>:
-<link rel="icon" type="image/png" sizes="192x192" href="mhac-icon-192.png">
-<meta name="theme-color" content="#e21d25">
-
-After uploading, remove the old Home Screen shortcuts and install/create
-the shortcuts again so Chrome refreshes the app icons.
+Important:
+This package does not change the original application source files.
+It is a safe clean-layer test before we replace/rename the live files.
