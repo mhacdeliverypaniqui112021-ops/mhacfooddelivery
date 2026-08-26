@@ -2171,82 +2171,40 @@ function renderStores(){
    list.classList.toggle("hidden");
    if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
- host.querySelectorAll("[data-publish-store]").forEach(b=>b.onclick=async()=>{
-   if(b.dataset.busy==="1")return;
-   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ PUBLISHING...";
-   selectedStore=+b.dataset.publishStore;
-   const ok=await publishMenu();
-   b.dataset.busy="0";
-   if(!ok){ b.disabled=false; b.textContent="📢 PUBLISH THIS STORE TO CUSTOMER APP"; }
- });
- host.querySelectorAll("[data-unpublish-store]").forEach(b=>b.onclick=async()=>{
-   if(b.dataset.busy==="1")return;
-   b.dataset.busy="1"; b.disabled=true; b.textContent="⏳ UNPUBLISHING...";
-   selectedStore=+b.dataset.unpublishStore;
-   try{ await unpublishStore(selectedStore); } finally { b.dataset.busy="0"; }
- });
- saveDraftMenu();
-}
-function renderNestedFoods(si,ci,list){
- const s=draft.stores[si],c=s.categories[ci];
- list.innerHTML=(c.items||[]).map((f,fi)=>`
-  <div class="storeFoodItem">
-   <div class="foodLine">
-    <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
-    <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
-    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
-    <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
-   </div>
-  </div>`).join("")+
-  `<div class="addFoodInline">
-    <input class="nestedFoodName" placeholder="Food name">
-    <input class="nestedFoodPrice" type="number" min="0" step="0.01" placeholder="Base price">
-    <button class="red nestedAddFood">➕ ADD FOOD</button>
-   </div>`;
- list.querySelector(".nestedAddFood").onclick=()=>{
-   const n=list.querySelector(".nestedFoodName").value.trim();
-   const p=Number(list.querySelector(".nestedFoodPrice").value);
-   if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
-   c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
-   renderNestedFoods(si,ci,list); saveDraftMenu();
- };
- list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
-   const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
-   const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
-   ed.classList.toggle("hidden");
-   if(!ed.classList.contains("hidden") && typeof renderDirectFoodEditor==="function"){
-     renderDirectFoodEditor(y,z,ed,list);
-   }
- });
-}
-function renderEditor(){
- const s=draft.stores[selectedStore];
- if(!s){$("editor").classList.add("hidden");return}
- $("editor").classList.remove("hidden");
- $("editor").innerHTML=`
- <div class="directStoreEditor">
-   <label class="label">🏪 STORE NAME</label>
-   <input id="editStoreName" value="${esc(s.name)}" placeholder="Store name">
-   <button class="red" id="saveStoreName">SAVE STORE NAME</button>
-
-   <h3>📂 FOOD CATEGORIES</h3>
-   <p class="hint">Tap a category to see all foods. Food name, price, parts, drinks and add-ons are edited together in one box.</p>
-   <div id="directCategories"></div>
-
-   <div class="newCategoryBox">
-     <input id="newCat" placeholder="New category name">
-     <button class="blue" id="addCat">ADD CATEGORY</button>
-   </div>
-
-   <div class="publishBar">
-     <button type="button" class="green" id="publish">📢 PUBLISH / UNPUBLISH STORE</button>
-     <p class="small">Only this selected store will be published. Other stores stay unchanged.</p>
-   </div>
- </div>`;
- $("saveStoreName").onclick=()=>{
-   s.name=$("editStoreName").value.trim()||s.name;
-   saveDraftMenu(); renderStores(); renderEditor();
+  // Publish/unpublish controls use event delegation so taps remain reliable
+  // after the store accordion is re-rendered. This is intentionally UI-neutral.
+  if(!host.dataset.publishDelegation){
+    host.dataset.publishDelegation="1";
+    host.addEventListener("click",async ev=>{
+      const b=ev.target.closest("[data-publish-store],[data-unpublish-store]");
+      if(!b || !host.contains(b)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if(b.dataset.busy==="1") return;
+      const isUnpublish=b.hasAttribute("data-unpublish-store");
+      const si=Number(isUnpublish?b.dataset.unpublishStore:b.dataset.publishStore);
+      if(!Number.isInteger(si) || si<0) return;
+      b.dataset.busy="1";
+      b.disabled=true;
+      b.textContent=isUnpublish?"⏳ UNPUBLISHING...":"⏳ PUBLISHING...";
+      selectedStore=si;
+      try{
+        if(isUnpublish) await unpublishStore(si);
+        else await publishMenu();
+      }catch(e){
+        console.error("STORE PUBLISH ACTION FAILED",e);
+        const msg=err(e);
+        toast("❌ STORE ACTION FAILED: "+msg);
+        alert("STORE ACTION FAILED\n\n"+msg);
+      }finally{
+        if(document.body.contains(b)){
+          b.dataset.busy="0";
+          b.disabled=false;
+        }
+      }
+    });
+  }
+  saveDraftMenu(); renderStores(); renderEditor();
  };
  $("addCat").onclick=()=>{
    const n=$("newCat").value.trim();
