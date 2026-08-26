@@ -1,0 +1,9 @@
+MHAC DELIVERY V4.1.56
+CENTERED RIDER CHAT TEST BUILD
+
+- Rider order sync from V4.1.55 retained.
+- Time Limit TEST MODE retained.
+- Rider Admin Chatbox is hard-locked to horizontal center on mobile/desktop.
+- Chatbox width remains compact and responsive.
+- Keyboard-safe bottom positioning retained.
+- No changes to order flow, Firestore rules, customer UI, or admin UI.

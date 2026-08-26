@@ -1,31 +1,11 @@
-MHAC DELIVERY V4.1.55 RIDER SYNC FIX
+MHAC DELIVERY V4.1.56 — CENTERED RIDER CHAT
 
-IMPORTANT CORRECTION:
-This package now has ALL Rider version labels set to V4.1.55.
-The previous V4.1.55 package accidentally kept a V4.1.52 top banner label.
+Upload/replace rider.html from this package.
+Firestore rules and the rest of the package are unchanged from V4.1.55.
 
-UPLOAD TO GITHUB PAGES:
-- admin.html
-- rider.html
-- customer.html
-- mhac-logo.png
-
-FIREBASE RULES:
-- Deploy firestore.rules in Firebase Console -> Firestore Database -> Rules
-- Project: mhac-delivery-53099
-
-AFTER GITHUB UPLOAD:
-- Wait for GitHub Pages deployment to finish.
-- On the phone, open the site in an Incognito/Private tab OR clear site data/cache, then reload.
-- Confirm the top banner says V4.1.55 before testing.
-
-TEST FLOW:
-1. Customer places a NEW order.
-2. Admin accepts the order.
-3. Admin selects APPROVED rider Leomar.
-4. Click ASSIGN RIDER.
-5. Admin should show: "Order assigned + LIVE inbox verified".
-6. Rider should change to LIVE INBOX and show the order.
-7. Test PICK UP -> ON THE WAY -> DELIVERED.
-
-If assignment fails, copy the exact red/Toast Firebase error. It is surfaced instead of being hidden.
+After publishing:
+1. Open Rider app.
+2. Hard refresh / close and reopen Chrome.
+3. Confirm BUILD V4.1.56.
+4. Open CHAT ADMIN from any assigned order.
+5. Chatbox should remain horizontally centered.
