@@ -1,4 +1,4 @@
-MHAC DELIVERY V4.1.39 — UPLOAD THIS PACKAGE
+MHAC DELIVERY V4.1.40 — UPLOAD THIS PACKAGE
 
 Replace these files in the GitHub Pages repository:
 - rider.html
@@ -7,11 +7,8 @@ Replace these files in the GitHub Pages repository:
 
 Also keep mhac-logo.png.
 
-After upload:
-1. Deploy/save Firestore Rules.
-2. Open Admin and Rider in fresh tabs.
-3. Create a NEW test order.
-4. Admin assigns the approved Rider.
-5. Rider should receive it automatically.
+IMPORTANT: Deploy/save firestore.rules in Firebase Console. GitHub Pages does NOT deploy Firestore Rules.
+
+Test with a NEW order: Customer -> Admin receives -> Admin assigns approved Rider -> Rider receives automatically.
 
 Do not change the approved UI/design.

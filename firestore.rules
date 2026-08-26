@@ -84,6 +84,11 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    match /riderAssignments/{riderUid}/orders/{orderId} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
+      allow create, update, delete: if isAdmin();
+    }
+
     match /orders/{orderId}/riderMessages/{messageId} {
       allow read:
         if isAdmin()

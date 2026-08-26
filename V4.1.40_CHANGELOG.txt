@@ -1,0 +1,7 @@
+MHAC DELIVERY V4.1.40 — RIDER INBOX HARDENED
+
+- Added private riderAssignments/{riderUid}/orders/{orderId} inbox index.
+- Admin writes the inbox entry when assigning an order.
+- Rider watches its own inbox and then follows each assigned order live.
+- V4.1.39 assignment query listeners remain as compatibility fallback.
+- Approved Rider/Admin UI preserved.

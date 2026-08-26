@@ -592,10 +592,29 @@ function startOrdersListener(){
 
  const riderEmail=(auth.currentUser?.email||"").trim().toLowerCase();
  const buckets=new Map();
+ const orderWatchers=new Map();
  const riderUidForSync=uid;
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel) buildLabel.textContent="BUILD V4.1.39 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ if(buildLabel) buildLabel.textContent="BUILD V4.1.40 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
  const listeners=[];
+
+ function stopOrderWatcher(id){
+   const u=orderWatchers.get(id);
+   if(u){try{u()}catch(_){}orderWatchers.delete(id);}
+ }
+ function watchAssignedOrder(id){
+   if(!id || orderWatchers.has(id))return;
+   const u=onSnapshot(doc(db,"orders",id),snap=>{
+     if(!snap.exists()){buckets.delete(id);paint();return;}
+     const o={id:snap.id,...snap.data()};
+     const assignedUid=String(o.assignedRiderUid||o.riderUid||"");
+     const assignedEmail=String(o.assignedRiderEmail||o.riderEmail||"").trim().toLowerCase();
+     if(assignedUid===riderUidForSync || (riderEmail && assignedEmail===riderEmail)) buckets.set(id,o);
+     else { buckets.delete(id); stopOrderWatcher(id); }
+     paint();
+   },e=>{ console.warn("Rider assigned-order read failed",id,e); buckets.delete(id); paint(); });
+   orderWatchers.set(id,u);
+ }
 
  function paint(){
    const all=[...buckets.values()];
@@ -626,6 +645,18 @@ function startOrdersListener(){
      $("conn").innerHTML='<span class="error">❌ Firebase order listener: '+esc(e.message)+"</span>";
    });
  }
+
+ // V4.1.40: dedicated rider inbox. Admin writes one private index document
+ // per assignment, so Rider delivery no longer depends on a multi-field query.
+ listeners.push(onSnapshot(collection(db,"riderAssignments",uid,"orders"),snap=>{
+   const wanted=new Set();
+   snap.docs.forEach(d=>{
+     const a=d.data()||{};
+     if(String(a.assignedRiderUid||"")===riderUidForSync){wanted.add(d.id);watchAssignedOrder(d.id);}
+   });
+   for(const id of [...orderWatchers.keys()]) if(!wanted.has(id)) stopOrderWatcher(id);
+   paint();
+ },e=>console.warn("Rider inbox listener:",e)));
 
  // V4.1.39: listen to canonical AND legacy assignment keys.
  const syncQueries=[
