@@ -1,0 +1,5 @@
+V4.1.34 CHAT UNIFIED UI + FIREBASE FIX
+- Chat popup is centered on the phone.
+- Chat popup now uses the same unified white background / black text UI.
+- Chat header, messages, input and send button no longer use the blue chat theme.
+- Keeps V4.1.33 Firebase rules fixes for GCash and menu draft sync.
