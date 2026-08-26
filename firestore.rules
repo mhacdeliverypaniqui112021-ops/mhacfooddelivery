@@ -14,15 +14,20 @@ service cloud.firestore {
 
     function isApprovedRider() {
       return isSignedIn()
-        && exists(
-          /databases/$(database)/documents/riders/$(request.auth.uid)
-        )
-        && get(
-          /databases/$(database)/documents/riders/$(request.auth.uid)
-        ).data.approved == true;
+        && exists(/databases/$(database)/documents/riders/$(request.auth.uid))
+        && get(/databases/$(database)/documents/riders/$(request.auth.uid)).data.approved == true;
     }
 
     match /settings/menu {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/menuDraft {
+      allow read, write: if isAdmin();
+    }
+
+    match /settings/payment {
       allow read: if true;
       allow write: if isAdmin();
     }
@@ -39,33 +44,20 @@ service cloud.firestore {
 
       allow read:
         if isAdmin()
-        || (
-          isApprovedRider()
-          && resource.data.assignedRiderUid == request.auth.uid
-        )
-        || (
-          isSignedIn()
-          && resource.data.customer.uid == request.auth.uid
-        );
+        || (isApprovedRider() && resource.data.assignedRiderUid == request.auth.uid)
+        || (isSignedIn() && resource.data.customer.uid == request.auth.uid);
 
       allow update:
         if isAdmin()
-        || (
-          isApprovedRider()
-          && resource.data.assignedRiderUid == request.auth.uid
-        );
+        || (isApprovedRider() && resource.data.assignedRiderUid == request.auth.uid);
     }
 
-    // Customer <-> Admin chat
     match /orders/{orderId}/messages/{messageId} {
       allow read:
         if isSignedIn()
         && (
           isAdmin()
-          || (
-            get(/databases/$(database)/documents/orders/$(orderId))
-              .data.customer.uid == request.auth.uid
-          )
+          || get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
         );
 
       allow create:
@@ -73,8 +65,7 @@ service cloud.firestore {
         && (
           isAdmin()
           || (
-            get(/databases/$(database)/documents/orders/$(orderId))
-              .data.customer.uid == request.auth.uid
+            get(/databases/$(database)/documents/orders/$(orderId)).data.customer.uid == request.auth.uid
             && request.resource.data.senderRole == "customer"
             && request.resource.data.senderUid == request.auth.uid
           )
@@ -83,25 +74,19 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-
-
-    // V4.1.6: Admin <-> assigned Rider chat for a specific order.
-    // This is separate from Customer <-> Admin /messages.
     match /orders/{orderId}/riderMessages/{messageId} {
       allow read:
         if isAdmin()
         || (
           isApprovedRider()
-          && get(/databases/$(database)/documents/orders/$(orderId))
-               .data.assignedRiderUid == request.auth.uid
+          && get(/databases/$(database)/documents/orders/$(orderId)).data.assignedRiderUid == request.auth.uid
         );
 
       allow create:
         if isAdmin()
         || (
           isApprovedRider()
-          && get(/databases/$(database)/documents/orders/$(orderId))
-               .data.assignedRiderUid == request.auth.uid
+          && get(/databases/$(database)/documents/orders/$(orderId)).data.assignedRiderUid == request.auth.uid
           && request.resource.data.senderRole == "rider"
           && request.resource.data.senderUid == request.auth.uid
         );
@@ -111,8 +96,7 @@ service cloud.firestore {
 
     match /riders/{uid} {
       allow read:
-        if isAdmin()
-        || (isSignedIn() && request.auth.uid == uid);
+        if isAdmin() || (isSignedIn() && request.auth.uid == uid);
 
       allow create:
         if isSignedIn()
@@ -133,13 +117,8 @@ service cloud.firestore {
     }
 
     match /riderApplications/{uid} {
-      allow create:
-        if isSignedIn() && request.auth.uid == uid;
-
-      allow read:
-        if isAdmin()
-        || (isSignedIn() && request.auth.uid == uid);
-
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
       allow update, delete: if isAdmin();
     }
 

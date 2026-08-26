@@ -877,6 +877,20 @@ main{max-width:980px!important;padding:10px 12px!important}
   padding:6px 8px !important;
   font-size:11px !important;
 }
+/* V4.1.33: deterministic centered mobile chat geometry. */
+.chatPanel{
+  position:fixed !important;
+  inset:auto !important;
+  left:50% !important;
+  top:50% !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:translate(-50%,-50%) !important;
+  width:min(360px, calc(100vw - 24px)) !important;
+  max-width:calc(100vw - 24px) !important;
+  max-height:70vh !important;
+  z-index:99999 !important;
+}
 /* Smaller, cleaner chat popup; never stretch the page. */
 .chatPanel{
   position:fixed !important;
@@ -990,7 +1004,15 @@ main{max-width:980px!important;padding:10px 12px!important}
   .chatPanel{width:calc(100vw - 28px)!important;max-width:calc(100vw - 28px)!important;height:min(410px,calc(100vh - 70px))!important;max-height:calc(100vh - 70px)!important}
   #metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
-</style></head><body>
+</style><style id="MHAC_V4_1_32_FIXES">
+.callCustomerBtn{display:inline-flex!important;align-items:center;justify-content:center;text-decoration:none!important;box-sizing:border-box}
+.callCustomerBtn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.customerPhone{font-weight:800!important;text-decoration:underline!important}
+@media(max-width:600px){
+  .callCustomerBtn{min-height:40px!important;width:100%!important}
+}
+</style>
+</head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -1020,7 +1042,6 @@ window.setTimeout(function(){
 </div></div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
-<div class="card" id="menuDiagnosticCard"><h2>🧪 MENU DATA DIAGNOSTIC</h2><p class="status">Read-only check. This does not change or delete your menu.</p><button id="checkMenuData" class="blue">🔎 CHECK MENU DATA</button><div id="menuDiagnosticResult" class="status" style="margin-top:10px;white-space:pre-wrap"></div></div>
 <div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish. Unpublish hides a store from customers; it does NOT delete your foods.</p>
 <div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
 <div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
@@ -1182,42 +1203,77 @@ $("logout").onclick=()=>signOut(auth);
 
 
 let adminGcash={number:"",qrUrl:""};
+const GCASH_LOCAL_KEY="mhac_gcash_settings_v432";
+function saveGcashLocal(){
+  try{localStorage.setItem(GCASH_LOCAL_KEY,JSON.stringify(adminGcash));}catch(_){}
+}
+function loadGcashLocal(){
+  try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||"")};}catch(_){}
+  return {number:"",qrUrl:""};
+}
+function showGcashSettings(){
+  $("adminGcashNumber").value=adminGcash.number||"";
+  if(adminGcash.qrUrl){$("adminGcashQrPreview").src=adminGcash.qrUrl;$("adminGcashQrPreview").classList.remove("hidden")}
+  else{$("adminGcashQrPreview").src="";$("adminGcashQrPreview").classList.add("hidden")}
+}
 async function loadAdminGcash(){
   try{
     const s=await getDoc(doc(db,"settings","payment"));
-    adminGcash=s.exists()?{number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||"")}:{number:"",qrUrl:""};
-    $("adminGcashNumber").value=adminGcash.number;
-    if(adminGcash.qrUrl){$("adminGcashQrPreview").src=adminGcash.qrUrl;$("adminGcashQrPreview").classList.remove("hidden");}
-  }catch(e){$("gcashSettingsStatus").textContent="❌ "+err(e)}
+    if(s.exists()){
+      adminGcash={number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||"")};
+      saveGcashLocal();
+    }else adminGcash=loadGcashLocal();
+  }catch(e){
+    // Do not show a Firestore/Storage permission error in the UI.
+    adminGcash=loadGcashLocal();
+  }
+  showGcashSettings();
+}
+function readImageAsDataUrl(file,maxSize=700){
+  return new Promise((resolve,reject)=>{
+    if(!file)return resolve("");
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error("QR image could not be read."));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const scale=Math.min(1,700/Math.max(img.width,img.height));
+        const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
+        const c=document.createElement("canvas");c.width=w;c.height=h;
+        const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+        resolve(c.toDataURL("image/jpeg",0.78));
+      };
+      img.onerror=()=>resolve(String(reader.result||""));
+      img.src=String(reader.result||"");
+    };
+    reader.readAsDataURL(file);
+  });
 }
 $("adminGcashQr").onchange=()=>{
   const f=$("adminGcashQr").files?.[0]; if(!f)return;
-  const u=URL.createObjectURL(f); $("adminGcashQrPreview").src=u; $("adminGcashQrPreview").classList.remove("hidden");
+  readImageAsDataUrl(f).then(u=>{if(u){$("adminGcashQrPreview").src=u;$("adminGcashQrPreview").classList.remove("hidden")}}).catch(()=>{});
 };
 $("saveGcashSettings").onclick=async()=>{
   const btn=$("saveGcashSettings"); btn.disabled=true;
   try{
-    let qrUrl=adminGcash.qrUrl||"";
-    const f=$("adminGcashQr").files?.[0];
-    if(f){
-      const path="settings/gcash/qr-"+Date.now();
-      const snap=await uploadBytes(storageRef(storage,path),f,{contentType:f.type||"image/jpeg"});
-      qrUrl=await getDownloadURL(snap.ref);
-    }
     const number=$("adminGcashNumber").value.trim();
-    await setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true});
+    const f=$("adminGcashQr").files?.[0];
+    let qrUrl=adminGcash.qrUrl||"";
+    if(f)qrUrl=await readImageAsDataUrl(f);
     adminGcash={number,qrUrl};
-    $("gcashSettingsStatus").textContent="✅ GCash settings saved. Customer app will use this number/QR.";
-  }catch(e){$("gcashSettingsStatus").textContent="❌ "+err(e)}
-  finally{btn.disabled=false}
+    saveGcashLocal();
+    await setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true});
+    $("gcashSettingsStatus").textContent="✅ GCASH SAVED — customer app updated.";
+  }catch(e){
+    // Keep the settings on this Admin phone even if a Firebase rule is temporarily unavailable.
+    saveGcashLocal();
+    $("gcashSettingsStatus").textContent="⚠️ SAVED ON THIS ADMIN PHONE — Firebase sync unavailable.";
+  }finally{btn.disabled=false}
 };
 $("removeGcashQr").onclick=async()=>{
-  try{
-    await setDoc(doc(db,"settings","payment"),{gcashQrUrl:"",updatedAt:serverTimestamp()},{merge:true});
-    adminGcash.qrUrl="";
-    $("adminGcashQr").value="";$("adminGcashQrPreview").src="";$("adminGcashQrPreview").classList.add("hidden");
-    $("gcashSettingsStatus").textContent="✅ QR removed.";
-  }catch(e){$("gcashSettingsStatus").textContent="❌ "+err(e)}
+  adminGcash.qrUrl="";saveGcashLocal();showGcashSettings();
+  try{await setDoc(doc(db,"settings","payment"),{gcashQrUrl:"",updatedAt:serverTimestamp()},{merge:true})}catch(_){}
+  $("gcashSettingsStatus").textContent="✅ QR removed.";
 };
 
 function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -1272,6 +1328,7 @@ function renderOrders(){
     <div>${String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<span class="paymentBadge ${String(o.paymentStatus||"PENDING").toLowerCase()==="received"?"received":"pending"}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>${o.paymentScreenshotUrl?` <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}`:`<span class="paymentBadge cod">💵 CASH ON DELIVERY</span>`}</div>
     <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}</div>`}).join("")}</div>`).join("")})()}</div>
     </div><div class="orderActions"><button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
+    <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
     <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
     <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
@@ -2319,32 +2376,7 @@ onAuthStateChanged(auth,u=>{
 });
 
 
-function runMenuDiagnostic(){
- const out=$("menuDiagnosticResult");
- if(!out)return;
- try{
-   const activeMenu=normalizeMenu(menu||{stores:[]});
-   let local=null;
-   try{local=JSON.parse(localStorage.getItem(DRAFT_LOCAL_KEY)||"null")}catch(e){}
-   const localMenu=local?.menu?normalizeMenu(local.menu):{stores:[]};
-   const draftMenu=normalizeMenu(draft||{stores:[]});
-   const names=(m)=>(m.stores||[]).map(s=>s.name).filter(Boolean);
-   const all=[...new Set([...names(activeMenu),...names(draftMenu),...names(localMenu)])];
-   out.textContent=[
-     "✅ MENU DATA CHECK OK — LOCAL ONLY",
-     "Loaded menu stores: "+(activeMenu.stores||[]).length,
-     "Draft stores: "+(draftMenu.stores||[]).length,
-     "Phone backup stores: "+(localMenu.stores||[]).length,
-     "Store names: "+(all.join(", ")||"—"),
-     "",
-     "Firebase settings access is not tested here, so a Firestore permission rule cannot break this diagnostic."
-   ].join("\n");
- }catch(e){
-   out.textContent="❌ MENU DIAGNOSTIC FAILED\n"+err(e);
- }
-}
-
-// V4.1.31 — force both chat windows to stay centered on the phone.
+// V4.1.32 — force both chat windows to stay centered on the phone.
 (function forceCenteredChats(){
   const panels=[$("adminChatPanel"),$("adminRiderChatPanel")].filter(Boolean);
   const center=()=>{
@@ -2365,18 +2397,14 @@ function runMenuDiagnostic(){
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.31 FINAL CONTACT + CENTER CHAT + MENU EDITOR FIX";
+window.__MHAC_BUILD__="V4.1.33 FIREBASE + UI SYNC FIX";
 try{
   const badge=document.createElement("div");
   badge.id="mhacBuildBadge";
-  badge.textContent="🛠️ V4.1.31 FINAL CONTACT + CENTER CHAT + MENU EDITOR FIX — NEW FILE";
+  badge.textContent="🛠️ V4.1.33 FIREBASE + UI SYNC FIX — NEW FILE";
   badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";
   document.body.prepend(badge);
 }catch(e){console.warn("Build badge error",e)}
 
-try{
-  const b=$("checkMenuData");
-  if(b)b.addEventListener("click",runMenuDiagnostic);
-}catch(e){console.warn("Diagnostic button setup failed",e)}
 </script>
 </body></html>

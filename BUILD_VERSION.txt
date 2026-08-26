@@ -1,8 +1,1 @@
-MHAC DELIVERY V4.1.31 FINAL
-- Customer contact is clickable for rider call
-- Admin/rider chat centered on mobile
-- Earnings shown in one row: Total Deliveries / Rider Earnings / Admin Earnings
-- Menu diagnostic hidden from UI to eliminate permission-error confusion
-- Removed old CHICKEN / REGULAR ITEM selector from food editor
-- Food edits immediately refresh the menu manager and show parts/drinks/add-ons summary
-- Draft persistence retained; publish remains required for customer app
+V4.1.32 GCASH + CONTACT + CENTER CHAT + MENU SYNC FIX

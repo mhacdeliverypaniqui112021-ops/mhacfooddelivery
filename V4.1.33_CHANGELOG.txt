@@ -1,0 +1,7 @@
+V4.1.33 FIREBASE + UI SYNC FIX
+- Fixed missing Firestore rules for settings/payment (GCash).
+- Fixed missing Firestore rules for settings/menuDraft (Admin menu edits).
+- Keeps GCash local fallback while restoring Firebase sync.
+- Removed reliance on the old Menu Diagnostic error path.
+- Forces Admin customer/rider chat popup to stay centered on mobile.
+- Keeps the existing contact-call, earnings, food editor, and menu flow.
