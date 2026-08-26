@@ -884,7 +884,7 @@ import{getStorage,ref as storageRef,uploadBytes,getDownloadURL}from"https://www.
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
 const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence}),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
-// V4.1.66: explicitly keep Customer Firebase auth persistent across refresh/browser restarts.
+// V4.1.67: explicitly keep Customer Firebase auth persistent across refresh/browser restarts.
 setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Customer auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 const TEST_MODE=false;let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null,menuUnsub=null;

@@ -1,0 +1,3 @@
+V4.1.67 Delivered Status Fix
+
+Rider DELIVERED now sets order status to DELIVERED instead of COMPLETED. Delivered orders remain visible in Rider/Admin/Customer active order views until Admin manually clicks COMPLETE. Earnings and completed-delivery accounting remain based on COMPLETED only. UI and existing business flow otherwise unchanged.
