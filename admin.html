@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.51 LIVE RIDER SYNC HARDENED</title>
-<meta name="build-version" content="V4.1.51 LIVE RIDER SYNC HARDENED">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.52 LIVE RIDER SYNC HARDENED</title>
+<meta name="build-version" content="V4.1.52 LIVE RIDER SYNC HARDENED">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1772,7 +1772,7 @@ $("orders").onclick=async e=>{
   const riderEmail=(rr.email||"").trim().toLowerCase();
   const riderName=rr.nickname||rr.name||rr.email||u;
   const nextStatus=String(current.status||"NEW").toUpperCase()==="NEW"?"ASSIGNED":(current.status||"ASSIGNED");
-  // V4.1.51 ROBUST RIDER SYNC:
+  // V4.1.52 ROBUST RIDER SYNC:
   // Stamp the canonical order FIRST so rider order-query sync still works
   // even if an older live Firestore Rules deployment blocks the private inbox index.
   await updateDoc(doc(db,"orders",id),{
@@ -1786,21 +1786,20 @@ $("orders").onclick=async e=>{
     updatedAt:serverTimestamp()
   });
 
-  // Private inbox is an optimization/index. Do not make assignment fail
-  // just because this optional index is blocked by an older rules deployment.
+  // Legacy private index (optional compatibility path).
   try{
-    await setDoc(doc(db,"riderAssignments",u,"orders",id),{
-      orderId:id,
-      assignedRiderUid:u,
-      assignedRiderEmail:riderEmail,
-      assignedRiderName:riderName,
-      assignedAt:serverTimestamp(),
-      updatedAt:serverTimestamp()
-    },{merge:true});
-    toast("Order assigned to "+(rr.nickname||rr.name||rr.email||"rider")+".");
+    await setDoc(doc(db,"riderAssignments",u,"orders",id),{orderId:id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,assignedAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
+  }catch(inboxErr){console.warn("Legacy riderAssignments write unavailable; continuing with dedicated riderInbox.",inboxErr)}
+
+  // V4.1.52 PRIMARY RIDER INBOX: complete order snapshot under rider UID.
+  // This is independent of the legacy inbox, so one blocked path cannot stop delivery.
+  try{
+    const inboxOrder={...current,id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,riderUid:u,riderEmail:riderEmail,riderName:riderName,status:nextStatus};
+    await setDoc(doc(db,"riderInbox",u,"orders",id),{orderId:id,assignedRiderUid:u,assignedRiderEmail:riderEmail,assignedRiderName:riderName,order:inboxOrder,assignedAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
+    toast("Order assigned to "+(rr.nickname||rr.name||rr.email||"rider")+". LIVE inbox sent.");
   }catch(inboxErr){
-    console.warn("Private rider inbox index unavailable; canonical order sync remains active.",inboxErr);
-    toast("Order assigned. Rider will receive it through LIVE ORDER SYNC.");
+    console.warn("Dedicated riderInbox write failed; canonical sync remains active.",inboxErr);
+    toast("Order assigned. LIVE inbox write failed — deploy V4.1.52 firestore.rules.");
   }
 }catch(x){toast(err(x))}return;}
  const c=e.target.closest("[data-c]");

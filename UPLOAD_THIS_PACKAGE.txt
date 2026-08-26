@@ -1,23 +1,18 @@
-MHAC DELIVERY V4.1.51 — UPLOAD THIS PACKAGE
+MHAC DELIVERY V4.1.52
 
-Upload/replace:
+UPLOAD these files to the GitHub Pages site:
 - admin.html
-- customer.html
 - rider.html
+- customer.html
 - mhac-logo.png
-- firestore.rules
+- firestore.rules is for Firebase Rules deployment (not just GitHub upload).
 
-Important:
-- Deploy firestore.rules in Firebase Console > Firestore Database > Rules.
-- The Admin now saves the rider assignment to the canonical order FIRST.
-- Rider inbox is an additional private index; if an old rules deployment blocks it,
-  the rider can still receive the assignment through LIVE ORDER SYNC.
+IMPORTANT FIREBASE STEP:
+Deploy firestore.rules in this package to the Firebase project:
+MHAC DELIVERY (project mhac-delivery-53099).
 
-TEST:
-1. Login Customer.
-2. Place order.
-3. Admin accepts order.
-4. Admin assigns an APPROVED rider.
-5. Rider app should show the assigned order automatically.
-6. Deploy the included firestore.rules and reload the Rider App.
-7. The "PRIVATE INBOX SYNC UNAVAILABLE" warning should disappear.
+The new primary rider sync path is:
+riderInbox/{RIDER_UID}/orders/{ORDER_ID}
+
+After deployment:
+Customer -> Order -> Admin Accept -> Assign Approved Rider -> Rider receives LIVE order.

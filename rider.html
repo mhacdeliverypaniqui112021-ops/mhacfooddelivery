@@ -545,14 +545,14 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.51 • LIVE RIDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.52 • LIVE RIDER SYNC ACTIVE</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
 <div id="riderChatPanel" class="chatPanel hidden">
   <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
   <div id="riderChatMessages" class="chatMessages"></div>
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.51";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.52";</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
@@ -813,7 +813,7 @@ $("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.prevent
 $("orders").addEventListener("click",async e=>{
  const chat=e.target.closest("[data-rider-chat]");
  if(chat){openRiderChat(chat.dataset.riderChat);return;}
- const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;try{await updateDoc(doc(db,"orders",b.dataset.id),b.dataset.status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status:b.dataset.status,updatedAt:serverTimestamp()})}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
+ const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;const id=b.dataset.id,status=b.dataset.status;try{const patch=status==="COMPLETED"?{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()}:{status,updatedAt:serverTimestamp()};await updateDoc(doc(db,"orders",id),patch);try{await updateDoc(doc(db,"riderInbox",uid,"orders",id),{"order.status":status,"order.updatedAt":serverTimestamp(),...(status==="COMPLETED"?{"order.completedBusinessDay":businessDayKey()}: {})})}catch(inboxErr){console.warn("Rider inbox status mirror failed",inboxErr)}}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
 const riderChatWatchers=new Map();
 function syncRiderChatWatchers(active){
   const ids=new Set(active.map(o=>o.id));
@@ -838,96 +838,45 @@ function stopRiderChatWatchers(){for(const unsub of riderChatWatchers.values()){
 function startOrdersListener(){
  if(unsub){try{unsub()}catch(_){ }unsub=null}
  stopRiderChatWatchers();
-
  const riderEmail=(auth.currentUser?.email||"").trim().toLowerCase();
- const buckets=new Map();
- const orderWatchers=new Map();
  const riderUidForSync=uid;
+ const buckets=new Map(),orderWatchers=new Map(),listeners=[];
  const buildLabel=document.getElementById("riderBuild");
- if(buildLabel) buildLabel.textContent="BUILD V4.1.51 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
- const listeners=[];
-
- function stopOrderWatcher(id){
-   const u=orderWatchers.get(id);
-   if(u){try{u()}catch(_){}orderWatchers.delete(id);}
- }
+ if(buildLabel)buildLabel.textContent="BUILD V4.1.52 • UID "+riderUidForSync+(riderEmail?" • "+riderEmail:"")+" • ORDER SYNC ACTIVE";
+ function stopOrderWatcher(id){const u=orderWatchers.get(id);if(u){try{u()}catch(_){}orderWatchers.delete(id)}}
  function watchAssignedOrder(id){
-   if(!id || orderWatchers.has(id))return;
+   if(!id||orderWatchers.has(id))return;
    const u=onSnapshot(doc(db,"orders",id),snap=>{
-     if(!snap.exists()){buckets.delete(id);paint();return;}
-     const o={id:snap.id,...snap.data()};
-     const assignedUid=String(o.assignedRiderUid||o.riderUid||"");
-     const assignedEmail=String(o.assignedRiderEmail||o.riderEmail||"").trim().toLowerCase();
-     if(assignedUid===riderUidForSync || (riderEmail && assignedEmail===riderEmail)) buckets.set(id,o);
-     else { buckets.delete(id); stopOrderWatcher(id); }
+     if(!snap.exists()){buckets.delete(id);paint();return}
+     const o={id:snap.id,...snap.data()},au=String(o.assignedRiderUid||o.riderUid||""),ae=String(o.assignedRiderEmail||o.riderEmail||"").trim().toLowerCase();
+     if(au===riderUidForSync||(riderEmail&&ae===riderEmail))buckets.set(id,o);else{buckets.delete(id);stopOrderWatcher(id)}
      paint();
-   },e=>{ console.warn("Rider assigned-order read failed",id,e); buckets.delete(id); paint(); });
+   },e=>console.warn("Canonical order read unavailable",id,e));
    orderWatchers.set(id,u);
  }
-
  function paint(){
-   const all=[...buckets.values()];
-   const active=all.filter(o=>{
-     const st=String(o.status||"NEW").trim().toUpperCase();
-     return st!=="COMPLETED"&&st!=="CANCELLED"&&st!=="CANCELED";
-   });
-   const today=businessDayKey();
-   const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
-   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
-   const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
-   $("doneCount").textContent=done.length;
-   $("myEarnings").textContent=peso(df);
-   $("toRemit").textContent=peso(sf);
-   for(const o of active){
-     if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
-   }
-   render(active);
-   syncRiderChatWatchers(active);
-   $("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
+   const all=[...buckets.values()],active=all.filter(o=>{const st=String(o.status||"NEW").trim().toUpperCase();return st!=="COMPLETED"&&st!=="CANCELLED"&&st!=="CANCELED"});
+   const today=businessDayKey(),done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED"&&o.completedBusinessDay===today);
+   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0),sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
+   $("doneCount").textContent=done.length;$("myEarnings").textContent=peso(df);$("toRemit").textContent=peso(sf);
+   for(const o of active)if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
+   render(active);syncRiderChatWatchers(active);$("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
  }
-
- function watch(q){
-   return onSnapshot(q,snap=>{
-     snap.docs.forEach(d=>buckets.set(d.id,{id:d.id,...d.data()}));
-     paint();
-   },e=>{
-     $("conn").innerHTML='<span class="error">❌ Firebase order listener: '+esc(e.message)+"</span>";
-   });
- }
-
- // V4.1.40: dedicated rider inbox. Admin writes one private index document
- // per assignment, so Rider delivery no longer depends on a multi-field query.
- listeners.push(onSnapshot(collection(db,"riderAssignments",uid,"orders"),snap=>{
-   const wanted=new Set();
-   snap.docs.forEach(d=>{
-     const a=d.data()||{};
-     if(String(a.assignedRiderUid||"")===riderUidForSync){wanted.add(d.id);watchAssignedOrder(d.id);}
-   });
-   for(const id of [...orderWatchers.keys()]) if(!wanted.has(id)) stopOrderWatcher(id);
+ // PRIMARY: complete order snapshot under rider UID. No /orders query is required.
+ listeners.push(onSnapshot(collection(db,"riderInbox",uid,"orders"),snap=>{
+   const ids=new Set();
+   snap.docs.forEach(d=>{const a=d.data()||{},base=(a.order&&typeof a.order==="object")?a.order:a,id=String(a.orderId||base.id||d.id),au=String(base.assignedRiderUid||base.riderUid||a.assignedRiderUid||""),ae=String(base.assignedRiderEmail||base.riderEmail||a.assignedRiderEmail||"").trim().toLowerCase();if(id&&(au===riderUidForSync||(riderEmail&&ae===riderEmail))){buckets.set(id,{...base,id});ids.add(id)}});
+   for(const id of [...buckets.keys()])if(!ids.has(id)&&!orderWatchers.has(id))buckets.delete(id);
    paint();
- },e=>{
-   // The private inbox is only an index. Keep canonical order listeners alive
-   // so an older rules deployment cannot hide an otherwise valid assignment.
-   console.warn("Rider inbox listener unavailable; using canonical order sync:",e);
-   $("conn").innerHTML='<span class="status">🟡 PRIVATE INBOX SYNC UNAVAILABLE — LIVE ORDER SYNC ACTIVE</span>';
-   paint();
- }));
-
- // V4.1.42: listen to canonical AND legacy assignment keys.
- const syncQueries=[
-   ["assignedRiderUid",uid],
-   ["riderUid",uid],
-   ["assignedRiderEmail",riderEmail],
-   ["riderEmail",riderEmail]
- ];
- for(const [field,value] of syncQueries){
+ },e=>console.warn("Dedicated riderInbox unavailable; canonical fallback active",e)));
+ // SECONDARY: canonical assigned-field queries for older orders.
+ for(const [field,value] of [["assignedRiderUid",uid],["riderUid",uid],["assignedRiderEmail",riderEmail],["riderEmail",riderEmail]]){
    if(!value)continue;
-   listeners.push(watch(query(collection(db,"orders"),where(field,"==",value))));
+   listeners.push(onSnapshot(query(collection(db,"orders"),where(field,"==",value)),snap=>{snap.docs.forEach(d=>{const o={id:d.id,...d.data()};buckets.set(d.id,o);watchAssignedOrder(d.id)});paint()},e=>console.warn("Canonical rider query unavailable",field,e)));
  }
-
- unsub=()=>{
-   for(const u of listeners){try{u()}catch(_){}}
- };
+ // Legacy private index compatibility.
+ listeners.push(onSnapshot(collection(db,"riderAssignments",uid,"orders"),snap=>{snap.docs.forEach(d=>{const a=d.data()||{};if(String(a.assignedRiderUid||"")===riderUidForSync)watchAssignedOrder(d.id)});paint()},e=>console.warn("Legacy riderAssignments unavailable",e)));
+ unsub=()=>{for(const u of listeners){try{u()}catch(_){}}for(const id of [...orderWatchers.keys()])stopOrderWatcher(id)};
 }
 
 function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(()=>{if(!riderOpen())lockRider()},30000)}async function lockRider(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}try{await signOut(auth)}catch(_){}showClosed()}
@@ -958,7 +907,7 @@ onAuthStateChanged(auth,async user=>{
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });
-try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.51 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
+try{const badge=document.createElement("div");badge.textContent="🛠️ V4.1.52 LIVE RIDER SYNC + WHITE UI";badge.style.cssText="position:sticky;top:0;z-index:9999;background:#e21d25;color:#fff;text-align:center;font-weight:900;padding:10px 8px;font-size:14px;box-shadow:0 2px 6px #0003";document.body.prepend(badge)}catch(e){}
 </script>
 </body></html>
 

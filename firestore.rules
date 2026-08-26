@@ -89,6 +89,14 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // V4.1.52 dedicated rider inbox
+    match /riderInbox/{riderUid}/orders/{orderId} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == riderUid);
+      allow delete: if isAdmin();
+    }
+
     match /orders/{orderId}/riderMessages/{messageId} {
       allow read:
         if isAdmin()
