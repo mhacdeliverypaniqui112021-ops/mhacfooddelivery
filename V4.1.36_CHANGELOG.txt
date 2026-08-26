@@ -1,0 +1,5 @@
+V4.1.36 RIDER LOGIN FLOW FIX
+- Popup-first Google login on Android/Chrome; redirect fallback.
+- Prevent duplicate afterLogin calls from redirect + auth state.
+- Do not sign out on Firestore/rider-profile errors; show the actual error.
+- UI unchanged.

@@ -397,37 +397,46 @@ async function autoEnableRiderSound(){
    window.addEventListener("touchstart",unlock,{once:true,passive:true});
  }
 }
+let riderLoginProcessing=false, riderAfterLoginRunning=false;
 async function googleLogin(){
  const btn=$("googleBtn"),status=$("googleStatus");
- if(btn.disabled)return;
- btn.disabled=true;status.textContent="Opening Google sign-in…";
+ if(btn.disabled||riderLoginProcessing)return;
+ riderLoginProcessing=true;btn.disabled=true;status.textContent="Opening Google sign-in…";
  try{
    await setPersistence(auth,browserLocalPersistence);
-   const isAndroid=/Android/i.test(navigator.userAgent);
-   if(isAndroid){
-     // Redirect is more reliable than a popup inside Android Chrome/GitHub Pages.
-     await signInWithRedirect(auth,googleProvider);
-     return;
-   }
+   // Use popup first on Android/Chrome. If the browser blocks it, fall back to redirect.
    try{
      const result=await signInWithPopup(auth,googleProvider);
-     await afterLogin(result.user);return;
+     status.textContent="✅ Google sign-in successful. Checking rider account…";
+     await afterLogin(result.user);
+     return;
    }catch(popupErr){
-     console.warn("Google popup failed; using redirect",popupErr);
+     console.warn("Google popup failed; trying redirect",popupErr);
+     const code=popupErr?.code||"";
+     if(code==="auth/popup-closed-by-user"||code==="auth/cancelled-popup-request"){
+       status.textContent="Google sign-in was cancelled. Tap CONTINUE WITH GOOGLE again.";
+       return;
+     }
+     status.textContent="Opening secure Google sign-in…";
      await signInWithRedirect(auth,googleProvider);
    }
  }catch(e){
    console.error("Google sign-in:",e);
    const code=e?.code||"";let message=e?.message||String(e);
-   if(code==="auth/unauthorized-domain")message="GitHub Pages domain is not authorized in Firebase Authentication.";
+   if(code==="auth/unauthorized-domain")message="This GitHub Pages domain is not authorized in Firebase Authentication.";
    else if(code==="auth/operation-not-supported-in-this-environment")message="Google sign-in is not supported in this browser.";
    else if(code==="auth/network-request-failed")message="Network error. Check your internet connection.";
+   else if(code==="auth/invalid-api-key")message="Firebase API key is invalid.";
    status.innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
+ }finally{
+   riderLoginProcessing=false;
    btn.disabled=false;
  }
 }
 async function legacyLogin(){$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{const result=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);uid=result.user.uid;await afterLogin(result.user)}catch(e){$("loginStatus").innerHTML='<span class="error">❌ '+esc(e.message)+"</span>"}finally{$("loginBtn").disabled=false}}
 async function afterLogin(user){
+ if(riderAfterLoginRunning)return;
+ riderAfterLoginRunning=true;
  try{
    // A temporary/denied settings read must not throw the rider back to login.
    try{await loadHours()}catch(e){console.warn("Hours read skipped:",e)}
@@ -469,8 +478,10 @@ async function afterLogin(user){
       ?"Firebase denied creation/read of the rider profile. Firestore Rules must allow a signed-in rider to create/read only their own riders/{uid} document."
       :(e?.message||String(e));
    $("googleStatus").innerHTML='<span class="error">❌ Rider account check failed: '+esc(msg)+"</span>";
-   try{await signOut(auth)}catch(_){}
+   // Keep the signed-in Google session so the actual Firebase error remains visible.
    showLogin();
+ }finally{
+   riderAfterLoginRunning=false;
  }
 }
 async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||p.name||"RIDER"}
@@ -601,7 +612,7 @@ $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout")
 getRedirectResult(auth).then(async result=>{
   if(result?.user){
     $("googleStatus").textContent="✅ Google sign-in successful. Checking rider account…";
-    await afterLogin(result.user);
+    // onAuthStateChanged handles the signed-in user; avoid running afterLogin twice.
   }
 }).catch(e=>{
   console.error("Google redirect result:",e);
