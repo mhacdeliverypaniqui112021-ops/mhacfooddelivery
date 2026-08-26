@@ -1,5 +1,12 @@
-V4.1.36 RIDER LOGIN FLOW FIX
-- Popup-first Google login on Android/Chrome; redirect fallback.
-- Prevent duplicate afterLogin calls from redirect + auth state.
-- Do not sign out on Firestore/rider-profile errors; show the actual error.
-- UI unchanged.
+MHAC DELIVERY V4.1.36 — RIDER GOOGLE AUTH FLOW FIX
+
+FIXED:
+- Google sign-in now tries Firebase popup first on Android/Chrome.
+- Redirect remains as fallback when popup is blocked/unsupported.
+- Prevented duplicate afterLogin calls caused by popup/redirect + onAuthStateChanged racing.
+- Successful Google authentication is no longer silently signed out when rider profile checking fails.
+- Firebase error remains visible so the exact Firestore/Auth problem can be identified.
+- Preserved approved/final Rider UI, white background, call button, chat, orders, earnings and navigation.
+
+IMPORTANT:
+Deploy the included rider.html. If Firestore rules were changed, deploy the included firestore.rules as well.

@@ -1,16 +1,13 @@
-MHAC DELIVERY V4.1.35 — RIDER GOOGLE LOGIN FIX
+MHAC DELIVERY V4.1.36 RIDER FIX
 
-UPLOAD THE FILES FROM THIS FOLDER TO THE SAME GITHUB PAGES REPOSITORY.
+Upload/replace rider.html in the Rider App repository.
+Keep the existing mhac-logo.png and assets folder.
+If you manage Firestore rules from this package, deploy firestore.rules too.
 
-Main fix:
-- Fixed Rider App JavaScript syntax error before riderChatUnlockInstalled.
-- Removed obsolete LocalStorage Rider code from the bottom of rider.html.
-- Firebase Google Sign-In flow is preserved.
-- Admin + Customer UI are unchanged from the previous approved build.
-- Rider white/unified UI is preserved.
-
-After upload, clear/reload the Rider App and test:
-1. CONTINUE WITH GOOGLE
-2. Google account selection
-3. Rider approval check
-4. Rider dashboard
+TEST:
+1. Open Rider App.
+2. Tap CONTINUE WITH GOOGLE.
+3. Complete Google sign-in.
+4. Existing approved rider should enter dashboard.
+5. New rider should show RIDER ACCOUNT PENDING.
+6. Do not change the locked UI unless explicitly requested.

@@ -1,0 +1,15 @@
+MHAC DELIVERY V4.1.37 — RIDER ORDER ASSIGNMENT FIX
+
+FIXED:
+- Admin assignment now saves rider UID, rider email and rider name.
+- Rider app listens for both assignedRiderUid and assignedRiderEmail.
+- Existing UID assignments remain supported.
+- Older/legacy assignment data can still be detected when the email field exists.
+- Both listener streams are merged without duplicate orders.
+- Firestore rules allow an approved rider to access an order assigned to their UID or authenticated email.
+- Locked Rider UI was preserved.
+
+UPLOAD:
+1. rider.html
+2. admin.html
+3. firestore.rules

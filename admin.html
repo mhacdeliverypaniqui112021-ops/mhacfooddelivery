@@ -1476,7 +1476,18 @@ $("orders").onclick=async e=>{
    return;
  }
  const a=e.target.closest("[data-a]");
- if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u){toast("Select rider first.");return;}try{await updateDoc(doc(db,"orders",id),{assignedRiderUid:u,updatedAt:serverTimestamp()});toast("Order assigned.")}catch(x){toast(err(x))}return;}
+ if(a){const id=a.dataset.a,u=$("r-"+id).value;if(!u){toast("Select rider first.");return;}try{
+  const rr=riders.find(r=>(r.uid||r.id)===u)||{};
+  const current=orders.find(o=>o.id===id)||{};
+  await updateDoc(doc(db,"orders",id),{
+    assignedRiderUid:u,
+    assignedRiderEmail:(rr.email||"").trim().toLowerCase(),
+    assignedRiderName:rr.nickname||rr.name||rr.email||u,
+    status:String(current.status||"NEW").toUpperCase()==="NEW"?"ASSIGNED":(current.status||"ASSIGNED"),
+    updatedAt:serverTimestamp()
+  });
+  toast("Order assigned to "+(rr.nickname||rr.name||rr.email||"rider")+".");
+}catch(x){toast(err(x))}return;}
  const c=e.target.closest("[data-c]");
  if(c){c.disabled=true;try{await updateDoc(doc(db,"orders",c.dataset.c),{status:"COMPLETED",completedAt:serverTimestamp(),completedBusinessDay:businessDayKey(),updatedAt:serverTimestamp()});toast("Order completed.")}catch(x){c.disabled=false;toast(err(x))}}
 };

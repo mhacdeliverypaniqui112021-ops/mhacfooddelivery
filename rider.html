@@ -397,46 +397,40 @@ async function autoEnableRiderSound(){
    window.addEventListener("touchstart",unlock,{once:true,passive:true});
  }
 }
-let riderLoginProcessing=false, riderAfterLoginRunning=false;
 async function googleLogin(){
  const btn=$("googleBtn"),status=$("googleStatus");
- if(btn.disabled||riderLoginProcessing)return;
- riderLoginProcessing=true;btn.disabled=true;status.textContent="Opening Google sign-in…";
+ if(btn.disabled)return;
+ btn.disabled=true;status.textContent="Opening Google sign-in…";
  try{
    await setPersistence(auth,browserLocalPersistence);
-   // Use popup first on Android/Chrome. If the browser blocks it, fall back to redirect.
+   // Popup-first keeps Android Chrome on the same page and lets us immediately
+   // continue into the rider approval/dashboard flow. If popup is blocked or
+   // unsupported, fall back to Firebase redirect.
    try{
      const result=await signInWithPopup(auth,googleProvider);
-     status.textContent="✅ Google sign-in successful. Checking rider account…";
      await afterLogin(result.user);
      return;
    }catch(popupErr){
-     console.warn("Google popup failed; trying redirect",popupErr);
-     const code=popupErr?.code||"";
-     if(code==="auth/popup-closed-by-user"||code==="auth/cancelled-popup-request"){
-       status.textContent="Google sign-in was cancelled. Tap CONTINUE WITH GOOGLE again.";
-       return;
-     }
-     status.textContent="Opening secure Google sign-in…";
+     console.warn("Google popup failed; using redirect",popupErr);
      await signInWithRedirect(auth,googleProvider);
+     return;
    }
  }catch(e){
    console.error("Google sign-in:",e);
    const code=e?.code||"";let message=e?.message||String(e);
-   if(code==="auth/unauthorized-domain")message="This GitHub Pages domain is not authorized in Firebase Authentication.";
+   if(code==="auth/unauthorized-domain")message="GitHub Pages domain is not authorized in Firebase Authentication.";
    else if(code==="auth/operation-not-supported-in-this-environment")message="Google sign-in is not supported in this browser.";
    else if(code==="auth/network-request-failed")message="Network error. Check your internet connection.";
-   else if(code==="auth/invalid-api-key")message="Firebase API key is invalid.";
    status.innerHTML='<span class="error">❌ Google sign-in failed: '+esc(message)+"</span>";
- }finally{
-   riderLoginProcessing=false;
+ } finally {
    btn.disabled=false;
  }
 }
 async function legacyLogin(){$("loginBtn").disabled=true;$("loginStatus").textContent="Signing in…";try{const result=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);uid=result.user.uid;await afterLogin(result.user)}catch(e){$("loginStatus").innerHTML='<span class="error">❌ '+esc(e.message)+"</span>"}finally{$("loginBtn").disabled=false}}
 async function afterLogin(user){
- if(riderAfterLoginRunning)return;
- riderAfterLoginRunning=true;
+ if(!user)return;
+ if(authFlowBusy && authFlowUid===user.uid)return;
+ authFlowBusy=true; authFlowUid=user.uid;
  try{
    // A temporary/denied settings read must not throw the rider back to login.
    try{await loadHours()}catch(e){console.warn("Hours read skipped:",e)}
@@ -478,10 +472,11 @@ async function afterLogin(user){
       ?"Firebase denied creation/read of the rider profile. Firestore Rules must allow a signed-in rider to create/read only their own riders/{uid} document."
       :(e?.message||String(e));
    $("googleStatus").innerHTML='<span class="error">❌ Rider account check failed: '+esc(msg)+"</span>";
-   // Keep the signed-in Google session so the actual Firebase error remains visible.
+   // Keep the Google session alive so the real Firebase error remains visible.
+   // Do not silently sign the rider out; this made successful Google login look like it failed.
    showLogin();
- }finally{
-   riderAfterLoginRunning=false;
+ } finally {
+   authFlowBusy=false;
  }
 }
 async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||p.name||"RIDER"}
@@ -506,6 +501,7 @@ function render(arr){
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
+let authFlowBusy=false,authFlowUid="";
 async function playRiderChatAlert(){
   if(!soundReady||!soundCtx)return;
   try{
@@ -590,20 +586,51 @@ function syncRiderChatWatchers(active){
 function stopRiderChatWatchers(){for(const unsub of riderChatWatchers.values()){try{unsub()}catch(_){}}riderChatWatchers.clear();}
 
 function startOrdersListener(){
- if(unsub){unsub();unsub=null}
+ if(unsub){try{unsub()}catch(_){ }unsub=null}
  stopRiderChatWatchers();
- const q=query(collection(db,"orders"),where("assignedRiderUid","==",uid));
- unsub=onSnapshot(q,s=>{
-  const all=s.docs.map(d=>({id:d.id,...d.data()}));
-  const active=all.filter(o=>{const st=String(o.status||"").trim().toUpperCase();return st!=="COMPLETED"&&st!=="CANCELLED"&&st!=="CANCELED";});
-  const today=businessDayKey();
-  const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
-  const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0),sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
-  $("doneCount").textContent=done.length;$("myEarnings").textContent=peso(df);$("toRemit").textContent=peso(sf);
-  for(const o of active){if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}}
-  render(active);syncRiderChatWatchers(active);
-  $("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s")
- },e=>{$("conn").innerHTML='<span class="error">❌ Firebase error: '+esc(e.message)+"</span>"})
+
+ const riderEmail=(auth.currentUser?.email||"").trim().toLowerCase();
+ const buckets=new Map();
+ const listeners=[];
+
+ function paint(){
+   const all=[...buckets.values()];
+   const active=all.filter(o=>{
+     const st=String(o.status||"NEW").trim().toUpperCase();
+     return st!=="COMPLETED"&&st!=="CANCELLED"&&st!=="CANCELED";
+   });
+   const today=businessDayKey();
+   const done=all.filter(o=>String(o.status||"").toUpperCase()==="COMPLETED" && o.completedBusinessDay===today);
+   const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0);
+   const sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
+   $("doneCount").textContent=done.length;
+   $("myEarnings").textContent=peso(df);
+   $("toRemit").textContent=peso(sf);
+   for(const o of active){
+     if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
+   }
+   render(active);
+   syncRiderChatWatchers(active);
+   $("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
+ }
+
+ function watch(q){
+   return onSnapshot(q,snap=>{
+     snap.docs.forEach(d=>buckets.set(d.id,{id:d.id,...d.data()}));
+     paint();
+   },e=>{
+     $("conn").innerHTML='<span class="error">❌ Firebase order listener: '+esc(e.message)+"</span>";
+   });
+ }
+
+ listeners.push(watch(query(collection(db,"orders"),where("assignedRiderUid","==",uid))));
+ if(riderEmail){
+   listeners.push(watch(query(collection(db,"orders"),where("assignedRiderEmail","==",riderEmail))));
+ }
+
+ unsub=()=>{
+   for(const u of listeners){try{u()}catch(_){}}
+ };
 }
 
 function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(()=>{if(!riderOpen())lockRider()},30000)}async function lockRider(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}try{await signOut(auth)}catch(_){}showClosed()}
@@ -612,7 +639,7 @@ $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout")
 getRedirectResult(auth).then(async result=>{
   if(result?.user){
     $("googleStatus").textContent="✅ Google sign-in successful. Checking rider account…";
-    // onAuthStateChanged handles the signed-in user; avoid running afterLogin twice.
+    await afterLogin(result.user);
   }
 }).catch(e=>{
   console.error("Google redirect result:",e);
@@ -623,13 +650,14 @@ getRedirectResult(auth).then(async result=>{
 });
 onAuthStateChanged(auth,async user=>{
   if(!user){
+    authFlowBusy=false; authFlowUid="";
     if(unsub){unsub();unsub=null}
     $("app").classList.add("hidden");
     $("pending").classList.add("hidden");
     if($("closed").classList.contains("hidden"))$("login").classList.remove("hidden");
     return;
   }
-  if($("app").classList.contains("hidden")){
+  if($("app").classList.contains("hidden") && !authFlowBusy){
     try{await afterLogin(user)}catch(e){console.error("auth state afterLogin:",e)}
   }
 });

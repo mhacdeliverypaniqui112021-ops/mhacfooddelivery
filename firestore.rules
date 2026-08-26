@@ -44,12 +44,18 @@ service cloud.firestore {
 
       allow read:
         if isAdmin()
-        || (isApprovedRider() && resource.data.assignedRiderUid == request.auth.uid)
+        || (isApprovedRider() && (
+       resource.data.assignedRiderUid == request.auth.uid
+       || resource.data.assignedRiderEmail == request.auth.token.email
+     ))
         || (isSignedIn() && resource.data.customer.uid == request.auth.uid);
 
       allow update:
         if isAdmin()
-        || (isApprovedRider() && resource.data.assignedRiderUid == request.auth.uid);
+        || (isApprovedRider() && (
+       resource.data.assignedRiderUid == request.auth.uid
+       || resource.data.assignedRiderEmail == request.auth.token.email
+     ));
     }
 
     match /orders/{orderId}/messages/{messageId} {
