@@ -11,3 +11,8 @@ ADMIN FIXES
 
 DEPLOY
 Replace admin.html with this version. Firestore rules do not need to be changed again if V4.1.42 rules are already published.
+
+V4.1.45 FUNCTIONAL FIX
+- Fixed the missing loadAdminGcash() call after Admin authentication.
+- Saved GCash QR/number are now loaded from Firestore on every Admin login/refresh.
+- Existing Admin UI, banner, Store/Menu Manager, and Food Editor appearance are unchanged.

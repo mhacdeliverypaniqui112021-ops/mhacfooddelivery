@@ -2528,7 +2528,7 @@ getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{
  if(!u){stopAdminChatWatchers();if(ou){ou();ou=null}if(ru){ru();ru=null}loginView();return}
  if((u.email||"").toLowerCase()!==ADMIN_EMAIL){stopAdminChatWatchers();signOut(auth);loginView();return}
- appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadMenu();start();
+ appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();loadAdminGcash();loadMenu();start();
 });
 
 
