@@ -3020,4 +3020,14 @@ setTimeout(function(){
   }catch(_){}
 },4500);
 </script>
+<script>
+(function(){
+  const key=(location.pathname.split('/').pop()||'app')+'__mhac_earnings_day';
+  const day=()=>{const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+  function refreshDailyView(){ try { window.dispatchEvent(new Event('mhac:daily-day-check')); } catch(e) {} }
+  const start=day();
+  try { const last=localStorage.getItem(key); if(last!==start){ localStorage.setItem(key,start); refreshDailyView(); } }catch(e){}
+  setInterval(()=>{ const now=day(); try { const last=localStorage.getItem(key); if(last!==now){ localStorage.setItem(key,now); refreshDailyView(); location.reload(); } }catch(e){} },60000);
+})();
+</script>
 </body></html>
