@@ -2171,13 +2171,11 @@ function renderStores(){
    list.classList.toggle("hidden");
    if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
- // Publish/unpublish uses event delegation so taps remain reliable after
- // the store accordion is re-rendered. Existing editor/publish logic is unchanged.
- if(!host.dataset.publishDelegation){
-   host.dataset.publishDelegation="1";
-   host.addEventListener("click",async ev=>{
-     const b=ev.target.closest("[data-publish-store],[data-unpublish-store]");
-     if(!b || !host.contains(b)) return;
+ // V4.1.72: bind Publish/Unpublish directly after every Store Manager render.
+ // This avoids mobile/browser event-bubbling or stale-delegation issues.
+ // Existing publish/unpublish Firestore logic and business rules are unchanged.
+ host.querySelectorAll("[data-publish-store],[data-unpublish-store]").forEach(b=>{
+   b.onclick=async ev=>{
      ev.preventDefault();
      ev.stopPropagation();
      if(b.dataset.busy==="1")return;
@@ -2189,21 +2187,23 @@ function renderStores(){
      b.textContent=isUnpublish?"⏳ UNPUBLISHING...":"⏳ PUBLISHING...";
      selectedStore=si;
      try{
-       if(isUnpublish) await unpublishStore(si);
-       else await publishMenu();
+       const ok=isUnpublish ? await unpublishStore(si) : await publishMenu();
+       if(!ok && document.body.contains(b)){
+         b.dataset.busy="0"; b.disabled=false;
+         b.textContent=isUnpublish?"🔴 UNPUBLISH STORE":"📢 PUBLISH THIS STORE TO CUSTOMER APP";
+       }
      }catch(e){
        console.error("STORE PUBLISH ACTION FAILED",e);
        const msg=err(e);
        toast("❌ STORE ACTION FAILED: "+msg);
        alert("STORE ACTION FAILED\n\n"+msg);
-     }finally{
        if(document.body.contains(b)){
-         b.dataset.busy="0";
-         b.disabled=false;
+         b.dataset.busy="0"; b.disabled=false;
+         b.textContent=isUnpublish?"🔴 UNPUBLISH STORE":"📢 PUBLISH THIS STORE TO CUSTOMER APP";
        }
      }
-   });
- }
+   };
+ });
  saveDraftMenu();
 }
 function renderNestedFoods(si,ci,list){

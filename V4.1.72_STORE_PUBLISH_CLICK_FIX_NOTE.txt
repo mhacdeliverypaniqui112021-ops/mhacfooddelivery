@@ -1,0 +1,7 @@
+V4.1.72 STORE PUBLISH CLICK FIX
+
+Based on V4.1.71. Existing UI, business rules, Firebase auth, order flow, chat, rider flow and menu logic retained.
+
+Fix: Store Publish/Unpublish buttons are now bound directly after every Store Manager render instead of relying only on delegated click handling. This targets mobile taps where the button appears clickable but produces no response.
+
+No change to publish/unpublish Firestore logic. If Firebase denies the write, the button is restored and the actual error is shown.
