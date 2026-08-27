@@ -1,0 +1,6 @@
+MHAC DELIVERY V4.1.71 — DEEP CHECK SAFE REPAIR
+
+BASE: V4.1.68 GOOGLE AUTH FIX (full working build).
+ONLY CODE CHANGE: Admin Store/ Menu Publish + Unpublish button handling now uses event delegation so controls remain clickable after accordion/editor re-renders.
+Preserved: V4.1.68 Firebase Google Auth resolver fix, local auth persistence, Delivered-status behavior, Admin Complete flow, Customer/Rider files, Firestore rules, existing UI and business rules.
+IMPORTANT: Firestore rules are included in this ZIP but GitHub Pages upload does NOT deploy Firestore rules. If Rider still shows permission-denied, deploy the included firestore.rules to the Firebase project separately.
