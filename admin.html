@@ -2104,9 +2104,12 @@ function renderStores(){
    h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("[data-store-delete]")){e.preventDefault();toggle();} };
  });
 
- host.querySelectorAll("[data-store-save]").forEach(b=>{
+ host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
    const si=+b.dataset.storeSave, inp=host.querySelector(`[data-store="${si}"]`);
-   const n=inp.value.trim(); if(n)draft.stores[si].name=n;
+   const n=inp.value.trim();
+   if(!n)return;
+   draft.stores[si].name=n;
+   saveDraftMenu();
    renderStores();
  });
  host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=async()=>{

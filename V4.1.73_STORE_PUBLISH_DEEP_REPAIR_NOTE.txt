@@ -1,0 +1,11 @@
+MHAC DELIVERY V4.1.73 — STORE PUBLISH DEEP REPAIR
+
+Root cause found in V4.1.72 admin.html:
+The data-store-save render binding executed renderStores() immediately during render instead of assigning it as an onclick handler. This could recurse/re-render before the later publish/unpublish handlers were bound, leaving Publish/Unpublish buttons visually clickable but with no response.
+
+Repair:
+- data-store-save now uses b.onclick = ...
+- save only runs when the user clicks SAVE STORE NAME
+- publish/unpublish direct bindings remain intact
+- UI and business rules unchanged
+- customer.html, rider.html, index.html, firestore.rules retained from V4.1.72
