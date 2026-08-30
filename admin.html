@@ -1409,7 +1409,7 @@ window.setTimeout(function(){
 <input id="adminGcashQr" type="file" accept="image/*">
 <div class="small">Saved QR stays in Firebase after refresh. The file picker itself resets automatically for security.</div>
 <img id="adminGcashQrPreview" class="hidden" alt="GCash QR preview">
-<div class="row"><button id="saveGcashSettings" class="blue">SAVE GCASH SETTINGS</button><button id="removeGcashQr" class="gray">REMOVE QR</button></div>
+<div class="row"><button id="saveGcashSettings" class="blue">SAVE GCASH SETTINGS</button><button id="removeGcashQr" class="gray">HIDE QR</button></div>
 <p id="gcashSettingsStatus" class="status"></p>
 </div></div>
 <div class="card" id="businessTimeCard">
@@ -1659,21 +1659,21 @@ $("googleBtn").onclick=async()=>{try{await setPersistence(auth,browserLocalPersi
 $("logout").onclick=()=>signOut(auth);
 
 
-let adminGcash={number:"",qrUrl:""};
+let adminGcash={number:"",qrUrl:"",qrHidden:false};
 const GCASH_LOCAL_KEY="mhac_gcash_settings_v432";
 function saveGcashLocal(){
   try{localStorage.setItem(GCASH_LOCAL_KEY,JSON.stringify(adminGcash));}catch(_){}
 }
 function loadGcashLocal(){
-  try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||"")};}catch(_){}
-  return {number:"",qrUrl:""};
+  try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||""),qrHidden:!!x.qrHidden};}catch(_){}
+  return {number:"",qrUrl:"",qrHidden:false};
 }
 function showGcashSettings(){
   $("adminGcashNumber").value=adminGcash.number||"";
   // The browser file input MUST reset after refresh for security, but the saved
   // QR itself must remain visible from Firebase/local backup.
   const preview=$("adminGcashQrPreview");
-  if(adminGcash.qrUrl){
+  if(adminGcash.qrUrl && !adminGcash.qrHidden){
     preview.src=adminGcash.qrUrl;
     preview.classList.remove("hidden");
   }else{
@@ -1691,7 +1691,8 @@ async function loadAdminGcash(){
       // can never make the QR disappear after an Admin refresh.
       const firebaseData={
         number:String(d.gcashNumber||d.number||local.number||""),
-        qrUrl:String(d.gcashQrUrl||d.gcashQr||d.qrUrl||local.qrUrl||"")
+        qrUrl:String(d.gcashQrUrl||d.gcashQr||d.qrUrl||local.qrUrl||""),
+        qrHidden:!!d.gcashQrHidden
       };
       adminGcash=firebaseData;
       saveGcashLocal();
@@ -1728,7 +1729,7 @@ function readImageAsDataUrl(file,maxSize=500){
 }
 $("adminGcashQr").onchange=()=>{
   const f=$("adminGcashQr").files?.[0]; if(!f)return;
-  readImageAsDataUrl(f).then(u=>{if(u){$("adminGcashQrPreview").src=u;$("adminGcashQrPreview").classList.remove("hidden")}}).catch(()=>{});
+  readImageAsDataUrl(f).then(u=>{if(u){adminGcash.qrUrl=u;adminGcash.qrHidden=false;$("adminGcashQrPreview").src=u;$("adminGcashQrPreview").classList.remove("hidden")}}).catch(()=>{});
 };
 $("saveGcashSettings").onclick=async()=>{
   const btn=$("saveGcashSettings"); btn.disabled=true;
@@ -1738,18 +1739,19 @@ $("saveGcashSettings").onclick=async()=>{
     let qrUrl=adminGcash.qrUrl||"";
     if(f)qrUrl=await readImageAsDataUrl(f);
     if(qrUrl && qrUrl.length>900000) throw new Error("GCash QR image is too large. Please choose a smaller image.");
-    adminGcash={number,qrUrl};
+    adminGcash={number,qrUrl,qrHidden:false};
     saveGcashLocal();
-    await withTimeout(setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,updatedAt:serverTimestamp()},{merge:true}),10000,"Saving GCash settings");
+    await withTimeout(setDoc(doc(db,"settings","payment"),{gcashNumber:number,gcashQrUrl:qrUrl,gcashQrHidden:false,updatedAt:serverTimestamp()},{merge:true}),10000,"Saving GCash settings");
     // Verify the actual Firestore document before reporting success.
     const verify=await withTimeout(getDoc(doc(db,"settings","payment")),10000,"Verifying GCash settings");
     const vd=verify.data()||{};
     const savedQr=String(vd.gcashQrUrl||vd.gcashQr||vd.qrUrl||"");
     const savedNumber=String(vd.gcashNumber||"");
+    const savedHidden=!!vd.gcashQrHidden;
     if(savedNumber!==number || (qrUrl && savedQr!==qrUrl)){
       throw new Error("Firebase saved data could not be verified after write.");
     }
-    adminGcash={number:savedNumber,qrUrl:savedQr};
+    adminGcash={number:savedNumber,qrUrl:savedQr,qrHidden:savedHidden};
     saveGcashLocal();
     showGcashSettings();
     $("gcashSettingsStatus").textContent="✅ GCASH SAVED TO FIREBASE — customer app updated.";
@@ -1761,9 +1763,11 @@ $("saveGcashSettings").onclick=async()=>{
   }finally{btn.disabled=false}
 };
 $("removeGcashQr").onclick=async()=>{
-  adminGcash.qrUrl="";saveGcashLocal();showGcashSettings();
-  try{await setDoc(doc(db,"settings","payment"),{gcashQrUrl:"",updatedAt:serverTimestamp()},{merge:true})}catch(_){}
-  $("gcashSettingsStatus").textContent="✅ QR removed.";
+  if(!adminGcash.qrUrl){$("gcashSettingsStatus").textContent="ℹ️ No saved QR code yet.";return;}
+  adminGcash.qrHidden=true;saveGcashLocal();showGcashSettings();
+  $("removeGcashQr").textContent="HIDE QR";
+  try{await setDoc(doc(db,"settings","payment"),{gcashQrHidden:true,updatedAt:serverTimestamp()},{merge:true})}catch(_){}
+  $("gcashSettingsStatus").textContent="✅ QR hidden. Click SAVE GCASH SETTINGS to show it again — no re-upload needed.";
 };
 
 function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}

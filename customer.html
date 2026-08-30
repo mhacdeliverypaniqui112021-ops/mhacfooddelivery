@@ -888,7 +888,7 @@ const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:bro
 setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Customer auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 const TEST_MODE=false;let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null,menuUnsub=null;
-let gcashSettings={number:"",qrUrl:""},gcashSettingsUnsub=null;
+let gcashSettings={number:"",qrUrl:"",qrHidden:false},gcashSettingsUnsub=null;
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function isOpen(){if(TEST_MODE)return true;if(businessHours.manualClosed===true)return false;if(businessHours.enabled===false)return false;const n=new Date(),c=n.getHours()*60+n.getMinutes(),o=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return o<=cl?c>=o&&c<cl:(c>=o||c<cl)}
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
@@ -913,18 +913,18 @@ function saveGcashLocal(){
   try{localStorage.setItem(GCASH_LOCAL_KEY,JSON.stringify(gcashSettings));}catch(_){}
 }
 function loadGcashLocal(){
-  try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||"")};}catch(_){}
-  return {number:"",qrUrl:""};
+  try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||""),qrHidden:!!x.qrHidden};}catch(_){}
+  return {number:"",qrUrl:"",qrHidden:false};
 }
 function renderGcashSettings(){
   $("gcashNumberDisplay").textContent=gcashSettings.number||"GCash number not set yet.";
-  if(gcashSettings.qrUrl){$("gcashQrDisplay").src=gcashSettings.qrUrl;$("gcashQrDisplay").classList.remove("hidden")}
+  if(gcashSettings.qrUrl && !gcashSettings.qrHidden){$("gcashQrDisplay").src=gcashSettings.qrUrl;$("gcashQrDisplay").classList.remove("hidden")}
   else{$("gcashQrDisplay").classList.add("hidden");$("gcashQrDisplay").src=""}
 }
 function startGcashSettingsWatch(){
   if(gcashSettingsUnsub)gcashSettingsUnsub();
   gcashSettingsUnsub=onSnapshot(doc(db,"settings","payment"),s=>{
-    gcashSettings=s.exists()?{number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||"")}:loadGcashLocal();
+    gcashSettings=s.exists()?{number:String(s.data().gcashNumber||""),qrUrl:String(s.data().gcashQrUrl||""),qrHidden:!!s.data().gcashQrHidden}:loadGcashLocal();
     saveGcashLocal();renderGcashSettings();
   },e=>{
     // Do not break checkout if the payment settings read is denied.
