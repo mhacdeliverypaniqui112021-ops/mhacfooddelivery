@@ -1427,6 +1427,40 @@ button{font-size:17px!important;min-height:48px!important;line-height:1.2!import
 .foodLineMain{font-size:19px!important}
 @media(max-width:600px){body{font-size:17px!important}.small,.status,.hint{font-size:15px!important}.storeBox b{font-size:18px!important}}
 </style>
+
+<style id="MHAC_FINAL_READABILITY_CLEANUP">
+/* FINAL CLEANUP: compact admin order preview, readable text, reduced vertical space */
+#orders .orderInfo> .row{margin-bottom:2px!important}
+#orders .orderInfo>h3{font-size:19px!important;font-weight:700!important;line-height:1.15!important;margin:4px 0!important}
+#orders .orderInfo>p{font-size:15px!important;font-weight:500!important;line-height:1.3!important}
+#orders .adminOrderPreview{display:none!important}
+#orders .order{padding:9px!important;margin:6px 0!important}
+#orders .orderActions{gap:5px!important}
+#orders .orderActions button,#orders .orderActions select{font-size:13px!important}
+#metrics{gap:6px!important}
+#metrics .metric{min-height:58px!important;padding:7px!important}
+#metrics .metric span{font-size:12px!important;font-weight:500!important}
+#metrics .metric b{font-size:19px!important;font-weight:800!important}
+#riderAccounting{margin-top:4px!important}
+#riderAccounting h3{font-size:15px!important;margin:4px 0!important}
+#riderAccounting .item{padding:6px!important;margin:4px 0!important;font-size:13px!important}
+.gcSettings{padding:7px!important;border-radius:9px!important}
+.gcSettings .label{font-size:13px!important;font-weight:700!important}
+.gcSettings input{min-height:34px!important;padding:6px 8px!important;margin:2px 0 5px!important;font-size:15px!important}
+.gcSettings .small,.gcSettings .status{font-size:13px!important;line-height:1.25!important}
+.gcSettings .row{gap:6px!important}
+.gcSettings .row button{min-height:34px!important;font-size:12px!important;padding:6px 8px!important}
+#adminGcashQrPreview{max-width:120px!important;max-height:120px!important;margin:6px auto!important}
+@media(max-width:700px){
+ #metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #metrics .metric{min-height:56px!important;padding:6px!important}
+ #metrics .metric span{font-size:11px!important}
+ #metrics .metric b{font-size:18px!important}
+ .gcSettings .row{grid-template-columns:1fr 1fr!important}
+ #orders .orderInfo>h3{font-size:18px!important}
+ #orders .orderInfo>p{font-size:14px!important}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1863,9 +1897,7 @@ function renderOrders(){
     <div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div>
     <h3>${esc(o.customer?.name||"")}</h3>
     <p>📞 ${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
-    <p><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
     <div>${String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<span class="paymentBadge ${String(o.paymentStatus||"PENDING").toLowerCase()==="received"?"received":"pending"}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>${o.paymentScreenshotUrl?` <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}`:`<span class="paymentBadge cod">💵 CASH ON DELIVERY</span>`}</div>
-    <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}${i.choiceGroups?.length?i.choiceGroups.map(g=>`<br><span>${esc(g.group)}: ${g.options.map(esc).join(", ")}</span>`).join(""):""}</div>`}).join("")}</div>`).join("")})()}</div>
     </div><div class="orderActions"><button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
     <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>

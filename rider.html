@@ -546,6 +546,19 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .sound .status{font-size:14px!important}
 @media(max-width:600px){body{font-size:17px!important}.order h2,.riderCustomerName{font-size:24px!important}.riderFoodName{font-size:18px!important}.riderChoice,.riderParts{font-size:16px!important}.riderActionTop .nav,.riderActionTop button,.riderActionBottom button{font-size:15px!important}}
 </style>
+
+<style id="MHAC_FINAL_ORDER_READABILITY">
+/* FINAL: readable order text without increasing overall card footprint */
+.activeOrderDetails,.riderFoodName{font-size:16px!important;font-weight:500!important;line-height:1.3!important}
+.activeOrderLine b,.riderFoodName>b{font-size:17px!important;font-weight:800!important;line-height:1.25!important}
+.activeOrderLine .small,.riderChoice,.riderParts{font-size:15px!important;font-weight:500!important;line-height:1.25!important}
+.orderCard,.riderOrderGroup{padding:7px!important}
+@media(max-width:600px){
+ .activeOrderDetails,.riderFoodName{font-size:16px!important}
+ .activeOrderLine b,.riderFoodName>b{font-size:17px!important}
+ .activeOrderLine .small,.riderChoice,.riderParts{font-size:15px!important}
+}
+</style>
 </head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">
