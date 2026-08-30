@@ -4,7 +4,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#fff;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.brandName,.appName{display:block;text-align:center;line-height:1.05}.brandName{font-size:30px}.appName{font-size:30px}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}.pubState{font-size:12px;font-weight:900;text-align:center;padding:7px;border-radius:9px;margin-bottom:5px}.pubState.published{background:#e8f7ed;color:#138a36}.pubState.draft{background:#fff7d6;color:#8a6500}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#fff;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}main{max-width:950px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,textarea,select,button{width:100%;padding:11px;margin:5px 0;border-radius:10px;font-size:14px}input,textarea,select{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900}.red{background:#e21d25}.green{background:#138a36}.blue{background:#1976d2}.gray{background:#666}.hidden{display:none!important}.status{color:#666;font-size:13px}.error{color:#c62828;font-weight:800}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.order,.item,.storeBox{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{display:inline-block;padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{background:#111;color:#fff;border-radius:14px;padding:14px}.metric b{display:block;font-size:25px}.storeBox{cursor:pointer;background:#fff}.storeBox.selected{border-color:#e21d25}.small{font-size:12px;color:#666}.brandName,.appName{display:block;text-align:center;line-height:1.05}.brandName{font-size:30px}.appName{font-size:30px}.danger{background:#8b0000}.line{white-space:pre-wrap}.foodCard{border:2px solid #ddd;border-radius:14px;padding:13px;margin:10px 0;background:#fff}.foodTitle{font-size:17px;font-weight:900}.editorBox{margin-top:10px;padding:12px;border:2px solid #1976d2;border-radius:12px;background:#f7fbff}.label{display:block;font-size:12px;font-weight:900;margin-top:6px}.hint{font-size:11px;color:#666;line-height:1.35}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniBtn{width:auto!important;padding:9px 12px!important;display:inline-block;margin-right:5px}.publishBar{position:sticky;bottom:8px;z-index:5;background:#fff;padding:8px;border:2px solid #138a36;border-radius:14px;margin-top:12px}.photoThumb{width:120px;height:120px;object-fit:cover;border:2px solid #222;border-radius:12px;background:#f3f3f3;display:block}.photoRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}.photoRow input[type=file]{max-width:100%;padding:8px}.photoHint{font-size:11px;color:#666}.storePhotoPreview{width:120px;height:120px;object-fit:cover;border-radius:12px;border:2px solid #222;background:#f3f3f3}.pubState{font-size:12px;font-weight:900;text-align:center;padding:7px;border-radius:9px;margin-bottom:5px}.pubState.published{background:#e8f7ed;color:#138a36}.pubState.draft{background:#fff7d6;color:#8a6500}
 
 /* FINAL COMPACT RIDERS */
 #riders .riderCompact{padding:8px 10px!important;margin:5px 0!important;border-radius:10px!important}
@@ -1985,6 +1985,7 @@ $('addStore').onclick=async()=>{
 function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base;}
 function normalizeMenu(x){
  const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));
+ ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
  m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
@@ -2029,6 +2030,13 @@ function renderPublishButton(si){
  }
  return '<div class="pubState draft">🟡 DRAFT — NOT VISIBLE TO CUSTOMER</div><button type="button" class="green" data-publish-store="'+si+'">📢 PUBLISH THIS STORE TO CUSTOMER APP</button>';
 }
+function photoSvgData(name,type="food"){
+ const n=String(name||type||"Photo").trim().slice(0,24),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="14" fill="${bg}"/><text x="60" y="55" text-anchor="middle" font-size="36">${emoji}</text><text x="60" y="91" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
+function ensureGeneratedPhotos(menuObj){(menuObj?.stores||[]).forEach(st=>{if(!st.photo)st.photo=photoSvgData(st.name,"store");(st.categories||[]).forEach(c=>(c.items||[]).forEach(f=>{if(!f.photo)f.photo=photoSvgData(f.name,"food")}))});return menuObj;}
+function compressPhoto(file,max=120){return new Promise((resolve,reject)=>{if(!file)return resolve("");const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const side=Math.min(im.naturalWidth,im.naturalHeight),sx=(im.naturalWidth-side)/2,sy=(im.naturalHeight-side)/2,c=document.createElement("canvas");c.width=max;c.height=max;c.getContext("2d").drawImage(im,sx,sy,side,side,0,0,max,max);resolve(c.toDataURL("image/jpeg",0.78))};im.onerror=reject;im.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
 function renderStores(){
  const host=$("stores");
  host.innerHTML=(draft.stores||[]).map((st,si)=>`
@@ -2040,6 +2048,7 @@ function renderStores(){
    <div class="storeInner storeCollapsed">
     <label class="label">🏪 STORE NAME</label>
     <input class="storeNameInline" data-store="${si}" value="${esc(st.name)}" placeholder="Store name">
+    <div class="photoRow"><img class="storePhotoPreview" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><div><b>🏪 STORE PHOTO</b><div class="photoHint">Automatic 120×120 crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="storePhotoInput" data-store-photo="${si}"></div></div>
     <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
 
     <div class="storeCategories">
@@ -2108,13 +2117,15 @@ function renderStores(){
    h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("[data-store-delete]")){e.preventDefault();toggle();} };
  });
 
- host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=()=>{
+ host.querySelectorAll("[data-store-save]").forEach(b=>b.onclick=async()=>{
    const si=+b.dataset.storeSave, inp=host.querySelector(`[data-store="${si}"]`);
    const n=inp.value.trim();
    if(!n)return;
    draft.stores[si].name=n;
-   saveDraftMenu();
-   renderStores();
+   const fi=host.querySelector(`.storePhotoInput[data-store-photo="${si}"]`);
+   if(fi?.files?.[0]){try{draft.stores[si].photo=await compressPhoto(fi.files[0]);}catch(e){toast("Store photo failed: "+e.message);return;}}
+   if(!draft.stores[si].photo)draft.stores[si].photo=photoSvgData(n,"store");
+   await saveDraftMenu(); renderStores();
  });
  host.querySelectorAll("[data-store-delete]").forEach(b=>b.onclick=async()=>{
    if(b.dataset.busy==="1")return;
@@ -2375,6 +2386,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      <label class="label">🍽️ FOOD NAME</label>
      <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
    </div>
+   <div class="photoRow"><img class="photoThumb" src="${esc(it.photo||photoSvgData(it.name,"food"))}" alt="Food photo"><div><b>🍗 FOOD PHOTO</b><div class="photoHint">Automatic 120×120 crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="foodPhotoInput"></div></div>
    <div class="copyPasteRow foodNameCopyRow">
      <button type="button" class="blue smallBtn copyFoodName">📋 COPY FOOD NAME</button>
      <button type="button" class="blue smallBtn pasteFoodName">📥 PASTE FOOD NAME</button>
@@ -2626,7 +2638,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  };
  ed.querySelector(".pasteAddons").onclick=()=>foodClipboard.addOns.forEach(x=>addAddonRow(x[0],x[1]));
 
- ed.querySelector(".saveDirectFood").onclick=()=>{
+ ed.querySelector(".saveDirectFood").onclick=async()=>{
    const name=ed.querySelector(".foodNameEdit").value.trim();
    const price=Number(ed.querySelector(".foodPriceEdit").value);
    if(!name||!Number.isFinite(price)||price<0)return toast("Enter food name and valid price.");
@@ -2634,6 +2646,9 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    const categoryName=ed.querySelector(".categoryNameInFoodEdit").value.trim();
    if(categoryName)c.name=categoryName;
    it.name=name;it.price=price;it.available=ed.querySelector(".availability").value==="true";
+   const photoInput=ed.querySelector(".foodPhotoInput");
+   if(photoInput?.files?.[0]){try{it.photo=await compressPhoto(photoInput.files[0]);}catch(e){toast("Food photo failed: "+e.message);return;}}
+   if(!it.photo)it.photo=photoSvgData(name,"food");
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};
    it.spicyPrice=ed.querySelector(".spicyPrice")?Number(ed.querySelector(".spicyPrice").value||0):0;
    it.chickenParts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
