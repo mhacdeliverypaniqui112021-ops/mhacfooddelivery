@@ -844,6 +844,17 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 .activeOrderItemPhoto{width:30px!important;height:30px!important;object-fit:cover!important;border-radius:6px!important;border:1px solid #222!important;vertical-align:middle!important;margin-right:6px!important;}
 .choiceGroupCustomer{background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important;padding:8px!important;margin:8px 0!important;}
 .choiceGroupCustomer h4{margin:0 0 4px!important;}
+/* FINAL ORDER / STORE FLOW V2 */
+.title,.cart>h2{text-align:center!important}
+.storeBtnContent span:last-child{font-size:17px!important;font-weight:900!important}
+.storeBtnContent{justify-content:flex-start!important}
+.activeOrderDetails{font-size:17px!important;line-height:1.35!important}
+.activeOrderLine{padding:8px 0!important;border-bottom:1px solid #eee!important}
+.activeOrderLine:last-child{border-bottom:0!important}
+.activeOrderLine b{font-size:18px!important;font-weight:800!important}
+.activeOrderItemPhoto{display:none!important}
+.orderChatBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
+@media(max-width:600px){.store{min-height:54px!important;padding:8px!important}.storeBtnContent span:last-child{font-size:16px!important}.activeOrderDetails{font-size:16px!important}.activeOrderLine b{font-size:17px!important}}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -852,9 +863,9 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 <header><div class="logo">MHAC DELIVERY</div><div class="appName">CUSTOMER APP</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
 <div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px;display:none">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status">🔊 AUTOMATIC CHAT SOUND — preparing…</div></div>
-<main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">🍽️ Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
+<main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
 <section class="cart"><div class="cartHeader"><h2>🛒 YOUR CART <span id="count" style="font-size:14px">0</span></h2><button id="addMoreOrderBtn" class="addOrderBtn" onclick="window.scrollTo({top:document.querySelector('.title')?.offsetTop||0,behavior:'smooth'})">＋ ADD ORDER</button></div><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
-<section class="cart"><h2>📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
+<section class="cart"><h2 style="text-align:center">📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
 
 <audio id="chatAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
 <div id="customerChatPanel" class="customerChatPanel" style="display:none">
@@ -967,13 +978,13 @@ function photoSvgData(name,type="food"){
 }
 function renderStores(){
  const published=(data.stores||[]).filter(s=>s.published!==false);
- $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})"><span class="storeBtnContent"><img class="menuPhoto" src="${esc(s.photo||photoSvgData(s.name,"store"))}" alt="${esc(s.name)}"> <span>${s.icon||"🍽️"} ${esc(s.name)}</span></span></button>`).join("");
+ $("stores").innerHTML=published.map((s,i)=>`<button class=store onclick="openStore(${i})"><span class="storeBtnContent"><img class="menuPhoto" src="${esc(s.photo||photoSvgData(s.name,"store"))}" alt="${esc(s.name)}"> <span>${esc(s.name)}</span></span></button>`).join("");
  if(!published.length) $("stores").innerHTML='<div class="small">No published food stores available right now.</div>';
 }
 function openStore(si){
  const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si];
- let h=`<button class=back onclick="closeMenu()">← STORES</button><h2>${s.icon||"🍽️"} ${esc(s.name)}</h2>`;
+ let h=`<button class=back onclick="closeMenu()">← STORES</button><h2>${esc(s.name)}</h2>`;
  h+=`<div class="catTabs">${(s.categories||[]).map((c,i)=>`<button class="catTab ${i===0?"active":""}" onclick="openCat(${si},${i})">${esc(c.name)}</button>`).join("")}</div>`;
  if((s.categories||[]).length) h+=`<div class=small>Select a category above.</div>`;
  $("menuBody").innerHTML=h;
@@ -1127,7 +1138,7 @@ function renderCart(){
    const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);
    return `<div class="cartLine">
      <div class="cartStore">${esc(x.store)}</div>
-     <div class="cartItemWithPhoto"><img class="cartPhoto" src="${esc(x.photo||photoSvgData(x.name,"food"))}" alt="${esc(x.name)}"><div class="cartFood">${x.qty}x ${esc(x.name)}${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div></div>
+     <div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div>
      ${drinkParts.length?`<div class="cartDrinks">Drinks / Choices</div><div>${drinkParts.map(esc).join(", ")}</div>`:""}
      <div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div>
    </div>`;
@@ -1333,7 +1344,7 @@ function startOrders(){
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const choices=[];if(i.choice)choices.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)choices.push(`Bucket: ${esc(i.bucketChoice)}`);if(i.addOns?.length)choices.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);if(parts)choices.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>choices.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));return `<div class="activeOrderLine"><img class="activeOrderItemPhoto" src="${esc(i.photo||photoSvgData(i.name,"food"))}"><b>${esc(i.store)}</b> — ${esc(i.name)} ×${Math.max(1,Number(i.qty||1))}${choices.length?`<div class="small">${choices.join(" • ")}</div>`:""}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
       ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
       ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;

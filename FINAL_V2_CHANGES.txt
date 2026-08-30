@@ -1,0 +1,16 @@
+MHAC DELIVERY V4.1.74 FINAL V2 CLEANUP
+
+- Customer Choose Food Store remains 2-column compact flow.
+- Store photo display: 30x30.
+- Plate/food emoji removed from store-name rows.
+- CHOOSE FOOD STORE and MY ACTIVE ORDERS headings centered.
+- Customer Cart order list has no food photos.
+- Customer Active Orders have no food photos and show full selected choices.
+- Admin and Rider order lists have no food photos.
+- Admin/Rider/Customer order text made more readable while preserving compact spacing.
+- Customer name in Admin/Rider order cards made less heavy.
+- Chat buttons/panels use white background with dark text.
+- Food Editor choice fields have more readable/larger editing space without changing the overall layout.
+- Rider order rendering now also supports custom choice groups (e.g. Fries Size, Drinks).
+- Manual photo upload remains the source of original photos; compact displays use 30x30.
+- Existing QR Show/Hide behavior and working baseline flows preserved.

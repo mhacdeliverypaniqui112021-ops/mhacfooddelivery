@@ -14,17 +14,17 @@
 #riders .riderCompact .pill{font-size:8px;padding:4px 7px;margin-left:auto}
 #riders .riderApprove{width:auto!important;padding:7px 10px!important;font-size:12px!important;margin:5px 0 0!important}
 
-.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
-.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 48px;gap:8px;margin:9px 0;align-items:center}
+.choiceRow input{min-width:0;min-height:50px!important;font-size:17px!important;padding:11px 12px!important}.choiceRow button{margin:0!important;padding:10px!important;min-height:50px!important}
 
 .foodEditorWrap{border:2px solid #222;border-radius:18px;padding:12px;margin:14px 0;background:#fff}
 .foodBoxHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
 .foodBoxHeader .miniBtn{width:auto!important;margin:0!important;padding:9px 12px!important;font-size:13px!important}
 .storeFoodBox{padding:14px!important}
 .storeFoodBox h3{margin:8px 0 12px}
-.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
-.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
-@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 48px;gap:8px;margin:9px 0;align-items:center}
+.choiceRow input{min-width:0;min-height:50px!important;font-size:17px!important;padding:11px 12px!important}.choiceRow button{margin:0!important;padding:10px!important;min-height:50px!important}
+@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 100px 46px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
 
 /* V1.9 mobile food editor readability */
 .foodBoxHeader{display:block!important}
@@ -338,17 +338,17 @@ button.danger,.danger{
 .mhacLoader i{display:block;height:100%;width:45%;background:#e21d25;animation:mhacLoad 1.4s infinite}
 @keyframes mhacIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes mhacLoad{0%{transform:translateX(-150%)}50%{transform:translateX(120%)}100%{transform:translateX(300%)}}
 
-.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
-.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 48px;gap:8px;margin:9px 0;align-items:center}
+.choiceRow input{min-width:0;min-height:50px!important;font-size:17px!important;padding:11px 12px!important}.choiceRow button{margin:0!important;padding:10px!important;min-height:50px!important}
 
 .foodEditorWrap{border:2px solid #222;border-radius:18px;padding:12px;margin:14px 0;background:#fff}
 .foodBoxHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
 .foodBoxHeader .miniBtn{width:auto!important;margin:0!important;padding:9px 12px!important;font-size:13px!important}
 .storeFoodBox{padding:14px!important}
 .storeFoodBox h3{margin:8px 0 12px}
-.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 46px;gap:7px;margin:7px 0;align-items:center}
-.choiceRow input{min-width:0}.choiceRow button{margin:0!important;padding:10px!important}
-@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 92px 42px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
+.choiceRow{display:grid;grid-template-columns:minmax(0,1fr) 105px 48px;gap:8px;margin:9px 0;align-items:center}
+.choiceRow input{min-width:0;min-height:50px!important;font-size:17px!important;padding:11px 12px!important}.choiceRow button{margin:0!important;padding:10px!important;min-height:50px!important}
+@media(max-width:430px){.choiceRow{grid-template-columns:minmax(0,1fr) 100px 46px}.foodBoxHeader{align-items:flex-start}.foodBoxHeader b{font-size:16px}}
 
 /* V1.9 mobile food editor readability */
 .foodBoxHeader{display:block!important}
@@ -1389,7 +1389,17 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 .chatPanel,.chatHead,.chatMessages,.chatInput{background:#fff!important;color:#111!important;}
 .chatHead{border-bottom:1px solid #ddd!important;}
 .chatMsg.admin,.chatMsg.customer,.chatMsg.rider{background:#fff!important;color:#111!important;border:1px solid #ddd!important;}
-.orderInfo h3,.order h3{font-weight:700!important;font-size:18px!important;}
+.orderInfo h3,.order h3{font-weight:600!important;font-size:22px!important;}
+/* FINAL V2 ORDER / EDITOR / CHAT */
+.chatOpenBtn,.riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
+.orderInfo h3,.order h3{font-weight:600!important;font-size:22px!important}
+.adminOrderPreview,.orderInfo{font-size:17px!important;line-height:1.4!important}
+.adminOrderPreview b{font-size:18px!important}
+.orderInfo h3{margin:8px 0!important}
+.foodEditorWrap,.oneFoodBox,.editorBox{padding:18px!important}
+.choiceGroupEditor{padding:12px!important}
+.choiceGroupEditor input{min-height:50px!important;font-size:17px!important;padding:11px 12px!important}
+.choiceGroupEditor .editorRow{gap:8px!important;margin:8px 0!important}
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
@@ -2057,7 +2067,7 @@ function renderStores(){
    <div class="storeInner storeCollapsed">
     <label class="label">🏪 STORE NAME</label>
     <input class="storeNameInline" data-store="${si}" value="${esc(st.name)}" placeholder="Store name">
-    <div class="photoRow"><img class="storePhotoPreview" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><div><b>🏪 STORE PHOTO</b><div class="photoHint">Automatic 30×30 display crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="storePhotoInput" data-store-photo="${si}"></div></div>
+    <div class="photoRow"><img class="storePhotoPreview" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><div><b>🏪 STORE PHOTO</b><div class="photoHint">Manual upload. Photo displays at 30×30 in compact lists.</div><input type="file" accept="image/*" class="storePhotoInput" data-store-photo="${si}"></div></div>
     <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
 
     <div class="storeCategories">
@@ -2395,7 +2405,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      <label class="label">🍽️ FOOD NAME</label>
      <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
    </div>
-   <div class="photoRow"><img class="photoThumb" src="${esc(it.photo||photoSvgData(it.name,"food"))}" alt="Food photo"><div><b>🍗 FOOD PHOTO</b><div class="photoHint">Automatic 30×30 display crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="foodPhotoInput"></div></div>
+   <div class="photoRow"><img class="photoThumb" src="${esc(it.photo||photoSvgData(it.name,"food"))}" alt="Food photo"><div><b>🍗 FOOD PHOTO</b><div class="photoHint">Manual upload. Photo displays at 30×30 in compact lists.</div><input type="file" accept="image/*" class="foodPhotoInput"></div></div>
    <div class="copyPasteRow foodNameCopyRow">
      <button type="button" class="blue smallBtn copyFoodName">📋 COPY FOOD NAME</button>
      <button type="button" class="blue smallBtn pasteFoodName">📥 PASTE FOOD NAME</button>

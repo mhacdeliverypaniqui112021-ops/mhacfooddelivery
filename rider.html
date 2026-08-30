@@ -49,12 +49,12 @@ header h1 .appName{font-size:30px}
 </style>
 <style>
 .riderOrderGroup{margin:12px 0;padding:12px 14px;border:2px solid #222;border-radius:14px;background:#fff}
-.riderStoreName{font-size:24px;font-weight:900;margin-bottom:8px}
+.riderStoreName{font-size:22px;font-weight:800;margin-bottom:8px}
 .riderFoodRow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid #ddd}
 .riderFoodRow:first-child{border-top:0}
 .riderFoodQty{min-width:42px;font-size:21px;font-weight:900;line-height:1.2}
-.riderFoodName{font-size:20px;font-weight:900;line-height:1.25}
-.riderChoice,.riderParts{margin-top:4px;font-size:17px;font-weight:700}
+.riderFoodName{font-size:18px;font-weight:800;line-height:1.35}
+.riderChoice,.riderParts{margin-top:4px;font-size:16px;font-weight:700}
 .riderParts{padding:2px 0;display:block;border:0;background:#fff;font-size:18px;font-weight:700}
 </style>
 <style>
@@ -795,11 +795,12 @@ function render(arr){
        const qty=Math.max(1,Number(i.qty||0));
        const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div class="riderParts">${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
        const choice=i.choice?`<div class="riderChoice">Drinks: ${esc(i.choice)}</div>`:"";
+       const groupedChoices=i.choiceGroups?.length?i.choiceGroups.map(g=>`<div class="riderChoice">${esc(g.group)}: ${g.options.map(esc).join(", ")}</div>`).join(""):"";
        const addons=i.addOns?.length?`<div class="riderChoice">Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
-       return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${addons}</div></div>`;
+       return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${groupedChoices}${addons}</div></div>`;
      }).join("")}
    </div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2>${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
+ return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
