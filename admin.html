@@ -1382,6 +1382,14 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
   color:#111!important;
 }
 #mhacBuildBadge{display:none!important}
+
+/* FINAL COMPACT PHOTOS / WHITE CHAT */
+.photoThumb,.storePhotoPreview{width:30px!important;height:30px!important;object-fit:cover!important;border-radius:6px!important;}
+.chatOpenBtn,.riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important;}
+.chatPanel,.chatHead,.chatMessages,.chatInput{background:#fff!important;color:#111!important;}
+.chatHead{border-bottom:1px solid #ddd!important;}
+.chatMsg.admin,.chatMsg.customer,.chatMsg.rider{background:#fff!important;color:#111!important;border:1px solid #ddd!important;}
+.orderInfo h3,.order h3{font-weight:700!important;font-size:18px!important;}
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
@@ -1801,7 +1809,8 @@ function orderDetailHtml(o){
    const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div>${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
    const drink=i.choice?`<div>Drinks: ${esc(i.choice)}</div>`:"";
    const adds=i.addOns?.length?`<div>Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
-   return `<div style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${adds}</div>`;
+   const groups=i.choiceGroups?.length?i.choiceGroups.map(g=>`<div>${esc(g.group)}: ${g.options.map(esc).join(", ")}</div>`).join(""):"";
+   return `<div style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${groups}${adds}</div>`;
  }).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
  return `<div class="item" style="background:#f7f7f7"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}<hr><b>🛒 ORDER DETAILS</b>${rows}<hr><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>`;
 }
@@ -1820,7 +1829,7 @@ function renderOrders(){
     <p>📞 ${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
     <p><b>Customer Total:</b> ${peso(o.fees?.total)}</p>
     <div>${String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<span class="paymentBadge ${String(o.paymentStatus||"PENDING").toLowerCase()==="received"?"received":"pending"}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>${o.paymentScreenshotUrl?` <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}`:`<span class="paymentBadge cod">💵 CASH ON DELIVERY</span>`}</div>
-    <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}</div>`}).join("")}</div>`).join("")})()}</div>
+    <div class="adminOrderPreview">${(()=>{const g={};(o.items||[]).forEach(i=>{const st=String(i.store||"STORE");(g[st] ||= []).push(i)});return Object.entries(g).map(([st,is])=>`<div><b>${esc(st)}</b>${is.map(i=>{const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>esc(p.name||p)).join(", ");return `<div>${Math.max(1,Number(i.qty||1))}x ${esc(i.name||"Food")}${parts?`<br><span>Parts: ${parts}</span>`:""}${i.choice?`<br><span>Drinks: ${esc(i.choice)}</span>`:""}${i.choiceGroups?.length?i.choiceGroups.map(g=>`<br><span>${esc(g.group)}: ${g.options.map(esc).join(", ")}</span>`).join(""):""}</div>`}).join("")}</div>`).join("")})()}</div>
     </div><div class="orderActions"><button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
     <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
     <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
@@ -1988,7 +1997,7 @@ function normalizeMenu(x){
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",options:pairList(i.choices)}]:[]),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -2048,7 +2057,7 @@ function renderStores(){
    <div class="storeInner storeCollapsed">
     <label class="label">🏪 STORE NAME</label>
     <input class="storeNameInline" data-store="${si}" value="${esc(st.name)}" placeholder="Store name">
-    <div class="photoRow"><img class="storePhotoPreview" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><div><b>🏪 STORE PHOTO</b><div class="photoHint">Automatic 60×60 crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="storePhotoInput" data-store-photo="${si}"></div></div>
+    <div class="photoRow"><img class="storePhotoPreview" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><div><b>🏪 STORE PHOTO</b><div class="photoHint">Automatic 30×30 display crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="storePhotoInput" data-store-photo="${si}"></div></div>
     <button class="blue" data-store-save="${si}">SAVE STORE NAME</button>
 
     <div class="storeCategories">
@@ -2386,7 +2395,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      <label class="label">🍽️ FOOD NAME</label>
      <input class="foodNameEdit" value="${esc(it.name)}" placeholder="Food name">
    </div>
-   <div class="photoRow"><img class="photoThumb" src="${esc(it.photo||photoSvgData(it.name,"food"))}" alt="Food photo"><div><b>🍗 FOOD PHOTO</b><div class="photoHint">Automatic 60×60 crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="foodPhotoInput"></div></div>
+   <div class="photoRow"><img class="photoThumb" src="${esc(it.photo||photoSvgData(it.name,"food"))}" alt="Food photo"><div><b>🍗 FOOD PHOTO</b><div class="photoHint">Automatic 30×30 display crop. Upload original to replace generated photo.</div><input type="file" accept="image/*" class="foodPhotoInput"></div></div>
    <div class="copyPasteRow foodNameCopyRow">
      <button type="button" class="blue smallBtn copyFoodName">📋 COPY FOOD NAME</button>
      <button type="button" class="blue smallBtn pasteFoodName">📥 PASTE FOOD NAME</button>
@@ -2402,7 +2411,11 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    </div>
 
    <input type="hidden" class="foodType" value="${it.type==="bucket"?"bucket":"chicken"}">
-   <div class="foodEditorModeNote">✏️ Edit the food details below. The old regular-food selector was removed.</div>
+   <div class="foodEditorModeNote">✏️ Create your own choice groups and rename them anytime.</div>
+   <h4>🎯 CHOICE GROUPS</h4>
+   <p class="hint">Example: Fries Size → Regular, Medium, Large. You can add and rename groups/options.</p>
+   <div class="choiceGroupsEditor"></div>
+   <button type="button" class="blue addChoiceGroup">➕ ADD CHOICE GROUP</button>
 
    <div class="bucketSection hidden">
      <h4>🪣 BUCKET / COMBINATION</h4>
@@ -2472,6 +2485,10 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const partsRows=ed.querySelector(".partsRows");
  const drinkRows=ed.querySelector(".drinkRows");
  const addonRows=ed.querySelector(".addonRows");
+ const choiceGroupsBox=ed.querySelector(".choiceGroupsEditor");
+ const choiceGroups=Array.isArray(it.choiceGroups)?it.choiceGroups.map(g=>({name:String(g.name||"Choices"),options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||""),price:Number(x.price||0)})):[]})):((it.choices||[]).length?[{name:"Drinks",options:(it.choices||[]).map(x=>({name:x.name||x[0]||"",price:Number(x.price||x[1]||0)}))}]:[]);
+ const addChoiceGroup=(g={name:"",options:[]})=>{const box=document.createElement("div");box.className="selectionBox choiceGroupEditor";box.innerHTML=`<div style="display:flex;gap:6px;align-items:center"><input class=choiceGroupName placeholder="Choice group name (e.g. Fries Size)" value="${esc(g.name||"")}"><button type=button class=danger>✕</button></div><div class=choiceGroupOptions></div><button type=button class=blue style="margin-top:6px">➕ ADD OPTION</button>`;const opts=box.querySelector(".choiceGroupOptions");const addOpt=(o={name:"",price:0})=>{const r=document.createElement("div");r.className="editorRow";r.innerHTML=`<input class=groupOptionName placeholder="Option name" value="${esc(o.name||"")}"><input class=groupOptionPrice type=number min=0 step=.01 placeholder="Add price" value="${Number(o.price||0)}"><button type=button class=danger>✕</button>`;r.querySelector("button").onclick=()=>r.remove();opts.appendChild(r)};(g.options||[]).forEach(addOpt);box.querySelector("button.danger").onclick=()=>box.remove();box.querySelector("button.blue").onclick=()=>addOpt();choiceGroupsBox.appendChild(box)};
+ choiceGroups.forEach(addChoiceGroup);ed.querySelector(".addChoiceGroup").onclick=()=>addChoiceGroup();
 
  const addPartRow=(name="")=>{
    const r=document.createElement("div");r.className="editorRow partEditorRow";
@@ -2652,7 +2669,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};
    it.spicyPrice=ed.querySelector(".spicyPrice")?Number(ed.querySelector(".spicyPrice").value||0):0;
    it.chickenParts=[...ed.querySelectorAll(".partName")].map(x=>x.value.trim()).filter(Boolean).map(name=>({name}));
-   it.choices=[...ed.querySelectorAll(".drinkName")].map((x)=>{
+   it.choiceGroups=[...ed.querySelectorAll(".choiceGroupEditor")].map(box=>({name:box.querySelector(".choiceGroupName")?.value.trim()||"Choices",options:[...box.querySelectorAll(".editorRow")].map(r=>({name:r.querySelector(".groupOptionName")?.value.trim()||"",price:Number(r.querySelector(".groupOptionPrice")?.value||0)})).filter(x=>x.name)})).filter(g=>g.options.length);
+   it.choices=it.choiceGroups.find(g=>String(g.name).toLowerCase()==="drinks")?.options||[...ed.querySelectorAll(".drinkName")].map((x)=>{
      const r=x.closest(".editorRow");return {name:x.value.trim(),price:Number(r.querySelector(".drinkPrice").value||0)}
    }).filter(x=>x.name);
    it.addOns=[...ed.querySelectorAll(".addonName")].map((x)=>{
