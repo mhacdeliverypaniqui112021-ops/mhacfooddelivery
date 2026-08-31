@@ -910,6 +910,10 @@ h2{font-size:21px!important;line-height:1.15!important}
  .activeOrderLine .small,.riderChoice,.riderParts{font-size:14px!important}
  .storeBtnContent span:last-child{font-size:16px!important}
 }
+
+<style id="MHAC_PRICE_VISIBILITY_FINAL">
+.customerItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
+@media(max-width:600px){.customerItemPrice{font-size:14px!important}}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1164,7 +1168,7 @@ function customize(si,ci,fi){
    draftCart.push({
      key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),
      price:Number(f.price)+extra,basePrice:Number(f.price),qty,
-     choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),
+     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups:choiceGroups.map(g=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return {group:g.group,options:g.options.map(n=>{const q=(src?.options||[]).find(x=>x.name===n);return {name:n,price:Number(q?.price||0)}})}}),addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
      chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],
      original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
    });
@@ -1390,6 +1394,27 @@ function syncCustomerChatWatchers(active){
 }
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
+function orderItemPricing(i){
+  const qty=Math.max(1,Number(i.qty||1));
+  const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
+  const extras=[];
+  if(i.choice){ extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"}); }
+  if(i.bucketChoice){ extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"}); }
+  (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+    const name=typeof x==="string"?x:x?.name; const price=typeof x==="string"?0:Number(x?.price||0);
+    if(name) extras.push({name,price,label:g.group||"Choice"});
+  }));
+  (i.addOns||[]).forEach(x=>{const name=typeof x==="string"?x:x?.name;const price=typeof x==="string"?0:Number(x?.price||0);if(name)extras.push({name,price,label:"Add-on"})});
+  let unit=base+extras.reduce((a,x)=>a+x.price,0);
+  if(!extras.length && i.price!=null) unit=Number(i.price||0);
+  return {qty,base,extras,unit,line:unit*qty};
+}
+function customerOrderDetailHtml(o){
+ const c=o.customer||{}, f=o.fees||{};
+ const stores={}; (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(stores[st] ||= []).push(i)});
+ const rows=Object.entries(stores).map(([store,items])=>`<div class="orderCard"><div class="store-head" style="color:#111">${esc(store)}</div>${items.map(i=>{const p=orderItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>esc(x.name||x)).join(", ");const details=[];if(parts)details.push(`Part: ${parts}`);if(i.choice)details.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)details.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)details.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);return `${esc(n)}${pr?` (${peso(pr)})`:""}`}).join(", ")}`);return `<div class="row"><b>${p.qty}x ${esc(i.name||"Food")}</b> <b>${peso(p.unit)}</b>${details.map(d=>`<div class="small">${d}</div>`).join("")}<div class="small"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("");
+ return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${rows}<div class="orderDetailBill"><div>Sub Total: ${peso(f.foodOrder)}</div><div>10% Service Fee: ${peso(f.serviceFee)}</div><div>Delivery Fee: ${peso(f.deliveryFee)}</div>${Number(f.secondStoreFee||0)?`<div>2nd Store Fee: ${peso(f.secondStoreFee)}</div>`:""}<div><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
+}
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
@@ -1399,7 +1424,7 @@ function startOrders(){
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${customerOrderDetailHtml(o)}</div>
       ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
       ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;

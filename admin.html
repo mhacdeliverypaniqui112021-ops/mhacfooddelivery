@@ -2295,25 +2295,19 @@ function countdownText(o){
 function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEach(el=>{const o=orders.find(x=>x.id===el.dataset.countdown);if(o)el.textContent=countdownText(o)})}
 setInterval(refreshCountdowns,1000);
 
+function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let unit=base+extras.reduce((a,x)=>a+x.price,0);if(!extras.length&&i.price!=null)unit=Number(i.price||0);return{qty,base,extras,unit,line:unit*qty};}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="item orderDetailStore"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{
-   const qty=Math.max(1,Number(i.qty||1));
-   const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div>Parts: ${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
-   const drink=i.choice?`<div>Drinks: ${esc(i.choice)}</div>`:"";
-   const adds=i.addOns?.length?`<div>Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
-   const groups=i.choiceGroups?.length?i.choiceGroups.map(g=>`<div>${esc(g.group)}: ${g.options.map(esc).join(", ")}</div>`).join(""):"";
-   return `<div class="orderDetailFood" style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${groups}${adds}</div>`;
- }).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="item orderDetailStore"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{const p=adminItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>esc(x.name||x)).join(", ");const ds=[];if(parts)ds.push(`Part: ${parts}`);if(i.choice)ds.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(a=>{const n=typeof a==="string"?a:a?.name;const pr=typeof a==="string"?0:Number(a?.price||0);return `${esc(n)}${pr?` (${peso(pr)})`:""}`}).join(", ")}`);return `<div class="orderDetailFood" style="padding:6px 0;border-top:1px solid #eee"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b>${ds.map(x=>`<div>${x}</div>`).join("")}<div><b>Line Total: ${peso(p.line)}</b></div></div>`;}).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
    ? `<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
    : `<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
    ${payment}
    <div class="orderDetailHeading"><b>🛒 ORDER DETAILS</b></div>${rows}
-   <div class="orderDetailBill"><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>
+   <div class="orderDetailBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br>2nd Store Fee: ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div>
  </div>`;
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
