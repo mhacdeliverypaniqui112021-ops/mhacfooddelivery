@@ -1,15 +1,11 @@
-MHAC DELIVERY V4.1.74 — COMPACT STORE MENU / FOOD EDITOR BUILD
+MHAC DELIVERY V4.1.74 — COMPACT STORE / FOOD EDITOR UPDATE
 
-Changes:
-- Store opens compactly to category list only.
-- Categories (Chicken/Burger/etc.) open their own compact food drawer.
-- Food editor has Food Name + Price + clickable Part/Drink/Fries/other choice groups.
-- Description field removed.
-- Food photos are not used in the food editor/order breakdown.
-- Choice groups are editable, deletable, renameable, and support additional prices.
-- Copy/Paste is available per choice group for faster menu setup.
-- Empty standard choice groups remain available for editing.
-- Existing Admin/Rider order flow was left intact.
-
-SOURCE NOTE:
-The uploaded ZIP contained index.html, admin.html, rider.html and mhac-logo.png, but did not contain customer.html. No customer.html was invented or replaced. The existing index.html still links to customer.html.
+Changes in this build:
+- Deleted choice groups no longer reappear automatically when a food editor is reopened.
+- Existing foods show only their saved choice groups; use ADD CHOICE GROUP to add one again.
+- Choice name input is wider so long names are easier to see/edit.
+- Choice price input is narrower to save horizontal space while still supporting additional fees.
+- Chicken Parts keeps a wide name field with a compact delete button.
+- No Description field and no food photo were added.
+- Existing Admin/Rider order flow is preserved.
+Choice field sizing update: Choice Name is the wide field; Price is compact at 62px, intended to fit 3-digit prices such as 35, 100, 999 without stealing space from the choice name.
