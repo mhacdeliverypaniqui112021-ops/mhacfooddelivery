@@ -1825,6 +1825,38 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   #orders .orderActions [data-accept]{grid-column:1/-1!important;width:100%!important;height:38px!important;min-height:38px!important;}
 }
 </style>
+
+<style id="MHAC_FINAL_ACCEPT_3DOT_CLEAN">
+/* Final order-action behavior: dots replace the cancel row; cancel exists only inside dots. */
+#orders .orderActions .moreWrap{position:relative!important;display:block!important;min-width:0!important;grid-column:2!important;}
+#orders .orderActions .moreBtn{display:block!important;width:100%!important;height:38px!important;min-height:38px!important;padding:4px!important;margin:0!important;background:#fff!important;color:#111!important;border:1px solid #222!important;border-radius:9px!important;font-size:18px!important;font-weight:900!important;line-height:1!important;}
+#orders .orderActions .moreMenu{position:absolute!important;right:0!important;top:43px!important;z-index:99999!important;width:190px!important;max-width:70vw!important;padding:5px!important;margin:0!important;background:#fff!important;border:1px solid #ccc!important;border-radius:10px!important;box-shadow:0 5px 18px rgba(0,0,0,.16)!important;}
+#orders .orderActions .moreMenu.hidden{display:none!important;visibility:hidden!important;}
+#orders .orderActions .moreMenu button[data-cancel-order]{display:block!important;width:100%!important;height:38px!important;min-height:38px!important;margin:0!important;padding:5px 7px!important;background:#fff!important;color:#b00000!important;border:1px solid #b00000!important;border-radius:8px!important;font-size:12px!important;font-weight:900!important;}
+@media(max-width:700px){
+  #orders .orderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;align-items:stretch!important;}
+  #orders .orderActions [data-view]{grid-column:1/-1!important;}
+  #orders .orderActions .callCustomerBtn,
+  #orders .orderActions [data-chat]{grid-column:auto!important;}
+  #orders .orderActions .riderChatOpenBtn{grid-column:1!important;}
+  #orders .orderActions .moreWrap{grid-column:2!important;width:100%!important;}
+  #orders .orderActions [data-accept]{grid-column:1/-1!important;width:100%!important;height:38px!important;min-height:38px!important;margin:0!important;}
+}
+</style>
+<style id="MHAC_FINAL_ORDER_ACTION_LAYOUT">
+/* Final requested order layout: CANCEL ORDER replaces the three dots; ACCEPT ORDER is centered on the bottom row. */
+#orders .orderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;align-items:stretch!important;}
+#orders .orderActions [data-view]{grid-column:1/-1!important;}
+#orders .orderActions .cancelOrderBtn{grid-column:2!important;width:100%!important;min-height:38px!important;height:38px!important;margin:0!important;padding:5px 7px!important;font-size:12px!important;}
+#orders .orderActions [data-accept]{grid-column:1/-1!important;width:70%!important;max-width:360px!important;justify-self:center!important;min-height:40px!important;height:40px!important;margin:0!important;font-size:13px!important;}
+#orders .orderActions .moreWrap{display:none!important;}
+@media(max-width:700px){
+  #orders .orderActions{grid-template-columns:1fr 1fr!important;gap:6px!important;}
+  #orders .orderActions [data-view]{grid-column:1/-1!important;}
+  #orders .orderActions .cancelOrderBtn{grid-column:2!important;}
+  #orders .orderActions [data-accept]{grid-column:1/-1!important;width:70%!important;justify-self:center!important;}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2275,7 +2307,7 @@ function renderOrders(){
       <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
       <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
       <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
-      ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<div class="moreWrap"><button class="moreBtn" type="button" data-more="${esc(o.id)}" aria-label="More order actions">•••</button><div class="moreMenu hidden" data-more-menu="${esc(o.id)}"><button class="red" type="button" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button></div></div>`:""}
+      ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class="chatOpenBtn cancelOrderBtn" type="button" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
       ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
       <select id="r-${esc(o.id)}">${opts}</select>
