@@ -2295,7 +2295,7 @@ function countdownText(o){
 function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEach(el=>{const o=orders.find(x=>x.id===el.dataset.countdown);if(o)el.textContent=countdownText(o)})}
 setInterval(refreshCountdowns,1000);
 
-function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let unit=base+extras.reduce((a,x)=>a+x.price,0);if(!extras.length&&i.price!=null)unit=Number(i.price||0);return{qty,base,extras,unit,line:unit*qty};}
+function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
@@ -2547,7 +2547,7 @@ function photoSvgData(name,type="food"){
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="36">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
  return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
 }
-function ensureGeneratedPhotos(menuObj){(menuObj?.stores||[]).forEach(st=>{if(!st.photo)st.photo=photoSvgData(st.name,"store");(st.categories||[]).forEach(c=>(c.items||[]).forEach(f=>{if(!f.photo)f.photo=photoSvgData(f.name,"food")}))});return menuObj;}
+function ensureGeneratedPhotos(menuObj){(menuObj?.stores||[]).forEach(st=>{if(!st.photo)st.photo=photoSvgData(st.name,"store")});return menuObj;}
 function compressPhoto(file,max=60){return new Promise((resolve,reject)=>{if(!file)return resolve("");const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const side=Math.min(im.naturalWidth,im.naturalHeight),sx=(im.naturalWidth-side)/2,sy=(im.naturalHeight-side)/2,c=document.createElement("canvas");c.width=max;c.height=max;c.getContext("2d").drawImage(im,sx,sy,side,side,0,0,max,max);resolve(c.toDataURL("image/jpeg",0.78))};im.onerror=reject;im.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
 function renderStores(){
  const host=$("stores");
@@ -2757,7 +2757,7 @@ function renderNestedFoods(si,ci,list){
    const p=Number(list.querySelector(".nestedFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}],description:""});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
@@ -2864,7 +2864,7 @@ function renderDirectFoodList(ci,list){
    const p=Number(list.querySelector(".newFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],description:""});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}],description:""});
    renderDirectFoodList(ci,list); saveDraftMenu();
  };
  list.querySelectorAll(".editDirectFood").forEach(btn=>{
@@ -2929,8 +2929,8 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const roleExists=r=>rawGroups.some(g=>g.role===r);
  if(!roleExists('drinks')&&drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(x=>({name:x.name||x[0]||'',price:Number(x.price??x[1]??0)}))});
  if(!roleExists('addOns')&&addons.length) rawGroups.push({name:'Add-ons',role:'addOns',options:addons.map(x=>({name:x.name||x[0]||'',price:Number(x.price??x[1]??0)}))});
- if(!roleExists('fries')) rawGroups.push({name:'Fries',role:'fries',options:[]});
- if(!roleExists('chickenParts')) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:x.name||x,price:0}))});
+ if(!roleExists('fries') && Array.isArray(it.fries) && it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:pairList(it.fries)});
+ if(!roleExists('chickenParts')&&parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:x.name||x,price:0}))});
  const order=['drinks','addOns','fries','chickenParts'];
  rawGroups.sort((a,b)=>(order.indexOf(a.role)<0?99:order.indexOf(a.role))-(order.indexOf(b.role)<0?99:order.indexOf(b.role)));
  let open=null;
@@ -3315,7 +3315,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.74 FINAL COMPACT READABLE";
+window.__MHAC_BUILD__="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";
 </script>
 <script>
 setTimeout(function(){

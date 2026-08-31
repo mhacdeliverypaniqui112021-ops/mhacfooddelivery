@@ -1059,7 +1059,6 @@ function openCat(si,ci){
  h+=`<h2>${esc(c.name)}</h2>`;
  h+=(c.items||[]).filter(f=>f.available!==false).map((f,fi)=>`
    <div class="productRow">
-     <img class="productPhoto" src="${esc(f.photo||photoSvgData(f.name,"food"))}" alt="${esc(f.name)}">
      <div class="productInfo">
        <div class="productName">${esc(f.name)}</div>
        <div class="productPrice">${peso(f.price)}</div>
@@ -1069,6 +1068,14 @@ function openCat(si,ci){
  if(!(c.items||[]).length)h+=`<p class=small>No food published in this category yet.</p>`;
  $("menuBody").innerHTML=h;
  $("menuModal").style.display="block";
+}
+function menuOptionPrice(food,name){
+ const target=String(name||'').trim().toLowerCase();
+ if(!target||!food)return 0;
+ const groups=Array.isArray(food.choiceGroups)?food.choiceGroups:[];
+ for(const g of groups){for(const x of (g.options||[])){const n=String(typeof x==='string'?x:x?.name||'').trim().toLowerCase();if(n===target)return Number(typeof x==='string'?0:x?.price||0);}}
+ for(const list of [food.choices,food.addOns,food.bucketChoices,food.fries]){for(const x of (list||[])){const n=String(typeof x==='string'?x:x?.name||'').trim().toLowerCase();if(n===target)return Number(typeof x==='string'?0:x?.price||0);}}
+ return 0;
 }
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
@@ -1092,7 +1099,8 @@ function customize(si,ci,fi){
  if(f.choiceGroups?.length){
    h+=f.choiceGroups.map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
  }
- if(f.choices?.length){
+ const hasDrinksGroup=(f.choiceGroups||[]).some(g=>String(g.role||'').toLowerCase()==='drinks'||String(g.name||'').trim().toLowerCase()==='drinks');
+ if(f.choices?.length && !hasDrinksGroup){
    h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
  if(f.bucketChoices?.length){
@@ -1103,7 +1111,8 @@ function customize(si,ci,fi){
    <div class="bucketSelectRow"><span>Original</span><button class="mini" data-style="original" data-d="-1">−</button><b id="style-original">0</b><button class="mini" data-style="original" data-d="1">+</button></div>
    <div class="bucketSelectRow"><span>Spicy</span><button class="mini" data-style="spicy" data-d="-1">−</button><b id="style-spicy">0</b><button class="mini" data-style="spicy" data-d="1">+</button></div></div>`;
  }
- if(f.addOns?.length){
+ const hasAddOnsGroup=(f.choiceGroups||[]).some(g=>String(g.role||'').toLowerCase()==='addons'||String(g.role||'').toLowerCase()==='add-ons'||['add-ons','addons'].includes(String(g.name||'').trim().toLowerCase()));
+ if(f.addOns?.length && !hasAddOnsGroup){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
@@ -1157,18 +1166,20 @@ function customize(si,ci,fi){
      return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
    }
    const ch=document.querySelector('input[name=choice]:checked');
-   const choice=ch?f.choices[+ch.value]:null;
+   let choice=ch?f.choices[+ch.value]:null;
+   if(choice && Number(choice.price||0)===0) choice={...choice,price:menuOptionPrice(f,choice.name)};
    const choiceGroups=(f.choiceGroups||[]).map((g,gi)=>{const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);return {group:g.name,options:picked?[g.options?.[+picked.value]?.name||""].filter(Boolean):[]}}).filter(g=>g.options.length);
    const bh=document.querySelector('input[name=bucketChoice]:checked');
-   const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
-   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
+   let bucketChoice=bh?f.bucketChoices[+bh.value]:null;
+   if(bucketChoice && Number(bucketChoice.price||0)===0) bucketChoice={...bucketChoice,price:menuOptionPrice(f,bucketChoice.name)};
+   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>{const a=f.addOns[+x.dataset.addon];return a&&Number(a.price||0)===0?{...a,price:menuOptionPrice(f,a.name)}:a}).filter(Boolean);
    const spicyExtra=(f.type==="bucket"?styleSel.spicy*Number(f.spicyPrice||0):0);
-   const groupExtra=choiceGroups.reduce((sum,g)=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return sum+g.options.reduce((a,n)=>a+Number((src?.options||[]).find(x=>x.name===n)?.price||0),0)},0);
+   const groupExtra=choiceGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+menuOptionPrice(f,n),0),0);
    const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
    draftCart.push({
-     key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),
+     key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
      price:Number(f.price)+extra,basePrice:Number(f.price),qty,
-     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups:choiceGroups.map(g=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return {group:g.group,options:g.options.map(n=>{const q=(src?.options||[]).find(x=>x.name===n);return {name:n,price:Number(q?.price||0)}})}}),addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
+     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups:choiceGroups.map(g=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return {group:g.group,options:g.options.map(n=>({name:n,price:menuOptionPrice(f,n)}))}}),addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
      chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],
      original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
    });
@@ -1405,8 +1416,9 @@ function orderItemPricing(i){
     if(name) extras.push({name,price,label:g.group||"Choice"});
   }));
   (i.addOns||[]).forEach(x=>{const name=typeof x==="string"?x:x?.name;const price=typeof x==="string"?0:Number(x?.price||0);if(name)extras.push({name,price,label:"Add-on"})});
-  let unit=base+extras.reduce((a,x)=>a+x.price,0);
-  if(!extras.length && i.price!=null) unit=Number(i.price||0);
+  let extraTotal=extras.reduce((a,x)=>a+x.price,0);
+  let unit=base+extraTotal;
+  if(i.price!=null && Number(i.price)>base && extraTotal===0) unit=Number(i.price);
   return {qty,base,extras,unit,line:unit*qty};
 }
 function customerOrderDetailHtml(o){
@@ -1439,7 +1451,7 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.74 FINAL COMPACT READABLE";
+window.__MHAC_BUILD__="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";
 </script>
 
 <script>
