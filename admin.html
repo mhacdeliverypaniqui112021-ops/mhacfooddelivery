@@ -2017,6 +2017,24 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 }
 </style>
 
+
+<style id="MHAC_V4_1_74_CHOICE_NAME_PRICE_PUBLISH_FIX">
+/* V4.1.74 follow-up: wider choice-name field, compact 3-digit price, restore store publish control. */
+.foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 66px 42px!important;gap:6px!important}
+.foodEditorV2 .foodEditOptionRow .groupOptionName{min-width:0!important;width:100%!important;font-size:16px!important}
+.foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:66px!important;min-width:66px!important;max-width:66px!important;font-size:14px!important;padding:7px 5px!important;text-align:center!important}
+.foodEditorV2 .foodEditOptionRow button{width:42px!important;min-width:42px!important}
+@media(max-width:600px){
+ .foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 66px 42px!important;gap:5px!important}
+ .foodEditorV2 .foodEditOptionRow .groupOptionName{font-size:15px!important;padding:8px 9px!important}
+ .foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:66px!important;min-width:66px!important;max-width:66px!important;font-size:14px!important;padding:7px 4px!important}
+}
+/* Publish/Unpublish remains visible in the compact store drawer. */
+.storeBox.storeOpen .storeInner > .compactPublish{display:block!important;margin:6px 0 2px!important;padding:7px!important;border:1px solid #138a36!important;border-radius:10px!important;background:#fff!important}
+.storeBox.storeOpen .storeInner > .compactPublish .pubState{margin:0 0 5px!important;padding:5px!important;font-size:11px!important}
+.storeBox.storeOpen .storeInner > .compactPublish button{display:block!important;width:100%!important;min-height:40px!important;padding:7px 9px!important;font-size:12px!important}
+.storeBox.storeOpen .storeInner > .compactPublish p{margin:4px 0 0!important;text-align:center!important}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
