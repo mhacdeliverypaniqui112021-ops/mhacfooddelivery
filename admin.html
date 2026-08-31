@@ -2035,6 +2035,33 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .storeBox.storeOpen .storeInner > .compactPublish button{display:block!important;width:100%!important;min-height:40px!important;padding:7px 9px!important;font-size:12px!important}
 .storeBox.storeOpen .storeInner > .compactPublish p{margin:4px 0 0!important;text-align:center!important}
 </style>
+<style id="MHAC_V4_1_74_FINAL_CHOICE_LAYOUT_AND_EDITOR_STATE">
+/* FINAL CHOICE LAYOUT: long readable names, compact 3-digit price, safe gap before X. */
+#stores .foodEditorV2 .foodEditOptionRow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 68px 42px!important;
+  column-gap:10px!important;
+  align-items:center!important;
+  width:100%!important;
+}
+#stores .foodEditorV2 .foodEditOptionRow .groupOptionName{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  font-size:15px!important;padding:8px 10px!important;
+}
+#stores .foodEditorV2 .foodEditOptionRow .groupOptionPrice{
+  width:68px!important;min-width:68px!important;max-width:68px!important;
+  font-size:14px!important;padding:8px 5px!important;text-align:center!important;
+}
+#stores .foodEditorV2 .foodEditOptionRow>button{
+  width:42px!important;min-width:42px!important;max-width:42px!important;
+  margin:0!important;padding:6px!important;
+}
+@media(max-width:430px){
+ #stores .foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 68px 42px!important;column-gap:10px!important}
+ #stores .foodEditorV2 .foodEditOptionRow .groupOptionName{font-size:15px!important;padding:8px 9px!important}
+ #stores .foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:68px!important;min-width:68px!important;max-width:68px!important;font-size:14px!important}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2749,6 +2776,7 @@ function renderStores(){
  host.querySelectorAll("[data-store-toggle]").forEach(h=>{
    const toggle=()=>{
      const si=+h.dataset.storeToggle;
+     selectedStore=si;
      const card=h.closest(".storeBox");
      const inner=card.querySelector(".storeInner");
      const willOpen=inner.classList.contains("storeCollapsed");
@@ -2864,6 +2892,7 @@ function renderStores(){
  host.querySelectorAll("[data-cat-open]").forEach(b=>{
    const toggleCategory=()=>{
      const [si,ci]=b.dataset.catOpen.split("-").map(Number);
+     selectedStore=si;
      const list=$("store-food-"+si+"-"+ci);
      const opening=list.classList.contains("hidden");
      // Only one category drawer is open at a time inside the store.
@@ -3190,7 +3219,24 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    it.chickenParts=(chickenGroup?.options||[]).map(x=>({name:x.name}));it.choices=drinkGroup?.options||[];it.addOns=addonGroup?.options||[];
    it.bucketChoices=[...ed.querySelectorAll('.bucketName')].map(x=>{const r=x.closest('.foodEditOptionRow');return {name:x.value.trim(),price:Number(r.querySelector('.bucketPrice')?.value||0)}}).filter(x=>x.name);it.type=typeSel.value;
    saveDraftLocal();const btn=ed.querySelector('.saveDirectFood');btn.disabled=true;btn.textContent='💾 SAVING...';
-   flushDraftMenu().then(()=>{toast('✅ FOOD SAVED TO DRAFT.');renderStores();setTimeout(()=>{const openBtn=document.querySelector(`[data-cat-open="${selectedStore}-${ci}"]`);if(openBtn)openBtn.click()},30)}).catch(e=>{console.error(e);toast('❌ FOOD FIREBASE SAVE FAILED — local backup kept.');btn.disabled=false;btn.textContent='💾 SAVE FOOD';});
+   const keepStore=selectedStore, keepCategory=ci, keepFood=fi;
+   flushDraftMenu().then(()=>{
+     toast('✅ FOOD SAVED TO DRAFT.');
+     renderStores();
+     setTimeout(()=>{
+       selectedStore=keepStore;
+       const storeBtn=document.querySelector(`[data-store-toggle="${keepStore}"]`);
+       if(storeBtn){storeBtn.click();}
+       setTimeout(()=>{
+         const catBtn=document.querySelector(`[data-cat-open="${keepStore}-${keepCategory}"]`);
+         if(catBtn){catBtn.click();}
+         setTimeout(()=>{
+           const editBtn=document.querySelector(`#store-food-${keepStore}-${keepCategory} [data-fi="${keepFood}"]`);
+           if(editBtn){editBtn.click();}
+         },60);
+       },60);
+     },60);
+   }).catch(e=>{console.error(e);toast('❌ FOOD FIREBASE SAVE FAILED — local backup kept.');btn.disabled=false;btn.textContent='💾 SAVE FOOD';});
  };
  ed.querySelector('.deleteDirectFood').onclick=()=>{c.items.splice(fi,1);renderDirectFoodList(ci,list);saveDraftMenu();};
 }
