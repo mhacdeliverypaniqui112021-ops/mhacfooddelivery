@@ -1082,20 +1082,6 @@ function customize(si,ci,fi){
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
- if(f.chickenParts?.length){
-   h+=`<div class="field partSelectionField">
-     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
-     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
-     <div class="partGrid">${f.chickenParts.map((x,i)=>`
-       <div class="partBox" data-part-select="${i}">
-         <span class="partName">${esc(x.name)}</span>
-         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
-         <b class="partQty" data-part-count="${i}">0</b>
-         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
-       </div>`).join("")}</div>
-     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
-   </div>`;
- }
  if(f.choiceGroups?.length){
    h+=f.choiceGroups.map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
  }
@@ -1115,7 +1101,23 @@ function customize(si,ci,fi){
  if(f.addOns?.length && !hasAddOnsGroup){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
+ h+=`<div class="small" style="text-align:center;margin:7px 0 2px">CHICKEN QUANTITY</div>`;
+   if(f.chickenParts?.length){
+   h+=`<div class="field partSelectionField">
+     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
+     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
+     <div class="partGrid">${f.chickenParts.map((x,i)=>`
+       <div class="partBox" data-part-select="${i}">
+         <span class="partName">${esc(x.name)}</span>
+         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
+         <b class="partQty" data-part-count="${i}">0</b>
+         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
+       </div>`).join("")}</div>
+     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+   </div>`;
+ }
+ 
+   h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
@@ -1451,7 +1453,7 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";
+window.__MHAC_BUILD__="V4.1.74 CHICKEN PART BOTTOM SELECTOR";
 </script>
 
 <script>

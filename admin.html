@@ -1885,53 +1885,6 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .compactFoodEditor .saveDirectFood,.compactFoodEditor .deleteDirectFood{min-height:48px!important;font-size:15px!important}
 @media(max-width:600px){.compactGroupRow{grid-template-columns:minmax(0,1fr) 68px 38px!important}.choiceGroupToggle{font-size:16px!important}.compactFoodEditor input,.compactFoodEditor select{font-size:16px!important}}
 </style>
-
-<style>
-/* V4.1.74 MENU / FOOD EDITOR — compact accordion flow */
-#stores .storeBox{padding:8px!important;margin:8px 0!important;border-radius:14px!important}
-#stores .storeBoxHeader{min-height:48px!important;padding:7px 9px!important}
-#stores .storeBoxHeader b{font-size:18px!important}
-#stores .storeBoxHeader .storeDelete{width:auto!important;min-width:92px!important;padding:9px 8px!important;font-size:12px!important}
-#stores .storeInner{padding:6px!important}
-#stores .storeCategories{max-height:none!important;overflow:visible!important}
-#stores .storeCategory{border:2px solid #ddd!important;border-radius:12px!important;margin:6px 0!important;overflow:hidden!important}
-#stores .storeCategoryHeader{min-height:50px!important;padding:8px 10px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
-#stores .storeCategoryHeader>b{font-size:18px!important;flex:1!important}
-#stores .categoryTapRow{cursor:pointer!important}
-#stores .categoryBtns{display:flex!important;gap:5px!important;flex:none!important}
-#stores .categoryBtns button{width:auto!important;margin:0!important;padding:8px 9px!important;font-size:11px!important}
-#stores .storeFoodList{padding:5px 7px 8px!important;border-top:1px solid #ddd!important}
-#stores .storeFoodItem{border:1px solid #ddd!important;border-radius:10px!important;margin:6px 0!important;padding:7px!important}
-#stores .foodLine{padding:0!important}
-#stores .foodLineMain{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
-#stores .foodLineMain b{font-size:16px!important}
-#stores .foodLineMain span{font-size:15px!important;font-weight:900!important;white-space:nowrap!important}
-#stores .foodSummary{font-size:12px!important;margin:3px 0!important}
-#stores .editDirectFood{width:auto!important;padding:8px 10px!important;font-size:12px!important;margin:4px 0!important}
-#stores .directFoodEditor{margin-top:6px!important}
-#stores .compactFoodEditor{border:2px solid #ddd!important;border-radius:12px!important;padding:9px!important}
-#stores .compactFoodEditor h3{font-size:17px!important;margin:3px 0 8px!important}
-#stores .foodEditAccordion{border:2px solid #ddd!important;border-radius:10px!important;margin:5px 0!important}
-#stores .foodEditToggle{min-height:44px!important;padding:9px 11px!important;font-size:16px!important}
-#stores .foodEditDrawer{padding:8px!important}
-#stores .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 105px 42px!important;gap:6px!important;margin:6px 0!important}
-#stores .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 42px!important}
-#stores .foodEditOptionRow input{min-height:44px!important;font-size:15px!important;padding:8px!important}
-#stores .foodEditOptionRow button{min-height:44px!important;width:42px!important;padding:6px!important}
-#stores .choiceTools{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;margin:6px 0!important}
-#stores .choiceTools button{margin:0!important;padding:8px 6px!important;font-size:12px!important}
-#stores .foodEditGroupTitle{min-width:0!important;font-weight:900!important}
-#stores .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 44px 42px!important;gap:5px!important;align-items:center!important;padding:5px!important}
-#stores .foodEditHead .foodEditToggle{min-height:40px!important;padding:7px!important}
-#stores .foodEditHead .deleteGroup{min-height:40px!important;width:42px!important;margin:0!important;padding:5px!important}
-#stores .addChoiceGroup{margin:6px 0!important;font-size:13px!important}
-#stores .addFoodInline{margin-top:8px!important;padding-top:8px!important}
-#stores .addFoodInline input{padding:10px!important;font-size:15px!important}
-@media(max-width:420px){
- #stores .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 98px 40px!important}
- #stores .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 40px!important}
-}
-</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2547,7 +2500,7 @@ function normalizeMenu(x){
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:String(g.role||""),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",options:pairList(i.choices)}]:[]),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -2613,9 +2566,10 @@ function renderStores(){
     <div class="storeCategories">
      ${(st.categories||[]).map((c,ci)=>`
       <div class="storeCategory" data-category-card="${si}-${ci}">
-       <div class="storeCategoryHeader categoryTapRow" data-cat-open="${si}-${ci}" role="button" tabindex="0" aria-expanded="false">
+       <div class="storeCategoryHeader">
         <b>📂 ${esc(c.name)}</b>
-        <div class="categoryBtns" onclick="event.stopPropagation()">
+        <div class="categoryBtns">
+         <button class="gray" data-cat-open="${si}-${ci}">FOODS</button>
          <button class="gray" data-cat-edit="${si}-${ci}">EDIT</button>
          <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
         </div>
@@ -2661,13 +2615,13 @@ function renderStores(){
      card.classList.toggle("storeOpen",willOpen);
      h.setAttribute("aria-expanded",String(willOpen));
      const ic=h.querySelector(".storeToggleIcon"); if(ic) ic.textContent=willOpen?"▼":"▶";
-     // Store opens to CATEGORY list only. Food lists stay collapsed until
-     // the user explicitly taps a category (Chicken, Burger, etc.).
      if(willOpen){
+       // Opening the store reveals its food names/prices/options immediately.
        card.querySelectorAll(".storeCategory").forEach((catCard)=>{
+         const m=catCard.dataset.categoryCard.split("-").map(Number), ci=m[1];
          const list=catCard.querySelector(".storeFoodList");
-         list.classList.add("hidden");
-         list.innerHTML="";
+         list.classList.remove("hidden");
+         renderNestedFoods(si,ci,list);
        });
      }
    };
@@ -2741,25 +2695,11 @@ function renderStores(){
    const [si,ci]=b.dataset.catDelete.split("-").map(Number);
    draft.stores[si].categories.splice(ci,1); saveDraftMenu(); renderStores();
  });
- host.querySelectorAll("[data-cat-open]").forEach(b=>{
-   const toggleCategory=()=>{
-     const [si,ci]=b.dataset.catOpen.split("-").map(Number);
-     const list=$("store-food-"+si+"-"+ci);
-     const opening=list.classList.contains("hidden");
-     // Only one category drawer is open at a time inside the store.
-     b.closest(".storeBox")?.querySelectorAll(".storeFoodList").forEach(x=>{
-       if(x!==list){x.classList.add("hidden");x.innerHTML="";}
-     });
-     b.closest(".storeBox")?.querySelectorAll("[data-cat-open]").forEach(x=>{
-       if(x!==b)x.setAttribute("aria-expanded","false");
-     });
-     list.classList.toggle("hidden",!opening);
-     b.setAttribute("aria-expanded",String(opening));
-     if(opening) renderNestedFoods(si,ci,list);
-     else list.innerHTML="";
-   };
-   b.onclick=(e)=>{if(e.target.closest("button"))return;toggleCategory();};
-   b.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCategory();}};
+ host.querySelectorAll("[data-cat-open]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catOpen.split("-").map(Number);
+   const list=$("store-food-"+si+"-"+ci);
+   list.classList.toggle("hidden");
+   if(!list.classList.contains("hidden")) renderNestedFoods(si,ci,list);
  });
  // V4.1.72: bind Publish/Unpublish directly after every Store Manager render.
  // This avoids mobile/browser event-bubbling or stale-delegation issues.
@@ -2817,7 +2757,7 @@ function renderNestedFoods(si,ci,list){
    const p=Number(list.querySelector(".nestedFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}]});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}],description:""});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
@@ -2924,7 +2864,7 @@ function renderDirectFoodList(ci,list){
    const p=Number(list.querySelector(".newFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}]});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}],description:""});
    renderDirectFoodList(ci,list); saveDraftMenu();
  };
  list.querySelectorAll(".editDirectFood").forEach(btn=>{
@@ -2984,8 +2924,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const addons=it.addOns||[];
  let rawGroups=Array.isArray(it.choiceGroups)?it.choiceGroups.map(g=>{
    const nm=String(g.name||'Choices'), low=nm.trim().toLowerCase();
-   const savedRole=String(g.role||'');
-   return {name:nm,role:savedRole||(low==='drinks'?'drinks':low==='add-ons'||low==='addons'?'addOns':low==='fries'?'fries':low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'?'chickenParts':''),options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||''),price:Number(x.price||0)})):[]};
+   return {name:nm,role:low==='drinks'?'drinks':low==='add-ons'||low==='addons'?'addOns':low==='fries'?'fries':low==='chicken parts'||low==='🍗 chicken parts'?'chickenParts':'',options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||''),price:Number(x.price||0)})):[]};
  }):[];
  const roleExists=r=>rawGroups.some(g=>g.role===r);
  if(!roleExists('drinks')&&drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(x=>({name:x.name||x[0]||'',price:Number(x.price??x[1]??0)}))});
@@ -2993,16 +2932,12 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  if(!roleExists('fries') && Array.isArray(it.fries) && it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:pairList(it.fries)});
  if(!roleExists('chickenParts')&&parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:x.name||x,price:0}))});
  const order=['drinks','addOns','fries','chickenParts'];
- // Always expose the standard editable groups, even when they are empty.
- // Empty groups are intentionally kept in the food so they are ready for editing.
- // Do not recreate deleted choice groups. Existing foods show only the groups
- // that are actually saved on that food; new groups can be added manually.
  rawGroups.sort((a,b)=>(order.indexOf(a.role)<0?99:order.indexOf(a.role))-(order.indexOf(b.role)<0?99:order.indexOf(b.role)));
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
@@ -3013,32 +2948,6 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    (g.options||[]).forEach(addOpt);
    box.querySelector('.foodEditToggle').onclick=()=>{const was=open===box;closeOther(box);if(was){open=null;box.classList.remove('open');drawer.classList.add('hidden');box.querySelector('.foodEditToggle span').textContent='›';}else{open=box;box.classList.add('open');drawer.classList.remove('hidden');box.querySelector('.foodEditToggle span').textContent='⌄';}}; box.querySelector('.deleteGroup').onclick=()=>{if(open===box)open=null;box.remove();};
    box.querySelector('.addGroupOption').onclick=()=>addOpt();
-
-   // Copy/paste is per choice group and persists locally for easy Android editing.
-   box.querySelector('.copyChoices').onclick=async()=>{
-     const payload={
-       name:box.querySelector('.foodEditGroupTitle')?.value.trim()||g.name||'Choices',
-       role:g.role||box.dataset.role||'',
-       options:[...opts.querySelectorAll('.foodEditOptionRow')].map(r=>({
-         name:r.querySelector('.groupOptionName')?.value.trim()||'',
-         price:Number(r.querySelector('.groupOptionPrice')?.value||0)
-       })).filter(x=>x.name)
-     };
-     foodClipboard.choiceGroup=payload;
-     foodClipboard.parts=payload.role==='chickenParts'?payload.options:[];
-     foodClipboard.choices=payload.role==='drinks'?payload.options:[];
-     foodClipboard.addOns=payload.role==='addOns'?payload.options:[];
-     saveFoodClipboard();
-     await copySystemText(JSON.stringify(payload));
-     toast('📋 '+payload.name+' choices copied.');
-   };
-   box.querySelector('.pasteChoices').onclick=()=>{
-     const payload=foodClipboard.choiceGroup;
-     if(!payload?.options?.length)return toast('Nothing copied yet.');
-     opts.innerHTML='';
-     payload.options.forEach(o=>addOpt(o));
-     toast('📥 Choices pasted.');
-   };
    groupsBox.appendChild(box);
  };
  rawGroups.forEach(addGroup);
@@ -3065,7 +2974,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    if(!name||!Number.isFinite(price)||price<0)return toast('Enter food name and valid price.');
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
-   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>({name:box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices',role:box.dataset.role||'',options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)}));
+   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>({name:box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices',role:box.dataset.role||'',options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)})).filter(g=>g.options.length);
    const chickenGroup=it.choiceGroups.find(g=>g.role==='chickenParts'),drinkGroup=it.choiceGroups.find(g=>g.role==='drinks'),addonGroup=it.choiceGroups.find(g=>g.role==='addOns');
    it.chickenParts=(chickenGroup?.options||[]).map(x=>({name:x.name}));it.choices=drinkGroup?.options||[];it.addOns=addonGroup?.options||[];
    it.bucketChoices=[...ed.querySelectorAll('.bucketName')].map(x=>{const r=x.closest('.foodEditOptionRow');return {name:x.value.trim(),price:Number(r.querySelector('.bucketPrice')?.value||0)}}).filter(x=>x.name);it.type=typeSel.value;
@@ -3472,14 +3381,14 @@ body{font-size:15px!important;line-height:1.35!important}
 .foodEditorV2 .foodEditToggle span:last-child{font-size:25px!important;line-height:1!important}
 .foodEditorV2 .foodEditDrawer{padding:10px!important;border-top:1px solid #ddd;background:#fff!important}
 .foodEditorV2 .foodEditDrawer.hidden{display:none!important}
-.foodEditorV2 .foodEditOptionRow{display:grid;grid-template-columns:minmax(0,1fr) 62px 44px;gap:7px;align-items:center;margin:7px 0}
-.foodEditorV2 .foodEditOptionRow input{min-width:0!important;min-height:48px!important;font-size:16px!important;padding:9px 10px!important;box-sizing:border-box!important}.foodEditorV2 .foodEditOptionRow .groupOptionName{width:100%!important}.foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:62px!important;min-width:62px!important;max-width:62px!important;box-sizing:border-box!important}
+.foodEditorV2 .foodEditOptionRow{display:grid;grid-template-columns:minmax(0,1fr) 100px 46px;gap:7px;align-items:center;margin:7px 0}
+.foodEditorV2 .foodEditOptionRow input{min-width:0!important;min-height:48px!important;font-size:16px!important;padding:9px 10px!important}
 .foodEditorV2 .foodEditOptionRow button{min-height:48px!important;margin:0!important;padding:8px!important}
 .foodEditorV2 .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 46px}
 .foodEditorV2 .foodEditAccordion[data-kind="price"] .foodEditDrawer input{width:100%!important;min-height:50px!important;font-size:18px!important}
 .foodEditorV2 .foodEditGroupTitle{font-size:18px!important;font-weight:900!important}
 .foodEditorV2 .addChoiceGroup{margin-top:7px!important}
-@media(max-width:600px){.foodEditorV2 .foodEditToggle{font-size:17px!important}.foodEditorV2 .foodEditGroupTitle{font-size:17px!important}.foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 62px 42px!important;gap:6px!important}.foodEditorV2 .foodEditOptionRow .groupOptionName{width:100%!important;min-width:0!important}.foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:62px!important;min-width:62px!important;max-width:62px!important;box-sizing:border-box!important;font-size:15px!important;padding-left:6px!important;padding-right:6px!important}.foodEditorV2 .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 42px!important}}
+@media(max-width:600px){.foodEditorV2 .foodEditToggle{font-size:17px!important}.foodEditorV2 .foodEditGroupTitle{font-size:17px!important}.foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 92px 44px;gap:6px}.foodEditorV2 .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 44px}}
 
 .foodEditorV2 .foodEditHead{display:grid;grid-template-columns:minmax(0,1fr) 48px 48px;align-items:center;min-height:52px}
 .foodEditorV2 .foodEditGroupTitle{width:100%!important;min-width:0!important;min-height:50px!important;border:0!important;background:#fff!important;padding:11px 12px!important;font-size:18px!important;font-weight:900!important;color:#111!important;outline:none!important}
