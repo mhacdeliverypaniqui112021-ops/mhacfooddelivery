@@ -1507,6 +1507,232 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  #metrics .metric b{font-size:19px!important}
 }
 </style>
+
+<style id="MHAC_FINAL_ADMIN_COMPACT_ORDER_FIX_20260831">
+/* FINAL ADMIN COMPACT ORDER FIX
+   - Initial incoming order shows only order number + customer name.
+   - VIEW FULL ORDER expands directly underneath that header, before action buttons.
+   - GCash panel and metrics use compact, consistent boxes.
+*/
+#metrics{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+  align-items:stretch!important;
+}
+#metrics .metric{
+  min-width:0!important;
+  min-height:58px!important;
+  height:auto!important;
+  padding:7px 4px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+#metrics .metric span{font-size:11px!important;line-height:1.1!important;font-weight:600!important;white-space:nowrap!important}
+#metrics .metric b{font-size:18px!important;line-height:1.05!important;margin-top:4px!important;font-weight:800!important}
+
+.card:has(.gcSettings){
+  padding:9px!important;
+  margin:6px 0!important;
+}
+.card:has(.gcSettings)>h2{
+  font-size:21px!important;
+  margin:3px 0 5px!important;
+}
+.card:has(.gcSettings)>p.status{
+  font-size:13px!important;
+  line-height:1.2!important;
+  margin:2px 0 5px!important;
+}
+.gcSettings{
+  padding:6px!important;
+  margin:0!important;
+  border-radius:8px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings .label{
+  font-size:12px!important;
+  line-height:1.15!important;
+  margin:2px 0!important;
+}
+.gcSettings input{
+  min-height:36px!important;
+  height:36px!important;
+  padding:5px 8px!important;
+  margin:2px 0 4px!important;
+  font-size:14px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings .small,.gcSettings .status{
+  font-size:11px!important;
+  line-height:1.15!important;
+  margin:2px 0!important;
+}
+.gcSettings .row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:5px!important;
+  margin-top:4px!important;
+}
+.gcSettings .row button{
+  min-height:34px!important;
+  height:34px!important;
+  padding:5px 6px!important;
+  font-size:11px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings img,#adminGcashQrPreview{
+  width:70px!important;
+  height:70px!important;
+  max-width:70px!important;
+  max-height:70px!important;
+  margin:4px auto!important;
+  object-fit:contain!important;
+}
+
+#orders .order{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 260px!important;
+  gap:8px!important;
+  align-items:start!important;
+}
+#orders .orderInfo{
+  min-width:0!important;
+}
+#orders .orderPreviewHead{
+  margin:0 0 2px!important;
+  align-items:center!important;
+}
+#orders .orderPreviewHead b{
+  font-size:16px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+}
+#orders .orderPreviewCustomer{
+  font-size:19px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+  margin:4px 0!important;
+}
+#orders .orderActions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:5px!important;
+}
+#orders .orderActions button,
+#orders .orderActions a,
+#orders .orderActions select{
+  width:100%!important;
+  min-width:0!important;
+  min-height:38px!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+  font-size:13px!important;
+  line-height:1.15!important;
+  padding:7px 6px!important;
+  margin:0!important;
+}
+#orders .orderActions [data-view]{
+  grid-column:1 / -1!important;
+}
+#orders .orderActions [data-accept],
+#orders .orderActions [data-cancel-order]{
+  grid-column:1 / -1!important;
+}
+#orders .orderActions [data-time],
+#orders .orderActions [data-a],
+#orders .orderActions [data-c]{
+  min-height:36px!important;
+}
+#orders .orderActions [id^="details-"]{
+  display:none!important;
+}
+#orders .orderInfo [id^="details-"]{
+  grid-column:auto!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:6px 0 0!important;
+  padding:0!important;
+}
+#orders .orderInfo [id^="details-"]:not(.hidden){
+  display:block!important;
+  animation:mhacOrderSlideDown .18s ease-out!important;
+}
+.orderDetailPanel{
+  background:#fff!important;
+  border:1px solid #ddd!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+  overflow:hidden!important;
+}
+.orderDetailCustomer{
+  padding-bottom:6px!important;
+  border-bottom:1px solid #eee!important;
+}
+.orderDetailHeading{
+  margin-top:7px!important;
+  font-size:15px!important;
+}
+.orderDetailStore{
+  padding:7px!important;
+  margin:5px 0!important;
+  background:#fff!important;
+  border:1px solid #eee!important;
+  border-radius:7px!important;
+}
+.orderDetailStore h3{
+  font-size:17px!important;
+  line-height:1.15!important;
+}
+.orderDetailFood{
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+.orderDetailFood b{font-size:15px!important}
+.orderDetailPayment{
+  margin-top:6px!important;
+  font-size:13px!important;
+}
+.orderDetailPayment button{
+  min-height:32px!important;
+  font-size:11px!important;
+  padding:5px 7px!important;
+  margin-top:4px!important;
+}
+.orderDetailBill{
+  margin-top:6px!important;
+  padding-top:6px!important;
+  border-top:1px solid #eee!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+@keyframes mhacOrderSlideDown{
+  from{opacity:0;transform:translateY(-5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(max-width:700px){
+  #metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  #metrics .metric{min-height:56px!important;padding:6px 2px!important}
+  #metrics .metric span{font-size:10px!important}
+  #metrics .metric b{font-size:17px!important}
+  .card:has(.gcSettings){padding:8px!important}
+  .card:has(.gcSettings)>h2{font-size:20px!important}
+  .card:has(.gcSettings)>p.status{font-size:12px!important}
+  .gcSettings .row{grid-template-columns:1fr 1fr!important}
+  .gcSettings img,#adminGcashQrPreview{width:64px!important;height:64px!important;max-width:64px!important;max-height:64px!important}
+  #orders .order{grid-template-columns:1fr!important;gap:6px!important}
+  #orders .orderActions{grid-template-columns:1fr 1fr!important}
+  #orders .orderActions [data-view],
+  #orders .orderActions [data-accept],
+  #orders .orderActions [data-cancel-order]{grid-column:1 / -1!important}
+}
+</style>
+
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1920,15 +2146,23 @@ setInterval(refreshCountdowns,1000);
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="item"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="item orderDetailStore"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{
    const qty=Math.max(1,Number(i.qty||1));
-   const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div>${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
+   const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div>Parts: ${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
    const drink=i.choice?`<div>Drinks: ${esc(i.choice)}</div>`:"";
    const adds=i.addOns?.length?`<div>Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
    const groups=i.choiceGroups?.length?i.choiceGroups.map(g=>`<div>${esc(g.group)}: ${g.options.map(esc).join(", ")}</div>`).join(""):"";
-   return `<div style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${groups}${adds}</div>`;
+   return `<div class="orderDetailFood" style="padding:6px 0;border-top:1px solid #eee"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${drink}${groups}${adds}</div>`;
  }).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
- return `<div class="item" style="background:#f7f7f7"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}<hr><b>🛒 ORDER DETAILS</b>${rows}<hr><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>`;
+ const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
+   ? `<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
+   : `<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+ return `<div class="orderDetailPanel">
+   <div class="orderDetailCustomer"><b>👤 CUSTOMER</b><br>${esc(c.name||"")} • ${esc(c.contact||"")}<br>📍 ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   ${payment}
+   <div class="orderDetailHeading"><b>🛒 ORDER DETAILS</b></div>${rows}
+   <div class="orderDetailBill"><b>💰 BILL</b><br>Food Order: ${peso(f.foodOrder)}<br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}<br>2nd Store Fee: ${peso(f.secondStoreFee)}<br><b>Customer Total: ${peso(f.total)}</b></div>
+ </div>`;
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
@@ -1940,20 +2174,22 @@ function renderOrders(){
    }).join("");
    return `<div class="order">
     <div class="orderInfo">
-    <div class=row><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div>
-    <h3>${esc(o.customer?.name||"")}</h3>
-    <p>📞 ${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer GPS")}</p>
-    <div>${String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<span class="paymentBadge ${String(o.paymentStatus||"PENDING").toLowerCase()==="received"?"received":"pending"}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>${o.paymentScreenshotUrl?` <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}`:`<span class="paymentBadge cod">💵 CASH ON DELIVERY</span>`}</div>
-    </div><div class="orderActions"><button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
-    <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
-    <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
-    <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
-    <div id="details-${esc(o.id)}" class=hidden>${orderDetailHtml(o)}</div>
-    ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class=red data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
-    ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
-    <select id="r-${esc(o.id)}">${opts}</select>
-    <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
-    <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button></div>
+      <div class="row orderPreviewHead"><b>${esc(o.orderNo||o.id)}</b><span class=pill>${esc(o.status||"NEW")}</span></div>
+      <h3 class="orderPreviewCustomer">${esc(o.customer?.name||"")}</h3>
+      <div id="details-${esc(o.id)}" class="hidden">${orderDetailHtml(o)}</div>
+    </div>
+    <div class="orderActions">
+      <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
+      <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
+      <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
+      <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
+      ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
+      ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class=red data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
+      ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
+      <select id="r-${esc(o.id)}">${opts}</select>
+      <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
+      <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button>
+    </div>
    </div>`;
  }).join("");
 }
@@ -3154,7 +3390,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.64 ADMIN MASTER UNIFIED WHITE UI + BUSINESS TIME CONTROL";
+window.__MHAC_BUILD__="V4.1.74 FINAL COMPACT READABLE";
 </script>
 <script>
 setTimeout(function(){
@@ -3181,4 +3417,33 @@ setTimeout(function(){
   setInterval(()=>{ const now=day(); try { const last=localStorage.getItem(key); if(last!==now){ localStorage.setItem(key,now); refreshDailyView(); location.reload(); } }catch(e){} },60000);
 })();
 </script>
-</body></html>
+</body></html><style id="MHAC_FINAL_COMPACT_READABLE_20260831">
+/* FINAL COMPACT + READABLE — requested mobile layout */
+body{font-size:15px!important;line-height:1.35!important}
+.card{padding:14px!important;margin:9px 0!important;border-radius:16px!important}
+.card h2{font-size:22px!important;line-height:1.15!important;margin:5px 0 9px!important}
+.card h3{font-size:17px!important;line-height:1.2!important}
+.status,.small{font-size:13px!important;line-height:1.3!important}
+/* Earnings: always 3 columns on phone */
+#metrics{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+#metrics .metric{min-width:0!important;min-height:62px!important;padding:8px 3px!important;background:#fff!important;color:#111!important;border:1px solid #ddd!important;border-radius:10px!important;text-align:center!important}
+#metrics .metric span{display:block!important;font-size:11px!important;font-weight:700!important;line-height:1.1!important;white-space:nowrap!important}
+#metrics .metric b{display:block!important;font-size:19px!important;font-weight:900!important;line-height:1.1!important;margin-top:5px!important}
+#riderAccounting h3{font-size:17px!important;margin:10px 0 5px!important}
+/* GCash: compact box, no wasted vertical space */
+.gcSettings{padding:7px!important;margin:0!important;border:1px solid #ddd!important;border-radius:10px!important}
+.card:has(.gcSettings){padding:12px!important}
+.card:has(.gcSettings)>p.status{font-size:13px!important;line-height:1.25!important;margin:3px 0 7px!important}
+.gcSettings .label{font-size:13px!important;font-weight:800!important;margin:2px 0!important}
+.gcSettings input{min-height:40px!important;padding:7px 9px!important;margin:2px 0 6px!important;font-size:15px!important}
+.gcSettings .small,.gcSettings .status{font-size:12px!important;line-height:1.2!important;margin:3px 0!important}
+.gcSettings .row{gap:6px!important;margin-top:5px!important}
+.gcSettings .row button{min-height:38px!important;font-size:12px!important;padding:6px 8px!important}
+.gcSettings img,#adminGcashQrPreview{width:90px!important;height:90px!important;max-width:90px!important;max-height:90px!important;margin:5px auto!important;object-fit:contain!important}
+/* Chat action buttons are white; chat window may retain its existing behavior */
+.orderActions .chatOpenBtn,.orderActions .riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
+/* Order text readable but not oversized */
+#orders .orderInfo,.adminOrderPreview,.orderInfo{font-size:15px!important;line-height:1.35!important}
+#orders .orderInfo h3{font-size:21px!important;font-weight:800!important;margin:7px 0!important}
+#orders .orderActions button,#orders .orderActions select{font-size:13px!important}
+</style>
