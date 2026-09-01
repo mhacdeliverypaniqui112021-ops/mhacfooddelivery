@@ -1,8 +1,3 @@
-V4.1.57 FINAL BUSINESS TIME CONTROL
-
-Replace the three HTML files and firestore.rules from this package in the existing deployment.
-Publish firestore.rules in Firebase if changed.
-
-Admin: always accessible.
-Customer: automatic schedule + manual CLOSED/DAY OFF.
-Rider: no new assignments while closed; existing orders can still be completed.
+UPLOAD v424pkg contents to the GitHub Pages root.
+IMPORTANT: also deploy firestore.rules to the Firebase project.
+After uploading, hard-refresh/reopen the site and verify the red build bar says V4.1.33.
