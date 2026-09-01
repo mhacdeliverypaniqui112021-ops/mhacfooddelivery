@@ -915,15 +915,6 @@ h2{font-size:21px!important;line-height:1.15!important}
 .customerItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
 @media(max-width:600px){.customerItemPrice{font-size:14px!important}}
 </style>
-<style id="MHAC_CUSTOMER_CHICKEN_PART_RADIO_BOTTOM_V1">
-/* Customer: use the compact bottom Parts radio selector; remove duplicate top counter selector. */
-.partsRadioList{margin-top:8px!important}
-.partRadioRow{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:14px 8px!important;border-bottom:1px solid #e5e5e5!important;font-size:17px!important;font-weight:500!important;cursor:pointer!important}
-.partRadioRow:last-child{border-bottom:0!important}
-.partRadioRow input[type=radio]{width:28px!important;height:28px!important;margin:0 12px 0 0!important;vertical-align:middle!important;accent-color:#111!important}
-.partRadioRow>span{display:flex!important;align-items:center!important;min-width:0!important}
-.partRadioRow>b{font-size:17px!important;font-weight:900!important;white-space:nowrap!important}
-</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1091,6 +1082,20 @@ function customize(si,ci,fi){
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
+ if(f.chickenParts?.length){
+   h+=`<div class="field partSelectionField">
+     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
+     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
+     <div class="partGrid">${f.chickenParts.map((x,i)=>`
+       <div class="partBox" data-part-select="${i}">
+         <span class="partName">${esc(x.name)}</span>
+         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
+         <b class="partQty" data-part-count="${i}">0</b>
+         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
+       </div>`).join("")}</div>
+     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+   </div>`;
+ }
  if(f.choiceGroups?.length){
    h+=f.choiceGroups.map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
  }
@@ -1110,34 +1115,55 @@ function customize(si,ci,fi){
  if(f.addOns?.length && !hasAddOnsGroup){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class="small" style="text-align:center;margin:7px 0 2px">CHICKEN QUANTITY</div>`;
-   if(f.chickenParts?.length){
-   h+=`<div class="field partSelectionField">
-     <b>Parts</b>
-     <div class="partsRadioList">${f.chickenParts.map((x,i)=>`
-       <label class="partRadioRow">
-         <span><input type="radio" name="chickenPartRadio" value="${i}"> ${esc(x.name)}</span>
-         <b>Free</b>
-       </label>`).join("")}</div>
-   </div>`;
- }
- 
-   h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
- let qty=1,selectedPart=-1,styleSel={original:0,spicy:0};
- const update=()=>{ $("foodQty").textContent=qty; };
- $("qminus").onclick=()=>{qty=Math.max(1,qty-1);update()};
+ let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
+ const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
+ const update=()=>{
+   $("foodQty").textContent=qty;
+   const top=$("foodQtyTop"); if(top) top.textContent=qty;
+   const need=$("partNeed"); if(need) need.textContent=qty;
+   const total=totalPartQty();
+   const pt=$("partTotal"); if(pt) pt.textContent=total;
+   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{
+     const n=Number(parts[i]||0);
+     b.classList.toggle("selected",n>0);
+     const c=b.querySelector("[data-part-count]"); if(c)c.textContent=n;
+   });
+ };
+ function changePart(i,d){
+   if(!f.chickenParts?.length)return;
+   const current=Number(parts[i]||0);
+   if(d>0 && totalPartQty()>=qty)return;
+   parts[i]=Math.max(0,current+d);
+   update();
+ }
+ $("qminus").onclick=()=>{
+   qty=Math.max(1,qty-1);
+   while(totalPartQty()>qty){
+     const i=parts.findIndex(n=>Number(n||0)>0);
+     if(i<0)break;
+     parts[i]--;
+   }
+   update();
+ };
  $("qplus").onclick=()=>{qty++;update()};
+ document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
+ document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=(ev)=>{
+   if(ev.target?.closest("button"))return;
+   const i=Number(b.dataset.partSelect);
+   if(totalPartQty()>=qty && Number(parts[i]||0)===0)return;
+   changePart(i,Number(parts[i]||0)>0?-1:1);
+ });
  document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
    const k=b.dataset.style,d=Number(b.dataset.d);
    styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);
    const el=$("style-"+k);if(el)el.textContent=styleSel[k];
  });
  $("addConfigured").onclick=()=>{
-   const pickedPart=document.querySelector('input[name="chickenPartRadio"]:checked');
-   selectedPart=pickedPart?Number(pickedPart.value):-1;
-   if(f.chickenParts?.length && selectedPart<0){
-     return alert("Please select a chicken part before adding to cart.");
+   const totalSelectedParts=totalPartQty();
+   if(f.chickenParts?.length && totalSelectedParts!==qty){
+     return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
    }
    const ch=document.querySelector('input[name=choice]:checked');
    let choice=ch?f.choices[+ch.value]:null;
@@ -1154,7 +1180,7 @@ function customize(si,ci,fi){
      key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
      price:Number(f.price)+extra,basePrice:Number(f.price),qty,
      choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups:choiceGroups.map(g=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return {group:g.group,options:g.options.map(n=>({name:n,price:menuOptionPrice(f,n)}))}}),addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
-     chickenParts:f.chickenParts?.length?[{name:f.chickenParts[selectedPart]?.name||"",qty}].filter(x=>x.name):[],
+     chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],
      original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
    });
    renderCart();closeMenu();
@@ -1425,7 +1451,7 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.74 CHICKEN PART BOTTOM SELECTOR";
+window.__MHAC_BUILD__="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";
 </script>
 
 <script>
