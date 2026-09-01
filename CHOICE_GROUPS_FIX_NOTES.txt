@@ -1,0 +1,13 @@
+MHAC DELIVERY V4.1.74 — CHOICE GROUPS FIX
+
+Based on the uploaded CHOICE_LAYOUT_STATE_TRUE_FINAL_REUPLOAD baseline.
+
+FIXED:
+- Choice Groups become the source of truth once present.
+- Deleted Drinks/Add-ons/Fries/Parts are no longer recreated from legacy fields after refresh.
+- Fries is mirrored on SAVE FOOD for compatibility.
+- Saved foods are marked choiceGroupsLocked=true.
+- COPY/PASTE works for each Choice Group and is also available in the collapsed group header.
+- Pasted options are cloned into independent rows.
+
+No other app files were intentionally changed.
