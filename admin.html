@@ -3037,7 +3037,7 @@ function renderNestedFoods(si,ci,list){
    const p=Number(list.querySelector(".nestedFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}]});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[]});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
@@ -3144,7 +3144,7 @@ function renderDirectFoodList(ci,list){
    const p=Number(list.querySelector(".newFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
    c.items=c.items||[];
-   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[{name:'Drinks',role:'drinks',options:[]},{name:'Add-ons',role:'addOns',options:[]},{name:'Fries',role:'fries',options:[]},{name:'Parts',role:'chickenParts',options:[]}]});
+   c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[]});
    renderDirectFoodList(ci,list); saveDraftMenu();
  };
  list.querySelectorAll(".editDirectFood").forEach(btn=>{
@@ -3209,6 +3209,12 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  }):[];
  const hasChoiceGroups=Array.isArray(it.choiceGroups);
  const roleExists=r=>rawGroups.some(g=>g.role===r);
+ // Do not show empty built-in groups that were never populated. This prevents
+ // old/default Drinks/Add-ons/Fries/Parts shells from appearing on unrelated
+ // foods. Custom groups remain available when explicitly added.
+ if(hasChoiceGroups){
+   rawGroups=rawGroups.filter(g=>Array.isArray(g.options)&&g.options.length>0 || !g.role);
+ }
  // IMPORTANT: once a food has a choiceGroups array, it is the ONLY source of
  // truth. Legacy fields are kept only for compatibility with older customer
  // / rider code and must NEVER recreate a group that the Admin deleted.
@@ -3228,7 +3234,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="gray headerCopyChoices" title="Copy this Choice Group">📋</button><button type="button" class="gray headerPasteChoices" title="Paste copied Choice Group">📥</button><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div>${g.role!=='chickenParts'?'<div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div>':''}<button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
@@ -3265,14 +3271,14 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      payload.options.map(o=>({name:String(o.name||''),price:Number(o.price||0)})).filter(o=>o.name).forEach(o=>addOpt(o));
      toast('📥 Choices pasted.');
    };
-   box.querySelector('.copyChoices').onclick=copyGroup;
-   box.querySelector('.pasteChoices').onclick=pasteGroup;
-   box.querySelector('.headerCopyChoices').onclick=copyGroup;
-   box.querySelector('.headerPasteChoices').onclick=pasteGroup;
+   box.querySelector('.copyChoices')?.addEventListener('click',copyGroup);
+   box.querySelector('.pasteChoices')?.addEventListener('click',pasteGroup);
    groupsBox.appendChild(box);
  };
  rawGroups.forEach(addGroup);
 
+ // Copy/Paste lives only at the bottom of each normal Choice Group.
+ // Parts intentionally has no Copy/Paste controls.
  // Extra custom choice groups remain fully editable and deletable.
  const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>addGroup({name:'New Choice Group',role:'',options:[]});groupsBox.after(addCustom);
 
