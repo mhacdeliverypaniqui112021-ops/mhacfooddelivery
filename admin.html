@@ -3202,36 +3202,66 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const parts=it.chickenParts||[];
  const drinks=it.choices||[];
  const addons=it.addOns||[];
- let rawGroups=Array.isArray(it.choiceGroups)?it.choiceGroups.map(g=>{
-   const nm=String(g.name||'Choices'), low=nm.trim().toLowerCase();
-   const savedRole=String(g.role||'');
-   return {name:nm,role:savedRole||(low==='drinks'?'drinks':low==='add-ons'||low==='addons'?'addOns':low==='fries'?'fries':low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'?'chickenParts':''),options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||''),price:Number(x.price||0)})):[]};
- }):[];
  const hasChoiceGroups=Array.isArray(it.choiceGroups);
- // Normalize the built-in chicken part group even when older data saved it as "Part".
- rawGroups.forEach(g=>{const low=String(g.name||'').trim().toLowerCase();if(!g.role&&(low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'))g.role='chickenParts';});
- const roleExists=r=>rawGroups.some(g=>g.role===r);
- // Do not show empty built-in groups that were never populated. This prevents
- // old/default Drinks/Add-ons/Fries/Parts shells from appearing on unrelated
- // foods. Custom groups remain available when explicitly added.
+
+ const normOpt=x=>({name:String(x?.name??x?.[0]??x??'').trim(),price:Number(x?.price??x?.[1]??0)});
+ const roleFromName=(name)=>{
+   const low=String(name||'').trim().toLowerCase();
+   if(low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts') return 'chickenParts';
+   if(low==='drink'||low==='drinks'||low==='beverage'||low==='beverages') return 'drinks';
+   if(low==='add-on'||low==='add-ons'||low==='addon'||low==='addons') return 'addOns';
+   if(low==='fries'||low==='fry') return 'fries';
+   return '';
+ };
+ const inferChoiceRole=(name)=>{
+   const low=String(name||'').toLowerCase();
+   if(/\b(coke|cola|sprite|royal|pepsi|drink|drinks|juice|float|coffee|water|tea|soda|beverage|regular|medium|large)\b/.test(low)) return 'drinks';
+   if(/\b(fries|fry|potato)\b/.test(low)) return 'fries';
+   if(/\b(add.?on|cheese|gravy|sauce|extra)\b/.test(low)) return 'addOns';
+   return '';
+ };
+
+ let rawGroups=[];
  if(hasChoiceGroups){
-   rawGroups=rawGroups.filter(g=>Array.isArray(g.options)&&g.options.length>0 || !g.role);
+   // Read the saved Choice Groups exactly as saved, but repair the accidental
+   // "one choice = one group" shape produced by the earlier build.
+   const malformed=[];
+   rawGroups=it.choiceGroups.map(g=>{
+     const nm=String(g?.name||'Choices').trim();
+     const role=String(g?.role||'') || roleFromName(nm);
+     const options=Array.isArray(g?.options)?g.options.map(normOpt).filter(x=>x.name):[];
+     const itemLooksLikeChoice=!role && options.length===0 && inferChoiceRole(nm);
+     if(itemLooksLikeChoice){ malformed.push({name:nm,price:0,role:inferChoiceRole(nm)}); return null; }
+     return {name:nm,role,options};
+   }).filter(Boolean);
+
+   // Collapse malformed item-groups (Drink/Coke Regular/Coke Float/etc.)
+   // into proper editable groups so each item gets its own price input.
+   const buckets={drinks:[],addOns:[],fries:[]};
+   malformed.forEach(x=>buckets[x.role].push({name:x.name,price:x.price}));
+   Object.entries(buckets).forEach(([role,opts])=>{
+     if(!opts.length)return;
+     const existing=rawGroups.find(g=>g.role===role);
+     if(existing) existing.options=[...existing.options,...opts];
+     else rawGroups.push({name:role==='drinks'?'Drinks':role==='addOns'?'Add-ons':'Fries',role,options:opts});
+   });
+
+   // Also repair groups whose title is a category and whose options already exist.
+   rawGroups.forEach(g=>{
+     if(!g.role) g.role=roleFromName(g.name);
+   });
+ }else{
+   if(drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(normOpt).filter(x=>x.name)});
+   if(addons.length) rawGroups.push({name:'Add-ons',role:'addOns',options:addons.map(normOpt).filter(x=>x.name)});
+   if(Array.isArray(it.fries)&&it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:it.fries.map(normOpt).filter(x=>x.name)});
+   if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
  }
- // IMPORTANT: once a food has a choiceGroups array, it is the ONLY source of
- // truth. Legacy fields are kept only for compatibility with older customer
- // / rider code and must NEVER recreate a group that the Admin deleted.
- if(!hasChoiceGroups){
-   if(!roleExists('drinks')&&drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(x=>({name:x.name||x[0]||'',price:Number(x.price??x[1]??0)}))});
-   if(!roleExists('addOns')&&addons.length) rawGroups.push({name:'Add-ons',role:'addOns',options:addons.map(x=>({name:x.name||x[0]||'',price:Number(x.price??x[1]??0)}))});
-   if(!roleExists('fries') && Array.isArray(it.fries) && it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:pairList(it.fries)});
-   if(!roleExists('chickenParts')&&parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:x.name||x,price:0}))});
- }
+
  const order=['drinks','addOns','fries','chickenParts'];
- // Always expose the standard editable groups, even when they are empty.
- // Empty groups are intentionally kept in the food so they are ready for editing.
- // Do not recreate deleted choice groups. Existing foods show only the groups
- // that are actually saved on that food; new groups can be added manually.
- rawGroups.sort((a,b)=>(order.indexOf(a.role)<0?99:order.indexOf(a.role))-(order.indexOf(b.role)<0?99:order.indexOf(b.role)));
+ rawGroups.sort((a,b)=>{
+   const ai=order.indexOf(a.role), bi=order.indexOf(b.role);
+   return (ai<0?99:ai)-(bi<0?99:bi);
+ });
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
@@ -3303,7 +3333,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    if(!name||!Number.isFinite(price)||price<0)return toast('Enter food name and valid price.');
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
-   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>({name:box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices',role:box.dataset.role||'',options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)}));
+   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';return {name,role,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
    // From this save onward, Choice Groups are authoritative for this food.
    // Mirror them to legacy fields only for compatibility; never use those
    // legacy fields to recreate a deleted group on the next load.
