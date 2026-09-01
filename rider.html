@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MHAC DELIVERY — RIDER V4.1.64</title><meta name="build-version" content="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN RIDER">
+<title>MHAC DELIVERY — RIDER V4.1.64</title><meta name="build-version" content="V4.1.74 FINAL COMPACT READABLE RIDER">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}header{background:#111;color:#fff;text-align:center;padding:22px 14px;border-bottom:5px solid #e21d25}header h1{margin:0 0 10px;font-size:30px}header p{margin:0;font-size:16px}main{max-width:720px;margin:auto;padding:18px}.card{background:#fff;border:2px solid #ddd;border-radius:18px;padding:18px;margin:12px 0}input,button{width:100%;padding:13px;margin:6px 0;border-radius:12px;font-size:16px}input{border:2px solid #ccc}button{border:0;background:#111;color:#fff;font-weight:900;cursor:pointer}button:disabled{opacity:.55}.green{background:#138a36}.red{background:#e21d25}.blue{background:#1976d2}.google{background:#111}.status{color:#666;font-size:13px;line-height:1.45}.hidden{display:none!important}.nav{display:block;text-align:center;text-decoration:none;margin-top:8px;background:#e21d25;color:#fff;border-radius:12px;padding:13px;font-weight:900}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.sound{padding:10px;border:2px solid #222;border-radius:12px;background:#fff8e6}.order{border:2px solid #ddd;border-radius:14px;padding:14px;margin:10px 0}.pill{padding:6px 9px;border-radius:20px;background:#eee;font-weight:900}.error{color:#c62828;font-weight:700}.success{color:#138a36;font-weight:700}hr{border:0;border-top:1px solid #ddd;margin:16px 0}
 
@@ -580,10 +580,6 @@ h2{font-size:21px!important;line-height:1.15!important}
  .activeOrderLine .small,.riderChoice,.riderParts{font-size:14px!important}
  .storeBtnContent span:last-child{font-size:16px!important}
 }
-
-<style id="MHAC_PRICE_VISIBILITY_FINAL">
-.riderItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
-@media(max-width:600px){.riderItemPrice{font-size:14px!important}}
 </style>
 </head>
 <body>
@@ -643,7 +639,7 @@ window.addEventListener("load",function(){
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.74 FINAL COMPACT READABLE";</script>
 <script>
 (function(){
   var started=Date.now();
@@ -843,13 +839,23 @@ async function afterLogin(user){
 async function loadProfile(){const r=await getDoc(doc(db,"riders",uid));const p=r.exists()?r.data():{};$("nickname").textContent=p.nickname||p.name||"RIDER"}
 function maps(o){const g=o.customer?.gps;let d="";if(g&&typeof g.lat==="number"&&typeof g.lon==="number")d=g.lat+","+g.lon;else d=[o.customer?.address,o.customer?.barangay,o.customer?.municipality,"Tarlac","Philippines"].filter(Boolean).join(", ");return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)+"&travelmode=driving"}
 function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function riderItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function render(arr){
  if(!arr.length){$("orders").innerHTML='<div class="card"><h3>No assigned orders.</h3><p class="status">New assigned orders will appear here automatically.</p></div>';return}
  $("orders").innerHTML=arr.map(o=>{
  const grouped={};(o.items||[]).forEach(i=>{const s=String(i.store||"").trim()||"Store";(grouped[s] ||= []).push(i);});
- const items=Object.entries(grouped).map(([store,arr])=>`<div class="riderOrderGroup"><div class="riderStoreName">${esc(store)}</div>${arr.map(i=>{const p=riderItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`<div class="riderParts">Part: ${esc(x.name||x)}</div>`).join("");const details=[];if(i.choice)details.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)details.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)details.push(`Add-ons: ${i.addOns.map(a=>{const n=typeof a==="string"?a:a?.name;const pr=typeof a==="string"?0:Number(a?.price||0);return `${esc(n)}${pr?` (${peso(pr)})`:""}`}).join(", ")}`);return `<div class="riderFoodRow"><div class="riderFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b>${parts}${details.map(x=>`<div class="riderChoice">${x}</div>`).join("")}<div class="riderChoice"><b>Line Total: ${peso(p.line)}</b></div></div></div>`}).join("")}</div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Sub Total:</b> ${peso(o.fees?.foodOrder)}<br><b>10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Delivery Fee:</b> ${peso(o.fees?.deliveryFee)}<br><b>Grand Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div><div class="riderChatBottom"><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div></div>`
+ const items=Object.entries(grouped).map(([store,arr])=>`
+   <div class="riderOrderGroup">
+     <div class="riderStoreName">${esc(store)}</div>
+     ${arr.map(i=>{
+       const qty=Math.max(1,Number(i.qty||0));
+       const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`<div class="riderParts">${esc(p.name||p)}${Number(p.qty||1)>1?" ×"+Number(p.qty||1):""}</div>`).join("");
+       const choice=i.choice?`<div class="riderChoice">Drinks: ${esc(i.choice)}</div>`:"";
+       const groupedChoices=i.choiceGroups?.length?i.choiceGroups.map(g=>`<div class="riderChoice">${esc(g.group)}: ${g.options.map(esc).join(", ")}</div>`).join(""):"";
+       const addons=i.addOns?.length?`<div class="riderChoice">Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}</div>`:"";
+       return `<div class="riderFoodRow"><div class="riderFoodName"><b>${qty}x ${esc(i.name||"Food")}</b>${parts}${choice}${groupedChoices}${addons}</div></div>`;
+     }).join("")}
+   </div>`).join("");
+ return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Delivery Fee / My Earnings:</b> ${peso(o.fees?.deliveryFee)}<br><b>Admin 10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Customer Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div></div>`
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
