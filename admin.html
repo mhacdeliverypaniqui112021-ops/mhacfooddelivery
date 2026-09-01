@@ -3164,17 +3164,40 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices" title="Copy all choices in this group">📋 COPY CHOICES</button><button type="button" class="gray pasteChoices" title="Paste copied choices into this group">📥 PASTE CHOICES</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
+   const scheduleChoiceAutoSave=()=>{
+     clearTimeout(window.__mhacChoiceAutoSaveTimer);
+     window.__mhacChoiceAutoSaveTimer=setTimeout(()=>{
+       try{
+         it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(b=>({
+           name:b.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices',
+           role:b.dataset.role||'',
+           options:[...b.querySelectorAll('.foodEditOptionRow')].map(r=>({
+             name:r.querySelector('.groupOptionName')?.value.trim()||'',
+             price:Number(r.querySelector('.groupOptionPrice')?.value||0)
+           })).filter(x=>x.name)
+         }));
+         const dg=it.choiceGroups.find(x=>x.role==='drinks'), ag=it.choiceGroups.find(x=>x.role==='addOns'), pg=it.choiceGroups.find(x=>x.role==='chickenParts');
+         it.choices=dg?.options||[]; it.addOns=ag?.options||[]; it.chickenParts=(pg?.options||[]).map(x=>({name:x.name}));
+         saveDraftMenu().catch(e=>console.warn('Choice auto-save failed:',e));
+       }catch(e){console.warn('Choice auto-save build failed:',e)}
+     },500);
+   };
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
      const isPart=g.role==='chickenParts';
      r.innerHTML=isPart?`<input class="groupOptionName" placeholder="Part name" value="${esc(o.name||'')}"><button type="button" class="danger">✕</button>`:`<input class="groupOptionName" placeholder="Choice name" value="${esc(o.name||'')}"><input class="groupOptionPrice" type="number" min="0" step="0.01" placeholder="Price" value="${Number(o.price||0)}"><button type="button" class="danger">✕</button>`;
-     r.querySelector('button').onclick=()=>r.remove(); opts.appendChild(r);
+     r.querySelector('button').onclick=()=>{r.remove();scheduleChoiceAutoSave()};
+     r.querySelectorAll('input').forEach(inp=>{inp.addEventListener('input',scheduleChoiceAutoSave);inp.addEventListener('change',scheduleChoiceAutoSave)});
+     opts.appendChild(r);
    };
    (g.options||[]).forEach(addOpt);
-   box.querySelector('.foodEditToggle').onclick=()=>{const was=open===box;closeOther(box);if(was){open=null;box.classList.remove('open');drawer.classList.add('hidden');box.querySelector('.foodEditToggle span').textContent='›';}else{open=box;box.classList.add('open');drawer.classList.remove('hidden');box.querySelector('.foodEditToggle span').textContent='⌄';}}; box.querySelector('.deleteGroup').onclick=()=>{if(open===box)open=null;box.remove();};
-   box.querySelector('.addGroupOption').onclick=()=>addOpt();
+   box.querySelector('.foodEditToggle').onclick=()=>{const was=open===box;closeOther(box);if(was){open=null;box.classList.remove('open');drawer.classList.add('hidden');box.querySelector('.foodEditToggle span').textContent='›';}else{open=box;box.classList.add('open');drawer.classList.remove('hidden');box.querySelector('.foodEditToggle span').textContent='⌄';}};
+   box.querySelector('.deleteGroup').onclick=()=>{if(open===box)open=null;box.remove();scheduleChoiceAutoSave();};
+   box.querySelector('.foodEditGroupTitle').addEventListener('input',scheduleChoiceAutoSave);
+   box.querySelector('.foodEditGroupTitle').addEventListener('change',scheduleChoiceAutoSave);
+   box.querySelector('.addGroupOption').onclick=()=>{addOpt();scheduleChoiceAutoSave()};
 
    // Copy/paste is per choice group and persists locally for easy Android editing.
    box.querySelector('.copyChoices').onclick=async()=>{
@@ -3192,21 +3215,22 @@ function renderDirectFoodEditor(ci,fi,ed,list){
      foodClipboard.addOns=payload.role==='addOns'?payload.options:[];
      saveFoodClipboard();
      await copySystemText(JSON.stringify(payload));
-     toast('📋 '+payload.name+' choices copied.');
+     toast('📋 '+payload.name+' choices copied. Tap PASTE in another group to reuse them.');
    };
    box.querySelector('.pasteChoices').onclick=()=>{
      const payload=foodClipboard.choiceGroup;
      if(!payload?.options?.length)return toast('Nothing copied yet.');
      opts.innerHTML='';
      payload.options.forEach(o=>addOpt(o));
-     toast('📥 Choices pasted.');
+     scheduleChoiceAutoSave();
+     toast('📥 Choices pasted and auto-saved.');
    };
    groupsBox.appendChild(box);
  };
  rawGroups.forEach(addGroup);
 
  // Extra custom choice groups remain fully editable and deletable.
- const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>addGroup({name:'New Choice Group',role:'',options:[]});groupsBox.after(addCustom);
+ const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>{addGroup({name:'New Choice Group',role:'',options:[]});saveDraftMenu().catch(e=>console.warn('Choice group auto-save failed:',e))};groupsBox.after(addCustom);
 
  const priceBox=ed.querySelector('[data-kind="price"]');
  priceBox.querySelector('.foodEditToggle').onclick=()=>{const was=open===priceBox;closeOther(priceBox);if(was){open=null;priceBox.classList.remove('open');priceBox.querySelector('.foodEditDrawer').classList.add('hidden');priceBox.querySelector('.foodEditToggle span').textContent='›';}else{open=priceBox;priceBox.classList.add('open');priceBox.querySelector('.foodEditDrawer').classList.remove('hidden');priceBox.querySelector('.foodEditToggle span').textContent='⌄';}};
