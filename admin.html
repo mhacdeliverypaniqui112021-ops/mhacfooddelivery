@@ -2750,7 +2750,7 @@ function normalizeMenu(x){
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:String(g.role||""),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:(String(g.role||"")||((String(g.name||"").trim().toLowerCase()==='part'||String(g.name||"").trim().toLowerCase()==='parts')?'chickenParts':'')),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -3205,9 +3205,11 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  let rawGroups=Array.isArray(it.choiceGroups)?it.choiceGroups.map(g=>{
    const nm=String(g.name||'Choices'), low=nm.trim().toLowerCase();
    const savedRole=String(g.role||'');
-   return {name:nm,role:savedRole||(low==='drinks'?'drinks':low==='add-ons'||low==='addons'?'addOns':low==='fries'?'fries':low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'?'chickenParts':''),options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||''),price:Number(x.price||0)})):[]};
+   return {name:nm,role:savedRole||(low==='drinks'?'drinks':low==='add-ons'||low==='addons'?'addOns':low==='fries'?'fries':low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'?'chickenParts':''),options:Array.isArray(g.options)?g.options.map(x=>({name:String(x.name||''),price:Number(x.price||0)})):[]};
  }):[];
  const hasChoiceGroups=Array.isArray(it.choiceGroups);
+ // Normalize the built-in chicken part group even when older data saved it as "Part".
+ rawGroups.forEach(g=>{const low=String(g.name||'').trim().toLowerCase();if(!g.role&&(low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts'))g.role='chickenParts';});
  const roleExists=r=>rawGroups.some(g=>g.role===r);
  // Do not show empty built-in groups that were never populated. This prevents
  // old/default Drinks/Add-ons/Fries/Parts shells from appearing on unrelated
@@ -3234,7 +3236,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div>${g.role!=='chickenParts'?'<div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div>':''}<button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div>${g.role!=='chickenParts' && String(g.name||'').trim().toLowerCase()!=='part' && String(g.name||'').trim().toLowerCase()!=='parts'?'<div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div>':''}<button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
