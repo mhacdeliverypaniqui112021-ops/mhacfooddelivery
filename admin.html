@@ -2733,10 +2733,10 @@ $('addStore').onclick=async()=>{
  draft.stores.push({
    name:n,
    id:newId,
-   categories:[
-     {name:'Chicken',items:[]},
-     {name:'Burger',items:[]}
-   ]
+   // New stores start COMPLETELY EMPTY. Do not seed Chicken/Burger or any
+   // other category/choice data; categories are added only when the admin
+   // explicitly creates them.
+   categories:[]
  });
  inp.value='';
  selectedStore=draft.stores.length-1;
