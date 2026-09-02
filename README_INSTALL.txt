@@ -1,40 +1,42 @@
-MHAC DELIVERY — CHOICE GROUPS FIX
-================================
+MHAC CUSTOMER PART DUPLICATE FIX V2
+======================================
 
-This ZIP contains:
-- admin_choicegroups_fix.js
+Based on the current GitHub customer.html.
 
-Purpose:
-- Stop deleted Drinks/Add-ons/Fries/Parts choices from returning through old
-  legacy fields.
-- Persist Fries correctly.
-- Make Choice Group Copy/Paste reliable on Android.
-- Keep copied choices independent from the original group.
+Problem:
+The current Customer App renders both:
+- the old CHICKEN PART SELECTION (+/- counter)
+- the newer Choice Group named Part (radio buttons)
+
+Fix:
+- The old upper selector is hidden.
+- The lower Part radio selector is the only visible selector.
+- The selected lower Part is synchronized to the existing internal chickenParts
+  data so the existing cart/order structure still works.
+- If quantity is increased, the selected Part is applied to all pieces.
+- Other choice groups and checkout/GPS logic are untouched.
 
 INSTALL
 -------
-1. Open your current admin.html in GitHub.
-2. Find the final </body> tag.
-3. Before </body>, add:
+Put customer_part_selection_fix_v2.js in the same folder as customer.html.
 
-<script src="admin_choicegroups_fix.js"></script>
+Then add immediately before </body>:
 
-4. Upload admin_choicegroups_fix.js to the same folder as admin.html.
-5. Commit the changes.
-6. Refresh Admin with a hard refresh / clear cached page if needed.
+<script src="customer_part_selection_fix_v2.js"></script>
+
+Upload both files to GitHub.
+
+TEST
+----
+1. Open a chicken food.
+2. The upper CHICKEN PART SELECTION must be completely gone.
+3. Only the lower Part radio choices remain.
+4. Select Thigh (or another Part).
+5. Add to cart.
+6. Cart should still show the selected Part.
+7. Test quantity >1 and confirm the selected Part applies to the ordered pieces.
 
 IMPORTANT
 ---------
-Do not replace the current admin.html with an older version.
-This patch is intended for the current GitHub version you gave me.
-
-After installation:
-- Delete unwanted choices.
-- SAVE FOOD.
-- Close/reopen the food.
-- Refresh the Admin page.
-The deleted group choices should remain deleted.
-
-Copy/Paste:
-- COPY stores the whole current Choice Group locally.
-- PASTE creates fresh independent rows.
+Do not remove the existing chickenParts code yet. The patch hides its UI and
+uses it internally so existing order/cart compatibility is preserved.
