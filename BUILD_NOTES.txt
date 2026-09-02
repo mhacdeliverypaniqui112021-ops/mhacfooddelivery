@@ -1,19 +1,15 @@
-MHAC ADMIN — ALL CHOICE GROUPS COPY/PASTE
+MHAC DELIVERY ADMIN — RESTORED V5 + ALL CHOICE COPY/PASTE
 
-Every Choice Group in the Food Editor now has:
-- COPY CHOICES
-- PASTE CHOICES
+BASELINE:
+- Restored from MHAC_DELIVERY_V4_1_74_CHOICE_GROUPS_FIXED_FINAL_V5.zip.
+- Existing V5 Admin layout, drawer behavior, UI, login, orders, rider flow,
+  menu/store behavior and other working features are preserved.
 
-Examples:
-- Drinks
-- Part
-- Fries
-- Add-ons
-- Any new/custom Choice Group
+ONLY CHANGE:
+- Every Choice Group now has the existing COPY / PASTE controls.
+- This includes Part/Parts, Drinks, Fries, Add-ons, and any custom/new Choice Group.
+- Copy/paste uses the existing V5 choice-group clipboard logic.
+- Part rows remain the same (Part name + delete); only COPY/PASTE controls were enabled.
 
-Copy preserves option names and prices. Paste replaces only the options
-inside the selected Choice Group. The group name itself is not changed.
-
-Protected:
-- Customer is not included or modified.
-- Existing Admin features remain unchanged outside this Choice Group editor addition.
+CUSTOMER:
+- Not modified or included in this Admin-only fix.
