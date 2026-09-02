@@ -1,11 +1,19 @@
-MHAC CUSTOMER — PART + DRINK SELECTION FINAL BUILD
+MHAC ADMIN — ALL CHOICE GROUPS COPY/PASTE
 
-Admin is not included or modified.
-Only the requested Part/Drinks selection UI is changed.
+Every Choice Group in the Food Editor now has:
+- COPY CHOICES
+- PASTE CHOICES
 
-- Part: minus / quantity / plus + price
-- Drinks: minus / quantity / plus + price
-- Fixed aligned columns for all price lengths
-- Mixed quantities supported
-- Total selected must equal food quantity
-- No duplicate Part/Drinks radio selection
+Examples:
+- Drinks
+- Part
+- Fries
+- Add-ons
+- Any new/custom Choice Group
+
+Copy preserves option names and prices. Paste replaces only the options
+inside the selected Choice Group. The group name itself is not changed.
+
+Protected:
+- Customer is not included or modified.
+- Existing Admin features remain unchanged outside this Choice Group editor addition.
