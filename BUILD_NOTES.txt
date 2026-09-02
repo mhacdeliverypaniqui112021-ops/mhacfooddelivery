@@ -1,15 +1,15 @@
-MHAC DELIVERY ADMIN — RESTORED V5 + ALL CHOICE COPY/PASTE
+MHAC DELIVERY — FINAL 2 FIXES ONLY
 
-BASELINE:
-- Restored from MHAC_DELIVERY_V4_1_74_CHOICE_GROUPS_FIXED_FINAL_V5.zip.
-- Existing V5 Admin layout, drawer behavior, UI, login, orders, rider flow,
-  menu/store behavior and other working features are preserved.
+LOCKED WORKING BASELINE:
+- Admin working features protected.
+- Customer working features protected.
+- Rider untouched/protected.
 
-ONLY CHANGE:
-- Every Choice Group now has the existing COPY / PASTE controls.
-- This includes Part/Parts, Drinks, Fries, Add-ons, and any custom/new Choice Group.
-- Copy/paste uses the existing V5 choice-group clipboard logic.
-- Part rows remain the same (Part name + delete); only COPY/PASTE controls were enabled.
+ONLY TWO FIXES:
+1. ADMIN: Increase Incoming Orders status font for Picked Up / On the Way / Delivered.
+   Scoped only to #orders .orderInfo .pill.
+2. CUSTOMER: Add readable ORDER BREAKDOWN inside MY ACTIVE ORDERS.
+   Shows stores/items, quantities, Parts/Drinks/Choices/Add-ons, Food Order,
+   10% Service Fee, Delivery Fee, 2nd Store Fee when present, and Grand Total.
 
-CUSTOMER:
-- Not modified or included in this Admin-only fix.
+No other UI/logic/features intentionally changed.

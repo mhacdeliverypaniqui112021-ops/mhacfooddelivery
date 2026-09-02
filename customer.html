@@ -945,6 +945,37 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
+<style id="MHAC_CUSTOMER_BREAKDOWN_FINAL_FIX">
+/* FINAL FIX ONLY: Customer active-order breakdown. */
+.customerOrderBreakdown{
+  margin-top:8px!important;
+  padding:9px!important;
+  border:1px solid #ddd!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+}
+.customerOrderBreakdown .breakdownTitle{
+  font-weight:900!important;
+  margin-bottom:5px!important;
+}
+.customerOrderBreakdown .breakdownLine{
+  padding:3px 0!important;
+  border-bottom:1px solid #eee!important;
+}
+.customerOrderBreakdown .breakdownBill{
+  margin-top:6px!important;
+  padding-top:6px!important;
+  border-top:1px solid #ddd!important;
+}
+.customerOrderBreakdown .breakdownGrand{
+  font-size:16px!important;
+  font-weight:900!important;
+  margin-top:4px!important;
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1538,6 +1569,65 @@ function syncCustomerChatWatchers(active){
 }
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
+function customerOrderBreakdown(o){
+  const items=Array.isArray(o.items)?o.items:[];
+  const grouped={};
+  items.forEach(i=>{
+    const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+    (grouped[store] ||= []).push(i);
+  });
+
+  const storeHtml=Object.entries(grouped).map(([store,arr])=>{
+    const lines=arr.map(i=>{
+      const qty=Math.max(1,Number(i.qty||1));
+      const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
+      const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||0)>0)
+        .map(p=>`${esc(p.name||p)}${Number(p.qty||0)>1?` ×${Number(p.qty||0)}`:""}`).join(", ");
+
+      const extras=[];
+      if(i.choice) extras.push(`Drinks: ${esc(i.choice)}`);
+      if(i.bucketChoice) extras.push(`Bucket: ${esc(i.bucketChoice)}`);
+
+      (i.choiceGroups||[]).forEach(g=>{
+        const opts=(g.options||[]).map(x=>{
+          const name=typeof x==="string"?x:(x?.name||"");
+          return name?esc(name):"";
+        }).filter(Boolean);
+        if(opts.length) extras.push(`${esc(g.group||"Choice")}: ${opts.join(", ")}`);
+      });
+
+      if(parts) extras.push(`Parts: ${parts}`);
+      if(i.addOns?.length){
+        extras.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);
+      }
+
+      const lineTotal=Number(i.price||base)*qty;
+      return `<div class="breakdownLine"><b>${qty}× ${esc(i.name||"Food")}</b> — ${peso(lineTotal)}${extras.length?`<div class="small">${extras.join(" • ")}</div>`:""}</div>`;
+    }).join("");
+
+    return `<div><b>🏪 ${esc(store)}</b>${lines}</div>`;
+  }).join("");
+
+  const f=o.fees||{};
+  const food=Number(f.foodOrder||0);
+  const sf=Number(f.serviceFee||0);
+  const df=Number(f.deliveryFee||0);
+  const sf2=Number(f.secondStoreFee||0);
+  const total=Number(f.total||0);
+
+  return `<div class="customerOrderBreakdown">
+    <div class="breakdownTitle">🧾 ORDER BREAKDOWN</div>
+    ${storeHtml||'<div class="breakdownLine">No item details.</div>'}
+    <div class="breakdownBill">
+      Food Order: ${peso(food)}<br>
+      10% Service Fee: ${peso(sf)}<br>
+      Delivery Fee: ${peso(df)}
+      ${sf2?`<br>2nd Store Fee: ${peso(sf2)}`:""}
+      <div class="breakdownGrand">Grand Total: ${peso(total)}</div>
+    </div>
+  </div>`;
+}
+
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
@@ -1547,7 +1637,7 @@ function startOrders(){
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>${customerOrderBreakdown(o)}
       ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
       ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
