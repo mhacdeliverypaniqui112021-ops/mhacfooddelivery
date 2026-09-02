@@ -1,15 +1,21 @@
-MHAC DELIVERY — FINAL 2 FIXES ONLY
+MHAC DELIVERY — UNIFIED BREAKDOWN FINAL
 
-LOCKED WORKING BASELINE:
-- Admin working features protected.
-- Customer working features protected.
-- Rider untouched/protected.
+Locked working baseline preserved.
 
-ONLY TWO FIXES:
-1. ADMIN: Increase Incoming Orders status font for Picked Up / On the Way / Delivered.
-   Scoped only to #orders .orderInfo .pill.
-2. CUSTOMER: Add readable ORDER BREAKDOWN inside MY ACTIVE ORDERS.
-   Shows stores/items, quantities, Parts/Drinks/Choices/Add-ons, Food Order,
-   10% Service Fee, Delivery Fee, 2nd Store Fee when present, and Grand Total.
+Breakdown standard:
+ADMIN = RIDER = CUSTOMER
 
-No other UI/logic/features intentionally changed.
+Customer was changed only in its Order Breakdown presentation:
+- Per-store bordered group
+- Store name header
+- Food quantity + unit price
+- Part / Drink / Choice / Add-ons details
+- Line Total
+- Sub Total
+- 10% Service Fee
+- Delivery Fee
+- 2nd Store Fee when applicable
+- Grand Total
+
+Admin and Rider source files are carried over unchanged from the locked build.
+No other Customer feature was intentionally changed.

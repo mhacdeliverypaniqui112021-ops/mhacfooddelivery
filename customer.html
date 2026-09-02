@@ -945,34 +945,59 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
-<style id="MHAC_CUSTOMER_BREAKDOWN_FINAL_FIX">
-/* FINAL FIX ONLY: Customer active-order breakdown. */
+
+
+
+<style id="MHAC_CUSTOMER_BREAKDOWN_UNIFIED_FINAL">
+/* CUSTOMER BREAKDOWN — same structure/spacing language as Rider/Admin. */
 .customerOrderBreakdown{
-  margin-top:8px!important;
-  padding:9px!important;
-  border:1px solid #ddd!important;
-  border-radius:9px!important;
-  background:#fff!important;
-  font-size:14px!important;
+  margin-top:10px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  font-size:inherit!important;
   line-height:1.35!important;
 }
-.customerOrderBreakdown .breakdownTitle{
+.customerBreakdownTitle{
+  font-size:18px!important;
   font-weight:900!important;
-  margin-bottom:5px!important;
+  margin:0 0 8px!important;
 }
-.customerOrderBreakdown .breakdownLine{
-  padding:3px 0!important;
-  border-bottom:1px solid #eee!important;
+.customerBreakdownStore{
+  margin:12px 0!important;
+  padding:12px 14px!important;
+  border:2px solid #222!important;
+  border-radius:14px!important;
+  background:#fff!important;
 }
-.customerOrderBreakdown .breakdownBill{
-  margin-top:6px!important;
-  padding-top:6px!important;
+.customerBreakdownStoreName{
+  font-size:22px!important;
+  font-weight:800!important;
+  margin-bottom:8px!important;
+  padding-bottom:8px!important;
+  border-bottom:1px solid #ddd!important;
+}
+.customerBreakdownFood{
+  padding:9px 0!important;
   border-top:1px solid #ddd!important;
 }
-.customerOrderBreakdown .breakdownGrand{
-  font-size:16px!important;
-  font-weight:900!important;
+.customerBreakdownFood:first-of-type{border-top:0!important}
+.customerBreakdownFoodName{
+  font-size:18px!important;
+  font-weight:800!important;
+  line-height:1.35!important;
+}
+.customerBreakdownChoice{
   margin-top:4px!important;
+  font-size:15px!important;
+  line-height:1.25!important;
+}
+.customerBreakdownBill{
+  margin:12px 0 0!important;
+  padding:0 0 2px!important;
+  font-size:16px!important;
+  line-height:1.45!important;
 }
 </style>
 
@@ -1570,60 +1595,74 @@ function syncCustomerChatWatchers(active){
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
 function customerOrderBreakdown(o){
-  const items=Array.isArray(o.items)?o.items:[];
   const grouped={};
-  items.forEach(i=>{
-    const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+  (o.items||[]).forEach(i=>{
+    const store=String(i.store||i.storeName||"").trim()||"Store";
     (grouped[store] ||= []).push(i);
   });
 
-  const storeHtml=Object.entries(grouped).map(([store,arr])=>{
-    const lines=arr.map(i=>{
-      const qty=Math.max(1,Number(i.qty||1));
-      const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
-      const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||0)>0)
-        .map(p=>`${esc(p.name||p)}${Number(p.qty||0)>1?` ×${Number(p.qty||0)}`:""}`).join(", ");
+  const items=Object.entries(grouped).map(([store,arr])=>{
+    return `<div class="customerBreakdownStore">
+      <div class="customerBreakdownStoreName">${esc(store)}</div>
+      ${arr.map(i=>{
+        const qty=Math.max(1,Number(i.qty||1));
+        const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
+        const extras=[];
+        const parts=(i.chickenParts||[])
+          .filter(x=>Number(x.qty||1)>0)
+          .map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`)
+          .join(", ");
+        if(parts) extras.push(`<div class="customerBreakdownChoice">Part: ${parts}</div>`);
 
-      const extras=[];
-      if(i.choice) extras.push(`Drinks: ${esc(i.choice)}`);
-      if(i.bucketChoice) extras.push(`Bucket: ${esc(i.bucketChoice)}`);
+        if(i.choice){
+          extras.push(`<div class="customerBreakdownChoice">Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}</div>`);
+        }
+        if(i.bucketChoice){
+          extras.push(`<div class="customerBreakdownChoice">Bucket: ${esc(i.bucketChoice)}${Number(i.bucketChoicePrice||0)?` (${peso(i.bucketChoicePrice)})`:""}</div>`);
+        }
 
-      (i.choiceGroups||[]).forEach(g=>{
-        const opts=(g.options||[]).map(x=>{
-          const name=typeof x==="string"?x:(x?.name||"");
-          return name?esc(name):"";
-        }).filter(Boolean);
-        if(opts.length) extras.push(`${esc(g.group||"Choice")}: ${opts.join(", ")}`);
-      });
+        (i.choiceGroups||[]).forEach(g=>{
+          const opts=(g.options||[]).map(x=>{
+            const n=typeof x==="string"?x:x?.name;
+            const pr=typeof x==="string"?0:Number(x?.price||0);
+            return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:"";
+          }).filter(Boolean);
+          if(opts.length){
+            extras.push(`<div class="customerBreakdownChoice">${esc(g.group||"Choice")}: ${opts.join(", ")}</div>`);
+          }
+        });
 
-      if(parts) extras.push(`Parts: ${parts}`);
-      if(i.addOns?.length){
-        extras.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);
-      }
+        if(i.addOns?.length){
+          const adds=i.addOns.map(a=>{
+            const n=typeof a==="string"?a:a?.name;
+            const pr=typeof a==="string"?0:Number(a?.price||0);
+            return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:"";
+          }).filter(Boolean);
+          if(adds.length) extras.push(`<div class="customerBreakdownChoice">Add-ons: ${adds.join(", ")}</div>`);
+        }
 
-      const lineTotal=Number(i.price||base)*qty;
-      return `<div class="breakdownLine"><b>${qty}× ${esc(i.name||"Food")}</b> — ${peso(lineTotal)}${extras.length?`<div class="small">${extras.join(" • ")}</div>`:""}</div>`;
-    }).join("");
-
-    return `<div><b>🏪 ${esc(store)}</b>${lines}</div>`;
-  }).join("");
+        // Existing cart pricing remains the source of the line total.
+        const unit=Number(i.price!=null?i.price:base);
+        const line=unit*qty;
+        return `<div class="customerBreakdownFood">
+          <div class="customerBreakdownFoodName"><b>${qty}x ${esc(i.name||"Food")} — ${peso(unit)}</b></div>
+          ${extras.join("")}
+          <div class="customerBreakdownChoice"><b>Line Total: ${peso(line)}</b></div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("") || '<div class="customerBreakdownStore"><div class="customerBreakdownChoice">No item details.</div></div>';
 
   const f=o.fees||{};
-  const food=Number(f.foodOrder||0);
-  const sf=Number(f.serviceFee||0);
-  const df=Number(f.deliveryFee||0);
-  const sf2=Number(f.secondStoreFee||0);
-  const total=Number(f.total||0);
-
   return `<div class="customerOrderBreakdown">
-    <div class="breakdownTitle">🧾 ORDER BREAKDOWN</div>
-    ${storeHtml||'<div class="breakdownLine">No item details.</div>'}
-    <div class="breakdownBill">
-      Food Order: ${peso(food)}<br>
-      10% Service Fee: ${peso(sf)}<br>
-      Delivery Fee: ${peso(df)}
-      ${sf2?`<br>2nd Store Fee: ${peso(sf2)}`:""}
-      <div class="breakdownGrand">Grand Total: ${peso(total)}</div>
+    <div class="customerBreakdownTitle">🧾 ORDER DETAILS</div>
+    ${items}
+    <div class="customerBreakdownBill">
+      <b>Sub Total: ${peso(f.foodOrder)}</b><br>
+      <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
+      <b>Delivery Fee:</b> ${peso(f.deliveryFee)}
+      ${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
+      <b>Grand Total: ${peso(f.total)}</b>
     </div>
   </div>`;
 }
