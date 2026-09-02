@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.64</title><meta name="build-version" content="V4.1.64 CUSTOMER MULTI PART + MULTI DRINK QUANTITY FIX">
+<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.64</title><meta name="build-version" content="V4.1.63 CUSTOMER MASTER UNIFIED WHITE UI + CHICKEN PART ALIGNMENT">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:flex;flex-direction:column;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}.menuPhoto{width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #222;background:#f3f3f3;flex:0 0 60px}.productPhoto{width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #222;background:#f3f3f3;flex:0 0 60px}
 .cartItemWithPhoto{display:flex;align-items:center;gap:10px;padding:5px 0;}
@@ -890,165 +890,76 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
-<style id="mhac-final-readable-v4">
-/* FINAL V4: smaller than the previous oversized font pass, still readable */
-body{font-size:15px!important;line-height:1.35!important}
-p,.status,.small,.hint{font-size:14px!important;line-height:1.35!important}
-button{font-size:15px!important;min-height:44px!important;line-height:1.2!important}
-input,textarea,select{font-size:16px!important;min-height:46px!important}
-h2{font-size:21px!important;line-height:1.15!important}
-.order,.orderCard{font-size:15px!important;line-height:1.35!important}
-.orderCard .small,.activeOrderLine .small,.riderChoice,.riderParts{font-size:14px!important;line-height:1.3!important}
-.activeOrderLine b,.riderFoodName>b{font-size:16px!important;font-weight:800!important}
-.storeBtnContent span:last-child{font-size:16px!important;font-weight:800!important}
-@media(max-width:600px){
- body{font-size:15px!important}
- p,.status,.small,.hint{font-size:14px!important}
- button{font-size:15px!important}
- .activeOrderDetails,.riderFoodName{font-size:15px!important}
- .activeOrderLine b,.riderFoodName>b{font-size:16px!important}
- .activeOrderLine .small,.riderChoice,.riderParts{font-size:14px!important}
- .storeBtnContent span:last-child{font-size:16px!important}
-}
-
-<style id="MHAC_PRICE_VISIBILITY_FINAL">
-.customerItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
-@media(max-width:600px){.customerItemPrice{font-size:14px!important}}
-</style>
-<style id="MHAC_CUSTOMER_MULTI_PART_DRINK_QTY_V1">
-.specialQtyGroup{padding:10px!important;margin:9px 0!important;background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important}
-.specialQtyGroup h4{margin:0 0 5px!important;font-size:20px!important}
-.specialQtyList{display:flex!important;flex-direction:column!important}
-.specialQtyRow{display:grid!important;grid-template-columns:minmax(0,1fr) 42px 34px 42px auto!important;align-items:center!important;gap:7px!important;padding:9px 0!important;border-bottom:1px solid #eee!important;min-height:54px!important}
-.specialQtyRow:last-child{border-bottom:0!important}
-.specialQtyRow.selected{background:#fafafa!important}
-.specialQtyName{font-weight:700!important;min-width:0!important}
-.specialQtyValue{text-align:center!important;font-size:18px!important}
-.specialQtyRow .specialQtyMinus,.specialQtyRow .specialQtyPlus{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;font-size:22px!important;border:1px solid #222!important;background:#fff!important;color:#111!important}
-.specialQtyTotal{margin-top:7px!important;padding:8px!important;text-align:center!important;border-radius:8px!important;background:#f2f2f2!important;font-size:14px!important}
-@media(max-width:480px){.specialQtyRow{grid-template-columns:minmax(0,1fr) 40px 30px 40px auto!important;gap:5px!important}.specialQtyRow .specialQtyMinus,.specialQtyRow .specialQtyPlus{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}}
-</style>
-
-<style id="MHAC_PART_DRINK_OLD_LAYOUT_V2">
-/* V2: keep multi-quantity behavior, restore the old compact selection layout */
-.specialQtyGroup{
-  background:#fff!important;
+<style id="MHAC_PART_DRINK_COMPACT_OLD_LAYOUT_LOCKED">
+/* Part + Drinks only: compact old layout. No large selection cards. */
+.mhacCompactQtyGroup{
+  background:transparent!important;
   border:0!important;
   border-radius:0!important;
   box-shadow:none!important;
   padding:0!important;
-  margin:12px 0!important;
+  margin:10px 0!important;
 }
-.specialQtyGroup h4{
-  margin:0 0 4px!important;
-  font-size:20px!important;
-  font-weight:900!important;
-}
-.specialQtyGroup>.small{
-  margin:0 0 5px!important;
-  color:#555!important;
-  font-size:14px!important;
-  line-height:1.35!important;
-}
-.specialQtyList{
-  width:100%!important;
-}
-.specialQtyRow{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 40px 32px 40px auto!important;
-  align-items:center!important;
-  gap:7px!important;
-  min-height:58px!important;
-  padding:7px 0!important;
-  border-bottom:1px solid #eee!important;
-  background:#fff!important;
-}
-.specialQtyRow:first-child{
-  border-top:0!important;
-}
-.specialQtyName{
-  min-width:0!important;
-  font-size:17px!important;
-  font-weight:800!important;
-  line-height:1.2!important;
-}
-.specialQtyRow .specialQtyMinus,
-.specialQtyRow .specialQtyPlus{
-  width:40px!important;
-  min-width:40px!important;
-  height:40px!important;
-  min-height:40px!important;
+.mhacCompactQtyGroup h4{
+  margin:6px 0 3px!important;
   padding:0!important;
-  display:flex!important;
+}
+.mhacQtyHint{
+  font-size:12px!important;
+  color:#666!important;
+  margin:0 0 4px!important;
+}
+.mhacQtyList{
+  width:100%!important;
+  background:transparent!important;
+}
+.mhacQtyRow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 34px 30px 34px auto!important;
   align-items:center!important;
-  justify-content:center!important;
-  border:1px solid #222!important;
-  border-radius:8px!important;
-  background:#fff!important;
-  color:#111!important;
-  font-size:22px!important;
-  font-weight:900!important;
-  line-height:1!important;
+  gap:4px!important;
+  min-height:38px!important;
+  padding:3px 0!important;
+  border-bottom:1px solid #eee!important;
+  background:transparent!important;
 }
-.specialQtyValue{
-  width:32px!important;
-  min-width:32px!important;
-  text-align:center!important;
-  font-size:18px!important;
-  font-weight:900!important;
-}
-.specialQtyRow .choicePrice{
+.mhacQtyName{
+  min-width:0!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
   white-space:nowrap!important;
-  font-size:16px!important;
-  font-weight:800!important;
+}
+.mhacQtyCount{
+  text-align:center!important;
+  min-width:24px!important;
+}
+.mhacQtyRow .mini{
+  width:34px!important;
+  min-width:34px!important;
+  height:30px!important;
+  padding:0!important;
+  margin:0!important;
+}
+.mhacQtyRow .choicePrice{
+  font-size:12px!important;
+  white-space:nowrap!important;
   text-align:right!important;
 }
-.specialQtyTotal{
-  margin:7px 0 0!important;
-  padding:7px 0!important;
-  background:#fff!important;
-  border:0!important;
-  border-radius:0!important;
-  text-align:center!important;
-  font-size:14px!important;
+.mhacQtyTotal{
+  font-size:12px!important;
+  margin-top:4px!important;
   color:#555!important;
 }
-.specialQtyTotal b{
-  color:#111!important;
-}
-@media(max-width:480px){
-  .specialQtyGroup{margin:10px 0!important}
-  .specialQtyGroup h4{font-size:20px!important}
-  .specialQtyGroup>.small{font-size:14px!important}
-  .specialQtyRow{
-    grid-template-columns:minmax(0,1fr) 38px 30px 38px auto!important;
-    gap:5px!important;
-    min-height:54px!important;
-    padding:6px 0!important;
+@media(max-width:420px){
+  .mhacQtyRow{
+    grid-template-columns:minmax(0,1fr) 32px 28px 32px auto!important;
+    gap:3px!important;
   }
-  .specialQtyName{font-size:16px!important}
-  .specialQtyRow .specialQtyMinus,
-  .specialQtyRow .specialQtyPlus{
-    width:38px!important;
-    min-width:38px!important;
-    height:38px!important;
-    min-height:38px!important;
-    font-size:21px!important;
-  }
-  .specialQtyValue{width:30px!important;min-width:30px!important;font-size:17px!important}
-  .specialQtyRow .choicePrice{font-size:15px!important}
-}
-@media(max-width:380px){
-  .specialQtyRow{
-    grid-template-columns:minmax(0,1fr) 36px 28px 36px auto!important;
-    gap:4px!important;
-  }
-  .specialQtyRow .specialQtyMinus,
-  .specialQtyRow .specialQtyPlus{
-    width:36px!important;
-    min-width:36px!important;
-    height:36px!important;
-    min-height:36px!important;
+  .mhacQtyRow .mini{
+    width:32px!important;
+    min-width:32px!important;
   }
 }
 </style>
@@ -1197,6 +1108,7 @@ function openCat(si,ci){
  h+=`<h2>${esc(c.name)}</h2>`;
  h+=(c.items||[]).filter(f=>f.available!==false).map((f,fi)=>`
    <div class="productRow">
+     <img class="productPhoto" src="${esc(f.photo||photoSvgData(f.name,"food"))}" alt="${esc(f.name)}">
      <div class="productInfo">
        <div class="productName">${esc(f.name)}</div>
        <div class="productPrice">${peso(f.price)}</div>
@@ -1207,128 +1119,217 @@ function openCat(si,ci){
  $("menuBody").innerHTML=h;
  $("menuModal").style.display="block";
 }
-function menuOptionPrice(food,name){
- const target=String(name||'').trim().toLowerCase();
- if(!target||!food)return 0;
- const groups=Array.isArray(food.choiceGroups)?food.choiceGroups:[];
- for(const g of groups){for(const x of (g.options||[])){const n=String(typeof x==='string'?x:x?.name||'').trim().toLowerCase();if(n===target)return Number(typeof x==='string'?0:x?.price||0);}}
- for(const list of [food.choices,food.addOns,food.bucketChoices,food.fries]){for(const x of (list||[])){const n=String(typeof x==='string'?x:x?.name||'').trim().toLowerCase();if(n===target)return Number(typeof x==='string'?0:x?.price||0);}}
- return 0;
-}
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
+
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
- const isPartsGroup=g=>String(g?.role||'').toLowerCase()==='chickenparts'||['part','parts','chicken parts','🍗 chicken parts'].includes(String(g?.name||'').trim().toLowerCase());
- const isDrinksGroup=g=>String(g?.role||'').toLowerCase()==='drinks'||['drink','drinks'].includes(String(g?.name||'').trim().toLowerCase());
+ const isPartsGroup=g=>{
+   const role=String(g?.role||"").toLowerCase().replace(/[\s_-]+/g,"");
+   const name=String(g?.name||"").trim().toLowerCase();
+   return ["chickenparts","parts","part"].includes(role) ||
+          ["chickenparts","parts","part","🍗 chicken parts"].includes(name);
+ };
+ const isDrinksGroup=g=>{
+   const role=String(g?.role||"").toLowerCase().replace(/[\s_-]+/g,"");
+   const name=String(g?.name||"").trim().toLowerCase();
+   return role==="drinks" || name==="drink" || name==="drinks";
+ };
  const partsGroup=groups.find(isPartsGroup);
  const drinksGroup=groups.find(isDrinksGroup);
- const partOptions=(partsGroup?.options?.length?partsGroup.options:(f.chickenParts||[])).map(x=>({name:String(typeof x==='string'?x:x?.name||''),price:Number(typeof x==='string'?0:x?.price||0)})).filter(x=>x.name);
- const drinkOptions=(drinksGroup?.options?.length?drinksGroup.options:(f.choices||[])).map(x=>({name:String(typeof x==='string'?x:x?.name||''),price:Number(typeof x==='string'?0:x?.price||0)})).filter(x=>x.name);
+ const partOptions=((partsGroup?.options||[]).length?partsGroup.options:(f.chickenParts||[]))
+   .map(x=>typeof x==="string"?{name:x,price:0}:{name:String(x?.name||""),price:Number(x?.price||0)})
+   .filter(x=>x.name);
+ const drinkOptions=((drinksGroup?.options||[]).length?drinksGroup.options:(f.choices||[]))
+   .map(x=>typeof x==="string"?{name:x,price:0}:{name:String(x?.name||""),price:Number(x?.price||0)})
+   .filter(x=>x.name);
+
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
+
+ // PARTS — compact old layout, no large card/box.
  if(partOptions.length){
-   h+=`<div class="field specialQtyGroup partChoiceQtyGroup">
-     <h4>Part</h4>
-     <p class="small">Choose the chicken part for each ordered piece. You can use the same part or different parts.</p>
-     <div class="specialQtyList">${partOptions.map((x,i)=>`
-       <div class="specialQtyRow" data-part-row="${i}">
-         <span class="specialQtyName">${esc(x.name)}</span>
-         <button type="button" class="mini specialQtyMinus" data-part-q="${i}">−</button>
-         <b class="specialQtyValue" data-part-count-new="${i}">0</b>
-         <button type="button" class="mini specialQtyPlus" data-part-q="${i}">+</button>
-         <span class="choicePrice">Free</span>
+   h+=`<div class="field mhacCompactQtyGroup">
+     <h4>🍗 PART</h4>
+     <div class="mhacQtyHint">Choose exactly ${`<b id="partNeed">1</b>`} piece(s). Same or different parts are allowed.</div>
+     <div class="mhacQtyList">${partOptions.map((x,i)=>`
+       <div class="mhacQtyRow" data-part-select="${i}">
+         <span class="mhacQtyName">${esc(x.name)}</span>
+         <button type="button" class="mini mhacQtyMinus" data-part-d="${i}" data-d="-1">−</button>
+         <b class="mhacQtyCount" data-part-count="${i}">0</b>
+         <button type="button" class="mini mhacQtyPlus" data-part-d="${i}" data-d="1">+</button>
+         <span class="choicePrice">${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span>
        </div>`).join("")}</div>
-     <div class="specialQtyTotal">Selected pieces: <b id="partTotalNew">0</b> / <b id="partNeedNew">1</b></div>
+     <div class="mhacQtyTotal">Selected: <b id="partTotal">0</b> / <b id="partNeedBottom">1</b></div>
    </div>`;
  }
+
+ // DRINKS — compact old layout, each drink has its own quantity.
  if(drinkOptions.length){
-   h+=`<div class="field specialQtyGroup drinkChoiceQtyGroup">
-     <h4>Drink</h4>
-     <p class="small">Choose one drink for each ordered piece. Different pieces can have different drinks.</p>
-     <div class="specialQtyList">${drinkOptions.map((x,i)=>`
-       <div class="specialQtyRow" data-drink-row="${i}">
-         <span class="specialQtyName">${esc(x.name)}</span>
-         <button type="button" class="mini specialQtyMinus" data-drink-q="${i}">−</button>
-         <b class="specialQtyValue" data-drink-count-new="${i}">0</b>
-         <button type="button" class="mini specialQtyPlus" data-drink-q="${i}">+</button>
-         <span class="choicePrice">${x.price?`+ ${peso(x.price)}`:"Free"}</span>
+   h+=`<div class="field mhacCompactQtyGroup">
+     <h4>🥤 DRINKS</h4>
+     <div class="mhacQtyHint">Choose exactly <b id="drinkNeed">1</b> drink(s). Same or different drinks are allowed.</div>
+     <div class="mhacQtyList">${drinkOptions.map((x,i)=>`
+       <div class="mhacQtyRow">
+         <span class="mhacQtyName">${esc(x.name)}</span>
+         <button type="button" class="mini mhacDrinkMinus" data-drink-d="${i}" data-d="-1">−</button>
+         <b class="mhacQtyCount" data-drink-count="${i}">0</b>
+         <button type="button" class="mini mhacDrinkPlus" data-drink-d="${i}" data-d="1">+</button>
+         <span class="choicePrice">${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span>
        </div>`).join("")}</div>
-     <div class="specialQtyTotal">Selected drinks: <b id="drinkTotalNew">0</b> / <b id="drinkNeedNew">1</b></div>
+     <div class="mhacQtyTotal">Selected: <b id="drinkTotal">0</b> / <b id="drinkNeedBottom">1</b></div>
    </div>`;
  }
- if(f.choiceGroups?.length){
-   h+=f.choiceGroups.filter(g=>!isPartsGroup(g)&&!isDrinksGroup(g)).map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-other-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
+
+ // Keep all other choice groups unchanged, except Parts/Drinks which are handled above.
+ if(groups.length){
+   h+=groups.map((g,gi)=>{
+     if(isPartsGroup(g)||isDrinksGroup(g)) return "";
+     return `<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`
+       <div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label>
+       <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+   }).join("");
  }
- const hasDrinksGroup=!!drinksGroup;
- if(f.choices?.length && !hasDrinksGroup){
-   h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+
+ // Legacy drinks fallback only when there is no Drinks choice group.
+ if(f.choices?.length && !drinksGroup){
+   // Already rendered above when drinkOptions came from f.choices.
  }
+
  if(f.bucketChoices?.length){
-   h+=`<div class=field><b>🪣 BUCKET CHOICES</b>${f.bucketChoices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=bucketChoice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+   h+=`<div class=field><b>🪣 BUCKET CHOICES</b>${f.bucketChoices.map((x,i)=>`
+     <div class="choiceRowCustomer"><label><input type=radio name=bucketChoice value="${i}"> ${esc(x.name)}</label>
+     <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
+
  if(f.type==="bucket"){
-   h+=`<div class="bucketSelectBox"><b>🎯 ORIGINAL / SPICY SELECTION</b><p class="small">Spicy add-on: + ${peso(Number(f.spicyPrice||0))} per piece</p>
+   h+=`<div class="bucketSelectBox"><b>🎯 ORIGINAL / SPICY SELECTION</b>
+   <p class="small">Spicy add-on: + ${peso(Number(f.spicyPrice||0))} per piece</p>
    <div class="bucketSelectRow"><span>Original</span><button class="mini" data-style="original" data-d="-1">−</button><b id="style-original">0</b><button class="mini" data-style="original" data-d="1">+</button></div>
    <div class="bucketSelectRow"><span>Spicy</span><button class="mini" data-style="spicy" data-d="-1">−</button><b id="style-spicy">0</b><button class="mini" data-style="spicy" data-d="1">+</button></div></div>`;
  }
- const hasAddOnsGroup=(f.choiceGroups||[]).some(g=>String(g.role||'').toLowerCase()==='addons'||String(g.role||'').toLowerCase()==='add-ons'||['add-ons','addons'].includes(String(g.name||'').trim().toLowerCase()));
- if(f.addOns?.length && !hasAddOnsGroup){
-   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+
+ if(f.addOns?.length){
+   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`
+     <div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label>
+     <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
+
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div>
+ <button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
+
  let qty=1;
- let parts=partOptions.map(()=>0), drinks=drinkOptions.map(()=>0), styleSel={original:0,spicy:0};
+ let parts=partOptions.map(()=>0);
+ let drinks=drinkOptions.map(()=>0);
+ let styleSel={original:0,spicy:0};
+
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
  const totalDrinkQty=()=>drinks.reduce((a,n)=>a+Number(n||0),0);
- const trimCounts=(arr,target)=>{while(arr.reduce((a,n)=>a+Number(n||0),0)>target){const i=arr.findIndex(n=>Number(n||0)>0);if(i<0)break;arr[i]--;}};
  const update=()=>{
    $("foodQty").textContent=qty;
-   const pt=$("partTotalNew");if(pt)pt.textContent=totalPartQty();
-   const pn=$("partNeedNew");if(pn)pn.textContent=qty;
-   const dt=$("drinkTotalNew");if(dt)dt.textContent=totalDrinkQty();
-   const dn=$("drinkNeedNew");if(dn)dn.textContent=qty;
-   document.querySelectorAll("[data-part-row]").forEach((row,i)=>{const c=row.querySelector("[data-part-count-new]");if(c)c.textContent=Number(parts[i]||0);row.classList.toggle("selected",Number(parts[i]||0)>0)});
-   document.querySelectorAll("[data-drink-row]").forEach((row,i)=>{const c=row.querySelector("[data-drink-count-new]");if(c)c.textContent=Number(drinks[i]||0);row.classList.toggle("selected",Number(drinks[i]||0)>0)});
- };
- function changeCount(arr,i,d){if(i<0||i>=arr.length)return;const current=Number(arr[i]||0);if(d>0&&arr.reduce((a,n)=>a+Number(n||0),0)>=qty)return;arr[i]=Math.max(0,current+d);update();}
- $("qminus").onclick=()=>{qty=Math.max(1,qty-1);trimCounts(parts,qty);trimCounts(drinks,qty);update()};
- $("qplus").onclick=()=>{qty++;update()};
- document.querySelectorAll("[data-part-q]").forEach(b=>{const i=Number(b.dataset.partQ);b.onclick=()=>changeCount(parts,i,b.classList.contains("specialQtyPlus")?1:-1)});
- document.querySelectorAll("[data-drink-q]").forEach(b=>{const i=Number(b.dataset.drinkQ);b.onclick=()=>changeCount(drinks,i,b.classList.contains("specialQtyPlus")?1:-1)});
- document.querySelectorAll("[data-part-row]").forEach(row=>row.onclick=e=>{if(e.target.closest("button"))return;changeCount(parts,Number(row.dataset.partRow),Number(parts[Number(row.dataset.partRow)]||0)>0?-1:1)});
- document.querySelectorAll("[data-drink-row]").forEach(row=>row.onclick=e=>{if(e.target.closest("button"))return;changeCount(drinks,Number(row.dataset.drinkRow),Number(drinks[Number(row.dataset.drinkRow)]||0)>0?-1:1)});
- document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{const k=b.dataset.style,d=Number(b.dataset.d);styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);const el=$("style-"+k);if(el)el.textContent=styleSel[k]});
- $("addConfigured").onclick=()=>{
-   if(partOptions.length&&totalPartQty()!==qty)return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
-   if(drinkOptions.length&&totalDrinkQty()!==qty)return alert("Please select exactly "+qty+" drink"+(qty===1?"":"s")+" before adding to cart.");
-   const ch=document.querySelector('input[name=choice]:checked');
-   let choice=ch?f.choices[+ch.value]:null;
-   if(choice&&Number(choice.price||0)===0)choice={...choice,price:menuOptionPrice(f,choice.name)};
-   const choiceGroups=[];
-   if(drinksGroup&&drinkOptions.length){
-     const opts=[];
-     drinks.forEach((n,i)=>{for(let k=0;k<Number(n||0);k++)opts.push({name:drinkOptions[i].name,price:Number(drinkOptions[i].price||menuOptionPrice(f,drinkOptions[i].name)||0)});});
-     if(opts.length)choiceGroups.push({group:drinksGroup.name,options:opts});
-   }
-   (f.choiceGroups||[]).forEach((g,gi)=>{
-     if(isPartsGroup(g)||isDrinksGroup(g))return;
-     const picked=document.querySelector(`input[name="choiceGroup-other-${gi}"]:checked`);
-     if(picked){const x=g.options?.[+picked.value];if(x)choiceGroups.push({group:g.name,options:[{name:x.name,price:Number(x.price||menuOptionPrice(f,x.name)||0)}]});}
+   const pn=$("partNeed"); if(pn)pn.textContent=qty;
+   const pnb=$("partNeedBottom"); if(pnb)pnb.textContent=qty;
+   const dn=$("drinkNeed"); if(dn)dn.textContent=qty;
+   const dnb=$("drinkNeedBottom"); if(dnb)dnb.textContent=qty;
+   const pt=$("partTotal"); if(pt)pt.textContent=totalPartQty();
+   const dt=$("drinkTotal"); if(dt)dt.textContent=totalDrinkQty();
+
+   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{
+     const n=Number(parts[i]||0);
+     b.classList.toggle("selected",n>0);
+     const c=b.querySelector("[data-part-count]"); if(c)c.textContent=n;
    });
+   document.querySelectorAll("[data-drink-count]").forEach((c,i)=>c.textContent=Number(drinks[i]||0));
+ };
+
+ function changePart(i,d){
+   if(!partOptions.length)return;
+   const current=Number(parts[i]||0);
+   if(d>0 && totalPartQty()>=qty)return;
+   parts[i]=Math.max(0,current+d);
+   update();
+ }
+ function changeDrink(i,d){
+   if(!drinkOptions.length)return;
+   const current=Number(drinks[i]||0);
+   if(d>0 && totalDrinkQty()>=qty)return;
+   drinks[i]=Math.max(0,current+d);
+   update();
+ }
+
+ $("qminus").onclick=()=>{
+   qty=Math.max(1,qty-1);
+   while(totalPartQty()>qty){
+     const i=parts.findIndex(n=>Number(n||0)>0);
+     if(i<0)break; parts[i]--;
+   }
+   while(totalDrinkQty()>qty){
+     const i=drinks.findIndex(n=>Number(n||0)>0);
+     if(i<0)break; drinks[i]--;
+   }
+   update();
+ };
+ $("qplus").onclick=()=>{qty++;update()};
+
+ document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
+ document.querySelectorAll("[data-drink-d]").forEach(b=>b.onclick=()=>changeDrink(Number(b.dataset.drinkD),Number(b.dataset.d)));
+
+ document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
+   const k=b.dataset.style,d=Number(b.dataset.d);
+   styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);
+   const el=$("style-"+k);if(el)el.textContent=styleSel[k];
+ });
+
+ $("addConfigured").onclick=()=>{
+   if(partOptions.length && totalPartQty()!==qty)
+     return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
+   if(drinkOptions.length && totalDrinkQty()!==qty)
+     return alert("Please select exactly "+qty+" drink"+(qty===1?"":"s")+" before adding to cart.");
+
+   const ch=document.querySelector('input[name=choice]:checked');
+   const choice=ch?f.choices[+ch.value]:null;
+
+   const choiceGroups=[];
+   groups.forEach((g,gi)=>{
+     if(isPartsGroup(g)||isDrinksGroup(g))return;
+     const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);
+     if(picked){
+       const x=g.options?.[+picked.value];
+       if(x)choiceGroups.push({group:g.name,options:[{name:String(x.name||""),price:Number(x.price||0)}]});
+     }
+   });
+
+   if(drinkOptions.length){
+     const selectedDrinks=[];
+     drinks.forEach((n,i)=>{
+       for(let k=0;k<Number(n||0);k++){
+         selectedDrinks.push({name:drinkOptions[i].name,price:Number(drinkOptions[i].price||0)});
+       }
+     });
+     if(selectedDrinks.length)choiceGroups.push({group:drinksGroup?.name||"Drinks",options:selectedDrinks});
+   }
+
    const bh=document.querySelector('input[name=bucketChoice]:checked');
-   let bucketChoice=bh?f.bucketChoices[+bh.value]:null;
-   if(bucketChoice&&Number(bucketChoice.price||0)===0)bucketChoice={...bucketChoice,price:menuOptionPrice(f,bucketChoice.name)};
-   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>{const a=f.addOns[+x.dataset.addon];return a&&Number(a.price||0)===0?{...a,price:menuOptionPrice(f,a.name)}:a}).filter(Boolean);
+   const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
+   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]).filter(Boolean);
    const spicyExtra=(f.type==="bucket"?styleSel.spicy*Number(f.spicyPrice||0):0);
-   const groupExtra=choiceGroups.reduce((sum,g)=>sum+g.options.reduce((a,x)=>a+Number(x.price||menuOptionPrice(f,x.name)||0),0),0);
-   const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
-   const unitPrice=Number(f.price||0)+(qty?extra/qty:0);
+
+   const groupExtra=choiceGroups.reduce((sum,g)=>
+     sum+(g.options||[]).reduce((a,x)=>a+Number(x.price||0),0),0);
+   const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+
+     groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
+
+   // Store average per-unit extra so existing cart qty pricing remains correct.
+   const unitExtra=qty>0?extra/qty:extra;
+
    draftCart.push({
      key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
-     price:unitPrice,basePrice:Number(f.price||0),qty,
-     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups,
+     photo:f.photo||photoSvgData(f.name,"food"),
+     price:Number(f.price)+unitExtra,basePrice:Number(f.price),qty,
+     choice:choice?.name||"",choicePrice:Number(choice?.price||0),
+     bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),
+     choiceGroups,
      addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
      chickenParts:partOptions.length?partOptions.map((x,i)=>({name:x.name,qty:Number(parts[i]||0)})).filter(x=>x.qty):[],
      original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
@@ -1337,36 +1338,43 @@ function customize(si,ci,fi){
  };
  update();
 }
+
+function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
 function renderCart(){
  const names=[...new Set(draftCart.map(x=>x.store))];
  $("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);
  $("storeCount").textContent=`Stores selected: ${names.length}/2`;
- if(!draftCart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return;}
+ if(!draftCart.length){
+   $("cart").innerHTML="No items yet.";
+   $("totals").innerHTML="";
+   $("checkoutBtn").disabled=true;
+   return;
+ }
  $("checkoutBtn").disabled=false;
  $("cart").innerHTML=draftCart.map((x,i)=>{
-   const details=[];
-   if(x.choice)details.push(x.choice);
-   if(x.bucketChoice)details.push(x.bucketChoice);
-   (x.choiceGroups||[]).forEach(g=>{const n=String(g.group||'').toLowerCase();const vals=(g.options||[]).map(o=>typeof o==='string'?o:o?.name).filter(Boolean);if(vals.length)details.push((n==='drink'||n==='drinks'?'Drinks: ':esc(g.group)+': ')+vals.map(esc).join(', '));});
-   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);if(addNames.length)details.push("Add-ons: "+addNames.map(esc).join(", "));
+   const drinkParts=[];
+   if(x.choice)drinkParts.push(x.choice);
+   if(x.bucketChoice)drinkParts.push(x.bucketChoice);
+   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);
+   if(addNames.length)drinkParts.push(addNames.join(", "));
    const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);
-   return `<div class="cartLine"><div class="cartStore">${esc(x.store)}</div><div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>Parts: ${parts.join(" • ")}</div>`:""}</div>${details.length?`<div class="cartDrinks">${details.join(" • ")}</div>`:""}<div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`;
+   return `<div class="cartLine">
+     <div class="cartStore">${esc(x.store)}</div>
+     <div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div>
+     ${drinkParts.length?`<div class="cartDrinks">Drinks / Choices</div><div>${drinkParts.map(esc).join(", ")}</div>`:""}
+     <div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div>
+   </div>`;
  }).join("");
  const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
- $("totals").innerHTML=`<div class="cartTotals"><div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div><div class="cartTotalRow"><b>Service Fee</b><span>10% <span>${peso(sf)}</span></span></div><div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div><div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div><div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div></div>`;
+ $("totals").innerHTML=`<div class="cartTotals">
+   <div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div>
+   <div class="cartTotalRow"><b>Service Fee</b><span>10% <span>${peso(sf)}</span></span></div>
+   <div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div>
+   <div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div>
+   <div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div>
+ </div>`;
 }
-function openCheckout(){
- $("checkout").style.display="block";
- $("orderSummary").innerHTML=draftCart.map(x=>{
-   const details=[];
-   if(x.choice)details.push(esc(x.choice));
-   (x.choiceGroups||[]).forEach(g=>{const vals=(g.options||[]).map(o=>typeof o==='string'?o:o?.name).filter(Boolean);if(vals.length)details.push(esc(g.group)+": "+vals.map(esc).join(", "));});
-   if(x.addOns?.length)details.push("Add-ons: "+x.addOns.map(a=>esc(a.name)).join(", "));
-   if(x.chickenParts?.length)details.push("Parts: "+x.chickenParts.map(p=>esc(p.name)+"×"+p.qty).join(", "));
-   return `<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${details.join(" • ")}</small></div>`;
- }).join("");
- updateTotals();
-}
+function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}</small></div>`).join("");updateTotals()}
 function updateTotals(){
  const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
  $("checkoutTotals").innerHTML=`<div class="cartTotals">
@@ -1549,28 +1557,6 @@ function syncCustomerChatWatchers(active){
 }
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
-function orderItemPricing(i){
-  const qty=Math.max(1,Number(i.qty||1));
-  const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
-  const extras=[];
-  if(i.choice){ extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"}); }
-  if(i.bucketChoice){ extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"}); }
-  (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
-    const name=typeof x==="string"?x:x?.name; const price=typeof x==="string"?0:Number(x?.price||0);
-    if(name) extras.push({name,price,label:g.group||"Choice"});
-  }));
-  (i.addOns||[]).forEach(x=>{const name=typeof x==="string"?x:x?.name;const price=typeof x==="string"?0:Number(x?.price||0);if(name)extras.push({name,price,label:"Add-on"})});
-  let extraTotal=extras.reduce((a,x)=>a+x.price,0);
-  let unit=base+extraTotal;
-  if(i.price!=null && Number(i.price)>base && extraTotal===0) unit=Number(i.price);
-  return {qty,base,extras,unit,line:unit*qty};
-}
-function customerOrderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{};
- const stores={}; (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(stores[st] ||= []).push(i)});
- const rows=Object.entries(stores).map(([store,items])=>`<div class="orderCard"><div class="store-head" style="color:#111">${esc(store)}</div>${items.map(i=>{const p=orderItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>esc(x.name||x)).join(", ");const details=[];if(parts)details.push(`Part: ${parts}`);if(i.choice)details.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)details.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)details.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);return `${esc(n)}${pr?` (${peso(pr)})`:""}`}).join(", ")}`);return `<div class="row"><b>${p.qty}x ${esc(i.name||"Food")}</b> <b>${peso(p.unit)}</b>${details.map(d=>`<div class="small">${d}</div>`).join("")}<div class="small"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("");
- return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${rows}<div class="orderDetailBill"><div>Sub Total: ${peso(f.foodOrder)}</div><div>10% Service Fee: ${peso(f.serviceFee)}</div><div>Delivery Fee: ${peso(f.deliveryFee)}</div>${Number(f.secondStoreFee||0)?`<div>2nd Store Fee: ${peso(f.secondStoreFee)}</div>`:""}<div><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
-}
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
@@ -1580,7 +1566,7 @@ function startOrders(){
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${customerOrderDetailHtml(o)}</div>
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
       ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
       ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
@@ -1595,7 +1581,7 @@ $("myOrders").onclick=async e=>{
  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.74 FINAL MENU PRICE + STORE PHOTO CLEAN";
+window.__MHAC_BUILD__="V4.1.64 CUSTOMER MASTER UNIFIED WHITE UI — TIME LIMIT TEST MODE";
 </script>
 
 <script>
@@ -1614,27 +1600,3 @@ setTimeout(function(){
 },4500);
 </script>
 </body></html>
-<style id="MHAC_FINAL_COMPACT_READABLE_20260831">
-/* FINAL COMPACT + READABLE — same typography across all apps */
-body{font-size:15px!important;line-height:1.35!important}
-.wrap{padding-bottom:28px!important}
-.title{font-size:24px!important;line-height:1.15!important}
-.status,.small{font-size:13px!important;line-height:1.3!important}
-.cart{padding:12px!important;margin-top:12px!important}
-.cart h2{font-size:21px!important;line-height:1.15!important;margin:4px 0 8px!important}
-/* Store list remains compact with 30x30 photos */
-.store{min-height:58px!important;font-size:17px!important}
-.storeBtnContent{gap:8px!important}
-.storeBtnContent .menuPhoto{width:30px!important;height:30px!important;flex:0 0 30px!important;border-radius:6px!important}
-.storeBtnContent>span:last-child{font-size:18px!important;font-weight:900!important}
-/* Cart is text-only */
-.cart .cartItemWithPhoto img,.cart .cartPhoto{display:none!important}
-/* Active orders: text only, readable, with complete choices */
-.orderCard{padding:10px!important;margin:7px 0!important;font-size:15px!important;line-height:1.35!important}
-.activeOrderLine{padding:6px 0!important}
-.activeOrderLine>b{font-size:16px!important;font-weight:800!important}
-.activeOrderLine .small{font-size:14px!important;color:#222!important;font-weight:500!important}
-.orderChatBtn{background:#fff!important;color:#111!important;border:1px solid #222!important;font-size:14px!important}
-/* Chat button white like the rest of the UI */
-.customerChatPanel .customerChatHead{background:#fff!important;color:#111!important;border-bottom:1px solid #ddd!important}
-</style>
