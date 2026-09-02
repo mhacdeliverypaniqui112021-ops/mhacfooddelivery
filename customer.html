@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.64</title><meta name="build-version" content="V4.1.63 CUSTOMER MASTER UNIFIED WHITE UI + CHICKEN PART ALIGNMENT">
+<!doctype html><html lang="en"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — CUSTOMER V4.1.64</title><meta name="build-version" content="V4.1.64 CUSTOMER MULTI PART + MULTI DRINK QUANTITY FIX">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111}header{text-align:center;padding:18px 12px;border-bottom:3px solid #e21d25}.logo{font-size:30px;font-weight:900}.logo b{color:#e21d25}.tag{font-size:14px}.rate,.area,.schedule{max-width:680px;margin:10px auto;padding:10px 12px;border:1.5px solid #222;border-radius:12px;text-align:center;font-size:12px;font-weight:800}.rate h2{margin:0 0 6px;color:#c9232a;font-size:19px}.rate p{margin:3px}.reminder{margin-top:8px;padding:9px;border:1px solid #222;border-radius:9px;background:#fff8e6;text-align:left;font-size:12px}.wrap{max-width:700px;margin:auto;padding:0 14px 35px}.title{font-size:24px;font-weight:900;margin:18px 0 12px}.stores{display:flex;flex-direction:column;gap:10px}.store{min-height:70px;border:2px solid #222;border-radius:15px;background:#fff;font-size:16px;font-weight:900}.cart{margin-top:18px;border:2px solid #222;border-radius:15px;padding:14px}.store-head{font-size:16px;font-weight:900;color:#d71920;border-bottom:1px solid #ddd;padding:8px 0}.row{padding:8px 0;border-bottom:1px solid #eee}.qty{display:flex;align-items:center;gap:8px}.qty button,.choice button,.back,.mini{border:1.5px solid #222;background:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.add{width:100%;background:#e21d25;color:#fff;border:0;border-radius:9px;padding:11px;font-weight:900;font-size:15px}.modal,.checkout{display:none;position:fixed;inset:0;background:#0008;padding:15px;overflow:auto;z-index:20}.panel,.checkout-panel{background:#fff;border-radius:17px;padding:16px;max-width:620px;margin:auto}.close{float:right;background:#e21d25;color:#fff;border:0;border-radius:8px;padding:8px 11px;font-weight:900}.food{border:1.5px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}.choice{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:6px 0}.choice input{width:auto}.field{padding:8px;background:#f7f7f7;border-radius:10px;margin:8px 0}.counter{display:flex;align-items:center;justify-content:space-between;padding:7px 0}.counter button{width:40px}.authGate{position:fixed;inset:0;background:#fff;z-index:100;padding:22px;display:flex;align-items:center;justify-content:center}.authBox{width:min(520px,100%);border:2px solid #222;border-radius:18px;padding:22px;text-align:center}.googleBtn{width:100%;padding:14px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;font-size:16px}.closed{display:none;position:fixed;inset:0;background:#fff;z-index:90;padding:30px;text-align:center}.closed .box{max-width:520px;margin:12vh auto;border:2px solid #222;border-radius:18px;padding:25px}.status,.small{font-size:12px;color:#666}.account{font-size:12px;color:#555;text-align:center}.total{font-size:21px;font-weight:900}.orderCard{border:2px solid #ddd;border-radius:14px;padding:12px;margin:8px 0}.greenText{color:#138a36;font-weight:900}.menuPhoto{width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #222;background:#f3f3f3;flex:0 0 60px}.productPhoto{width:60px;height:60px;object-fit:cover;border-radius:12px;border:2px solid #222;background:#f3f3f3;flex:0 0 60px}
 .cartItemWithPhoto{display:flex;align-items:center;gap:10px;padding:5px 0;}
@@ -915,6 +915,19 @@ h2{font-size:21px!important;line-height:1.15!important}
 .customerItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
 @media(max-width:600px){.customerItemPrice{font-size:14px!important}}
 </style>
+<style id="MHAC_CUSTOMER_MULTI_PART_DRINK_QTY_V1">
+.specialQtyGroup{padding:10px!important;margin:9px 0!important;background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important}
+.specialQtyGroup h4{margin:0 0 5px!important;font-size:20px!important}
+.specialQtyList{display:flex!important;flex-direction:column!important}
+.specialQtyRow{display:grid!important;grid-template-columns:minmax(0,1fr) 42px 34px 42px auto!important;align-items:center!important;gap:7px!important;padding:9px 0!important;border-bottom:1px solid #eee!important;min-height:54px!important}
+.specialQtyRow:last-child{border-bottom:0!important}
+.specialQtyRow.selected{background:#fafafa!important}
+.specialQtyName{font-weight:700!important;min-width:0!important}
+.specialQtyValue{text-align:center!important;font-size:18px!important}
+.specialQtyRow .specialQtyMinus,.specialQtyRow .specialQtyPlus{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;font-size:22px!important;border:1px solid #222!important;background:#fff!important;color:#111!important}
+.specialQtyTotal{margin-top:7px!important;padding:8px!important;text-align:center!important;border-radius:8px!important;background:#f2f2f2!important;font-size:14px!important}
+@media(max-width:480px){.specialQtyRow{grid-template-columns:minmax(0,1fr) 40px 30px 40px auto!important;gap:5px!important}.specialQtyRow .specialQtyMinus,.specialQtyRow .specialQtyPlus{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1081,25 +1094,48 @@ function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
+ const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
+ const isPartsGroup=g=>String(g?.role||'').toLowerCase()==='chickenparts'||['part','parts','chicken parts','🍗 chicken parts'].includes(String(g?.name||'').trim().toLowerCase());
+ const isDrinksGroup=g=>String(g?.role||'').toLowerCase()==='drinks'||['drink','drinks'].includes(String(g?.name||'').trim().toLowerCase());
+ const partsGroup=groups.find(isPartsGroup);
+ const drinksGroup=groups.find(isDrinksGroup);
+ const partOptions=(partsGroup?.options?.length?partsGroup.options:(f.chickenParts||[])).map(x=>({name:String(typeof x==='string'?x:x?.name||''),price:Number(typeof x==='string'?0:x?.price||0)})).filter(x=>x.name);
+ const drinkOptions=(drinksGroup?.options?.length?drinksGroup.options:(f.choices||[])).map(x=>({name:String(typeof x==='string'?x:x?.name||''),price:Number(typeof x==='string'?0:x?.price||0)})).filter(x=>x.name);
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
- if(false && f.chickenParts?.length){
-   h+=`<div class="field partSelectionField">
-     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
-     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
-     <div class="partGrid">${f.chickenParts.map((x,i)=>`
-       <div class="partBox" data-part-select="${i}">
-         <span class="partName">${esc(x.name)}</span>
-         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
-         <b class="partQty" data-part-count="${i}">0</b>
-         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
+ if(partOptions.length){
+   h+=`<div class="field specialQtyGroup partChoiceQtyGroup">
+     <h4>Part</h4>
+     <p class="small">Choose the chicken part for each ordered piece. You can use the same part or different parts.</p>
+     <div class="specialQtyList">${partOptions.map((x,i)=>`
+       <div class="specialQtyRow" data-part-row="${i}">
+         <span class="specialQtyName">${esc(x.name)}</span>
+         <button type="button" class="mini specialQtyMinus" data-part-q="${i}">−</button>
+         <b class="specialQtyValue" data-part-count-new="${i}">0</b>
+         <button type="button" class="mini specialQtyPlus" data-part-q="${i}">+</button>
+         <span class="choicePrice">Free</span>
        </div>`).join("")}</div>
-     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+     <div class="specialQtyTotal">Selected pieces: <b id="partTotalNew">0</b> / <b id="partNeedNew">1</b></div>
+   </div>`;
+ }
+ if(drinkOptions.length){
+   h+=`<div class="field specialQtyGroup drinkChoiceQtyGroup">
+     <h4>Drink</h4>
+     <p class="small">Choose one drink for each ordered piece. Different pieces can have different drinks.</p>
+     <div class="specialQtyList">${drinkOptions.map((x,i)=>`
+       <div class="specialQtyRow" data-drink-row="${i}">
+         <span class="specialQtyName">${esc(x.name)}</span>
+         <button type="button" class="mini specialQtyMinus" data-drink-q="${i}">−</button>
+         <b class="specialQtyValue" data-drink-count-new="${i}">0</b>
+         <button type="button" class="mini specialQtyPlus" data-drink-q="${i}">+</button>
+         <span class="choicePrice">${x.price?`+ ${peso(x.price)}`:"Free"}</span>
+       </div>`).join("")}</div>
+     <div class="specialQtyTotal">Selected drinks: <b id="drinkTotalNew">0</b> / <b id="drinkNeedNew">1</b></div>
    </div>`;
  }
  if(f.choiceGroups?.length){
-   h+=f.choiceGroups.map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
+   h+=f.choiceGroups.filter(g=>!isPartsGroup(g)&&!isDrinksGroup(g)).map((g,gi)=>`<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`<div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-other-${gi}" value="${oi}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`).join("");
  }
- const hasDrinksGroup=(f.choiceGroups||[]).some(g=>String(g.role||'').toLowerCase()==='drinks'||String(g.name||'').trim().toLowerCase()==='drinks');
+ const hasDrinksGroup=!!drinksGroup;
  if(f.choices?.length && !hasDrinksGroup){
    h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
@@ -1117,151 +1153,95 @@ function customize(si,ci,fi){
  }
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
- let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0},selectedPartIndex=null;
+ let qty=1;
+ let parts=partOptions.map(()=>0), drinks=drinkOptions.map(()=>0), styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
- const lowerPartGroupIndex=()=>{
-   return (f.choiceGroups||[]).findIndex(g=>{
-     const role=String(g.role||'').trim().toLowerCase();
-     const name=String(g.name||'').trim().toLowerCase();
-     return role==='chickenparts' || role==='chicken_parts' || role==='parts' || name==='part' || name==='parts';
-   });
- };
- const syncLowerPartSelection=()=>{
-   const gi=lowerPartGroupIndex();
-   if(gi<0)return;
-   const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);
-   if(!picked)return;
-   const option=f.choiceGroups?.[gi]?.options?.[Number(picked.value)];
-   const pickedName=String(typeof option==='string'?option:option?.name||'').trim().toLowerCase();
-   let idx=(f.chickenParts||[]).findIndex(x=>String(x?.name||x||'').trim().toLowerCase()===pickedName);
-   if(idx<0)idx=Number(picked.value);
-   if(idx<0 || idx>=parts.length)return;
-   parts=parts.map(()=>0);
-   parts[idx]=qty;
-   selectedPartIndex=idx;
-   update();
- };
+ const totalDrinkQty=()=>drinks.reduce((a,n)=>a+Number(n||0),0);
+ const trimCounts=(arr,target)=>{while(arr.reduce((a,n)=>a+Number(n||0),0)>target){const i=arr.findIndex(n=>Number(n||0)>0);if(i<0)break;arr[i]--;}};
  const update=()=>{
    $("foodQty").textContent=qty;
-   const top=$("foodQtyTop"); if(top) top.textContent=qty;
-   const need=$("partNeed"); if(need) need.textContent=qty;
-   const total=totalPartQty();
-   const pt=$("partTotal"); if(pt) pt.textContent=total;
-   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{
-     const n=Number(parts[i]||0);
-     b.classList.toggle("selected",n>0);
-     const c=b.querySelector("[data-part-count]"); if(c)c.textContent=n;
-   });
+   const pt=$("partTotalNew");if(pt)pt.textContent=totalPartQty();
+   const pn=$("partNeedNew");if(pn)pn.textContent=qty;
+   const dt=$("drinkTotalNew");if(dt)dt.textContent=totalDrinkQty();
+   const dn=$("drinkNeedNew");if(dn)dn.textContent=qty;
+   document.querySelectorAll("[data-part-row]").forEach((row,i)=>{const c=row.querySelector("[data-part-count-new]");if(c)c.textContent=Number(parts[i]||0);row.classList.toggle("selected",Number(parts[i]||0)>0)});
+   document.querySelectorAll("[data-drink-row]").forEach((row,i)=>{const c=row.querySelector("[data-drink-count-new]");if(c)c.textContent=Number(drinks[i]||0);row.classList.toggle("selected",Number(drinks[i]||0)>0)});
  };
- function changePart(i,d){
-   if(!f.chickenParts?.length)return;
-   const current=Number(parts[i]||0);
-   if(d>0 && totalPartQty()>=qty)return;
-   parts[i]=Math.max(0,current+d);
-   update();
- }
- $("qminus").onclick=()=>{
-   qty=Math.max(1,qty-1);
-   if(selectedPartIndex!==null && selectedPartIndex<parts.length){
-     parts=parts.map((n,i)=>i===selectedPartIndex?Math.min(Number(n||0),qty):0);
-     if(parts[selectedPartIndex]>0)parts[selectedPartIndex]=qty;
-   }else{
-     while(totalPartQty()>qty){
-       const i=parts.findIndex(n=>Number(n||0)>0);
-       if(i<0)break;
-       parts[i]--;
-     }
-   }
-   update();
- };
- $("qplus").onclick=()=>{
-   qty++;
-   if(selectedPartIndex!==null && selectedPartIndex<parts.length){
-     parts=parts.map((n,i)=>i===selectedPartIndex?qty:0);
-   }
-   update();
- };
- const lowerPartGi=lowerPartGroupIndex();
- if(lowerPartGi>=0){
-   document.querySelectorAll(`input[name="choiceGroup-${lowerPartGi}"]`).forEach(r=>{
-     r.addEventListener("change",syncLowerPartSelection);
-   });
- }
- document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
- document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=(ev)=>{
-   if(ev.target?.closest("button"))return;
-   const i=Number(b.dataset.partSelect);
-   if(totalPartQty()>=qty && Number(parts[i]||0)===0)return;
-   changePart(i,Number(parts[i]||0)>0?-1:1);
- });
- document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
-   const k=b.dataset.style,d=Number(b.dataset.d);
-   styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);
-   const el=$("style-"+k);if(el)el.textContent=styleSel[k];
- });
+ function changeCount(arr,i,d){if(i<0||i>=arr.length)return;const current=Number(arr[i]||0);if(d>0&&arr.reduce((a,n)=>a+Number(n||0),0)>=qty)return;arr[i]=Math.max(0,current+d);update();}
+ $("qminus").onclick=()=>{qty=Math.max(1,qty-1);trimCounts(parts,qty);trimCounts(drinks,qty);update()};
+ $("qplus").onclick=()=>{qty++;update()};
+ document.querySelectorAll("[data-part-q]").forEach(b=>{const i=Number(b.dataset.partQ);b.onclick=()=>changeCount(parts,i,b.classList.contains("specialQtyPlus")?1:-1)});
+ document.querySelectorAll("[data-drink-q]").forEach(b=>{const i=Number(b.dataset.drinkQ);b.onclick=()=>changeCount(drinks,i,b.classList.contains("specialQtyPlus")?1:-1)});
+ document.querySelectorAll("[data-part-row]").forEach(row=>row.onclick=e=>{if(e.target.closest("button"))return;changeCount(parts,Number(row.dataset.partRow),Number(parts[Number(row.dataset.partRow)]||0)>0?-1:1)});
+ document.querySelectorAll("[data-drink-row]").forEach(row=>row.onclick=e=>{if(e.target.closest("button"))return;changeCount(drinks,Number(row.dataset.drinkRow),Number(drinks[Number(row.dataset.drinkRow)]||0)>0?-1:1)});
+ document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{const k=b.dataset.style,d=Number(b.dataset.d);styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);const el=$("style-"+k);if(el)el.textContent=styleSel[k]});
  $("addConfigured").onclick=()=>{
-   const totalSelectedParts=totalPartQty();
-   if(f.chickenParts?.length && totalSelectedParts!==qty){
-     return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
-   }
+   if(partOptions.length&&totalPartQty()!==qty)return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
+   if(drinkOptions.length&&totalDrinkQty()!==qty)return alert("Please select exactly "+qty+" drink"+(qty===1?"":"s")+" before adding to cart.");
    const ch=document.querySelector('input[name=choice]:checked');
    let choice=ch?f.choices[+ch.value]:null;
-   if(choice && Number(choice.price||0)===0) choice={...choice,price:menuOptionPrice(f,choice.name)};
-   const choiceGroups=(f.choiceGroups||[]).map((g,gi)=>{const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);return {group:g.name,options:picked?[g.options?.[+picked.value]?.name||""].filter(Boolean):[]}}).filter(g=>g.options.length);
+   if(choice&&Number(choice.price||0)===0)choice={...choice,price:menuOptionPrice(f,choice.name)};
+   const choiceGroups=[];
+   if(drinksGroup&&drinkOptions.length){
+     const opts=[];
+     drinks.forEach((n,i)=>{for(let k=0;k<Number(n||0);k++)opts.push({name:drinkOptions[i].name,price:Number(drinkOptions[i].price||menuOptionPrice(f,drinkOptions[i].name)||0)});});
+     if(opts.length)choiceGroups.push({group:drinksGroup.name,options:opts});
+   }
+   (f.choiceGroups||[]).forEach((g,gi)=>{
+     if(isPartsGroup(g)||isDrinksGroup(g))return;
+     const picked=document.querySelector(`input[name="choiceGroup-other-${gi}"]:checked`);
+     if(picked){const x=g.options?.[+picked.value];if(x)choiceGroups.push({group:g.name,options:[{name:x.name,price:Number(x.price||menuOptionPrice(f,x.name)||0)}]});}
+   });
    const bh=document.querySelector('input[name=bucketChoice]:checked');
    let bucketChoice=bh?f.bucketChoices[+bh.value]:null;
-   if(bucketChoice && Number(bucketChoice.price||0)===0) bucketChoice={...bucketChoice,price:menuOptionPrice(f,bucketChoice.name)};
+   if(bucketChoice&&Number(bucketChoice.price||0)===0)bucketChoice={...bucketChoice,price:menuOptionPrice(f,bucketChoice.name)};
    const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>{const a=f.addOns[+x.dataset.addon];return a&&Number(a.price||0)===0?{...a,price:menuOptionPrice(f,a.name)}:a}).filter(Boolean);
    const spicyExtra=(f.type==="bucket"?styleSel.spicy*Number(f.spicyPrice||0):0);
-   const groupExtra=choiceGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+menuOptionPrice(f,n),0),0);
+   const groupExtra=choiceGroups.reduce((sum,g)=>sum+g.options.reduce((a,x)=>a+Number(x.price||menuOptionPrice(f,x.name)||0),0),0);
    const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
+   const unitPrice=Number(f.price||0)+(qty?extra/qty:0);
    draftCart.push({
      key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
-     price:Number(f.price)+extra,basePrice:Number(f.price),qty,
-     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups:choiceGroups.map(g=>{const src=(f.choiceGroups||[]).find(x=>x.name===g.group);return {group:g.group,options:g.options.map(n=>({name:n,price:menuOptionPrice(f,n)}))}}),addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
-     chickenParts:f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],
+     price:unitPrice,basePrice:Number(f.price||0),qty,
+     choice:choice?.name||"",choicePrice:Number(choice?.price||0),bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),choiceGroups,
+     addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
+     chickenParts:partOptions.length?partOptions.map((x,i)=>({name:x.name,qty:Number(parts[i]||0)})).filter(x=>x.qty):[],
      original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
    });
    renderCart();closeMenu();
  };
  update();
 }
-function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
 function renderCart(){
  const names=[...new Set(draftCart.map(x=>x.store))];
  $("count").textContent=draftCart.reduce((a,x)=>a+x.qty,0);
  $("storeCount").textContent=`Stores selected: ${names.length}/2`;
- if(!draftCart.length){
-   $("cart").innerHTML="No items yet.";
-   $("totals").innerHTML="";
-   $("checkoutBtn").disabled=true;
-   return;
- }
+ if(!draftCart.length){$("cart").innerHTML="No items yet.";$("totals").innerHTML="";$("checkoutBtn").disabled=true;return;}
  $("checkoutBtn").disabled=false;
  $("cart").innerHTML=draftCart.map((x,i)=>{
-   const drinkParts=[];
-   if(x.choice)drinkParts.push(x.choice);
-   if(x.bucketChoice)drinkParts.push(x.bucketChoice);
-   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);
-   if(addNames.length)drinkParts.push(addNames.join(", "));
+   const details=[];
+   if(x.choice)details.push(x.choice);
+   if(x.bucketChoice)details.push(x.bucketChoice);
+   (x.choiceGroups||[]).forEach(g=>{const n=String(g.group||'').toLowerCase();const vals=(g.options||[]).map(o=>typeof o==='string'?o:o?.name).filter(Boolean);if(vals.length)details.push((n==='drink'||n==='drinks'?'Drinks: ':esc(g.group)+': ')+vals.map(esc).join(', '));});
+   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);if(addNames.length)details.push("Add-ons: "+addNames.map(esc).join(", "));
    const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);
-   return `<div class="cartLine">
-     <div class="cartStore">${esc(x.store)}</div>
-     <div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div>
-     ${drinkParts.length?`<div class="cartDrinks">Drinks / Choices</div><div>${drinkParts.map(esc).join(", ")}</div>`:""}
-     <div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div>
-   </div>`;
+   return `<div class="cartLine"><div class="cartStore">${esc(x.store)}</div><div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>Parts: ${parts.join(" • ")}</div>`:""}</div>${details.length?`<div class="cartDrinks">${details.join(" • ")}</div>`:""}<div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div></div>`;
  }).join("");
  const sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
- $("totals").innerHTML=`<div class="cartTotals">
-   <div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div>
-   <div class="cartTotalRow"><b>Service Fee</b><span>10% <span>${peso(sf)}</span></span></div>
-   <div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div>
-   <div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div>
-   <div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div>
- </div>`;
+ $("totals").innerHTML=`<div class="cartTotals"><div class="cartTotalRow"><b>Sub total</b><span>${peso(sub)}</span></div><div class="cartTotalRow"><b>Service Fee</b><span>10% <span>${peso(sf)}</span></span></div><div class="cartTotalRow"><b>Additional Fee</b><span>${peso(second)}</span></div><div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div><div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div></div>`;
 }
-function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}</small></div>`).join("");updateTotals()}
+function openCheckout(){
+ $("checkout").style.display="block";
+ $("orderSummary").innerHTML=draftCart.map(x=>{
+   const details=[];
+   if(x.choice)details.push(esc(x.choice));
+   (x.choiceGroups||[]).forEach(g=>{const vals=(g.options||[]).map(o=>typeof o==='string'?o:o?.name).filter(Boolean);if(vals.length)details.push(esc(g.group)+": "+vals.map(esc).join(", "));});
+   if(x.addOns?.length)details.push("Add-ons: "+x.addOns.map(a=>esc(a.name)).join(", "));
+   if(x.chickenParts?.length)details.push("Parts: "+x.chickenParts.map(p=>esc(p.name)+"×"+p.qty).join(", "));
+   return `<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${details.join(" • ")}</small></div>`;
+ }).join("");
+ updateTotals();
+}
 function updateTotals(){
  const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
  $("checkoutTotals").innerHTML=`<div class="cartTotals">

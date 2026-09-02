@@ -1,11 +1,15 @@
-MHAC DELIVERY V4.1.74 — COMPACT STORE / FOOD EDITOR UPDATE
+MHAC CUSTOMER — MULTI PART + MULTI DRINK FIX
 
 Changes in this build:
-- Deleted choice groups no longer reappear automatically when a food editor is reopened.
-- Existing foods show only their saved choice groups; use ADD CHOICE GROUP to add one again.
-- Choice name input is wider so long names are easier to see/edit.
-- Choice price input is narrower to save horizontal space while still supporting additional fees.
-- Chicken Parts keeps a wide name field with a compact delete button.
-- No Description field and no food photo were added.
-- Existing Admin/Rider order flow is preserved.
-Choice field sizing update: Choice Name is the wide field; Price is compact at 62px, intended to fit 3-digit prices such as 35, 100, 999 without stealing space from the choice name.
+- Removed the duplicate upper Chicken Part Selection UI.
+- Kept the lower Part selection as the only customer-facing part selector.
+- Part selector now has - / count / + for each part.
+- If order quantity is 2, customer can choose 2 parts, same or different (example: Thigh x1 + Wing x1).
+- Drink selector now has - / count / + for each drink.
+- If order quantity is 2, customer can choose 2 drinks, same or different (example: Coke Regular x1 + Coke Float x1).
+- ADD TO CART requires the selected part count to equal the order quantity when parts exist.
+- ADD TO CART requires the selected drink count to equal the order quantity when drinks exist.
+- Different drink prices are distributed correctly across the ordered quantity so the cart/order total remains accurate.
+- Existing Admin, GPS, checkout, GCash, chat, store limit, and other Customer flows were preserved.
+
+Upload customer.html from this ZIP to the same location as the current Customer app file.
