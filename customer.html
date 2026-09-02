@@ -928,6 +928,131 @@ h2{font-size:21px!important;line-height:1.15!important}
 .specialQtyTotal{margin-top:7px!important;padding:8px!important;text-align:center!important;border-radius:8px!important;background:#f2f2f2!important;font-size:14px!important}
 @media(max-width:480px){.specialQtyRow{grid-template-columns:minmax(0,1fr) 40px 30px 40px auto!important;gap:5px!important}.specialQtyRow .specialQtyMinus,.specialQtyRow .specialQtyPlus{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}}
 </style>
+
+<style id="MHAC_PART_DRINK_OLD_LAYOUT_V2">
+/* V2: keep multi-quantity behavior, restore the old compact selection layout */
+.specialQtyGroup{
+  background:#fff!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin:12px 0!important;
+}
+.specialQtyGroup h4{
+  margin:0 0 4px!important;
+  font-size:20px!important;
+  font-weight:900!important;
+}
+.specialQtyGroup>.small{
+  margin:0 0 5px!important;
+  color:#555!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+}
+.specialQtyList{
+  width:100%!important;
+}
+.specialQtyRow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 40px 32px 40px auto!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-height:58px!important;
+  padding:7px 0!important;
+  border-bottom:1px solid #eee!important;
+  background:#fff!important;
+}
+.specialQtyRow:first-child{
+  border-top:0!important;
+}
+.specialQtyName{
+  min-width:0!important;
+  font-size:17px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+}
+.specialQtyRow .specialQtyMinus,
+.specialQtyRow .specialQtyPlus{
+  width:40px!important;
+  min-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid #222!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:22px!important;
+  font-weight:900!important;
+  line-height:1!important;
+}
+.specialQtyValue{
+  width:32px!important;
+  min-width:32px!important;
+  text-align:center!important;
+  font-size:18px!important;
+  font-weight:900!important;
+}
+.specialQtyRow .choicePrice{
+  white-space:nowrap!important;
+  font-size:16px!important;
+  font-weight:800!important;
+  text-align:right!important;
+}
+.specialQtyTotal{
+  margin:7px 0 0!important;
+  padding:7px 0!important;
+  background:#fff!important;
+  border:0!important;
+  border-radius:0!important;
+  text-align:center!important;
+  font-size:14px!important;
+  color:#555!important;
+}
+.specialQtyTotal b{
+  color:#111!important;
+}
+@media(max-width:480px){
+  .specialQtyGroup{margin:10px 0!important}
+  .specialQtyGroup h4{font-size:20px!important}
+  .specialQtyGroup>.small{font-size:14px!important}
+  .specialQtyRow{
+    grid-template-columns:minmax(0,1fr) 38px 30px 38px auto!important;
+    gap:5px!important;
+    min-height:54px!important;
+    padding:6px 0!important;
+  }
+  .specialQtyName{font-size:16px!important}
+  .specialQtyRow .specialQtyMinus,
+  .specialQtyRow .specialQtyPlus{
+    width:38px!important;
+    min-width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+    font-size:21px!important;
+  }
+  .specialQtyValue{width:30px!important;min-width:30px!important;font-size:17px!important}
+  .specialQtyRow .choicePrice{font-size:15px!important}
+}
+@media(max-width:380px){
+  .specialQtyRow{
+    grid-template-columns:minmax(0,1fr) 36px 28px 36px auto!important;
+    gap:4px!important;
+  }
+  .specialQtyRow .specialQtyMinus,
+  .specialQtyRow .specialQtyPlus{
+    width:36px!important;
+    min-width:36px!important;
+    height:36px!important;
+    min-height:36px!important;
+  }
+}
+</style>
+
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
