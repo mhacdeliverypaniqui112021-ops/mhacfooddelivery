@@ -1655,7 +1655,7 @@ function customerOrderBreakdown(o){
 
   const f=o.fees||{};
   return `<div class="customerOrderBreakdown">
-    <div class="customerBreakdownTitle">🧾 ORDER DETAILS</div>
+    <div class="customerBreakdownTitle">🧾 ORDER BREAKDOWN</div>
     ${items}
     <div class="customerBreakdownBill">
       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
@@ -1671,15 +1671,20 @@ function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
   ordersUnsub=onSnapshot(query(collection(db,"orders"),where("customer.uid","==",currentUser.uid)),snap=>{
-    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
+    const arr=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
       const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(`Drinks: ${esc(i.choice)}`);if(i.bucketChoice)lines.push(`Bucket: ${esc(i.bucketChoice)}`);if(parts)lines.push(`Parts: ${parts}`);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>lines.push(`${esc(g.group)}: ${g.options.map(esc).join(", ")}`));if(i.addOns?.length)lines.push(`Add-ons: ${i.addOns.map(a=>esc(a.name||a)).join(", ")}`);return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>${customerOrderBreakdown(o)}
-      ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
-      ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
-      <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
+      return `<div class=orderCard>
+        <b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>
+        ${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}
+        ${customerOrderBreakdown(o)}
+        ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
+        ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
+        <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button>
+      </div>`;
     }).join(""):"No active orders.";
     syncCustomerChatWatchers(arr);
   });

@@ -1,21 +1,8 @@
-MHAC DELIVERY — UNIFIED BREAKDOWN FINAL
+CUSTOMER BREAKDOWN FINAL CLEANUP
 
-Locked working baseline preserved.
-
-Breakdown standard:
-ADMIN = RIDER = CUSTOMER
-
-Customer was changed only in its Order Breakdown presentation:
-- Per-store bordered group
-- Store name header
-- Food quantity + unit price
-- Part / Drink / Choice / Add-ons details
-- Line Total
-- Sub Total
-- 10% Service Fee
-- Delivery Fee
-- 2nd Store Fee when applicable
-- Grand Total
-
-Admin and Rider source files are carried over unchanged from the locked build.
-No other Customer feature was intentionally changed.
+Only Customer active-order presentation was changed:
+- Removed the duplicate old item summary above the breakdown.
+- Customer now uses the unified ORDER BREAKDOWN as the single order detail.
+- Drink/Choice objects are rendered by their name/price, never [object Object].
+- No food/store photos are shown inside the order breakdown.
+- Admin and Rider are carried over unchanged.
