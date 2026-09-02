@@ -1,0 +1,9 @@
+MHAC CUSTOMER — DUPLICATE CHICKEN PART FIX
+Base: uploaded customer.html
+
+Changes only:
+1. Removed the duplicate upper CHICKEN PART SELECTION +/- UI from the customer-facing customize screen.
+2. Kept the lower Part/Parts radio choice group as the only visible chicken-part selector.
+3. Lower Part selection now drives the existing internal chickenParts cart/order data.
+4. Quantity +/- remains synchronized with the selected lower Part.
+5. Drinks, Fries, Add-ons, Original/Spicy, checkout, GPS, GCash, chat, and order flow were not intentionally changed.

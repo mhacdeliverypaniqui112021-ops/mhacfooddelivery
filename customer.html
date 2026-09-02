@@ -1082,7 +1082,7 @@ function customize(si,ci,fi){
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
- if(f.chickenParts?.length){
+ if(false && f.chickenParts?.length){
    h+=`<div class="field partSelectionField">
      <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
      <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
@@ -1117,8 +1117,30 @@ function customize(si,ci,fi){
  }
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
- let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
+ let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0},selectedPartIndex=null;
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
+ const lowerPartGroupIndex=()=>{
+   return (f.choiceGroups||[]).findIndex(g=>{
+     const role=String(g.role||'').trim().toLowerCase();
+     const name=String(g.name||'').trim().toLowerCase();
+     return role==='chickenparts' || role==='chicken_parts' || role==='parts' || name==='part' || name==='parts';
+   });
+ };
+ const syncLowerPartSelection=()=>{
+   const gi=lowerPartGroupIndex();
+   if(gi<0)return;
+   const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);
+   if(!picked)return;
+   const option=f.choiceGroups?.[gi]?.options?.[Number(picked.value)];
+   const pickedName=String(typeof option==='string'?option:option?.name||'').trim().toLowerCase();
+   let idx=(f.chickenParts||[]).findIndex(x=>String(x?.name||x||'').trim().toLowerCase()===pickedName);
+   if(idx<0)idx=Number(picked.value);
+   if(idx<0 || idx>=parts.length)return;
+   parts=parts.map(()=>0);
+   parts[idx]=qty;
+   selectedPartIndex=idx;
+   update();
+ };
  const update=()=>{
    $("foodQty").textContent=qty;
    const top=$("foodQtyTop"); if(top) top.textContent=qty;
@@ -1140,14 +1162,31 @@ function customize(si,ci,fi){
  }
  $("qminus").onclick=()=>{
    qty=Math.max(1,qty-1);
-   while(totalPartQty()>qty){
-     const i=parts.findIndex(n=>Number(n||0)>0);
-     if(i<0)break;
-     parts[i]--;
+   if(selectedPartIndex!==null && selectedPartIndex<parts.length){
+     parts=parts.map((n,i)=>i===selectedPartIndex?Math.min(Number(n||0),qty):0);
+     if(parts[selectedPartIndex]>0)parts[selectedPartIndex]=qty;
+   }else{
+     while(totalPartQty()>qty){
+       const i=parts.findIndex(n=>Number(n||0)>0);
+       if(i<0)break;
+       parts[i]--;
+     }
    }
    update();
  };
- $("qplus").onclick=()=>{qty++;update()};
+ $("qplus").onclick=()=>{
+   qty++;
+   if(selectedPartIndex!==null && selectedPartIndex<parts.length){
+     parts=parts.map((n,i)=>i===selectedPartIndex?qty:0);
+   }
+   update();
+ };
+ const lowerPartGi=lowerPartGroupIndex();
+ if(lowerPartGi>=0){
+   document.querySelectorAll(`input[name="choiceGroup-${lowerPartGi}"]`).forEach(r=>{
+     r.addEventListener("change",syncLowerPartSelection);
+   });
+ }
  document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
  document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=(ev)=>{
    if(ev.target?.closest("button"))return;
