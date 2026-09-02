@@ -1,15 +1,11 @@
-MHAC CUSTOMER — PART + DRINK QUANTITY ONLY
+MHAC CUSTOMER — PART + DRINK SELECTION FINAL BUILD
 
-Locked baseline preserved:
-- Admin not included/changed.
-- Existing Customer app code/flows preserved outside the requested Part + Drinks selection area.
-- No large selection card/box UI.
+Admin is not included or modified.
+Only the requested Part/Drinks selection UI is changed.
 
-Requested behavior:
-- Part: each option has − / count / +.
-- Drinks: each option has − / count / +.
-- Food quantity is the maximum total for Parts and Drinks.
-- Food Qty 2 can be Thigh x1 + Leg x1.
-- Food Qty 2 can be Coke Regular x1 + Coke Float x1.
-- Exact quantity is required before ADD TO CART when Parts/Drinks exist.
-- Existing cart qty pricing is preserved by storing per-unit extra pricing.
+- Part: minus / quantity / plus + price
+- Drinks: minus / quantity / plus + price
+- Fixed aligned columns for all price lengths
+- Mixed quantities supported
+- Total selected must equal food quantity
+- No duplicate Part/Drinks radio selection

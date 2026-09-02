@@ -890,77 +890,58 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
-<style id="MHAC_PART_DRINK_COMPACT_OLD_LAYOUT_LOCKED">
-/* Part + Drinks only: compact old layout. No large selection cards. */
+
+
+
+<style id="MHAC_PART_DRINK_SELECTION_FINAL_LOCKED">
+/* FINAL Part + Drinks selector: aligned columns, clean grouped layout. */
 .mhacCompactQtyGroup{
-  background:transparent!important;
-  border:0!important;
-  border-radius:0!important;
+  background:#fff!important;
+  border:1px solid #ddd!important;
+  border-radius:14px!important;
   box-shadow:none!important;
-  padding:0!important;
-  margin:10px 0!important;
+  padding:14px!important;
+  margin:12px 0!important;
 }
-.mhacCompactQtyGroup h4{
-  margin:6px 0 3px!important;
-  padding:0!important;
-}
-.mhacQtyHint{
-  font-size:12px!important;
-  color:#666!important;
-  margin:0 0 4px!important;
-}
-.mhacQtyList{
-  width:100%!important;
-  background:transparent!important;
-}
+.mhacCompactQtyGroup h4{margin:0 0 6px!important;padding:0!important;font-size:22px!important}
+.mhacQtyHint{font-size:15px!important;color:#666!important;line-height:1.35!important;margin:0 0 8px!important}
+.mhacQtyList{width:100%!important}
 .mhacQtyRow{
   display:grid!important;
-  grid-template-columns:minmax(0,1fr) 34px 30px 34px auto!important;
+  grid-template-columns:minmax(0,1fr) 44px 36px 44px 94px!important;
   align-items:center!important;
-  gap:4px!important;
-  min-height:38px!important;
-  padding:3px 0!important;
+  column-gap:8px!important;
+  min-height:58px!important;
+  padding:7px 0!important;
   border-bottom:1px solid #eee!important;
-  background:transparent!important;
+  background:#fff!important;
 }
 .mhacQtyName{
-  min-width:0!important;
-  font-size:14px!important;
-  font-weight:600!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  white-space:nowrap!important;
+  min-width:0!important;font-size:17px!important;font-weight:600!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important
 }
-.mhacQtyCount{
-  text-align:center!important;
-  min-width:24px!important;
-}
+.mhacQtyCount{width:36px!important;text-align:center!important;font-size:18px!important}
 .mhacQtyRow .mini{
-  width:34px!important;
-  min-width:34px!important;
-  height:30px!important;
-  padding:0!important;
-  margin:0!important;
+  width:44px!important;min-width:44px!important;height:44px!important;
+  padding:0!important;margin:0!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;font-size:20px!important
 }
 .mhacQtyRow .choicePrice{
-  font-size:12px!important;
-  white-space:nowrap!important;
-  text-align:right!important;
+  width:94px!important;min-width:94px!important;text-align:right!important;
+  white-space:nowrap!important;font-size:15px!important;font-weight:600!important
 }
-.mhacQtyTotal{
-  font-size:12px!important;
-  margin-top:4px!important;
-  color:#555!important;
-}
-@media(max-width:420px){
+.mhacQtyTotal{font-size:14px!important;color:#666!important;margin-top:7px!important}
+@media(max-width:430px){
+  .mhacCompactQtyGroup{padding:12px!important}
+  .mhacCompactQtyGroup h4{font-size:20px!important}
   .mhacQtyRow{
-    grid-template-columns:minmax(0,1fr) 32px 28px 32px auto!important;
-    gap:3px!important;
+    grid-template-columns:minmax(0,1fr) 40px 30px 40px 82px!important;
+    column-gap:5px!important
   }
-  .mhacQtyRow .mini{
-    width:32px!important;
-    min-width:32px!important;
-  }
+  .mhacQtyRow .mini{width:40px!important;min-width:40px!important;height:40px!important}
+  .mhacQtyCount{width:30px!important;font-size:17px!important}
+  .mhacQtyRow .choicePrice{width:82px!important;min-width:82px!important;font-size:14px!important}
+  .mhacQtyName{font-size:16px!important}
 }
 </style>
 
