@@ -1,8 +1,12 @@
-CUSTOMER BREAKDOWN FINAL CLEANUP
+MHAC DELIVERY — UNIFIED BREAKDOWN FINAL STYLE
 
-Only Customer active-order presentation was changed:
-- Removed the duplicate old item summary above the breakdown.
-- Customer now uses the unified ORDER BREAKDOWN as the single order detail.
-- Drink/Choice objects are rendered by their name/price, never [object Object].
-- No food/store photos are shown inside the order breakdown.
-- Admin and Rider are carried over unchanged.
+Admin, Rider, Customer now use the same breakdown visual style based on the Customer reference screenshot.
+
+Requested changes only:
+- Admin breakdown: unified Customer-style per-store cards and totals.
+- Rider breakdown: unified Customer-style per-store cards and totals.
+- Customer food/category selection: removed small food thumbnail; store thumbnails remain.
+- Customer/Admin/Rider breakdown photos: none.
+- Drink object values render by name/price, never [object Object].
+
+Other working features are preserved.

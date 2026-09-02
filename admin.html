@@ -2149,6 +2149,17 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   }
 }
 </style>
+<style id="MHAC_UNIFIED_BREAKDOWN_STYLE_FINAL">
+.unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
+.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
+.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
+.unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
+.unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
+.unifiedFoodRow:first-child{border-top:0!important}
+.unifiedFoodName{font-size:18px!important;line-height:1.35!important}
+.unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
+.unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2563,16 +2574,9 @@ function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=N
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="item orderDetailStore"><h3 style="margin:0 0 6px">${esc(store)}</h3>${items.map(i=>{const p=adminItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>esc(x.name||x)).join(", ");const ds=[];if(parts)ds.push(`Part: ${parts}`);if(i.choice)ds.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(a=>{const n=typeof a==="string"?a:a?.name;const pr=typeof a==="string"?0:Number(a?.price||0);return `${esc(n)}${pr?` (${peso(pr)})`:""}`}).join(", ")}`);return `<div class="orderDetailFood" style="padding:6px 0;border-top:1px solid #eee"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b>${ds.map(x=>`<div>${x}</div>`).join("")}<div><b>Line Total: ${peso(p.line)}</b></div></div>`;}).join("")}</div>`).join("") || '<div class=item>No item details.</div>';
- const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
-   ? `<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
-   : `<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
-   ${payment}
-   <div class="orderDetailHeading"><b>🛒 ORDER DETAILS</b></div>${rows}
-   <div class="orderDetailBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br>10% Service Fee: ${peso(f.serviceFee)}<br>Delivery Fee: ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br>2nd Store Fee: ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div>
- </div>`;
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}if(i.bucketChoice)ds.push(`Choice: ${esc(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"")}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
+ const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`:`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+ return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
 }
 function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
