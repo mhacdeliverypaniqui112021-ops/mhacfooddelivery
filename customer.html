@@ -1681,7 +1681,7 @@ function startOrders(){
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
-      const canCancel=!['COMPLETED','CANCELLED'].includes(st);
+      const canCancel=(st==="NEW");
       return `<div class=orderCard>
         <b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>
         ${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}
