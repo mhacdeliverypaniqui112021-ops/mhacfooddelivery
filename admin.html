@@ -3063,7 +3063,7 @@ function renderNestedFoods(si,ci,list){
    const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
    ed.classList.toggle("hidden");
    if(!ed.classList.contains("hidden") && typeof renderDirectFoodEditor==="function"){
-     renderDirectFoodEditor(y,z,ed,list);
+     renderDirectFoodEditor(x,y,z,ed,list);
    }
  });
 }
@@ -3171,13 +3171,13 @@ function renderDirectFoodList(ci,list){
      const fi=+btn.dataset.fi;
      const ed=list.querySelector(`[data-editor="${fi}"]`);
      ed.classList.toggle("hidden");
-     if(!ed.classList.contains("hidden")) renderDirectFoodEditor(ci,fi,ed,list);
+     if(!ed.classList.contains("hidden")) renderDirectFoodEditor(selectedStore,ci,fi,ed,list);
    };
  });
 }
 
-function renderDirectFoodEditor(ci,fi,ed,list){
- const s=draft.stores[selectedStore],c=s.categories[ci],it=c.items[fi];
+function renderDirectFoodEditor(si,ci,fi,ed,list){
+ const s=draft.stores[si],c=s.categories[ci],it=c.items[fi];
  ed.innerHTML=`
  <div class="oneFoodBox compactFoodEditor foodEditorV2">
    <h3>🍽️ EDIT FOOD</h3>
@@ -3359,7 +3359,7 @@ function renderDirectFoodEditor(ci,fi,ed,list){
    it.chickenParts=(chickenGroup?.options||[]).map(x=>({name:x.name}));it.choices=drinkGroup?.options||[];it.addOns=addonGroup?.options||[];it.fries=friesGroup?.options||[];
    it.bucketChoices=[...ed.querySelectorAll('.bucketName')].map(x=>{const r=x.closest('.foodEditOptionRow');return {name:x.value.trim(),price:Number(r.querySelector('.bucketPrice')?.value||0)}}).filter(x=>x.name);it.type=typeSel.value;
    saveDraftLocal();const btn=ed.querySelector('.saveDirectFood');btn.disabled=true;btn.textContent='💾 SAVING...';
-   const keepStore=selectedStore,keepCategory=ci,keepFood=fi;
+   const keepStore=si,keepCategory=ci,keepFood=fi;
    flushDraftMenu().then(()=>{
      toast('✅ FOOD SAVED TO DRAFT.');
      renderStores();
