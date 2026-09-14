@@ -2574,7 +2574,7 @@ function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=N
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}if(i.bucketChoice)ds.push(`Choice: ${esc(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"")}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];if(i.category)ds.push(`Category: ${esc(i.category)}`);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: ${esc(n)}${pr?` + ${peso(pr)}`:""}`)}if(i.bucketChoice)ds.push(`Choice: ${esc(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"")}`);(i.choiceGroups||[]).forEach(g=>{const m={};(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);if(!n)return;(m[n] ||= {n,pr,c:0}).c++;});const opts=Object.values(m).map(v=>`${esc(v.n)}${v.c>1?` ×${v.c}`:""}${v.pr?` + ${peso(v.pr)}`:""}`).join(", ");if(opts)ds.push(`${esc(g.name||g.group||"Choice")}: ${opts}`)});if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`:`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
 }
@@ -2768,7 +2768,7 @@ function normalizeMenu(x){
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:(String(g.role||"")||((String(g.name||"").trim().toLowerCase()==='part'||String(g.name||"").trim().toLowerCase()==='parts')?'chickenParts':'')),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:(String(g.role||"")||((String(g.name||"").trim().toLowerCase()==='part'||String(g.name||"").trim().toLowerCase()==='parts')?'chickenParts':'')),requiredSelections:Math.max(0,Number(g.requiredSelections||0)),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -3250,7 +3250,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      const options=Array.isArray(g?.options)?g.options.map(normOpt).filter(x=>x.name):[];
      const itemLooksLikeChoice=!role && options.length===0 && inferChoiceRole(nm);
      if(itemLooksLikeChoice){ malformed.push({name:nm,price:0,role:inferChoiceRole(nm)}); return null; }
-     return {name:nm,role,options};
+     return {name:nm,role,requiredSelections:Math.max(0,Number(g?.requiredSelections||0)),options};
    }).filter(Boolean);
 
    // Collapse malformed item-groups (Drink/Coke Regular/Coke Float/etc.)
@@ -3261,7 +3261,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      if(!opts.length)return;
      const existing=rawGroups.find(g=>g.role===role);
      if(existing) existing.options=[...existing.options,...opts];
-     else rawGroups.push({name:role==='drinks'?'Drinks':role==='addOns'?'Add-ons':'Fries',role,options:opts});
+     else rawGroups.push({name:role==='drinks'?'Drinks':role==='addOns'?'Add-ons':'Fries',role,requiredSelections:0,options:opts});
    });
 
    // Also repair groups whose title is a category and whose options already exist.
@@ -3269,22 +3269,20 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      if(!g.role) g.role=roleFromName(g.name);
    });
  }else{
-   if(drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(normOpt).filter(x=>x.name)});
-   if(addons.length) rawGroups.push({name:'Add-ons',role:'addOns',options:addons.map(normOpt).filter(x=>x.name)});
-   if(Array.isArray(it.fries)&&it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:it.fries.map(normOpt).filter(x=>x.name)});
-   if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
+   if(drinks.length) rawGroups.push({name:'Drinks',role:'drinks',requiredSelections:0,options:drinks.map(normOpt).filter(x=>x.name)});
+   if(addons.length) rawGroups.push({name:'Add-ons',role:'addOns',requiredSelections:0,options:addons.map(normOpt).filter(x=>x.name)});
+   if(Array.isArray(it.fries)&&it.fries.length) rawGroups.push({name:'Fries',role:'fries',requiredSelections:0,options:it.fries.map(normOpt).filter(x=>x.name)});
+   if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',requiredSelections:0,options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
  }
 
- const order=['drinks','addOns','fries','chickenParts'];
- rawGroups.sort((a,b)=>{
-   const ai=order.indexOf(a.role), bi=order.indexOf(b.role);
-   return (ai<0?99:ai)-(bi<0?99:bi);
- });
+ // Preserve the exact saved Choice Group order. Do not auto-sort.
+ // The Admin order is authoritative for Customer and Rider.
+
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><input class="foodEditRequired" type="number" min="1" step="1" value="${Number(g.requiredSelections||0)||''}" placeholder="Auto" title="Required distinct choices; blank = food quantity"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
@@ -3350,7 +3348,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    if(!name||!Number.isFinite(price)||price<0)return toast('Enter food name and valid price.');
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
-   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';return {name,role,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
+   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';return {name,role,requiredSelections:Math.max(0,Number(box.querySelector('.foodEditRequired')?.value||0)),options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
    // From this save onward, Choice Groups are authoritative for this food.
    // Mirror them to legacy fields only for compatibility; never use those
    // legacy fields to recreate a deleted group on the next load.
@@ -3738,6 +3736,7 @@ setTimeout(function(){
   setInterval(()=>{ const now=day(); try { const last=localStorage.getItem(key); if(last!==now){ localStorage.setItem(key,now); refreshDailyView(); location.reload(); } }catch(e){} },60000);
 })();
 </script>
+
 </body></html><style id="MHAC_FINAL_COMPACT_READABLE_20260831">
 /* FINAL COMPACT + READABLE — requested mobile layout */
 body{font-size:15px!important;line-height:1.35!important}
@@ -3792,4 +3791,9 @@ body{font-size:15px!important;line-height:1.35!important}
 .foodEditorV2 .foodEditGroupTitle{width:100%!important;min-width:0!important;min-height:50px!important;border:0!important;background:#fff!important;padding:11px 12px!important;font-size:18px!important;font-weight:900!important;color:#111!important;outline:none!important}
 .foodEditorV2 .foodEditHead .foodEditToggle{min-height:50px!important;width:48px!important;padding:0!important;justify-content:center!important}
 .foodEditorV2 .foodEditHead .deleteGroup{min-height:44px!important;width:44px!important;margin:0 2px!important;padding:6px!important}
+</style>
+<style id="MHAC_CHOICE_REQUIRED_COUNT_UI">
+.foodEditorV2 .foodEditHead{grid-template-columns:minmax(0,1fr) 72px 48px 48px!important;gap:4px!important}
+.foodEditorV2 .foodEditRequired{width:72px!important;min-width:0!important;min-height:44px!important;padding:8px!important;font-size:14px!important;font-weight:800!important}
+@media(max-width:600px){.foodEditorV2 .foodEditHead{grid-template-columns:minmax(0,1fr) 62px 42px 42px!important}.foodEditorV2 .foodEditRequired{width:62px!important;font-size:13px!important;padding:6px!important}}
 </style>
