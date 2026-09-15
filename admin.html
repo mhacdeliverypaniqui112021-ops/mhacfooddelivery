@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.64 LIVE RIDER SYNC HARDENED</title>
-<meta name="build-version" content="V4.1.64 LIVE RIDER SYNC HARDENED">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.69 CHOICE ORDER SAVE FIX</title>
+<meta name="build-version" content="V4.1.67 CHOICE ORDER SAVE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2160,7 +2160,26 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
 .unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
 </style>
-</head><body>
+<style id="MHAC_UNIVERSAL_CHOICE_COUNT_V1">
+.foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 112px 62px 44px 44px!important;gap:5px!important;align-items:center!important}
+.foodEditHead .foodEditCountMode{width:112px!important;min-height:42px!important;font-size:11px!important;padding:7px 5px!important;margin:0!important}
+.foodEditHead .foodEditRequiredCount{width:62px!important;min-height:42px!important;font-size:13px!important;text-align:center!important;padding:7px 4px!important;margin:0!important}
+.foodEditHead .foodEditRequiredCount:disabled{opacity:.55}
+@media(max-width:600px){
+ .foodEditHead{grid-template-columns:minmax(0,1fr) 96px 56px 40px 40px!important}
+ .foodEditHead .foodEditCountMode{width:96px!important;font-size:10px!important}
+ .foodEditHead .foodEditRequiredCount{width:56px!important}
+}
+<style id="MHAC_CHOICE_GROUP_MOVE_V1">
+.choiceGroupOrderTools{display:flex;gap:6px;margin:0 0 8px;padding:0}
+.choiceGroupOrderTools button{flex:1;min-height:40px!important;margin:0!important;padding:6px 8px!important;font-size:12px!important;font-weight:800!important;border-radius:8px!important}
+.choiceGroupOrderTools button:disabled{opacity:.4!important}
+/* Long-press / drag whole Choice Group on mobile */
+.foodEditAccordion.choiceGroupDragging{opacity:.55!important;outline:2px dashed #222!important;transform:scale(.99);}
+.foodEditAccordion.choiceGroupDragReady{user-select:none;-webkit-user-select:none;}
+.foodEditAccordion .foodEditHead{touch-action:manipulation;}
+.foodEditAccordion.choiceGroupDragging .foodEditHead{touch-action:none;}
+</style></head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -2763,12 +2782,27 @@ $('addStore').onclick=async()=>{
 };
 
 function storeKey(name,index){const base=String(name||"store").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"store";return "store_"+base;}
+function canonicalChoiceRole(name,role){
+ const nm=String(name||"").trim().toLowerCase();
+ const rr=String(role||"").trim();
+ if(/^(?:flavor|flavors|flavour|flavours)$/.test(nm)||nm==="🌶️ flavor"||nm==="🌶️ flavors") return "flavor";
+ if(/^(?:part|parts|chicken parts)$/.test(nm)||nm==="🍗 chicken parts") return "chickenParts";
+ if(/^(?:drink|drinks|beverage|beverages)$/.test(nm)) return "drinks";
+ if(/^(?:fries|fry)$/.test(nm)) return "fries";
+ if(/^(?:add-on|add-ons|addon|addons)$/.test(nm)) return "addOns";
+ // IMPORTANT: a custom group name must NEVER inherit an old standard role.
+ // Example: "Choice" may have stale role:"drinks" from an older build.
+ // Standard role is determined by the current group title only.
+ if(["flavor","chickenParts","fries","drinks","addOns"].includes(rr)) return "";
+ return rr;
+}
+
 function normalizeMenu(x){
  const m=JSON.parse(JSON.stringify(x||{version:"final",stores:[]}));
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:(String(g.role||"")||((String(g.name||"").trim().toLowerCase()==='part'||String(g.name||"").trim().toLowerCase()==='parts')?'chickenParts':'')),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map((g,gIndex)=>({name:String(g.name||"Choices"),role:canonicalChoiceRole(String(g.name||"Choices"),String(g.role||"")),options:pairList(g.options||[]),countMode:String(g.countMode||"auto")==="fixed"?"fixed":"auto",requiredCount:Math.max(1,Number(g.requiredCount||1)),choiceOrder:gIndex})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices),countMode:"auto",requiredCount:1,choiceOrder:0}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -3223,14 +3257,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  const hasChoiceGroups=Array.isArray(it.choiceGroups);
 
  const normOpt=x=>({name:String(x?.name??x?.[0]??x??'').trim(),price:Number(x?.price??x?.[1]??0)});
- const roleFromName=(name)=>{
-   const low=String(name||'').trim().toLowerCase();
-   if(low==='part'||low==='parts'||low==='chicken parts'||low==='🍗 chicken parts') return 'chickenParts';
-   if(low==='drink'||low==='drinks'||low==='beverage'||low==='beverages') return 'drinks';
-   if(low==='add-on'||low==='add-ons'||low==='addon'||low==='addons') return 'addOns';
-   if(low==='fries'||low==='fry') return 'fries';
-   return '';
- };
+ const roleFromName=(name)=>canonicalChoiceRole(name,"");
  const inferChoiceRole=(name)=>{
    const low=String(name||'').toLowerCase();
    if(/\b(coke|cola|sprite|royal|pepsi|drink|drinks|juice|float|coffee|water|tea|soda|beverage|regular|medium|large)\b/.test(low)) return 'drinks';
@@ -3246,11 +3273,11 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    const malformed=[];
    rawGroups=it.choiceGroups.map(g=>{
      const nm=String(g?.name||'Choices').trim();
-     const role=String(g?.role||'') || roleFromName(nm);
+     const role=canonicalChoiceRole(nm,String(g?.role||''));
      const options=Array.isArray(g?.options)?g.options.map(normOpt).filter(x=>x.name):[];
      const itemLooksLikeChoice=!role && options.length===0 && inferChoiceRole(nm);
      if(itemLooksLikeChoice){ malformed.push({name:nm,price:0,role:inferChoiceRole(nm)}); return null; }
-     return {name:nm,role,options};
+     return {name:nm,role,countMode:String(g?.countMode||'auto')==='fixed'?'fixed':'auto',requiredCount:Math.max(1,Number(g?.requiredCount||1)),choiceOrder:Number.isFinite(Number(g?.choiceOrder))?Number(g.choiceOrder):rawGroups.length,options};
    }).filter(Boolean);
 
    // Collapse malformed item-groups (Drink/Coke Regular/Coke Float/etc.)
@@ -3261,7 +3288,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      if(!opts.length)return;
      const existing=rawGroups.find(g=>g.role===role);
      if(existing) existing.options=[...existing.options,...opts];
-     else rawGroups.push({name:role==='drinks'?'Drinks':role==='addOns'?'Add-ons':'Fries',role,options:opts});
+     else rawGroups.push({name:role==='drinks'?'Drinks':role==='addOns'?'Add-ons':'Fries',role,countMode:'auto',requiredCount:1,options:opts});
    });
 
    // Also repair groups whose title is a category and whose options already exist.
@@ -3269,23 +3296,26 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      if(!g.role) g.role=roleFromName(g.name);
    });
  }else{
-   if(drinks.length) rawGroups.push({name:'Drinks',role:'drinks',options:drinks.map(normOpt).filter(x=>x.name)});
-   if(addons.length) rawGroups.push({name:'Add-ons',role:'addOns',options:addons.map(normOpt).filter(x=>x.name)});
-   if(Array.isArray(it.fries)&&it.fries.length) rawGroups.push({name:'Fries',role:'fries',options:it.fries.map(normOpt).filter(x=>x.name)});
-   if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
+   if(drinks.length) rawGroups.push({name:'Drinks',role:'drinks',countMode:'auto',requiredCount:1,options:drinks.map(normOpt).filter(x=>x.name)});
+   if(addons.length) rawGroups.push({name:'Add-ons',role:'addOns',countMode:'auto',requiredCount:1,options:addons.map(normOpt).filter(x=>x.name)});
+   if(Array.isArray(it.fries)&&it.fries.length) rawGroups.push({name:'Fries',role:'fries',countMode:'auto',requiredCount:1,options:it.fries.map(normOpt).filter(x=>x.name)});
+   if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',countMode:'auto',requiredCount:1,options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
  }
 
- const order=['drinks','addOns','fries','chickenParts'];
- rawGroups.sort((a,b)=>{
-   const ai=order.indexOf(a.role), bi=order.indexOf(b.role);
-   return (ai<0?99:ai)-(bi<0?99:bi);
- });
+ // IMPORTANT: preserve the exact saved Choice Group order.
+ // The first group stays first, second stays second, third stays third,
+ // and fourth stays fourth. Do not sort by role/name here.
+
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
+   box.querySelector('.foodEditCountMode').value=String(g.countMode||'auto')==='fixed'?'fixed':'auto';
+   box.querySelector('.foodEditRequiredCount').value=Math.max(1,Number(g.requiredCount||1));
+   box.querySelector('.foodEditRequiredCount').disabled=box.querySelector('.foodEditCountMode').value!=='fixed';
+   box.querySelector('.foodEditCountMode').onchange=()=>{box.querySelector('.foodEditRequiredCount').disabled=box.querySelector('.foodEditCountMode').value!=='fixed';};
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
      const isPart=g.role==='chickenParts';
@@ -3293,7 +3323,81 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      r.querySelector('button').onclick=()=>r.remove(); opts.appendChild(r);
    };
    (g.options||[]).forEach(addOpt);
-   box.querySelector('.foodEditToggle').onclick=()=>{const was=open===box;closeOther(box);if(was){open=null;box.classList.remove('open');drawer.classList.add('hidden');box.querySelector('.foodEditToggle span').textContent='›';}else{open=box;box.classList.add('open');drawer.classList.remove('hidden');box.querySelector('.foodEditToggle span').textContent='⌄';}}; box.querySelector('.deleteGroup').onclick=()=>{if(open===box)open=null;box.remove();};
+   // Mobile-safe Choice Group ordering: move the WHOLE group up/down.
+   // The DOM order is the draft order and is saved exactly as displayed.
+   const orderTools=document.createElement('div');
+   orderTools.className='choiceGroupOrderTools';
+   orderTools.innerHTML='<button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">⬆️ UP</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">⬇️ DOWN</button>';
+   box.insertBefore(orderTools,drawer);
+   const syncOrderButtons=()=>{
+     const parent=box.parentElement;
+     if(!parent)return;
+     const boxes=[...parent.querySelectorAll('.foodEditAccordion')];
+     const idx=boxes.indexOf(box);
+     orderTools.querySelector('.moveChoiceUp').disabled=idx<=0;
+     orderTools.querySelector('.moveChoiceDown').disabled=idx<0||idx>=boxes.length-1;
+   };
+   const moveGroup=(dir)=>{
+     const parent=box.parentElement;
+     if(!parent)return;
+     if(dir<0){ const prev=box.previousElementSibling; if(prev) parent.insertBefore(box,prev); }
+     else { const next=box.nextElementSibling; if(next) parent.insertBefore(next,box); }
+     [...parent.querySelectorAll('.foodEditAccordion')].forEach((b,i)=>b.dataset.order=String(i));
+     [...parent.querySelectorAll('.foodEditAccordion')].forEach(b=>b.querySelector('.choiceGroupOrderTools')?.dispatchEvent(new Event('orderSync')));
+     syncOrderButtons();
+     toast('↕️ Choice Group order updated. SAVE FOOD to keep it.');
+   };
+   orderTools.querySelector('.moveChoiceUp').onclick=()=>moveGroup(-1);
+   orderTools.querySelector('.moveChoiceDown').onclick=()=>moveGroup(1);
+   orderTools.addEventListener('orderSync',syncOrderButtons);
+
+   // MOBILE LONG-PRESS MOVE: press and hold the Choice Group card, then drag it
+   // above/below another group. Do not start drag from inputs/buttons.
+   let dragTimer=null, dragging=false, dragPointerId=null;
+   const dragStart=(e)=>{
+     const t=e.target;
+     if(t.closest('input,select,button,.foodEditDrawer')) return;
+     if(e.pointerType==='mouse' && e.button!==0) return;
+     clearTimeout(dragTimer);
+     dragPointerId=e.pointerId;
+     dragTimer=setTimeout(()=>{
+       dragging=true;
+       box.classList.add('choiceGroupDragging');
+       box.classList.add('choiceGroupDragReady');
+       try{box.setPointerCapture(dragPointerId)}catch(_){}
+       toast('↕️ HOLD + DRAG to move this Choice Group.');
+     },450);
+   };
+   const dragCancel=()=>{ if(dragTimer){clearTimeout(dragTimer);dragTimer=null;} };
+   const dragMove=(e)=>{
+     if(!dragging) return;
+     e.preventDefault();
+     const parent=box.parentElement; if(!parent) return;
+     const boxes=[...parent.querySelectorAll('.foodEditAccordion')].filter(b=>b!==box);
+     let target=null;
+     for(const other of boxes){
+       const r=other.getBoundingClientRect();
+       if(e.clientY < r.top + r.height/2){ target=other; break; }
+     }
+     if(target) parent.insertBefore(box,target);
+     else if(boxes.length) parent.appendChild(box);
+     [...parent.querySelectorAll('.foodEditAccordion')].forEach((b,i)=>b.dataset.order=String(i));
+     [...parent.querySelectorAll('.foodEditAccordion')].forEach(b=>b.querySelector('.choiceGroupOrderTools')?.dispatchEvent(new Event('orderSync')));
+   };
+   const dragEnd=()=>{
+     dragCancel();
+     if(!dragging) return;
+     dragging=false;
+     box.classList.remove('choiceGroupDragging','choiceGroupDragReady');
+     syncOrderButtons();
+     toast('✅ Choice Group moved. SAVE FOOD to keep it.');
+   };
+   box.addEventListener('pointerdown',dragStart);
+   box.addEventListener('pointermove',dragMove,{passive:false});
+   box.addEventListener('pointerup',dragEnd);
+   box.addEventListener('pointercancel',dragEnd);
+   box.addEventListener('pointerleave',()=>{ if(!dragging) dragCancel(); });
+   box.querySelector('.foodEditToggle').onclick=()=>{const was=open===box;closeOther(box);if(was){open=null;box.classList.remove('open');drawer.classList.add('hidden');box.querySelector('.foodEditToggle span').textContent='›';}else{open=box;box.classList.add('open');drawer.classList.remove('hidden');box.querySelector('.foodEditToggle span').textContent='⌄';syncOrderButtons();}}; box.querySelector('.deleteGroup').onclick=()=>{if(open===box)open=null;box.remove();groupsBox.querySelectorAll('.choiceGroupOrderTools').forEach(t=>t.dispatchEvent(new Event('orderSync')));};
    box.querySelector('.addGroupOption').onclick=()=>addOpt();
 
    // Copy/paste is per choice group and persists locally for easy Android editing.
@@ -3301,6 +3405,8 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      const payload={
        name:box.querySelector('.foodEditGroupTitle')?.value.trim()||g.name||'Choices',
        role:g.role||box.dataset.role||'',
+       countMode:box.querySelector('.foodEditCountMode')?.value==='fixed'?'fixed':'auto',
+       requiredCount:Math.max(1,Math.floor(Number(box.querySelector('.foodEditRequiredCount')?.value||1))),
        options:[...opts.querySelectorAll('.foodEditOptionRow')].map(r=>({
          name:r.querySelector('.groupOptionName')?.value.trim()||'',
          price:Number(r.querySelector('.groupOptionPrice')?.value||0)
@@ -3318,6 +3424,9 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      const payload=foodClipboard.choiceGroup;
      if(!payload?.options?.length)return toast('Nothing copied yet.');
      opts.innerHTML='';
+     if(payload.countMode){box.querySelector('.foodEditCountMode').value=payload.countMode==='fixed'?'fixed':'auto';}
+     if(payload.requiredCount){box.querySelector('.foodEditRequiredCount').value=Math.max(1,Number(payload.requiredCount));}
+     box.querySelector('.foodEditRequiredCount').disabled=box.querySelector('.foodEditCountMode').value!=='fixed';
      payload.options.map(o=>({name:String(o.name||''),price:Number(o.price||0)})).filter(o=>o.name).forEach(o=>addOpt(o));
      toast('📥 Choices pasted.');
    };
@@ -3350,7 +3459,16 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    if(!name||!Number.isFinite(price)||price<0)return toast('Enter food name and valid price.');
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
-   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';return {name,role,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
+   // IMPORTANT: save in the exact visual order shown in the editor.
+   // Whatever is first remains first; second remains second; etc.
+   const visualGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')];
+   it.choiceGroups=visualGroups.map((box,visualIndex)=>{
+     const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';
+     let role=canonicalChoiceRole(name,box.dataset.role||'');
+     const mode=box.querySelector('.foodEditCountMode')?.value==='fixed'?'fixed':'auto';
+     const required=Math.max(1,Math.floor(Number(box.querySelector('.foodEditRequiredCount')?.value||1)));
+     return {name,role,countMode:mode,requiredCount:required,choiceOrder:visualIndex,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};
+   });
    // From this save onward, Choice Groups are authoritative for this food.
    // Mirror them to legacy fields only for compatibility; never use those
    // legacy fields to recreate a deleted group on the next load.
