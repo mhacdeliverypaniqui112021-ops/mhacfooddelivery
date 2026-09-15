@@ -2160,11 +2160,10 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
 .unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
 </style>
-
 <style>
 .choiceRuleBox{border:1px solid #ddd;border-radius:10px;padding:8px;margin:6px 0;background:#fff}
-.choiceRuleBox .groupRequiredCount{display:none;margin-top:5px}
-.choiceRuleBox .groupSelectionMode{width:100%;min-height:42px}
+.choiceRuleBox .groupRequiredCount{display:none;margin-top:5px;width:100%;box-sizing:border-box;min-height:40px}
+.choiceRuleBox .groupSelectionMode{width:100%;min-height:40px}
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
@@ -2578,43 +2577,55 @@ setInterval(refreshCountdowns,1000);
 
 function selectedChoiceRows(i){
  const out=[];
- const push=(name,price=0,qty=1)=>{name=String(name||'').trim();if(!name)return;const n=Math.max(1,Number(qty||1));out.push({name,price:Number(price||0),qty:n});};
- const pushValue=(v,defaultPrice=0)=>{if(v==null)return;if(typeof v==='string'||typeof v==='number'){push(v,defaultPrice,1);return;}if(Array.isArray(v)){v.forEach(x=>pushValue(x,defaultPrice));return;}const name=v.name??v.choice??v.label??v.value;const price=v.price??v.choicePrice??defaultPrice;const qty=v.qty??v.quantity??v.count??v.selectedQty??1;if(name)push(name,price,qty);};
- // Preferred authoritative saved selections.
- const preferred=i.selectedChoices??i.selections??i.choiceSelections??i.selectedChoiceGroups;
- if(Array.isArray(preferred)) preferred.forEach(g=>{if(Array.isArray(g?.options))g.options.forEach(x=>{if(x?.selected||Number(x?.qty||x?.quantity||x?.count||0)>0)push(x.name,x.price,x.qty||x.quantity||x.count);}); else pushValue(g);});
- else if(preferred&&typeof preferred==='object') Object.values(preferred).forEach(v=>{if(Array.isArray(v))v.forEach(x=>pushValue(x));else pushValue(v);});
- // Choice groups may themselves carry selected flags/quantities.
+ const push=(name,price=0,qty=1)=>{name=String(name||"").trim();if(!name)return;const n=Math.max(1,Number(qty||1));out.push({name,price:Number(price||0),qty:n});};
+ const walk=(v,defaultPrice=0)=>{
+   if(v==null)return;
+   if(Array.isArray(v)){v.forEach(x=>walk(x,defaultPrice));return;}
+   if(typeof v==="string"||typeof v==="number"){push(v,defaultPrice,1);return;}
+   const name=v.name??v.choice??v.value;
+   const price=v.price??v.choicePrice??defaultPrice;
+   const qty=v.qty??v.quantity??v.selectedQty??v.count??1;
+   if(name && (v.selected!==false || v.selected===true)) push(name,price,qty);
+ };
+ // New/known selected-choice containers. Only selected entries are displayed.
+ const preferred=i.selectedChoices??i.selections??i.choiceSelections;
+ if(preferred) walk(preferred);
  (Array.isArray(i.choiceGroups)?i.choiceGroups:[]).forEach(g=>{
-   (Array.isArray(g?.selectedOptions)?g.selectedOptions:[]).forEach(x=>pushValue(x));
-   (Array.isArray(g?.options)?g.options:[]).forEach(x=>{if(x?.selected===true||Number(x?.selectedQty||x?.qty||x?.quantity||x?.count||0)>0)push(x.name,x.price,x.selectedQty||x.qty||x.quantity||x.count);});
+   if(Array.isArray(g.selectedOptions)) g.selectedOptions.forEach(x=>walk(x));
+   (Array.isArray(g.options)?g.options:[]).forEach(x=>{
+     if(x?.selected===true || Number(x?.selectedQty||x?.qty||x?.quantity||x?.count||0)>0) push(x.name,x.price,x.selectedQty||x.qty||x.quantity||x.count);
+   });
  });
- // Legacy fields remain supported as selected values, not as menu definitions.
+ // Legacy saved selections. Do not treat menu definitions as selected.
  (Array.isArray(i.chickenParts)?i.chickenParts:[]).forEach(x=>{const q=Number(x?.qty||x?.quantity||x?.selectedQty||0);if(q>0)push(x?.name??x,0,q);});
- if(i.choice)push(typeof i.choice==='string'?i.choice:i.choice?.name,i.choicePrice??i.choice?.price,1);
- if(i.bucketChoice)push(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name,i.bucketChoicePrice??i.bucketChoice?.price,1);
- (Array.isArray(i.addOnsSelected)?i.addOnsSelected:[]).forEach(x=>pushValue(x));
+ if(i.choice) walk(i.choice,i.choicePrice||0);
+ if(i.bucketChoice) walk(i.bucketChoice,i.bucketChoicePrice||0);
+ (Array.isArray(i.addOnsSelected)?i.addOnsSelected:[]).forEach(x=>walk(x));
  return out;
 }
 function adminItemPricing(i){
  const qty=Math.max(1,Number(i.qty||1));
  const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
- const selected=selectedChoiceRows(i);
- const extras=selected.map(x=>({name:x.name,price:x.price,qty:x.qty}));
- const extraTotal=extras.reduce((a,x)=>a+(Number(x.price||0)*Number(x.qty||1)),0);
- let unit=base+(qty?extraTotal/qty:extraTotal);
- // If the saved order already supplied an authoritative unit price, retain it only when no selected extras were found.
- if(!selected.length&&i.price!=null)unit=Number(i.price||base);
- return{qty,base,extras,unit,line:unit*qty,extraTotal};
+ const extras=selectedChoiceRows(i);
+ return{qty,base,extras,unit:base,line:base*qty};
 }
 function orderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{}, groups={};
- (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];p.extras.forEach(x=>{const q=Number(x.qty||1);ds.push(`${esc(x.name)}${q>1?` ×${q}`:""}${Number(x.price||0)?` + ${peso(x.price)}`:""}`)});return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(Number(i.basePrice!=null?i.basePrice:i.price||0))}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}</div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
+ const c=o.customer||{}, f=o.fees||{};
+ const groups={};
+ (o.items||[]).forEach(i=>{
+   const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+   const category=String(i.category||i.categoryName||i.categoryLabel||"").trim();
+   const key=store+"\u0000"+category;
+   (groups[key] ||= {store,category,items:[]}).items.push(i);
+ });
+ const rows=Object.values(groups).map(g=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(g.store)}</div>${g.category?`<div class="unifiedChoice"><b>${esc(g.category)}</b></div>`:""}${g.items.map(i=>{
+   const p=adminItemPricing(i);
+   const choices=p.extras.map(x=>{const q=Number(x.qty||1);return `${esc(x.name)}${q>1?` ×${q}`:""}${Number(x.price||0)?` + ${peso(x.price)}`:""}`;});
+   return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.base)}</b></div>${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}</div>`;
+ }).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`:`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
+ return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Food Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
 }
-function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
  const active=orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"NEW").toUpperCase()));
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
@@ -2804,31 +2815,7 @@ function normalizeMenu(x){
  ensureGeneratedPhotos(m);
  const pairList=v=>Array.isArray(v)?v.map(x=>Array.isArray(x)?({name:String(x[0]||""),price:Number(x[1]||0)}):({name:String(x?.name||""),price:Number(x?.price||0)})).filter(x=>x.name):[];
  const partList=v=>Array.isArray(v)?v.map(x=>typeof x==="string"?({name:x}):({name:String(x?.name||"")})).filter(x=>x.name):[];
- const roleOf=(g)=>{
-   const nm=String(g?.name||"").trim().toLowerCase();
-   const r=String(g?.role||"").trim();
-   if(r)return r;
-   if(/^flavou?r/.test(nm))return 'flavor';
-   if(/^(part|parts|chicken parts|🍗 chicken parts)$/.test(nm))return 'chickenParts';
-   if(/^fries?$/.test(nm))return 'fries';
-   if(/^(drink|drinks|beverage|beverages)$/.test(nm))return 'drinks';
-   if(/^add[- ]?ons?$/.test(nm))return 'addOns';
-   return '';
- };
- const groupRank=g=>{const r=roleOf(g); return ({flavor:0,chickenParts:1,fries:2,drinks:3,addOns:4})[r]??99};
- m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>{
-   const groups=Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({
-     name:String(g?.name||"Choices"),role:roleOf(g),
-     options:pairList(g?.options||[]),
-     requiredCount:Math.max(0,Number(g?.requiredCount??g?.selectionCount??0)||0),
-     selectionMode:String(g?.selectionMode||"perItem"),
-     requiredPerItem:Math.max(0,Number(g?.requiredPerItem??1)||0)
-   })):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices),requiredCount:0,selectionMode:"perItem",requiredPerItem:1}]:[]);
-   groups.sort((a,b)=>groupRank(a)-groupRank(b));
-   return {...i,choices:pairList(i.choices),choiceGroups:groups,choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)};
- }));
- return {...c,items};
- }))}));
+ m.stores=(m.stores||[]).map((s,index)=>({...s,id:s.id||storeKey(s.name,index),categories:(s.categories||[]).map(c=>({...c,items:(c.items||[]).map(i=>({...i,choices:pairList(i.choices),choiceGroups:Array.isArray(i.choiceGroups)?i.choiceGroups.map(g=>({name:String(g.name||"Choices"),role:(String(g.role||"")||((String(g.name||"").trim().toLowerCase()==='part'||String(g.name||"").trim().toLowerCase()==='parts')?'chickenParts':'')),selectionMode:String(g.selectionMode||'perItem'),requiredCount:Math.max(0,Number(g.requiredCount||0)),requiredPerItem:Math.max(1,Number(g.requiredPerItem||1)),options:pairList(g.options||[])})):((i.choices||[]).length?[{name:"Drinks",role:"drinks",options:pairList(i.choices)}]:[]),choiceGroupsLocked:Boolean(i.choiceGroupsLocked),addOns:pairList(i.addOns||i.addons),chickenParts:partList(i.chickenParts||i.parts),bucketChoices:pairList(i.bucketChoices),type:i.type==="bucket"?"bucket":"chicken",selection:{original:Number(i.selection?.original||0),spicy:Number(i.selection?.spicy||0)},spicyPrice:Number(i.spicyPrice||0),bucketPieces:Number(i.bucketPieces||0)}))}))}));
  return m;
 }
 let draftSaveTimer=null;
@@ -3345,12 +3332,12 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceRuleBox"><label class="label">REQUIRED SELECTIONS</label><select class="groupSelectionMode"><option value="perItem">Automatic: 1 per food quantity</option><option value="fixed">Choose X per food quantity</option><option value="bucketPieces">Automatic: bucket pieces</option></select><input class="groupRequiredCount" type="number" min="0" step="1" placeholder="X selections per food" value="${Number(g.requiredCount||0)}"><div class="hint">0 = automatic. Example: Choose 3 Flavors = Fixed + X=3. Bucket = automatic based on bucket pieces.</div></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
- const modeSel=box.querySelector('.groupSelectionMode'), countInput=box.querySelector('.groupRequiredCount');
- modeSel.value=(g.selectionMode||'perItem');
- countInput.value=Number(g.requiredCount||0);
- const syncRuleUi=()=>{countInput.disabled=modeSel.value!=='fixed';countInput.style.display=modeSel.value==='fixed'?'block':'none';};
- modeSel.onchange=syncRuleUi; syncRuleUi();
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceRuleBox"><label class="label">REQUIRED SELECTIONS</label><select class="groupSelectionMode"><option value="perItem">Automatic: 1 per food quantity</option><option value="fixed">Choose X per food quantity</option><option value="bucketPieces">Automatic: bucket pieces</option></select><input class="groupRequiredCount" type="number" min="1" step="1" placeholder="X selections per food" value="${Number(g.requiredCount||0)}"><div class="hint">Choose X = exact selections required for each food quantity. Bucket = based on bucket pieces.</div></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   const modeSel=box.querySelector('.groupSelectionMode'), countInput=box.querySelector('.groupRequiredCount');
+   modeSel.value=String(g.selectionMode||'perItem');
+   countInput.value=Number(g.requiredCount||0);
+   const syncRuleUi=()=>{countInput.disabled=modeSel.value!=='fixed';countInput.style.display=modeSel.value==='fixed'?'block':'none';};
+   modeSel.onchange=syncRuleUi; syncRuleUi();
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
@@ -3419,7 +3406,6 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
    it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';if(role==='flavor'||/^flavou?r/i.test(name))role='flavor';return {name,role,selectionMode:box.querySelector('.groupSelectionMode')?.value||'perItem',requiredCount:Math.max(0,Number(box.querySelector('.groupRequiredCount')?.value||0)),requiredPerItem:1,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
-   it.choiceGroups.sort((a,b)=>{const rank={flavor:0,chickenParts:1,fries:2,drinks:3,addOns:4};return (rank[a.role]??99)-(rank[b.role]??99);});
    // From this save onward, Choice Groups are authoritative for this food.
    // Mirror them to legacy fields only for compatibility; never use those
    // legacy fields to recreate a deleted group on the next load.
