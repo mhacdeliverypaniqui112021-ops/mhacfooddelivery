@@ -3281,11 +3281,16 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  };
  const inferChoiceRole=(name)=>{
    const low=String(name||'').toLowerCase();
+   if(/\b(flavor|flavour|flavors|flavours|taste|spicy|original)\b/.test(low)) return 'flavor';
+   if(/\b(part|parts|chicken part|chicken parts|wing|wings|thigh|thighs|breast|breasts|leg|legs|drumstick|drumsticks)\b/.test(low)) return 'chickenParts';
    if(/\b(coke|cola|sprite|royal|pepsi|drink|drinks|juice|float|coffee|water|tea|soda|beverage|regular|medium|large)\b/.test(low)) return 'drinks';
-   if(/\b(fries|fry|potato)\b/.test(low)) return 'fries';
-   if(/\b(add.?on|cheese|gravy|sauce|extra)\b/.test(low)) return 'addOns';
+   if(/\b(fries|fry|potato|potatoes)\b/.test(low)) return 'fries';
+   if(/\b(add.?on|cheese|gravy|sauce|extra|topping|toppings)\b/.test(low)) return 'addOns';
    return '';
  };
+
+ const choiceRoleOrder=['flavor','chickenParts','fries','drinks','addOns'];
+ const choiceRoleRank=(role)=>{const i=choiceRoleOrder.indexOf(String(role||''));return i<0?99:i;};
 
  let rawGroups=[];
  if(hasChoiceGroups){
@@ -3323,21 +3328,23 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    if(parts.length) rawGroups.push({name:'Parts',role:'chickenParts',options:parts.map(x=>({name:String(x?.name??x).trim(),price:0})).filter(x=>x.name)});
  }
 
- const order=['flavor','chickenParts','fries','drinks','addOns'];
- rawGroups.sort((a,b)=>{
-   const ai=order.indexOf(a.role), bi=order.indexOf(b.role);
-   return (ai<0?99:ai)-(bi<0?99:bi);
- });
+ // UNIVERSAL CHOICE ORDER — never alphabetical.
+ // Standard groups always render FLAVOR → PART → FRIES → DRINK.
+ // Any custom/unknown group stays after the standard groups.
+ rawGroups.forEach((g,idx)=>{g._choiceOrder=idx;});
+ rawGroups.sort((a,b)=>choiceRoleRank(a.role)-choiceRoleRank(b.role) || Number(a._choiceOrder||0)-Number(b._choiceOrder||0));
+ rawGroups.forEach(g=>delete g._choiceOrder);
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceRuleBox"><label class="label">REQUIRED SELECTIONS</label><select class="groupSelectionMode"><option value="perItem">Automatic: 1 per food quantity</option><option value="fixed">Choose X per food quantity</option><option value="bucketPieces">Automatic: bucket pieces</option></select><input class="groupRequiredCount" type="number" min="1" step="1" placeholder="X selections per food" value="${Number(g.requiredCount||0)}"><div class="hint">Choose X = exact selections required for each food quantity. Bucket = based on bucket pieces.</div></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceRuleBox"><label class="label">REQUIRED SELECTIONS</label><select class="groupSelectionMode"><option value="perItem">Automatic: 1 per food quantity</option><option value="fixed">Choose X per food quantity</option><option value="bucketPieces">Automatic: bucket pieces</option></select><div class="quickChooseRow"><span class="quickChooseLabel">QUICK CHOOSE:</span><button type="button" class="gray quickChoose" data-count="2">2</button><button type="button" class="gray quickChoose" data-count="3">3</button><button type="button" class="gray quickChoose" data-count="4">4</button><button type="button" class="gray quickChoose" data-count="6">6</button></div><input class="groupRequiredCount" type="number" min="1" step="1" placeholder="X selections per food" value="${Number(g.requiredCount||0)}"><div class="hint">Automatic = 1 selection per food quantity. Choose X = exactly X selections per food quantity. Example: 2x food + Choose 3 = 6 selections. Bucket = based on bucket pieces.</div></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const modeSel=box.querySelector('.groupSelectionMode'), countInput=box.querySelector('.groupRequiredCount');
    modeSel.value=String(g.selectionMode||'perItem');
    countInput.value=Number(g.requiredCount||0);
-   const syncRuleUi=()=>{countInput.disabled=modeSel.value!=='fixed';countInput.style.display=modeSel.value==='fixed'?'block':'none';};
+   const syncRuleUi=()=>{countInput.disabled=modeSel.value!=='fixed';countInput.style.display=modeSel.value==='fixed'?'block':'none';box.querySelectorAll('.quickChoose').forEach(b=>b.disabled=modeSel.value!=='fixed');};
    modeSel.onchange=syncRuleUi; syncRuleUi();
+   box.querySelectorAll('.quickChoose').forEach(b=>b.onclick=()=>{modeSel.value='fixed';countInput.value=Number(b.dataset.count||0);syncRuleUi();});
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    const addOpt=(o={name:'',price:0})=>{
      const r=document.createElement('div'); r.className='foodEditOptionRow';
@@ -3405,7 +3412,10 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    if(!name||!Number.isFinite(price)||price<0)return toast('Enter food name and valid price.');
    it.name=name;it.price=price;it.available=ed.querySelector('.availability').value==='true';
    it.selection={original:Number(selection.original||0),spicy:Number(selection.spicy||0)};it.spicyPrice=Number(ed.querySelector('.spicyPrice')?.value||0);
-   it.choiceGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map(box=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';if(role==='flavor'||/^flavou?r/i.test(name))role='flavor';return {name,role,selectionMode:box.querySelector('.groupSelectionMode')?.value||'perItem',requiredCount:Math.max(0,Number(box.querySelector('.groupRequiredCount')?.value||0)),requiredPerItem:1,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name)};});
+   const savedGroups=[...ed.querySelectorAll('.foodEditGroups .foodEditAccordion')].map((box,idx)=>{const name=box.querySelector('.foodEditGroupTitle')?.value.trim()||'Choices';let role=box.dataset.role||roleFromName(name)||inferChoiceRole(name);if(role==='chickenParts'||/^parts?$/i.test(name))role='chickenParts';if(role==='flavor'||/^flavou?r/i.test(name))role='flavor';if(role==='fries'||/^fr(?:ie|ies)$/i.test(name))role='fries';if(role==='drinks'||/^drinks?$/i.test(name))role='drinks';if(role==='addOns'||/^add[- ]?ons?$/i.test(name))role='addOns';return {name,role,selectionMode:box.querySelector('.groupSelectionMode')?.value||'perItem',requiredCount:Math.max(0,Number(box.querySelector('.groupRequiredCount')?.value||0)),requiredPerItem:1,options:[...box.querySelectorAll('.foodEditOptionRow')].map(r=>({name:r.querySelector('.groupOptionName')?.value.trim()||'',price:Number(r.querySelector('.groupOptionPrice')?.value||0)})).filter(x=>x.name),_saveOrder:idx};});
+   // Persist the universal order, never alphabetical: FLAVOR → PART → FRIES → DRINK, then custom groups.
+   savedGroups.sort((a,b)=>choiceRoleRank(a.role)-choiceRoleRank(b.role)||a._saveOrder-b._saveOrder).forEach(g=>delete g._saveOrder);
+   it.choiceGroups=savedGroups;
    // From this save onward, Choice Groups are authoritative for this food.
    // Mirror them to legacy fields only for compatibility; never use those
    // legacy fields to recreate a deleted group on the next load.
