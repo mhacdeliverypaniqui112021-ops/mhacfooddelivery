@@ -2253,6 +2253,25 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   #stores .foodEditAccordion .deleteGroup{width:32px!important;min-width:32px!important;}
 }
 </style>
+<style id="MHAC_CHOICE_GROUP_SIMPLE_BAR_V176">
+#stores .foodEditAccordion .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 34px 58px 34px!important;gap:5px!important;align-items:center!important;min-height:48px!important;padding:5px!important;}
+#stores .foodEditAccordion .foodEditGroupTitle{min-width:0!important;width:100%!important;font-weight:900!important;font-size:16px!important;text-transform:uppercase!important;}
+#stores .foodEditAccordion .foodEditToggle{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
+#stores .foodEditAccordion .choiceGroupOrderTools{width:58px!important;min-width:58px!important;height:34px!important;display:flex!important;gap:3px!important;align-items:center!important;justify-content:center!important;}
+#stores .foodEditAccordion .choiceGroupOrderTools button{width:27px!important;min-width:27px!important;height:27px!important;min-height:27px!important;font-size:15px!important;padding:0!important;margin:0!important;}
+#stores .foodEditAccordion .deleteGroup{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
+#stores .foodEditAccordion .choiceCountBar{display:flex!important;align-items:center!important;gap:6px!important;padding:7px 8px!important;margin:0 0 7px!important;border:1px solid #ddd!important;border-radius:8px!important;}
+#stores .foodEditAccordion .choiceCountBar .foodEditCountMode{width:120px!important;min-width:120px!important;min-height:34px!important;height:34px!important;}
+#stores .foodEditAccordion .choiceCountBar .foodEditRequiredCount{width:58px!important;min-width:58px!important;min-height:34px!important;height:34px!important;text-align:center!important;}
+#stores .foodEditAccordion .choiceCountBar span{font-weight:900!important;font-size:12px!important;}
+#stores .allChoiceAutoCount{width:100%!important;min-height:44px!important;margin:8px 0!important;font-weight:900!important;}
+@media(max-width:600px){
+ #stores .foodEditAccordion .foodEditHead{grid-template-columns:minmax(0,1fr) 32px 56px 32px!important;gap:3px!important;padding:4px!important;}
+ #stores .foodEditAccordion .foodEditGroupTitle{font-size:15px!important;}
+ #stores .foodEditAccordion .choiceGroupOrderTools{width:56px!important;min-width:56px!important;}
+ #stores .foodEditAccordion .choiceGroupOrderTools button{width:26px!important;min-width:26px!important;height:26px!important;min-height:26px!important;}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -3320,6 +3339,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    </div>
 
    <label class="label">AVAILABILITY</label><select class="availability"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
+   <button type="button" class="gray allChoiceAutoCount">☑ ALL CHOICE AUTO COUNT</button>
    <button type="button" class="green saveDirectFood">💾 SAVE FOOD</button>
    <button type="button" class="danger deleteDirectFood">🗑️ DELETE FOOD</button>
  </div>`;
@@ -3383,8 +3403,10 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
+   const standardTitle={chickenParts:'PART',flavor:'FLAVOR',fries:'FRIES',drinks:'DRINK'};
+   if(standardTitle[g.role] && (!g.name || /^(parts?|flavou?rs?|fries|drinks?|beverages?)$/i.test(String(g.name).trim()))) g.name=standardTitle[g.role];
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><div class="choiceGroupOrderTools"><button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">↑</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">↓</button></div><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><div class="choiceGroupOrderTools"><button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">↑</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">↓</button></div><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceCountBar"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><span>COUNT</span></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
    const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions'), orderTools=box.querySelector('.choiceGroupOrderTools');
    box.querySelector('.foodEditCountMode').value=String(g.countMode||'auto')==='fixed'?'fixed':'auto';
    box.querySelector('.foodEditRequiredCount').value=Math.max(1,Number(g.requiredCount||1));
@@ -3506,9 +3528,30 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  };
  rawGroups.forEach(addGroup);
 
+ // Standard first-load order: PART → FLAVOR → FRIES → DRINK.
+ // Once choiceOrder exists, preserve the exact saved/manual order.
+ if(Array.isArray(rawGroups) && rawGroups.length && !rawGroups.some(g=>Number.isFinite(Number(g.choiceOrder)))){
+   const rank={chickenParts:0,flavor:1,fries:2,drinks:3};
+   rawGroups.sort((a,b)=>{
+     const ra=Object.prototype.hasOwnProperty.call(rank,a.role)?rank[a.role]:99;
+     const rb=Object.prototype.hasOwnProperty.call(rank,b.role)?rank[b.role]:99;
+     return ra-rb;
+   });
+ }
+
  // Copy/Paste lives at the bottom of every Choice Group, including Parts.
  // Extra custom choice groups remain fully editable and deletable.
  const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>addGroup({name:'New Choice Group',role:'',options:[]});groupsBox.after(addCustom);
+ const allAutoBtn=ed.querySelector('.allChoiceAutoCount');
+ if(allAutoBtn){ allAutoBtn.onclick=()=>{
+   groupsBox.querySelectorAll('.foodEditAccordion').forEach(box=>{
+     const mode=box.querySelector('.foodEditCountMode');
+     const req=box.querySelector('.foodEditRequiredCount');
+     if(mode) mode.value='auto';
+     if(req) req.disabled=true;
+   });
+   toast('✅ ALL CHOICE GROUPS set to AUTO COUNT.');
+ }; }
 
  const priceBox=ed.querySelector('[data-kind="price"]');
  priceBox.querySelector('.foodEditToggle').onclick=()=>{const was=open===priceBox;closeOther(priceBox);if(was){open=null;priceBox.classList.remove('open');priceBox.querySelector('.foodEditDrawer').classList.add('hidden');priceBox.querySelector('.foodEditToggle span').textContent='›';}else{open=priceBox;priceBox.classList.add('open');priceBox.querySelector('.foodEditDrawer').classList.remove('hidden');priceBox.querySelector('.foodEditToggle span').textContent='⌄';}};
