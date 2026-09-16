@@ -889,123 +889,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
  .activeOrderLine .small,.riderChoice,.riderParts{font-size:15px!important}
 }
 </style>
-
-
-
-
-<style id="MHAC_PART_DRINK_SELECTION_FINAL_LOCKED">
-/* FINAL Part + Drinks selector: aligned columns, clean grouped layout. */
-.mhacCompactQtyGroup{
-  background:#fff!important;
-  border:1px solid #ddd!important;
-  border-radius:14px!important;
-  box-shadow:none!important;
-  padding:14px!important;
-  margin:12px 0!important;
-}
-.mhacCompactQtyGroup h4{margin:0 0 6px!important;padding:0!important;font-size:22px!important}
-.mhacQtyHint{font-size:15px!important;color:#666!important;line-height:1.35!important;margin:0 0 8px!important}
-.mhacQtyList{width:100%!important}
-.mhacQtyRow{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 44px 36px 44px 94px!important;
-  align-items:center!important;
-  column-gap:8px!important;
-  min-height:58px!important;
-  padding:7px 0!important;
-  border-bottom:1px solid #eee!important;
-  background:#fff!important;
-}
-.mhacQtyName{
-  min-width:0!important;font-size:17px!important;font-weight:600!important;
-  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important
-}
-.mhacQtyCount{width:36px!important;text-align:center!important;font-size:18px!important}
-.mhacQtyRow .mini{
-  width:44px!important;min-width:44px!important;height:44px!important;
-  padding:0!important;margin:0!important;display:flex!important;
-  align-items:center!important;justify-content:center!important;font-size:20px!important
-}
-.mhacQtyRow .choicePrice{
-  width:94px!important;min-width:94px!important;text-align:right!important;
-  white-space:nowrap!important;font-size:15px!important;font-weight:600!important
-}
-.mhacQtyTotal{font-size:14px!important;color:#666!important;margin-top:7px!important}
-@media(max-width:430px){
-  .mhacCompactQtyGroup{padding:12px!important}
-  .mhacCompactQtyGroup h4{font-size:20px!important}
-  .mhacQtyRow{
-    grid-template-columns:minmax(0,1fr) 40px 30px 40px 82px!important;
-    column-gap:5px!important
-  }
-  .mhacQtyRow .mini{width:40px!important;min-width:40px!important;height:40px!important}
-  .mhacQtyCount{width:30px!important;font-size:17px!important}
-  .mhacQtyRow .choicePrice{width:82px!important;min-width:82px!important;font-size:14px!important}
-  .mhacQtyName{font-size:16px!important}
-}
-</style>
-
-
-
-
-<style id="MHAC_CUSTOMER_BREAKDOWN_UNIFIED_FINAL">
-/* CUSTOMER BREAKDOWN — same structure/spacing language as Rider/Admin. */
-.customerOrderBreakdown{
-  margin-top:10px!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  font-size:inherit!important;
-  line-height:1.35!important;
-}
-.customerBreakdownTitle{
-  font-size:18px!important;
-  font-weight:900!important;
-  margin:0 0 8px!important;
-}
-.customerBreakdownStore{
-  margin:12px 0!important;
-  padding:12px 14px!important;
-  border:2px solid #222!important;
-  border-radius:14px!important;
-  background:#fff!important;
-}
-.customerBreakdownStoreName{
-  font-size:22px!important;
-  font-weight:800!important;
-  margin-bottom:8px!important;
-  padding-bottom:8px!important;
-  border-bottom:1px solid #ddd!important;
-}
-.customerBreakdownFood{
-  padding:9px 0!important;
-  border-top:1px solid #ddd!important;
-}
-.customerBreakdownFood:first-of-type{border-top:0!important}
-.customerBreakdownFoodName{
-  font-size:18px!important;
-  font-weight:800!important;
-  line-height:1.35!important;
-}
-.customerBreakdownChoice{
-  margin-top:4px!important;
-  font-size:15px!important;
-  line-height:1.25!important;
-}
-.customerBreakdownBill{
-  margin:12px 0 0!important;
-  padding:0 0 2px!important;
-  font-size:16px!important;
-  line-height:1.45!important;
-}
-</style>
-
-<style id="MHAC_CUSTOMER_NO_FOOD_THUMB_FINAL">
-/* Food choice list: no small food photo. Store photos remain unchanged. */
-.productRow .productPhoto{display:none!important}
-.productRow .productInfo{margin-left:0!important}
-</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1165,220 +1048,156 @@ function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
  const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
-
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
- const isPartsGroup=g=>{
-   const role=String(g?.role||"").toLowerCase().replace(/[\s_-]+/g,"");
-   const name=String(g?.name||"").trim().toLowerCase();
-   return ["chickenparts","parts","part"].includes(role) ||
-          ["chickenparts","parts","part","🍗 chicken parts"].includes(name);
- };
- const isDrinksGroup=g=>{
-   const role=String(g?.role||"").toLowerCase().replace(/[\s_-]+/g,"");
-   const name=String(g?.name||"").trim().toLowerCase();
-   return role==="drinks" || name==="drink" || name==="drinks";
- };
- const partsGroup=groups.find(isPartsGroup);
- const drinksGroup=groups.find(isDrinksGroup);
- const partOptions=((partsGroup?.options||[]).length?partsGroup.options:(f.chickenParts||[]))
-   .map(x=>typeof x==="string"?{name:x,price:0}:{name:String(x?.name||""),price:Number(x?.price||0)})
-   .filter(x=>x.name);
- const drinkOptions=((drinksGroup?.options||[]).length?drinksGroup.options:(f.choices||[]))
-   .map(x=>typeof x==="string"?{name:x,price:0}:{name:String(x?.name||""),price:Number(x?.price||0)})
-   .filter(x=>x.name);
-
+ const hasPartGroup=groups.some(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));
+ const hasDrinkGroup=groups.some(g=>String(g?.role||'')==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
+ const hasFlavorGroup=groups.some(g=>String(g?.role||'')==='flavor'||/^(?:flavor|flavors|flavour|flavours|taste)$/i.test(String(g?.name||'')));
  let h=`<button class=back onclick="openCat(${si},${ci})">← ${esc(s.name)}</button><h2>${esc(f.name)}</h2><p>Base price: <b>${peso(f.price)}</b></p>`;
-
- // PARTS — compact old layout, no large card/box.
- if(partOptions.length){
-   h+=`<div class="field mhacCompactQtyGroup">
-     <h4>🍗 PART</h4>
-     <div class="mhacQtyHint">Choose exactly ${`<b id="partNeed">1</b>`} piece(s). Same or different parts are allowed.</div>
-     <div class="mhacQtyList">${partOptions.map((x,i)=>`
-       <div class="mhacQtyRow" data-part-select="${i}">
-         <span class="mhacQtyName">${esc(x.name)}</span>
-         <button type="button" class="mini mhacQtyMinus" data-part-d="${i}" data-d="-1">−</button>
-         <b class="mhacQtyCount" data-part-count="${i}">0</b>
-         <button type="button" class="mini mhacQtyPlus" data-part-d="${i}" data-d="1">+</button>
-         <span class="choicePrice">${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span>
-       </div>`).join("")}</div>
-     <div class="mhacQtyTotal">Selected: <b id="partTotal">0</b> / <b id="partNeedBottom">1</b></div>
-   </div>`;
- }
-
- // DRINKS — compact old layout, each drink has its own quantity.
- if(drinkOptions.length){
-   h+=`<div class="field mhacCompactQtyGroup">
-     <h4>🥤 DRINKS</h4>
-     <div class="mhacQtyHint">Choose exactly <b id="drinkNeed">1</b> drink(s). Same or different drinks are allowed.</div>
-     <div class="mhacQtyList">${drinkOptions.map((x,i)=>`
-       <div class="mhacQtyRow">
-         <span class="mhacQtyName">${esc(x.name)}</span>
-         <button type="button" class="mini mhacDrinkMinus" data-drink-d="${i}" data-d="-1">−</button>
-         <b class="mhacQtyCount" data-drink-count="${i}">0</b>
-         <button type="button" class="mini mhacDrinkPlus" data-drink-d="${i}" data-d="1">+</button>
-         <span class="choicePrice">${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span>
-       </div>`).join("")}</div>
-     <div class="mhacQtyTotal">Selected: <b id="drinkTotal">0</b> / <b id="drinkNeedBottom">1</b></div>
-   </div>`;
- }
-
- // Keep all other choice groups unchanged, except Parts/Drinks which are handled above.
+ /* Choice Groups are rendered in the exact saved Admin order. */
  if(groups.length){
    h+=groups.map((g,gi)=>{
-     if(isPartsGroup(g)||isDrinksGroup(g)) return "";
-     return `<div class="choiceGroupCustomer"><h4>${esc(g.name||"CHOICES")}</h4>${(g.options||[]).map((x,oi)=>`
-       <div class="choiceRowCustomer"><label><input type=radio name="choiceGroup-${gi}" value="${oi}"> ${esc(x.name)}</label>
-       <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+     const opts=Array.isArray(g.options)?g.options:[];
+     return `<div class="choiceGroupCustomer" data-choice-group="${gi}">
+       <div class="choiceGroupTitleCustomer"><b>${esc(g.name||"CHOICES")}</b><span class="choiceGroupNeed" id="choiceNeed-${gi}">0 / 0</span></div>
+       <div class="choiceGroupRows">${opts.map((x,oi)=>`<div class="choiceRowCustomer choiceCountRow">
+         <span class="choiceOptionName">${esc(x.name)}</span>
+         <button type="button" class="mini choiceMinus" data-group="${gi}" data-opt="${oi}" data-d="-1">−</button>
+         <b class="choiceSelectedQty" data-choice-count="${gi}-${oi}">0</b>
+         <button type="button" class="mini choicePlus" data-group="${gi}" data-opt="${oi}" data-d="1">+</button>
+         <span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span>
+       </div>`).join("")}</div>
+     </div>`;
    }).join("");
  }
-
- // Legacy drinks fallback only when there is no Drinks choice group.
- if(f.choices?.length && !drinksGroup){
-   // Already rendered above when drinkOptions came from f.choices.
+ /* Legacy fields remain only when there is no equivalent Choice Group. */
+ if(!hasPartGroup && f.chickenParts?.length){
+   h+=`<div class="field partSelectionField">
+     <div class="partHeader"><b>🍗 CHICKEN PART SELECTION</b><span class="qtyBadge">ORDER: <b id="foodQtyTop">1</b></span></div>
+     <p class="small">Choose exactly one part for each ordered piece. You may use the same part or different parts. The number shows how many pieces use that part.</p>
+     <div class="partGrid">${f.chickenParts.map((x,i)=>`
+       <div class="partBox" data-part-select="${i}">
+         <span class="partName">${esc(x.name)}</span>
+         <button type="button" class="mini partMinus" data-part-d="${i}" data-d="-1">−</button>
+         <b class="partQty" data-part-count="${i}">0</b>
+         <button type="button" class="mini partPlus" data-part-d="${i}" data-d="1">+</button>
+       </div>`).join("")}</div>
+     <div class="partTotal">Selected pieces: <b id="partTotal">0</b> / <b id="partNeed">1</b></div>
+   </div>`;
  }
-
+ if(!hasDrinkGroup && f.choices?.length){
+   h+=`<div class=field><b>🥤 DRINKS / CHOICES</b>${f.choices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=choice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+ }
  if(f.bucketChoices?.length){
-   h+=`<div class=field><b>🪣 BUCKET CHOICES</b>${f.bucketChoices.map((x,i)=>`
-     <div class="choiceRowCustomer"><label><input type=radio name=bucketChoice value="${i}"> ${esc(x.name)}</label>
-     <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+   h+=`<div class=field><b>🪣 BUCKET CHOICES</b>${f.bucketChoices.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=radio name=bucketChoice value="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
-
- if(f.type==="bucket"){
-   h+=`<div class="bucketSelectBox"><b>🎯 ORIGINAL / SPICY SELECTION</b>
-   <p class="small">Spicy add-on: + ${peso(Number(f.spicyPrice||0))} per piece</p>
-   <div class="bucketSelectRow"><span>Original</span><button class="mini" data-style="original" data-d="-1">−</button><b id="style-original">0</b><button class="mini" data-style="original" data-d="1">+</button></div>
-   <div class="bucketSelectRow"><span>Spicy</span><button class="mini" data-style="spicy" data-d="-1">−</button><b id="style-spicy">0</b><button class="mini" data-style="spicy" data-d="1">+</button></div></div>`;
+ /* Legacy Original/Spicy becomes a counted selection when no Flavor Choice Group exists. */
+ if(f.type==="bucket" && !hasFlavorGroup){
+   h+=`<div class="bucketSelectBox"><b>🌶️ FLAVOR</b><p class="small">Choose exactly the required number. Same or different flavors are allowed.</p>
+   <div class="bucketSelectRow"><span>Original</span><button type="button" class="mini" data-style="original" data-d="-1">−</button><b id="style-original">0</b><button type="button" class="mini" data-style="original" data-d="1">+</button></div>
+   <div class="bucketSelectRow"><span>Spicy</span><button type="button" class="mini" data-style="spicy" data-d="-1">−</button><b id="style-spicy">0</b><button type="button" class="mini" data-style="spicy" data-d="1">+</button></div>
+   <div class="partTotal">Selected flavors: <b id="flavorTotal">0</b> / <b id="flavorNeed">0</b></div></div>`;
  }
-
  if(f.addOns?.length){
-   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`
-     <div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label>
-     <span class=choicePrice>${Number(x.price||0)?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
-
- h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div>
- <button class=add id=addConfigured>ADD TO CART</button>`;
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
-
- let qty=1;
- let parts=partOptions.map(()=>0);
- let drinks=drinkOptions.map(()=>0);
- let styleSel={original:0,spicy:0};
-
+ let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
- const totalDrinkQty=()=>drinks.reduce((a,n)=>a+Number(n||0),0);
+ const groupSelections=(f.choiceGroups||[]).map(()=>[]);
+ const isBucket=String(f.type||'').toLowerCase()==='bucket';
+ const bucketPieces=Math.max(0,Number(f.bucketPieces||0));
+ const requiredForGroup=(g)=>{
+   const mode=String(g?.selectionMode||g?.countMode||'perItem');
+   if(mode==='bucketPieces') return Math.max(1,qty*(bucketPieces||1));
+   if(mode==='choose2') return qty*2;
+   if(mode==='choose3') return qty*3;
+   if(mode==='choose4') return qty*4;
+   if(mode==='choose6') return qty*6;
+   const rc=Number(g?.requiredCount||0);
+   if((mode==='fixed'||mode==='chooseX') && rc>0) return qty*rc;
+   /* ALL CHOICE AUTO COUNT: bucket foods count by configured pieces; normal foods by quantity. */
+   return qty*(isBucket&&bucketPieces>0?bucketPieces:1);
+ };
+ const groupTotal=gi=>groupSelections[gi].reduce((a,n)=>a+Number(n||0),0);
+ const updateGroup=(gi)=>{
+   const need=requiredForGroup(groups[gi]);
+   const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
+   groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
+ };
+ const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
+ const changeGroupChoice=(gi,oi,d)=>{
+   const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
+   if(d>0 && total>=need)return;
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
+ };
+ const syncLegacyPart=()=>{
+   const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
+   const pt=$("partTotal");if(pt)pt.textContent=totalPartQty();
+   const pn=$("partNeed");if(pn)pn.textContent=need;
+ };
  const update=()=>{
    $("foodQty").textContent=qty;
-   const pn=$("partNeed"); if(pn)pn.textContent=qty;
-   const pnb=$("partNeedBottom"); if(pnb)pnb.textContent=qty;
-   const dn=$("drinkNeed"); if(dn)dn.textContent=qty;
-   const dnb=$("drinkNeedBottom"); if(dnb)dnb.textContent=qty;
-   const pt=$("partTotal"); if(pt)pt.textContent=totalPartQty();
-   const dt=$("drinkTotal"); if(dt)dt.textContent=totalDrinkQty();
-
-   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{
-     const n=Number(parts[i]||0);
-     b.classList.toggle("selected",n>0);
-     const c=b.querySelector("[data-part-count]"); if(c)c.textContent=n;
-   });
-   document.querySelectorAll("[data-drink-count]").forEach((c,i)=>c.textContent=Number(drinks[i]||0));
+   const top=$("foodQtyTop");if(top)top.textContent=qty;
+   syncLegacyPart(); updateAllGroups();
+   const flavorNeed=$("flavorNeed"); if(flavorNeed)flavorNeed.textContent=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
+   const flavorTotal=$("flavorTotal"); if(flavorTotal)flavorTotal.textContent=Number(styleSel.original||0)+Number(styleSel.spicy||0);
+   document.querySelectorAll("[data-part-select]").forEach((b,i)=>{const n=Number(parts[i]||0);b.classList.toggle("selected",n>0);const c=b.querySelector("[data-part-count]");if(c)c.textContent=n;});
+   const so=$("style-original");if(so)so.textContent=styleSel.original;
+   const ss=$("style-spicy");if(ss)ss.textContent=styleSel.spicy;
  };
-
  function changePart(i,d){
-   if(!partOptions.length)return;
-   const current=Number(parts[i]||0);
-   if(d>0 && totalPartQty()>=qty)return;
-   parts[i]=Math.max(0,current+d);
-   update();
+   if(!f.chickenParts?.length)return;
+   const current=Number(parts[i]||0),need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
+   if(d>0&&totalPartQty()>=need)return;
+   parts[i]=Math.max(0,current+d);update();
  }
- function changeDrink(i,d){
-   if(!drinkOptions.length)return;
-   const current=Number(drinks[i]||0);
-   if(d>0 && totalDrinkQty()>=qty)return;
-   drinks[i]=Math.max(0,current+d);
-   update();
- }
-
- $("qminus").onclick=()=>{
-   qty=Math.max(1,qty-1);
-   while(totalPartQty()>qty){
-     const i=parts.findIndex(n=>Number(n||0)>0);
-     if(i<0)break; parts[i]--;
-   }
-   while(totalDrinkQty()>qty){
-     const i=drinks.findIndex(n=>Number(n||0)>0);
-     if(i<0)break; drinks[i]--;
-   }
-   update();
- };
+ $("qminus").onclick=()=>{qty=Math.max(1,qty-1);while(totalPartQty()>(isBucket&&bucketPieces>0?qty*bucketPieces:qty)){const i=parts.findIndex(n=>Number(n||0)>0);if(i<0)break;parts[i]--;}update()};
  $("qplus").onclick=()=>{qty++;update()};
-
  document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
- document.querySelectorAll("[data-drink-d]").forEach(b=>b.onclick=()=>changeDrink(Number(b.dataset.drinkD),Number(b.dataset.d)));
-
- document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{
-   const k=b.dataset.style,d=Number(b.dataset.d);
-   styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);
-   const el=$("style-"+k);if(el)el.textContent=styleSel[k];
- });
-
+ document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=ev=>{if(ev.target?.closest("button"))return;const i=Number(b.dataset.partSelect);const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;if(totalPartQty()>=need&&Number(parts[i]||0)===0)return;changePart(i,Number(parts[i]||0)>0?-1:1)});
+ document.querySelectorAll(".choicePlus,.choiceMinus").forEach(b=>b.onclick=()=>changeGroupChoice(Number(b.dataset.group),Number(b.dataset.opt),Number(b.dataset.d)));
+ document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{const k=b.dataset.style,d=Number(b.dataset.d),need=isBucket&&bucketPieces>0?qty*bucketPieces:qty,total=Number(styleSel.original||0)+Number(styleSel.spicy||0);if(d>0&&total>=need)return;styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);update()});
  $("addConfigured").onclick=()=>{
-   if(partOptions.length && totalPartQty()!==qty)
-     return alert("Please select exactly "+qty+" chicken part piece"+(qty===1?"":"s")+" before adding to cart.");
-   if(drinkOptions.length && totalDrinkQty()!==qty)
-     return alert("Please select exactly "+qty+" drink"+(qty===1?"":"s")+" before adding to cart.");
-
-   const ch=document.querySelector('input[name=choice]:checked');
-   const choice=ch?f.choices[+ch.value]:null;
-
-   const choiceGroups=[];
-   groups.forEach((g,gi)=>{
-     if(isPartsGroup(g)||isDrinksGroup(g))return;
-     const picked=document.querySelector(`input[name="choiceGroup-${gi}"]:checked`);
-     if(picked){
-       const x=g.options?.[+picked.value];
-       if(x)choiceGroups.push({group:g.name,options:[{name:String(x.name||""),price:Number(x.price||0)}]});
-     }
-   });
-
-   if(drinkOptions.length){
-     const selectedDrinks=[];
-     drinks.forEach((n,i)=>{
-       for(let k=0;k<Number(n||0);k++){
-         selectedDrinks.push({name:drinkOptions[i].name,price:Number(drinkOptions[i].price||0)});
-       }
-     });
-     if(selectedDrinks.length)choiceGroups.push({group:drinksGroup?.name||"Drinks",options:selectedDrinks});
+   const legacyPartNeed=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
+   if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
+   if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
+   for(let gi=0;gi<groups.length;gi++){
+     const need=requiredForGroup(groups[gi]);
+     if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
-
-   const bh=document.querySelector('input[name=bucketChoice]:checked');
-   const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
-   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]).filter(Boolean);
-   const spicyExtra=(f.type==="bucket"?styleSel.spicy*Number(f.spicyPrice||0):0);
-
-   const groupExtra=choiceGroups.reduce((sum,g)=>
-     sum+(g.options||[]).reduce((a,x)=>a+Number(x.price||0),0),0);
-   const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+
-     groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
-
-   // Store average per-unit extra so existing cart qty pricing remains correct.
-   const unitExtra=qty>0?extra/qty:extra;
-
-   draftCart.push({
-     key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,
-     photo:f.photo||photoSvgData(f.name,"food"),
-     price:Number(f.price)+unitExtra,basePrice:Number(f.price),qty,
-     choice:choice?.name||"",choicePrice:Number(choice?.price||0),
-     bucketChoice:bucketChoice?.name||"",bucketChoicePrice:Number(bucketChoice?.price||0),
-     choiceGroups,
-     addOns:adds.map(x=>({name:x.name,price:Number(x.price||0)})),
-     chickenParts:partOptions.length?partOptions.map((x,i)=>({name:x.name,qty:Number(parts[i]||0)})).filter(x=>x.qty):[],
-     original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)
-   });
+   if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&(Number(styleSel.original||0)+Number(styleSel.spicy||0))!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
+   const ch=document.querySelector('input[name=choice]:checked'); const choice=ch?f.choices[+ch.value]:null;
+   const selectedGroups=(groups||[]).map((g,gi)=>({group:g.name,options:(g.options||[]).map((o,oi)=>({name:o.name,price:Number(o.price||0),qty:Number(groupSelections[gi]?.[oi]||0)})).filter(o=>o.qty>0)})).filter(g=>g.options.length);
+   const bh=document.querySelector('input[name=bucketChoice]:checked'); const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
+   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
+   const spicyExtra=(isBucket?Number(styleSel.spicy||0)*Number(f.spicyPrice||0):0);
+   const groupExtra=selectedGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+Number(n.price||0)*Number(n.qty||1),0),0);
+   const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
+   draftCart.push({key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),price:Number(f.price)+(extra/Math.max(1,qty)),basePrice:Number(f.price),qty,choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups:selectedGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:!hasPartGroup&&f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)});
    renderCart();closeMenu();
  };
  update();
+}
+
+function choiceDisplayText(g){
+  const vals=Array.isArray(g?.options)?g.options:[];
+  return vals.map(o=>{
+    if(o==null)return '';
+    if(typeof o==='string')return o;
+    const q=Number(o.qty||o.quantity||o.count||0);
+    const name=String(o.name||o.choice||o.value||'').trim();
+    if(!name)return '';
+    return name+(q>1?` ×${q}`:'')+(Number(o.price||0)>0?` + ${peso(Number(o.price||0))}`:'');
+  }).filter(Boolean);
+}
+function cartChoiceLines(x){
+  const lines=[];
+  (x.choiceGroups||[]).forEach(g=>choiceDisplayText(g).forEach(t=>lines.push(t)));
+  if(x.choice)lines.push(String(x.choice));
+  if(x.bucketChoice)lines.push(String(x.bucketChoice));
+  (x.addOns||[]).map(a=>String(a?.name||a||'')).filter(Boolean).forEach(n=>lines.push(n));
+  return lines;
 }
 
 function changeQty(i,d){draftCart[i].qty+=d;if(draftCart[i].qty<=0)draftCart.splice(i,1);renderCart()}
@@ -1394,16 +1213,13 @@ function renderCart(){
  }
  $("checkoutBtn").disabled=false;
  $("cart").innerHTML=draftCart.map((x,i)=>{
-   const drinkParts=[];
-   if(x.choice)drinkParts.push(x.choice);
-   if(x.bucketChoice)drinkParts.push(x.bucketChoice);
-   const addNames=(x.addOns||[]).map(a=>a.name).filter(Boolean);
-   if(addNames.length)drinkParts.push(addNames.join(", "));
+   const choiceLines=cartChoiceLines(x);
    const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);
    return `<div class="cartLine">
      <div class="cartStore">${esc(x.store)}</div>
-     <div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b>${parts.length?`<div>${parts.join(" • ")}</div>`:""}</div>
-     ${drinkParts.length?`<div class="cartDrinks">Drinks / Choices</div><div>${drinkParts.map(esc).join(", ")}</div>`:""}
+     <div class="cartFood"><b>${x.qty}x ${esc(x.name)}</b></div>
+     ${parts.length?`<div>${parts.join(" • ")}</div>`:""}
+     ${choiceLines.length?choiceLines.map(t=>`<div>${esc(t)}</div>`).join(""):""}
      <div class="qty"><button onclick="changeQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="changeQty(${i},1)">+</button><span>${peso(x.price*x.qty)}</span></div>
    </div>`;
  }).join("");
@@ -1416,7 +1232,7 @@ function renderCart(){
    <div class="cartTotalRow" style="font-size:19px"><b>Total Amount</b><b>${peso(total)}</b></div>
  </div>`;
 }
-function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>`<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}<br><small>${esc(x.choice)}${x.addOns?.length?" • Add-ons: "+x.addOns.map(a=>a.name).join(", "):""}${x.chickenParts?.length?" • Parts: "+x.chickenParts.map(p=>p.name+"×"+p.qty).join(", "):""}</small></div>`).join("");updateTotals()}
+function openCheckout(){$("checkout").style.display="block";$("orderSummary").innerHTML=draftCart.map(x=>{const lines=cartChoiceLines(x);const parts=(x.chickenParts||[]).filter(p=>Number(p.qty||0)>0).map(p=>`${esc(p.name)} ×${p.qty}`);return `<div class=orderCard><b>${esc(x.store)}</b><br>${x.qty} × ${esc(x.name)}${parts.length?`<br>${parts.join(" • ")}`:""}${lines.length?`<br>${lines.map(t=>esc(t)).join("<br>")}`:""}</div>`}).join("");updateTotals()}
 function updateTotals(){
  const names=[...new Set(draftCart.map(x=>x.store))],sub=draftCart.reduce((a,x)=>a+x.price*x.qty,0),sf=sub*.1,second=names.length>1?5:0,total=sub+sf+(deliveryFee||0)+second;
  $("checkoutTotals").innerHTML=`<div class="cartTotals">
@@ -1599,97 +1415,19 @@ function syncCustomerChatWatchers(active){
 }
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
-function customerOrderBreakdown(o){
-  const grouped={};
-  (o.items||[]).forEach(i=>{
-    const store=String(i.store||i.storeName||"").trim()||"Store";
-    (grouped[store] ||= []).push(i);
-  });
-
-  const items=Object.entries(grouped).map(([store,arr])=>{
-    return `<div class="customerBreakdownStore">
-      <div class="customerBreakdownStoreName">${esc(store)}</div>
-      ${arr.map(i=>{
-        const qty=Math.max(1,Number(i.qty||1));
-        const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
-        const extras=[];
-        const parts=(i.chickenParts||[])
-          .filter(x=>Number(x.qty||1)>0)
-          .map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`)
-          .join(", ");
-        if(parts) extras.push(`<div class="customerBreakdownChoice">Part: ${parts}</div>`);
-
-        if(i.choice){
-          extras.push(`<div class="customerBreakdownChoice">Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` (${peso(i.choicePrice)})`:""}</div>`);
-        }
-        if(i.bucketChoice){
-          extras.push(`<div class="customerBreakdownChoice">Bucket: ${esc(i.bucketChoice)}${Number(i.bucketChoicePrice||0)?` (${peso(i.bucketChoicePrice)})`:""}</div>`);
-        }
-
-        (i.choiceGroups||[]).forEach(g=>{
-          const opts=(g.options||[]).map(x=>{
-            const n=typeof x==="string"?x:x?.name;
-            const pr=typeof x==="string"?0:Number(x?.price||0);
-            return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:"";
-          }).filter(Boolean);
-          if(opts.length){
-            extras.push(`<div class="customerBreakdownChoice">${esc(g.group||"Choice")}: ${opts.join(", ")}</div>`);
-          }
-        });
-
-        if(i.addOns?.length){
-          const adds=i.addOns.map(a=>{
-            const n=typeof a==="string"?a:a?.name;
-            const pr=typeof a==="string"?0:Number(a?.price||0);
-            return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:"";
-          }).filter(Boolean);
-          if(adds.length) extras.push(`<div class="customerBreakdownChoice">Add-ons: ${adds.join(", ")}</div>`);
-        }
-
-        // Existing cart pricing remains the source of the line total.
-        const unit=Number(i.price!=null?i.price:base);
-        const line=unit*qty;
-        return `<div class="customerBreakdownFood">
-          <div class="customerBreakdownFoodName"><b>${qty}x ${esc(i.name||"Food")} — ${peso(unit)}</b></div>
-          ${extras.join("")}
-          <div class="customerBreakdownChoice"><b>Line Total: ${peso(line)}</b></div>
-        </div>`;
-      }).join("")}
-    </div>`;
-  }).join("") || '<div class="customerBreakdownStore"><div class="customerBreakdownChoice">No item details.</div></div>';
-
-  const f=o.fees||{};
-  return `<div class="customerOrderBreakdown">
-    <div class="customerBreakdownTitle">🧾 ORDER BREAKDOWN</div>
-    ${items}
-    <div class="customerBreakdownBill">
-      <b>Sub Total: ${peso(f.foodOrder)}</b><br>
-      <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
-      <b>Delivery Fee:</b> ${peso(f.deliveryFee)}
-      ${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
-      <b>Grand Total: ${peso(f.total)}</b>
-    </div>
-  </div>`;
-}
-
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
   ordersUnsub=onSnapshot(query(collection(db,"orders"),where("customer.uid","==",currentUser.uid)),snap=>{
-    const arr=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
+    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
       const st=String(o.status||"NEW").toUpperCase();
-      const canCancel=(st==="NEW");
-      return `<div class=orderCard>
-        <b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>
-        ${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}
-        ${customerOrderBreakdown(o)}
-        ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
-        ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
-        <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button>
-      </div>`;
+      const canCancel=!['COMPLETED','CANCELLED'].includes(st);
+      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(esc(i.choice));if(i.bucketChoice)lines.push(esc(i.bucketChoice));if(parts)lines.push(parts);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>choiceDisplayText(g).forEach(t=>lines.push(esc(t))));if(i.addOns?.length)i.addOns.forEach(a=>lines.push(esc(a.name||a)));return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
+      ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
+      ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
+      <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
     }).join(""):"No active orders.";
     syncCustomerChatWatchers(arr);
   });
