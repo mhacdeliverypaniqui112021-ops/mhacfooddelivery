@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.69 CHOICE ORDER SAVE FIX</title>
-<meta name="build-version" content="V4.1.82 CATEGORY DRAWER RESTORE">
+<meta name="build-version" content="V4.1.83 ONE DRAWER ORDER LIST">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2179,7 +2179,42 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .foodEditAccordion.choiceGroupDragReady{user-select:none;-webkit-user-select:none;}
 .foodEditAccordion .foodEditHead{touch-action:manipulation;}
 .foodEditAccordion.choiceGroupDragging .foodEditHead{touch-action:none;}
-</style></head><body>
+</style>
+<style id="MHAC_ONE_DRAWER_ORDERLIST_V183">
+/* V4.1.83: ONE drawer box per order. All stores/categories/items stay inside
+   the same opened drawer. Do not create separate drawer boxes per store. */
+#orders .orderInfo [id^="details-"]{
+  width:100%!important; box-sizing:border-box!important;
+  margin:8px 0 0!important; padding:0!important;
+}
+#orders .orderInfo [id^="details-"]:not(.hidden){display:block!important;}
+#orders .orderDetailPanel{
+  width:100%!important; box-sizing:border-box!important;
+  background:#fff!important; border:2px solid #222!important;
+  border-radius:14px!important; padding:12px!important; margin:0!important;
+  overflow:hidden!important;
+}
+#orders .unifiedBreakdown{
+  width:100%!important; box-sizing:border-box!important;
+  margin:10px 0 0!important; padding:0!important;
+  border:0!important; background:transparent!important;
+}
+#orders .unifiedStoreSection{
+  width:100%!important; box-sizing:border-box!important;
+  margin:0!important; padding:8px 0!important;
+  border:0!important; background:transparent!important;
+}
+#orders .unifiedStoreSection + .unifiedStoreSection{
+  border-top:1px solid #999!important;
+}
+#orders .unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 4px!important;}
+#orders .unifiedCategoryName{font-size:16px!important;font-weight:900!important;margin:0 0 7px!important;}
+#orders .unifiedFoodRow{padding:8px 0!important;border-top:1px solid #ddd!important;}
+#orders .unifiedFoodRow:first-child{border-top:0!important;}
+#orders .unifiedChoice{font-size:15px!important;line-height:1.35!important;margin-top:3px!important;}
+#orders .unifiedBill{border-top:1px solid #999!important;margin-top:10px!important;padding-top:8px!important;}
+</style>
+</head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
