@@ -2709,7 +2709,7 @@ function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
    const st=String(i.store||i.storeName||'STORE').trim()||'STORE';
-   const cat=String(i.category||i.categoryName||i.categoryLabel||findOrderCategory(st,i.name)||'Category Name').trim()||'Category Name';
+   const cat=String(i.category||i.categoryName||i.categoryLabel||(typeof findOrderCategory==='function'?findOrderCategory(st,i.name):'')||'Category Name').trim()||'Category Name';
    const key=st+'\\u0000'+cat;
    (groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
  });
