@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.69 CHOICE ORDER SAVE FIX</title>
-<meta name="build-version" content="V4.1.67 CHOICE ORDER SAVE FIX">
+<meta name="build-version" content="V4.1.81 ADMIN GOOGLE LOGIN RESILIENT FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2192,7 +2192,7 @@ window.setTimeout(function(){
 },2200);
 </script>
 <header><h1><span class="brandName">MHAC DELIVERY</span><span class="appName">ADMIN APP</span></h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
-<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
+<div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn" type="button" onclick="window.mhacAdminGoogleLogin()">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
 <div class="card"><div id="logoutRow" class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
@@ -2256,6 +2256,39 @@ window.setTimeout(function(){
   setTimeout(safeHide,3000);
   window.addEventListener('load',function(){setTimeout(safeHide,2400);});
 })();
+</script>
+<script>
+/* V4.1.81: resilient Admin Google Login bridge.
+   This handler is intentionally outside the main module so the login button
+   remains clickable even if a later startup routine fails. */
+window.mhacAdminGoogleLogin=async function(){
+  const btn=document.getElementById("googleBtn"), status=document.getElementById("loginStatus");
+  if(btn){btn.disabled=true;btn.textContent="🔄 OPENING GOOGLE...";}
+  try{
+    const {initializeApp,getApps,getApp}=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js");
+    const {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,setPersistence,browserLocalPersistence}=await import("https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js");
+    const cfg={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
+    const app=getApps().length?getApp():initializeApp(cfg);
+    const auth=getAuth(app);
+    const gp=new GoogleAuthProvider(); gp.setCustomParameters({prompt:"select_account"});
+    await setPersistence(auth,browserLocalPersistence);
+    try{
+      const r=await signInWithPopup(auth,gp);
+      if((r.user?.email||"").toLowerCase()!=="mhacdeliverypaniqui112021@gmail.com".toLowerCase()){
+        await auth.signOut(); throw new Error("Unauthorized admin account.");
+      }
+      location.reload();
+    }catch(e){
+      if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){
+        await signInWithRedirect(auth,gp); return;
+      }
+      throw e;
+    }
+  }catch(e){
+    if(status)status.textContent="❌ "+(e?.message||"Google login failed.");
+    if(btn){btn.disabled=false;btn.textContent="🔵 CONTINUE WITH GOOGLE";}
+  }
+};
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
