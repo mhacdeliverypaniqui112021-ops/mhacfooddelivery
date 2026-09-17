@@ -2159,15 +2159,6 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .unifiedFoodName{font-size:18px!important;line-height:1.35!important}
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
 .unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
-</style><style id="MHAC_ORDERLIST_ONE_DRAWER_TEST">
-/* ORDER LIST TEST — one drawer per entire order, including 2 stores. */
-.unifiedStoreCard{margin:0!important;padding:8px 0!important;border:0!important;border-radius:0!important;background:transparent!important}
-.unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 4px!important;padding-bottom:4px!important;border-bottom:0!important}
-.unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 4px!important}
-.unifiedFoodName{font-size:18px!important;line-height:1.35!important}
-.unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important;padding-left:10px!important}
-.unifiedFoodTotal{font-size:16px!important;font-weight:900!important;margin-top:6px!important}
-.unifiedStoreDivider{border-top:1px solid #ddd!important;margin:12px 0!important}
 </style>
 <style id="MHAC_UNIVERSAL_CHOICE_COUNT_V1">
 .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 112px 62px 44px 44px!important;gap:5px!important;align-items:center!important}
@@ -2693,44 +2684,68 @@ setInterval(refreshCountdowns,1000);
 
 function adminItemPricing(i){
  const qty=Math.max(1,Number(i.qty||1));
- const base=Number(i.basePrice!=null?i.basePrice:(i.price!=null?i.price:0));
+ const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
  const extras=[];
- const push=(name,count,price)=>{name=String(name||'').trim();count=Math.max(1,Number(count||1));price=Number(price||0);if(name)extras.push({name,count,price,total:count*price});};
- if(i.choice)push(typeof i.choice==='string'?i.choice:i.choice?.name,Number(i.choiceQty||1),Number(i.choicePrice||i.choice?.price||0));
- if(i.bucketChoice)push(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name,Number(i.bucketChoiceQty||1),Number(i.bucketChoicePrice||i.bucketChoice?.price||0));
- (i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).forEach(x=>push(x?.name||x,Number(x?.qty||1),0));
- (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||x?.quantity||x?.count||1),typeof x==='string'?0:Number(x?.price||0))));
- (i.addOns||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||x?.quantity||1),typeof x==='string'?0:Number(x?.price||0)));
- const extraTotal=extras.reduce((a,x)=>a+x.total,0);
- const line=base*qty+extraTotal;
- return{qty,base,extras,line};
+ if(i.choice){extras.push({name:typeof i.choice==='string'?i.choice:i.choice?.name||'',price:Number(i.choicePrice||i.choice?.price||0),qty:1});}
+ if(i.bucketChoice){extras.push({name:typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||'',price:Number(i.bucketChoicePrice||i.bucketChoice?.price||0),qty:1});}
+ (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+   const n=typeof x==='string'?x:x?.name;
+   const pr=typeof x==='string'?0:Number(x?.price||0);
+   const q=Math.max(1,Number(x?.qty||x?.quantity||x?.count||1));
+   if(n)extras.push({name:n,price:pr,qty:q,group:g?.group||g?.name||'Choice'});
+ }));
+ (i.chickenParts||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const q=Math.max(1,Number(x?.qty||1));if(n)extras.push({name:n,price:0,qty:q,group:'Part'});});
+ (i.addOns||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);const q=Math.max(1,Number(x?.qty||1));if(n)extras.push({name:n,price:pr,qty:q,group:'Add-on'});});
+ const extraTotal=extras.reduce((a,x)=>a+x.price*x.qty,0);
+ let unit=base+(extraTotal/qty);
+ if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);
+ return{qty,base,extras,unit,line:unit*qty,extraTotal};
+}
+function orderChoiceLines(i,p){
+ const lines=[];
+ const push=(name,qty,price)=>{
+   const n=String(name||'').trim();if(!n)return;
+   const q=Math.max(1,Number(qty||1));
+   const priceNum=Number(price||0);
+   lines.push(`${q}x ${esc(n)}${priceNum>0?` + ${peso(priceNum*q)}`:''}`);
+ };
+ (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+   const n=typeof x==='string'?x:x?.name;
+   const q=typeof x==='string'?1:Number(x?.qty||x?.quantity||x?.count||1);
+   const pr=typeof x==='string'?0:Number(x?.price||0);
+   push(n,q,pr);
+ }));
+ (i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).forEach(x=>push(x?.name||x,x?.qty||1,0));
+ if(i.choice){push(typeof i.choice==='string'?i.choice:i.choice?.name,1,Number(i.choicePrice||i.choice?.price||0));}
+ if(i.bucketChoice){push(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name,1,Number(i.bucketChoicePrice||i.bucketChoice?.price||0));}
+ (i.addOns||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||1),typeof x==='string'?0:Number(x?.price||0)));
+ return lines;
 }
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
    const st=String(i.store||i.storeName||'STORE').trim()||'STORE';
-   const cat=String(i.category||i.categoryName||i.categoryLabel||(typeof findOrderCategory==='function'?findOrderCategory(st,i.name):'')||'Category Name').trim()||'Category Name';
-   const key=st+'\\u0000'+cat;
+   const cat=String(i.category||i.categoryName||i.categoryLabel||findOrderCategory(st,i.name)||'Category Name').trim()||'Category Name';
+   const key=st+'\u0000'+cat;
    (groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
  });
  const vals=Object.values(groups);
  const sections=vals.map((g,idx)=>{
    const foodRows=g.items.map(i=>{
-     const p=adminItemPricing(i);
-     const choices=p.extras.map(x=>`${x.count}x ${esc(x.name)}${x.price>0?` + ${peso(x.total)}`:''}`);
+     const p=adminItemPricing(i), choices=orderChoiceLines(i,p);
      return `<div class="unifiedFoodRow">
-       <div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||'Food')} ${peso(p.base)}</b></div>
+       <div class="unifiedFoodName">${p.qty}x ${esc(i.name||'Food')} ${peso(p.unit)}</div>
        ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join('')}
        <div class="unifiedFoodTotal">Food Total: ${peso(p.line)}</div>
      </div>`;
    }).join('');
-   return `<div class="unifiedStoreCard">
+   return `<div class="unifiedStoreSection">
      <div class="unifiedStoreName">${esc(g.store)}</div>
      <div class="unifiedCategoryName">${esc(g.category)}</div>
      ${foodRows}
      ${idx<vals.length-1?'<div class="unifiedStoreDivider"></div>':''}
    </div>`;
- }).join('') || '<div class="unifiedStoreCard">No item details.</div>';
+ }).join('') || '<div class="unifiedStoreSection">No item details.</div>';
  const payment=String(o.payment||'Cash on Delivery').toUpperCase()==='GCASH'
    ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||'PENDING').toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:''} ${String(o.paymentStatus||'PENDING').toUpperCase()!=='RECEIVED'?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:''}</div>`
    :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
@@ -2742,7 +2757,7 @@ function orderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${sections}
      <div class="unifiedBill">
-       <div class="unifiedBillRow big"><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
+       <div class="unifiedBillRow"><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
        <div class="unifiedBillRow"><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>
        ${second?`<div class="unifiedBillRow"><span>Additional Store</span><b>${peso(second)}</b></div>`:''}
        <div class="unifiedBillRow"><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div>
@@ -4084,4 +4099,19 @@ body{font-size:15px!important;line-height:1.35!important}
 .foodEditorV2 .foodEditGroupTitle{width:100%!important;min-width:0!important;min-height:50px!important;border:0!important;background:#fff!important;padding:11px 12px!important;font-size:18px!important;font-weight:900!important;color:#111!important;outline:none!important}
 .foodEditorV2 .foodEditHead .foodEditToggle{min-height:50px!important;width:48px!important;padding:0!important;justify-content:center!important}
 .foodEditorV2 .foodEditHead .deleteGroup{min-height:44px!important;width:44px!important;margin:0 2px!important;padding:6px!important}
+
+/* V4.1.76 LOCKED ORDER LIST SAMPLE LAYOUT — additive only */
+.unifiedBreakdown{background:#fff!important;border:2px solid #222!important;border-radius:12px!important;padding:14px!important;box-shadow:none!important}
+.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin-bottom:14px!important}
+.unifiedStoreSection{padding:0!important;margin:0!important}
+.unifiedStoreName{font-size:17px!important;font-weight:900!important;margin:2px 0 3px!important}
+.unifiedCategoryName{font-size:14px!important;font-weight:800!important;margin:0 0 10px!important}
+.unifiedFoodRow{padding:0 0 12px!important;margin:0!important;border:0!important;background:transparent!important}
+.unifiedFoodName{font-size:15px!important;font-weight:900!important;line-height:1.35!important}
+.unifiedChoice{font-size:14px!important;padding-left:16px!important;line-height:1.45!important}
+.unifiedFoodTotal{font-size:14px!important;font-weight:900!important;margin-top:5px!important}
+.unifiedStoreDivider{height:1px!important;background:#bbb!important;margin:10px 0 12px!important}
+.unifiedBill{border-top:1px solid #bbb!important;margin-top:4px!important;padding-top:8px!important}
+.unifiedBillRow{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:3px 0!important;font-size:14px!important}
+.unifiedBillRow.grand{border-top:1px solid #222!important;margin-top:5px!important;padding-top:8px!important;font-size:16px!important;font-weight:900!important}
 </style>
