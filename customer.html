@@ -1016,6 +1016,29 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
+
+<style id="MHAC_CUSTOMER_ORDERLIST_MATCH_ADMIN">
+.customerOrderPreviewHead{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.customerOrderPreviewHead b{font-size:18px!important}
+.customerOrderPreviewName{font-size:22px!important;font-weight:800!important;margin:8px 0!important}
+.customerViewFullOrder{background:#fff!important;color:#111!important;border:1px solid #222!important;width:100%!important;margin:8px 0!important}
+.customerUnifiedDrawer{border:2px solid #222!important;border-radius:12px!important;background:#fff!important;padding:12px!important}
+.customerUnifiedCustomer{padding:0 0 12px!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.4!important}
+.customerUnifiedPayment{padding:12px 0!important;border-bottom:1px solid #eee!important;font-size:16px!important}
+.customerUnifiedTitle{font-size:22px!important;font-weight:900!important;padding:14px 0 10px!important}
+.customerUnifiedStoreName{font-size:22px!important;font-weight:900!important;padding-bottom:8px!important;border-bottom:1px solid #eee!important}
+.customerUnifiedCategoryName{font-size:18px!important;font-weight:800!important;padding:8px 0!important}
+.customerUnifiedFoodRow{padding:8px 0!important;border-bottom:1px solid #eee!important}
+.customerUnifiedFoodName{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
+.customerUnifiedChoice{padding-left:12px!important;font-size:15px!important;line-height:1.35!important}
+.customerUnifiedFoodTotal{font-size:16px!important;font-weight:800!important;margin-top:5px!important}
+.customerUnifiedStoreDivider{border-top:1px solid #ddd!important;margin:10px 0!important}
+.customerUnifiedBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
+.customerUnifiedBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important}
+.customerUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
+.customerOrderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+.customerOrderActions button{margin:0!important;width:100%!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1599,6 +1622,65 @@ function syncCustomerChatWatchers(active){
 }
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
+
+function customerOrderCategory(storeName,itemName){
+  const norm=v=>String(v||"").trim().toLowerCase().replace(/\s+/g," ");
+  const sk=norm(storeName),ik=norm(itemName);
+  for(const s of (data?.stores||[])){
+    if(norm(s?.name)!==sk)continue;
+    for(const c of (s?.categories||[])){
+      const items=Array.isArray(c?.items)?c.items:[];
+      if(items.some(x=>norm(x?.name)===ik))return String(c?.name||c?.label||"").trim()||"Category Name";
+    }
+  }
+  return "Category Name";
+}
+function customerOrderPrice(i){
+  const qty=Math.max(1,Number(i.qty||1));
+  let extra=0;
+  (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>extra+=Number(x.price||0)*Number(x.qty||x.quantity||x.count||1)));
+  (i.addOns||[]).forEach(x=>extra+=Number(x.price||0)*(Number(x.qty||1)||1));
+  if(Number(i.spicy||0)&&Number(i.spicyAddPrice||0))extra+=Number(i.spicy||0)*Number(i.spicyAddPrice||0);
+  const unit=i.basePrice!=null?Number(i.basePrice)+extra/qty:Number(i.price||0);
+  const line=Number(i.price||0)*qty;
+  return {qty,unit:Number(unit)||0,line:Number(line)||Number(unit||0)*qty};
+}
+function customerOrderChoiceLines(i){
+  const lines=[];
+  (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+    const q=Number(x.qty||x.quantity||x.count||0);if(q<=0)return;
+    const n=String(x.name||x.choice||x.value||"").trim();if(!n)return;
+    const ex=Number(x.price||0)*q;
+    lines.push(`${q}x ${esc(n)}${ex>0?` + ${peso(ex)}`:""}`);
+  }));
+  (i.chickenParts||[]).forEach(x=>{const q=Number(x.qty||0);if(q>0)lines.push(`${q}x ${esc(x.name||x)}`)});
+  if(i.choice)lines.push(`1x ${esc(i.choice)}`);
+  if(i.bucketChoice)lines.push(`1x ${esc(i.bucketChoice)}`);
+  (i.addOns||[]).forEach(x=>{const q=Number(x.qty||1)||1,n=String(x.name||x).trim();if(n)lines.push(`${q}x ${esc(n)}${Number(x.price||0)*q>0?` + ${peso(Number(x.price||0)*q)}`:""}`)});
+  if(Number(i.original||0)>0)lines.push(`${Number(i.original)}x Original`);
+  if(Number(i.spicy||0)>0){const ex=Number(i.spicy||0)*Number(i.spicyAddPrice||0);lines.push(`${Number(i.spicy)}x Spicy${ex>0?` + ${peso(ex)}`:""}`)}
+  return lines;
+}
+function customerUnifiedOrderDetailHtml(o){
+  const c=o.customer||{},f=o.fees||{},groups={};
+  (o.items||[]).forEach(i=>{
+    const st=String(i.store||i.storeName||"STORE").trim()||"STORE";
+    const cat=String(i.category||i.categoryName||i.categoryLabel||customerOrderCategory(st,i.name)||"Category Name").trim()||"Category Name";
+    const key=st+"\u0000"+cat;(groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
+  });
+  const vals=Object.values(groups);
+  const sections=vals.map((g,idx)=>{
+    const foods=g.items.map(i=>{
+      const p=customerOrderPrice(i),lines=customerOrderChoiceLines(i);
+      return `<div class="customerUnifiedFoodRow"><div class="customerUnifiedFoodName">${p.qty}x ${esc(i.name||"Food")} ${peso(p.unit)}</div>${lines.map(x=>`<div class="customerUnifiedChoice">${x}</div>`).join("")}<div class="customerUnifiedFoodTotal">Food Total: ${peso(p.line)}</div></div>`;
+    }).join("");
+    return `<div class="customerUnifiedStoreSection"><div class="customerUnifiedStoreName">${esc(g.store)}</div><div class="customerUnifiedCategoryName">${esc(g.category)}</div>${foods}${idx<vals.length-1?'<div class="customerUnifiedStoreDivider"></div>':""}</div>`;
+  }).join("")||"<div>No item details.</div>";
+  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="customerUnifiedPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}</div>`:`<div class="customerUnifiedPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+  const loc=String(c.gps?.display||c.address||"Customer GPS").replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,"").trim();
+  return `<div class="customerUnifiedDrawer"><div class="customerUnifiedCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: 📍 LOCATION DETECTED: ${esc(loc)}</div>${payment}<div class="customerUnifiedTitle">🧾 ORDER BREAKDOWN</div>${sections}<div class="customerUnifiedBill"><div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div><div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}<div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div><div class="grand"><span>Grand Total</span><b>${peso(f.total)}</b></div></div></div>`;
+}
+
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
   stopCustomerChatWatchers();
@@ -1606,21 +1688,26 @@ function startOrders(){
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
-      const st=String(o.status||"NEW").toUpperCase();
-      const canCancel=!['COMPLETED','CANCELLED'].includes(st);
-      return `<div class=orderCard><b>${esc(o.orderNo||o.id)}</b> <span class=pill>${esc(o.status||"NEW")}</span>${String(o.payment||"").toUpperCase()==="GCASH"?` <span class="paymentStatus ${String(o.paymentStatus||"PENDING").toUpperCase()==="RECEIVED"?"received":""}">💳 GCASH ${String(o.paymentStatus||"PENDING").toUpperCase()}</span>`:""}<div class="activeOrderDetails">${(o.items||[]).map(i=>{const qty=Math.max(1,Number(i.qty||1));const parts=(i.chickenParts||[]).filter(p=>Number(p.qty||1)>0).map(p=>`${esc(p.name||p)}${Number(p.qty||1)>1?` ×${Number(p.qty||1)}`:""}`).join(", ");const lines=[];if(i.choice)lines.push(esc(i.choice));if(i.bucketChoice)lines.push(esc(i.bucketChoice));if(parts)lines.push(parts);if(i.choiceGroups?.length)i.choiceGroups.forEach(g=>choiceDisplayText(g).forEach(t=>lines.push(esc(t))));if(i.addOns?.length)i.addOns.forEach(a=>lines.push(esc(a.name||a)));return `<div class="activeOrderLine"><b>${qty}x ${esc(i.name||"Food")}</b>${lines.map(x=>`<div class="small">${x}</div>`).join("")}</div>`}).join("")||"No items."}</div><br><b>Grand Total: ${peso(o.fees?.total)}</b>
-      ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
-      ${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
-      <button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>`;
+      const st=String(o.status||"NEW").toUpperCase(),canCancel=!["COMPLETED","CANCELLED"].includes(st);
+      return `<div class="orderCard">
+        <div class="customerOrderPreviewHead"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
+        <h3 class="customerOrderPreviewName">${esc(o.customer?.name||"")}</h3>
+        <div id="customer-order-details-${esc(o.id)}" class="hidden customerUnifiedDetailWrap">${customerUnifiedOrderDetailHtml(o)}</div>
+        <button type="button" class="customerViewFullOrder" data-customer-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
+        ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
+        <div class="customerOrderActions">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
+      </div>`;
     }).join(""):"No active orders.";
     syncCustomerChatWatchers(arr);
   });
 }
 $("myOrders").onclick=async e=>{
- const b=e.target.closest("[data-cancel-order]");if(!b)return;
- const id=b.dataset.cancelOrder;b.disabled=true;
- try{await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});}
- catch(x){b.disabled=false;alert(x.message||x)}
+  const view=e.target.closest("[data-customer-view]");
+  if(view){const d=$("customer-order-details-"+view.dataset.customerView);if(d)d.classList.toggle("hidden");return;}
+  const b=e.target.closest("[data-cancel-order]");if(!b)return;
+  const id=b.dataset.cancelOrder;b.disabled=true;
+  try{await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});}
+  catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
 window.__MHAC_BUILD__="V4.1.64 CUSTOMER MASTER UNIFIED WHITE UI — TIME LIMIT TEST MODE";
