@@ -2273,85 +2273,25 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 }
 </style>
 
-<style id="MHAC_ONE_DRAWER_ORDERLIST_SIZE_MATCH_REFERENCE">
-/* SIZE ONLY: match the approved large mobile Order List reference screenshot.
-   No layout/flow/Firebase/Choice Group logic changed. */
-@media(max-width:600px){
-  #orders .order{
-    font-size:18px!important;
-  }
-  #orders .orderPreviewHead b{
-    font-size:22px!important;
-    line-height:1.15!important;
-  }
-  #orders .orderPreviewCustomer{
-    font-size:21px!important;
-    line-height:1.25!important;
-  }
-  #orders .orderDetailPanel{
-    font-size:18px!important;
-  }
-  #orders .orderDetailCustomer{
-    font-size:18px!important;
-    line-height:1.5!important;
-  }
-  #orders .orderDetailPayment{
-    font-size:18px!important;
-    line-height:1.4!important;
-    padding:10px 0!important;
-  }
-  #orders .unifiedBreakdown{
-    padding:16px!important;
-  }
-  #orders .unifiedBreakdownTitle{
-    font-size:22px!important;
-    line-height:1.25!important;
-    margin-bottom:14px!important;
-  }
-  #orders .unifiedStoreName{
-    font-size:24px!important;
-    line-height:1.25!important;
-  }
-  #orders .unifiedCategoryName{
-    font-size:20px!important;
-    line-height:1.3!important;
-    margin-bottom:12px!important;
-  }
-  #orders .unifiedFoodName{
-    font-size:18px!important;
-    line-height:1.4!important;
-  }
-  #orders .unifiedChoice{
-    font-size:17px!important;
-    line-height:1.45!important;
-    padding-left:16px!important;
-  }
-  #orders .unifiedFoodTotal{
-    font-size:18px!important;
-    line-height:1.35!important;
-    margin-top:7px!important;
-  }
-  #orders .unifiedBill{
-    margin-top:7px!important;
-    padding-top:10px!important;
-  }
-  #orders .unifiedBillRow{
-    font-size:18px!important;
-    line-height:1.4!important;
-    padding:5px 0!important;
-  }
-  #orders .unifiedBillRow.grand{
-    font-size:22px!important;
-    padding-top:10px!important;
-  }
-  #orders .orderActions button,
-  #orders .orderActions a,
-  #orders .orderActions select{
-    font-size:17px!important;
-  }
+<style id="MHAC_CALL_CUSTOMER_COMPACT_FIX">
+#orders .orderActions .callCustomerBtn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:38px!important;
+  height:38px!important;
+  padding:5px 7px!important;
+  margin:0!important;
+  font-size:12px!important;
+  line-height:1.1!important;
+  font-weight:800!important;
+  text-align:center!important;
+  white-space:normal!important;
+  overflow:hidden!important;
 }
 </style>
-
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2801,20 +2741,6 @@ function orderChoiceLines(i,p){
  (i.addOns||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||1),typeof x==='string'?0:Number(x?.price||0)));
  return lines;
 }
-function findOrderCategory(storeName,itemName){
-  const stores=[];
-  if(menu&&Array.isArray(menu.stores)) stores.push(...menu.stores);
-  if(draft&&Array.isArray(draft.stores)) stores.push(...draft.stores);
-  const sn=String(storeName||'').trim().toLowerCase();
-  const fn=String(itemName||'').trim().toLowerCase();
-  for(const st of stores){
-    if(sn && String(st?.name||'').trim().toLowerCase()!==sn) continue;
-    for(const cat of (st?.categories||[])){
-      if((cat?.items||[]).some(it=>String(it?.name||'').trim().toLowerCase()===fn)) return String(cat?.name||'').trim();
-    }
-  }
-  return '';
-}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
@@ -2845,7 +2771,12 @@ function orderDetailHtml(o){
    :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  const second=Number(f.secondStoreFee||0);
  return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||'')}</b><br>CP #: ${esc(c.contact||'—')}<br>Address Location: ${esc(c.gps?.display||c.address||'Customer GPS')}</div>
+   <div class="orderDetailCustomer">
+     <b>${esc(o.orderNo||o.id)}</b><br>
+     <b>${esc(c.name||'')}</b><br>
+     CP #: ${esc(c.contact||'—')}<br>
+     Address Location: 📍 LOCATION DETECTED: ${esc(c.gps?.display||c.address||'Customer GPS')}
+   </div>
    ${payment}
    <div class="unifiedBreakdown">
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
