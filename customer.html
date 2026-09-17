@@ -1038,6 +1038,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
 .customerOrderActions{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;width:100%!important}
 .customerOrderActions button{margin:0!important;width:100%!important;max-width:100%!important;display:block!important;text-align:center!important}
+.customerOrderActions.single .orderChatBtn{width:100%!important;max-width:100%!important;display:block!important;}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1677,7 +1678,7 @@ function startOrders(){
         <div id="customer-order-details-${esc(o.id)}" class="hidden customerUnifiedDetailWrap">${customerUnifiedOrderDetailHtml(o)}</div>
         <button type="button" class="customerViewFullOrder" data-customer-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
         ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
-        <div class="customerOrderActions">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
+        <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
       </div>`;
     }).join(""):"No active orders.";
     syncCustomerChatWatchers(arr);
