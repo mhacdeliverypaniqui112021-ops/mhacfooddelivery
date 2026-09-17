@@ -2741,6 +2741,17 @@ function orderChoiceLines(i,p){
  (i.addOns||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||1),typeof x==='string'?0:Number(x?.price||0)));
  return lines;
 }
+function findOrderCategory(storeName,itemName){
+  // Order records may already carry the category; keep the fallback local and non-invasive.
+  const name=String(itemName||"").trim();
+  for(const st of (menu?.stores||[])){
+    if(String(st?.name||"").trim()!==String(storeName||"").trim())continue;
+    for(const cat of (st?.categories||[])){
+      if((cat?.foods||[]).some(f=>String(f?.name||"").trim()===name)) return String(cat?.name||cat?.label||"").trim();
+    }
+  }
+  return "Category Name";
+}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
