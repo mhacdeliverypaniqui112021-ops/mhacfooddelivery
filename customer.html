@@ -1677,7 +1677,6 @@ function startOrders(){
         <h3 class="customerOrderPreviewName">${esc(o.customer?.name||"")}</h3>
         <div id="customer-order-details-${esc(o.id)}" class="hidden customerUnifiedDetailWrap">${customerUnifiedOrderDetailHtml(o)}</div>
         <button type="button" class="customerViewFullOrder" data-customer-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
-        ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
         <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
       </div>`;
     }).join(""):"No active orders.";
