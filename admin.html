@@ -2755,12 +2755,17 @@ function orderChoiceLines(i,p){
  return lines;
 }
 function findOrderCategory(storeName,itemName){
-  // Order records may already carry the category; keep the fallback local and non-invasive.
-  const name=String(itemName||"").trim();
+  // Orders may omit category; resolve it from the current published Admin menu.
+  // Menu structure uses categories[].items[] (not categories[].foods[]).
+  const norm=v=>String(v||"").trim().toLowerCase().replace(/\s+/g," ");
+  const storeKey=norm(storeName), itemKey=norm(itemName);
   for(const st of (menu?.stores||[])){
-    if(String(st?.name||"").trim()!==String(storeName||"").trim())continue;
+    if(norm(st?.name)!==storeKey)continue;
     for(const cat of (st?.categories||[])){
-      if((cat?.foods||[]).some(f=>String(f?.name||"").trim()===name)) return String(cat?.name||cat?.label||"").trim();
+      const items=Array.isArray(cat?.items)?cat.items:[];
+      if(items.some(f=>norm(f?.name)===itemKey)){
+        return String(cat?.name||cat?.label||"").trim() || "Category Name";
+      }
     }
   }
   return "Category Name";
