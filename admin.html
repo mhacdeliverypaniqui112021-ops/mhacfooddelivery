@@ -2786,7 +2786,7 @@ function orderDetailHtml(o){
      <b>${esc(o.orderNo||o.id)}</b><br>
      <b>${esc(c.name||'')}</b><br>
      CP #: ${esc(c.contact||'—')}<br>
-     Address Location: 📍 LOCATION DETECTED: ${esc(c.gps?.display||c.address||'Customer GPS')}
+     ${(()=>{const loc=String(c.gps?.display||c.address||'Customer GPS').replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,'').trim();return `Address Location: 📍 LOCATION DETECTED: ${esc(loc)}`})()}
    </div>
    ${payment}
    <div class="unifiedBreakdown">
