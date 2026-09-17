@@ -1224,29 +1224,6 @@ function customize(si,ci,fi){
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
  /* SIMPLE FOOD AUTO-ADD: foods with no configurable choices are added immediately.
     After auto-add, stay inside the current store/category. */
- const simpleAutoAdd=!groups.length&&!f.chickenParts?.length&&!f.choices?.length&&!f.bucketChoices?.length&&!f.addOns?.length&&String(f.type||'').toLowerCase()!=='bucket';
- if(simpleAutoAdd){
-   draftCart.push({
-     key:Date.now()+"-"+Math.random(),
-     store:s.name,
-     name:f.name,
-     photo:f.photo||photoSvgData(f.name,"food"),
-     price:Number(f.price||0),
-     basePrice:Number(f.price||0),
-     qty:1,
-     choice:"",
-     bucketChoice:"",
-     choiceGroups:[],
-     addOns:[],
-     chickenParts:[],
-     original:0,
-     spicy:0,
-     spicyAddPrice:0
-   });
-   renderCart();
-   openCat(si,ci);
-   return;
- }
  const hasPartGroup=groups.some(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));
  const hasDrinkGroup=groups.some(g=>String(g?.role||'')==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
  const hasFlavorGroup=groups.some(g=>String(g?.role||'')==='flavor'||/^(?:flavor|flavors|flavour|flavours|taste)$/i.test(String(g?.name||'')));
@@ -1375,6 +1352,11 @@ function customize(si,ci,fi){
    }
    if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&(Number(styleSel.original||0)+Number(styleSel.spicy||0))!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
    const ch=document.querySelector('input[name=choice]:checked'); const choice=ch?f.choices[+ch.value]:null;
+   // Maximum 2 stores per order. Existing store(s) may continue to receive more food.
+   const selectedStoreNames=[...new Set(draftCart.map(x=>String(x.store||'')))];
+   if(!selectedStoreNames.includes(String(s.name||'')) && selectedStoreNames.length>=2){
+     return alert("Maximum of 2 stores per order only. Please finish or remove an existing store before adding another store.");
+   }
    const selectedGroups=(groups||[]).map((g,gi)=>({group:g.name,options:(g.options||[]).map((o,oi)=>({name:o.name,price:Number(o.price||0),qty:Number(groupSelections[gi]?.[oi]||0)})).filter(o=>o.qty>0)})).filter(g=>g.options.length);
    const bh=document.querySelector('input[name=bucketChoice]:checked'); const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
    const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
