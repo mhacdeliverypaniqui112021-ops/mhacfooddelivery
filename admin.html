@@ -1887,7 +1887,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 </style>
 
 <style>
-/* V4.1.74 MENU / FOOD EDITOR — compact accordion flow */
+/* V4.1.75 MENU / FOOD EDITOR — compact accordion flow */
 #stores .storeBox{padding:8px!important;margin:8px 0!important;border-radius:14px!important}
 #stores .storeBoxHeader{min-height:48px!important;padding:7px 9px!important}
 #stores .storeBoxHeader b{font-size:18px!important}
@@ -1937,7 +1937,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .storeHeaderActions{display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:nowrap!important}
 .storeHeaderActions .storeDelete{width:auto!important}
 @media(max-width:600px){.storeHeaderActions{gap:4px!important}.storeHeaderActions .storeDelete{font-size:9px!important;padding:5px 7px!important}}
-/* V4.1.74 UI fix: clicking a Store opens a very compact CATEGORY-ONLY drawer.
+/* V4.1.75 UI fix: clicking a Store opens a very compact CATEGORY-ONLY drawer.
    Store editing controls remain available through the small EDIT STORE toggle. */
 .storeBox.storeOpen .storeInner.storeCollapsed{display:block!important}
 .storeBox.storeOpen .storeInner > .label,
@@ -2019,7 +2019,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 
 
 <style id="MHAC_V4_1_74_CHOICE_NAME_PRICE_PUBLISH_FIX">
-/* V4.1.74 follow-up: wider choice-name field, compact 3-digit price, restore store publish control. */
+/* V4.1.75 follow-up: wider choice-name field, compact 3-digit price, restore store publish control. */
 .foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 66px 42px!important;gap:6px!important}
 .foodEditorV2 .foodEditOptionRow .groupOptionName{min-width:0!important;width:100%!important;font-size:16px!important}
 .foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:66px!important;min-width:66px!important;max-width:66px!important;font-size:14px!important;padding:7px 5px!important;text-align:center!important}
@@ -2170,16 +2170,109 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  .foodEditHead .foodEditCountMode{width:96px!important;font-size:10px!important}
  .foodEditHead .foodEditRequiredCount{width:56px!important}
 }
-<style id="MHAC_CHOICE_GROUP_MOVE_V1">
-.choiceGroupOrderTools{display:flex;gap:6px;margin:0 0 8px;padding:0}
-.choiceGroupOrderTools button{flex:1;min-height:40px!important;margin:0!important;padding:6px 8px!important;font-size:12px!important;font-weight:800!important;border-radius:8px!important}
-.choiceGroupOrderTools button:disabled{opacity:.4!important}
+</style>
+<style id="MHAC_CHOICE_GROUP_MOVE_V2_COMPACT">
+/* Compact move controls stay on the side of each Choice Group header. */
+.foodEditHead{position:relative!important;}
+.foodEditHead .choiceGroupOrderTools{display:flex!important;flex-direction:row!important;gap:2px!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;white-space:nowrap!important;}
+.foodEditHead .choiceGroupOrderTools button{width:26px!important;min-width:26px!important;height:26px!important;min-height:26px!important;margin:0!important;padding:0!important;font-size:15px!important;line-height:1!important;font-weight:900!important;border-radius:6px!important;}
+.foodEditHead .choiceGroupOrderTools button:disabled{opacity:.35!important}
+@media(min-width:601px){
+ .foodEditHead{grid-template-columns:minmax(0,1fr) 112px 62px 34px 58px 34px!important}
+}
+@media(max-width:600px){
+ .foodEditHead{grid-template-columns:minmax(0,1fr) 96px 50px 34px 58px 34px!important}
+ .foodEditHead .foodEditCountMode{width:96px!important;font-size:10px!important}
+ .foodEditHead .foodEditRequiredCount{width:50px!important}
+}
 /* Long-press / drag whole Choice Group on mobile */
 .foodEditAccordion.choiceGroupDragging{opacity:.55!important;outline:2px dashed #222!important;transform:scale(.99);}
 .foodEditAccordion.choiceGroupDragReady{user-select:none;-webkit-user-select:none;}
 .foodEditAccordion .foodEditHead{touch-action:manipulation;}
 .foodEditAccordion.choiceGroupDragging .foodEditHead{touch-action:none;}
-</style></head><body>
+</style>
+<style id="MHAC_CHOICE_GROUP_TINY_ARROWS_V175">
+/* FINAL compact Choice Group bar: keep every group listed, arrows INSIDE the bar */
+#stores .foodEditAccordion .foodEditHead{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 82px 34px 32px 56px 34px!important;
+  align-items:center!important;
+  gap:4px!important;
+  min-height:48px!important;
+  height:auto!important;
+  padding:5px!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+#stores .foodEditAccordion .foodEditGroupTitle{
+  width:100%!important; min-width:0!important; margin:0!important;
+  font-weight:900!important; font-size:16px!important;
+}
+#stores .foodEditAccordion .foodEditCountMode{
+  width:82px!important; min-width:0!important; height:38px!important;
+  min-height:38px!important; padding:4px!important; font-size:10px!important;
+}
+#stores .foodEditAccordion .foodEditRequiredCount{
+  width:34px!important; min-width:34px!important; height:38px!important;
+  min-height:38px!important; padding:4px!important; font-size:12px!important;
+}
+#stores .foodEditAccordion .foodEditToggle{
+  width:32px!important; min-width:32px!important; height:38px!important;
+  min-height:38px!important; margin:0!important; padding:0!important;
+}
+#stores .foodEditAccordion .choiceGroupOrderTools{
+  display:flex!important; flex-direction:row!important; align-items:center!important;
+  justify-content:center!important; gap:2px!important; width:56px!important;
+  min-width:56px!important; height:38px!important; margin:0!important; padding:0!important;
+}
+#stores .foodEditAccordion .choiceGroupOrderTools button{
+  display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  width:26px!important; min-width:26px!important; height:26px!important; min-height:26px!important;
+  margin:0!important; padding:0!important; font-size:15px!important; line-height:1!important;
+  border-radius:6px!important; font-weight:900!important;
+}
+#stores .foodEditAccordion .deleteGroup{
+  width:34px!important; min-width:34px!important; height:38px!important;
+  min-height:38px!important; margin:0!important; padding:0!important;
+}
+/* Never render move controls as full-width rows */
+#stores .foodEditAccordion > .moveChoiceUp,
+#stores .foodEditAccordion > .moveChoiceDown{
+  display:none!important;
+}
+@media(max-width:600px){
+  #stores .foodEditAccordion .foodEditHead{
+    grid-template-columns:minmax(0,1fr) 76px 32px 30px 54px 32px!important;
+    gap:3px!important; padding:4px!important;
+  }
+  #stores .foodEditAccordion .foodEditCountMode{width:76px!important;font-size:9px!important;}
+  #stores .foodEditAccordion .foodEditRequiredCount{width:32px!important;min-width:32px!important;}
+  #stores .foodEditAccordion .foodEditToggle{width:30px!important;min-width:30px!important;}
+  #stores .foodEditAccordion .choiceGroupOrderTools{width:54px!important;min-width:54px!important;}
+  #stores .foodEditAccordion .choiceGroupOrderTools button{width:25px!important;min-width:25px!important;height:25px!important;min-height:25px!important;font-size:14px!important;}
+  #stores .foodEditAccordion .deleteGroup{width:32px!important;min-width:32px!important;}
+}
+</style>
+<style id="MHAC_CHOICE_GROUP_SIMPLE_BAR_V176">
+#stores .foodEditAccordion .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 34px 58px 34px!important;gap:5px!important;align-items:center!important;min-height:48px!important;padding:5px!important;}
+#stores .foodEditAccordion .foodEditGroupTitle{min-width:0!important;width:100%!important;font-weight:900!important;font-size:16px!important;text-transform:uppercase!important;}
+#stores .foodEditAccordion .foodEditToggle{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
+#stores .foodEditAccordion .choiceGroupOrderTools{width:58px!important;min-width:58px!important;height:34px!important;display:flex!important;gap:3px!important;align-items:center!important;justify-content:center!important;}
+#stores .foodEditAccordion .choiceGroupOrderTools button{width:27px!important;min-width:27px!important;height:27px!important;min-height:27px!important;font-size:15px!important;padding:0!important;margin:0!important;}
+#stores .foodEditAccordion .deleteGroup{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
+#stores .foodEditAccordion .choiceCountBar{display:flex!important;align-items:center!important;gap:6px!important;padding:7px 8px!important;margin:0 0 7px!important;border:1px solid #ddd!important;border-radius:8px!important;}
+#stores .foodEditAccordion .choiceCountBar .foodEditCountMode{width:120px!important;min-width:120px!important;min-height:34px!important;height:34px!important;}
+#stores .foodEditAccordion .choiceCountBar .foodEditRequiredCount{width:58px!important;min-width:58px!important;min-height:34px!important;height:34px!important;text-align:center!important;}
+#stores .foodEditAccordion .choiceCountBar span{font-weight:900!important;font-size:12px!important;}
+#stores .allChoiceAutoCount{width:100%!important;min-height:44px!important;margin:8px 0!important;font-weight:900!important;}
+@media(max-width:600px){
+ #stores .foodEditAccordion .foodEditHead{grid-template-columns:minmax(0,1fr) 32px 56px 32px!important;gap:3px!important;padding:4px!important;}
+ #stores .foodEditAccordion .foodEditGroupTitle{font-size:15px!important;}
+ #stores .foodEditAccordion .choiceGroupOrderTools{width:56px!important;min-width:56px!important;}
+ #stores .foodEditAccordion .choiceGroupOrderTools button{width:26px!important;min-width:26px!important;height:26px!important;min-height:26px!important;}
+}
+</style>
+</head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <script>
@@ -2589,11 +2682,11 @@ function countdownText(o){
 function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEach(el=>{const o=orders.find(x=>x.id===el.dataset.countdown);if(o)el.textContent=countdownText(o)})}
 setInterval(refreshCountdowns,1000);
 
-function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];const addExtra=(name,price,q,label)=>{const n=String(name||"").trim();if(!n)return;const pr=Number(price||0);const qq=Math.max(1,Number(q||1));extras.push({name:n,price:pr,qty:qq,label:label||"Choice"});};if(i.choice)addExtra(i.choice,i.choicePrice,1,"Drink");if(i.bucketChoice)addExtra(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name,i.bucketChoicePrice??i.bucketChoice?.price,1,"Choice");(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);const q=typeof x==="string"?1:Number(x?.qty||x?.quantity||x?.count||1);if(n)addExtra(n,pr,q,g.group||g.name||"Choice");}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);const q=typeof x==="string"?1:Number(x?.qty||x?.quantity||x?.count||1);if(n)addExtra(n,pr,q,"Add-on")});let extraTotal=extras.reduce((a,x)=>a+(x.price*x.qty),0);let unit=base+(extraTotal/qty);if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
+function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${Number(x.qty||1)}x ${esc(x.name||x)}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: 1x ${esc(n)}${pr?` + ${peso(pr)}`:""}`)}if(i.bucketChoice){const bn=typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"";const bp=typeof i.bucketChoice==='string'?Number(i.bucketChoicePrice||0):Number(i.bucketChoicePrice??i.bucketChoice?.price||0);if(bn)ds.push(`Choice: 1x ${esc(bn)}${bp?` + ${peso(bp)}`:""}`)}(i.choiceGroups||[]).forEach(g=>{const byName={};(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);const q=typeof x==='string'?1:Number(x?.qty||x?.quantity||x?.count||1);if(!n)return;const key=String(n).trim().toLowerCase();if(!byName[key])byName[key]={name:n,price:pr,qty:0};byName[key].qty+=Math.max(1,q);if(!byName[key].price&&pr)byName[key].price=pr;});Object.values(byName).forEach(x=>ds.push(`${x.qty}x ${esc(x.name)}${x.price?` + ${peso(x.price*x.qty)}`:""}`));});if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);const q=typeof x==='string'?1:Number(x?.qty||x?.quantity||x?.count||1);return n?`${q}x ${esc(n)}${pr?` + ${peso(pr*q)}`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
+ const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}if(i.bucketChoice)ds.push(`Choice: ${esc(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"")}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`:`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
 }
@@ -3033,7 +3126,7 @@ function renderStores(){
    b.onclick=(e)=>{if(e.target.closest("button"))return;toggleCategory();};
    b.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCategory();}};
  });
- // V4.1.72: bind Publish/Unpublish directly after every Store Manager render.
+ // V4.1.75: bind Publish/Unpublish directly after every Store Manager render.
  // This avoids mobile/browser event-bubbling or stale-delegation issues.
  // Existing publish/unpublish Firestore logic and business rules are unchanged.
  host.querySelectorAll("[data-publish-store],[data-unpublish-store]").forEach(b=>{
@@ -3246,6 +3339,7 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    </div>
 
    <label class="label">AVAILABILITY</label><select class="availability"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
+   <button type="button" class="gray allChoiceAutoCount">☑ ALL CHOICE AUTO COUNT</button>
    <button type="button" class="green saveDirectFood">💾 SAVE FOOD</button>
    <button type="button" class="danger deleteDirectFood">🗑️ DELETE FOOD</button>
  </div>`;
@@ -3309,9 +3403,11 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
+   const standardTitle={chickenParts:'PART',flavor:'FLAVOR',fries:'FRIES',drinks:'DRINK'};
+   if(standardTitle[g.role] && (!g.name || /^(parts?|flavou?rs?|fries|drinks?|beverages?)$/i.test(String(g.name).trim()))) g.name=standardTitle[g.role];
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
-   const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><div class="choiceGroupOrderTools"><button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">↑</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">↓</button></div><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceCountBar"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><span>COUNT</span></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions'), orderTools=box.querySelector('.choiceGroupOrderTools');
    box.querySelector('.foodEditCountMode').value=String(g.countMode||'auto')==='fixed'?'fixed':'auto';
    box.querySelector('.foodEditRequiredCount').value=Math.max(1,Number(g.requiredCount||1));
    box.querySelector('.foodEditRequiredCount').disabled=box.querySelector('.foodEditCountMode').value!=='fixed';
@@ -3323,12 +3419,8 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      r.querySelector('button').onclick=()=>r.remove(); opts.appendChild(r);
    };
    (g.options||[]).forEach(addOpt);
-   // Mobile-safe Choice Group ordering: move the WHOLE group up/down.
+   // Compact Choice Group ordering controls live in the card header.
    // The DOM order is the draft order and is saved exactly as displayed.
-   const orderTools=document.createElement('div');
-   orderTools.className='choiceGroupOrderTools';
-   orderTools.innerHTML='<button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">⬆️ UP</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">⬇️ DOWN</button>';
-   box.insertBefore(orderTools,drawer);
    const syncOrderButtons=()=>{
      const parent=box.parentElement;
      if(!parent)return;
@@ -3436,9 +3528,30 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  };
  rawGroups.forEach(addGroup);
 
+ // Standard first-load order: PART → FLAVOR → FRIES → DRINK.
+ // Once choiceOrder exists, preserve the exact saved/manual order.
+ if(Array.isArray(rawGroups) && rawGroups.length && !rawGroups.some(g=>Number.isFinite(Number(g.choiceOrder)))){
+   const rank={chickenParts:0,flavor:1,fries:2,drinks:3};
+   rawGroups.sort((a,b)=>{
+     const ra=Object.prototype.hasOwnProperty.call(rank,a.role)?rank[a.role]:99;
+     const rb=Object.prototype.hasOwnProperty.call(rank,b.role)?rank[b.role]:99;
+     return ra-rb;
+   });
+ }
+
  // Copy/Paste lives at the bottom of every Choice Group, including Parts.
  // Extra custom choice groups remain fully editable and deletable.
  const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>addGroup({name:'New Choice Group',role:'',options:[]});groupsBox.after(addCustom);
+ const allAutoBtn=ed.querySelector('.allChoiceAutoCount');
+ if(allAutoBtn){ allAutoBtn.onclick=()=>{
+   groupsBox.querySelectorAll('.foodEditAccordion').forEach(box=>{
+     const mode=box.querySelector('.foodEditCountMode');
+     const req=box.querySelector('.foodEditRequiredCount');
+     if(mode) mode.value='auto';
+     if(req) req.disabled=true;
+   });
+   toast('✅ ALL CHOICE GROUPS set to AUTO COUNT.');
+ }; }
 
  const priceBox=ed.querySelector('[data-kind="price"]');
  priceBox.querySelector('.foodEditToggle').onclick=()=>{const was=open===priceBox;closeOther(priceBox);if(was){open=null;priceBox.classList.remove('open');priceBox.querySelector('.foodEditDrawer').classList.add('hidden');priceBox.querySelector('.foodEditToggle span').textContent='›';}else{open=priceBox;priceBox.classList.add('open');priceBox.querySelector('.foodEditDrawer').classList.remove('hidden');priceBox.querySelector('.foodEditToggle span').textContent='⌄';}};
@@ -3829,7 +3942,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.74 STORE CLICK CATEGORY-ONLY COMPACT |  FINAL MENU PRICE + STORE PHOTO CLEAN";
+window.__MHAC_BUILD__="V4.1.75 STORE CLICK CATEGORY-ONLY COMPACT |  FINAL MENU PRICE + STORE PHOTO CLEAN";
 </script>
 <script>
 setTimeout(function(){
