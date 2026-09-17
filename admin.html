@@ -2721,6 +2721,20 @@ function orderChoiceLines(i,p){
  (i.addOns||[]).forEach(x=>push(typeof x==='string'?x:x?.name,Number(x?.qty||1),typeof x==='string'?0:Number(x?.price||0)));
  return lines;
 }
+function findOrderCategory(storeName,itemName){
+  const stores=[];
+  if(menu&&Array.isArray(menu.stores)) stores.push(...menu.stores);
+  if(draft&&Array.isArray(draft.stores)) stores.push(...draft.stores);
+  const sn=String(storeName||'').trim().toLowerCase();
+  const fn=String(itemName||'').trim().toLowerCase();
+  for(const st of stores){
+    if(sn && String(st?.name||'').trim().toLowerCase()!==sn) continue;
+    for(const cat of (st?.categories||[])){
+      if((cat?.items||[]).some(it=>String(it?.name||'').trim().toLowerCase()===fn)) return String(cat?.name||'').trim();
+    }
+  }
+  return '';
+}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
