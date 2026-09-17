@@ -2292,6 +2292,19 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   overflow:hidden!important;
 }
 </style>
+
+<style id="MHAC_DRAWER_CUSTOMER_INSIDE_FIX">
+.unifiedBreakdown .orderDetailCustomer{
+  margin:0!important;
+  padding:0 0 12px!important;
+  border-bottom:1px solid #eee!important;
+}
+.unifiedBreakdown .orderDetailPayment{
+  margin:12px 0!important;
+  padding:0 0 10px!important;
+  border-bottom:1px solid #eee!important;
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2782,14 +2795,14 @@ function orderDetailHtml(o){
    :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  const second=Number(f.secondStoreFee||0);
  return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer">
-     <b>${esc(o.orderNo||o.id)}</b><br>
-     <b>${esc(c.name||'')}</b><br>
-     CP #: ${esc(c.contact||'—')}<br>
-     ${(()=>{const loc=String(c.gps?.display||c.address||'Customer GPS').replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,'').trim();return `Address Location: 📍 LOCATION DETECTED: ${esc(loc)}`})()}
-   </div>
-   ${payment}
    <div class="unifiedBreakdown">
+     <div class="orderDetailCustomer">
+       <b>${esc(o.orderNo||o.id)}</b><br>
+       <b>${esc(c.name||'')}</b><br>
+       CP #: ${esc(c.contact||'—')}<br>
+       ${(()=>{const loc=String(c.gps?.display||c.address||'Customer GPS').replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,'').trim();return `Address Location: 📍 LOCATION DETECTED: ${esc(loc)}`})()}
+     </div>
+     ${payment}
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${sections}
      <div class="unifiedBill">
