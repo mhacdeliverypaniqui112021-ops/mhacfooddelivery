@@ -1688,7 +1688,7 @@ function startOrders(){
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
-      const st=String(o.status||"NEW").toUpperCase(),canCancel=!["COMPLETED","CANCELLED"].includes(st);
+      const st=String(o.status||"NEW").toUpperCase(),canCancel=(st==="NEW");
       return `<div class="orderCard">
         <div class="customerOrderPreviewHead"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
         <h3 class="customerOrderPreviewName">${esc(o.customer?.name||"")}</h3>
@@ -1705,9 +1705,22 @@ $("myOrders").onclick=async e=>{
   const view=e.target.closest("[data-customer-view]");
   if(view){const d=$("customer-order-details-"+view.dataset.customerView);if(d)d.classList.toggle("hidden");return;}
   const b=e.target.closest("[data-cancel-order]");if(!b)return;
-  const id=b.dataset.cancelOrder;b.disabled=true;
-  try{await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});}
-  catch(x){b.disabled=false;alert(x.message||x)}
+  const id=b.dataset.cancelOrder;
+  const order=(window.__mhacOrders||[]).find(x=>String(x.id)===String(id));
+  if(!order || String(order.status||"NEW").toUpperCase()!=="NEW"){
+    b.remove();
+    return;
+  }
+  b.disabled=true;
+  try{
+    const fresh=await getDoc(doc(db,"orders",id));
+    const latest=fresh.exists()?fresh.data():null;
+    if(!latest || String(latest.status||"NEW").toUpperCase()!=="NEW"){
+      b.remove();
+      return;
+    }
+    await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});
+  }catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
 window.__MHAC_BUILD__="V4.1.64 CUSTOMER MASTER UNIFIED WHITE UI — TIME LIMIT TEST MODE";
