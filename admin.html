@@ -1125,6 +1125,11 @@ main{max-width:980px!important;padding:10px 12px!important}
 }
 </style>
 
+<style id="MHAC_CATEGORY_REORDER_ARROWS_V1">
+/* CATEGORY REORDER ONLY — additive; preserves locked UI/flows */
+.categoryReorder{display:flex!important;gap:5px!important;align-items:center!important;flex:none!important}
+.categoryReorder button{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:6px!important;margin:0!important;font-size:20px!important;line-height:1!important}
+</style>
 <style id="V4_1_30_CONTACT_EARNINGS_FIX">
 .customerPhone{color:#111!important;font-weight:700;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
 .customerPhone:active{opacity:.55}
@@ -1900,6 +1905,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 #stores .categoryTapRow{cursor:pointer!important}
 #stores .categoryBtns{display:flex!important;gap:5px!important;flex:none!important}
 #stores .categoryBtns button{width:auto!important;margin:0!important;padding:8px 9px!important;font-size:11px!important}
+#stores .categoryBtns .categoryMoveUp,#stores .categoryBtns .categoryMoveDown{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:6px!important;font-size:20px!important;line-height:1!important}
 #stores .storeFoodList{padding:5px 7px 8px!important;border-top:1px solid #ddd!important}
 #stores .storeFoodItem{border:1px solid #ddd!important;border-radius:10px!important;margin:6px 0!important;padding:7px!important}
 #stores .foodLine{padding:0!important}
@@ -3097,6 +3103,8 @@ function renderStores(){
        <div class="storeCategoryHeader categoryTapRow" data-cat-open="${si}-${ci}" role="button" tabindex="0" aria-expanded="false">
         <b>📂 ${esc(c.name)}</b>
         <div class="categoryBtns" onclick="event.stopPropagation()">
+         <button class="gray categoryMoveUp" data-cat-up="${si}-${ci}" type="button" title="Move category up" aria-label="Move category up">↑</button>
+         <button class="gray categoryMoveDown" data-cat-down="${si}-${ci}" type="button" title="Move category down" aria-label="Move category down">↓</button>
          <button class="gray" data-cat-edit="${si}-${ci}">EDIT</button>
          <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
         </div>
@@ -3217,6 +3225,20 @@ function renderStores(){
    draft.stores[si].categories.push({name:n,items:[]});
    saveDraftMenu();
    renderStores();
+ });
+ host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catUp.split("-").map(Number);
+   const cats=draft?.stores?.[si]?.categories||[];
+   if(ci<=0)return;
+   const tmp=cats[ci-1]; cats[ci-1]=cats[ci]; cats[ci]=tmp;
+   saveDraftMenu(); renderStores();
+ });
+ host.querySelectorAll("[data-cat-down]").forEach(b=>b.onclick=()=>{
+   const [si,ci]=b.dataset.catDown.split("-").map(Number);
+   const cats=draft?.stores?.[si]?.categories||[];
+   if(ci>=cats.length-1)return;
+   const tmp=cats[ci+1]; cats[ci+1]=cats[ci]; cats[ci]=tmp;
+   saveDraftMenu(); renderStores();
  });
  host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
@@ -3366,7 +3388,11 @@ function renderEditor(){
    card.innerHTML=`
      <div class="categoryHeader">
        <div><b>🍽️ ${esc(c.name)}</b><div class="small">${(c.items||[]).length} food item(s)</div></div>
-       <button class="gray" type="button">OPEN / CLOSE</button>
+       <div class="categoryReorder">
+         <button class="gray categoryMoveUp" type="button" title="Move category up" aria-label="Move category up">↑</button>
+         <button class="gray categoryMoveDown" type="button" title="Move category down" aria-label="Move category down">↓</button>
+         <button class="gray categoryOpenClose" type="button">OPEN / CLOSE</button>
+       </div>
      </div>
      <div class="categoryControls">
        <input class="categoryNameEdit" value="${esc(c.name)}" placeholder="Category name">
@@ -3378,9 +3404,28 @@ function renderEditor(){
    const list=card.querySelector(".directFoodList");
    list.classList.add("hidden");
    card.querySelector(".categoryHeader").onclick=(e)=>{
-     if(e.target.closest(".categoryControls")) return;
+     if(e.target.closest(".categoryControls") || e.target.closest(".categoryReorder")) return;
      list.classList.toggle("hidden");
      if(!list.classList.contains("hidden")) renderDirectFoodList(ci,list);
+   };
+   card.querySelector(".categoryOpenClose").onclick=(e)=>{
+     e.stopPropagation();
+     list.classList.toggle("hidden");
+     if(!list.classList.contains("hidden")) renderDirectFoodList(ci,list);
+   };
+   card.querySelector(".categoryMoveUp").onclick=(e)=>{
+     e.stopPropagation();
+     const cats=s.categories||[];
+     if(ci<=0) return;
+     const tmp=cats[ci-1]; cats[ci-1]=cats[ci]; cats[ci]=tmp;
+     saveDraftMenu(); renderEditor();
+   };
+   card.querySelector(".categoryMoveDown").onclick=(e)=>{
+     e.stopPropagation();
+     const cats=s.categories||[];
+     if(ci>=cats.length-1) return;
+     const tmp=cats[ci+1]; cats[ci+1]=cats[ci]; cats[ci]=tmp;
+     saveDraftMenu(); renderEditor();
    };
    card.querySelector(".saveCategoryName").onclick=()=>{
      const n=card.querySelector(".categoryNameEdit").value.trim();
