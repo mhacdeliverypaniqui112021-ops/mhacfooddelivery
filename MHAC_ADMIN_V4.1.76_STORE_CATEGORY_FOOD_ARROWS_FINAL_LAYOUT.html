@@ -2385,6 +2385,35 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   #stores .foodLine>.editDirectFood{width:74px!important;min-width:74px!important;height:32px!important;min-height:32px!important;font-size:9px!important}
   #stores .foodLineMain>b{font-size:14px!important}
 }
+
+<style id="MHAC_STORE_HEADER_MOBILE_FIX">
+/* Store header: same compact visual language as Category/Food rows.
+   Keep store logo, name and reorder/edit/delete controls on one clean row. */
+#stores .storeBoxHeader{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:5px!important;min-height:48px!important;padding:4px 5px!important}
+#stores .storeTitleCompact{display:grid!important;grid-template-columns:18px 34px minmax(0,1fr)!important;align-items:center!important;gap:5px!important;min-width:0!important}
+#stores .storeTitleCompact .storeToggleIcon{width:18px!important;min-width:18px!important;font-size:15px!important;line-height:1!important}
+#stores .storeHeaderPhoto{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;object-fit:cover!important;border-radius:7px!important}
+#stores .storeTitleCompact>b{font-size:16px!important;line-height:1.12!important;font-weight:900!important;min-width:0!important;overflow-wrap:anywhere!important;word-break:normal!important;white-space:normal!important}
+#stores .storeHeaderActions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:3px!important;flex:0 0 auto!important;flex-wrap:nowrap!important;min-width:0!important}
+#stores .storeHeaderActions button{height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;border-radius:8px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1!important}
+#stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:30px!important;min-width:30px!important;font-size:16px!important}
+#stores .storeHeaderActions .storeEditToggle{width:58px!important;min-width:58px!important;font-size:9px!important;font-weight:900!important}
+#stores .storeHeaderActions .storeDelete{width:68px!important;min-width:68px!important;font-size:9px!important;font-weight:900!important;line-height:1.05!important}
+/* Food edit action stays readable as one compact line; no icon decoration. */
+#stores .editDirectFood{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+@media(max-width:600px){
+  #stores .storeBoxHeader{grid-template-columns:minmax(0,1fr) auto!important;gap:4px!important;padding:4px!important}
+  #stores .storeTitleCompact{grid-template-columns:16px 32px minmax(0,1fr)!important;gap:4px!important}
+  #stores .storeTitleCompact .storeToggleIcon{width:16px!important;min-width:16px!important;font-size:14px!important}
+  #stores .storeHeaderPhoto{width:32px!important;height:32px!important;min-width:32px!important;max-width:32px!important}
+  #stores .storeTitleCompact>b{font-size:15px!important;line-height:1.12!important}
+  #stores .storeHeaderActions{gap:2px!important}
+  #stores .storeHeaderActions button{height:32px!important;min-height:32px!important}
+  #stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:28px!important;min-width:28px!important;font-size:15px!important}
+  #stores .storeHeaderActions .storeEditToggle{width:54px!important;min-width:54px!important;font-size:8.5px!important}
+  #stores .storeHeaderActions .storeDelete{width:64px!important;min-width:64px!important;font-size:8.5px!important}
+}
+</style>
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
@@ -3245,20 +3274,24 @@ function renderStores(){
  });
 
  host.querySelectorAll("[data-store-up]").forEach(b=>b.onclick=()=>{
+   const scrollY=window.scrollY;
    const si=+b.dataset.storeUp;
    if(si<=0)return;
    const stores=draft?.stores||[];
    const tmp=stores[si-1]; stores[si-1]=stores[si]; stores[si]=tmp;
    if(selectedStore===si)selectedStore=si-1; else if(selectedStore===si-1)selectedStore=si;
    saveDraftMenu(); renderStores();
+   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
  });
  host.querySelectorAll("[data-store-down]").forEach(b=>b.onclick=()=>{
+   const scrollY=window.scrollY;
    const si=+b.dataset.storeDown;
    const stores=draft?.stores||[];
    if(si>=stores.length-1)return;
    const tmp=stores[si+1]; stores[si+1]=stores[si]; stores[si]=tmp;
    if(selectedStore===si)selectedStore=si+1; else if(selectedStore===si+1)selectedStore=si;
    saveDraftMenu(); renderStores();
+   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
  });
  host.querySelectorAll("[data-store-edit]").forEach(b=>{
    b.onclick=(e)=>{
@@ -3433,7 +3466,7 @@ function renderNestedFoods(si,ci,list){
     <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
     <button class="gray foodMoveUp" data-food-up="${si}-${ci}-${fi}" type="button" title="Move food up" aria-label="Move food up">↑</button>
     <button class="gray foodMoveDown" data-food-down="${si}-${ci}-${fi}" type="button" title="Move food down" aria-label="Move food down">↓</button>
-    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
+    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">EDIT FOOD</button>
     <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
    </div>
   </div>`).join("")+
@@ -3586,7 +3619,7 @@ function renderDirectFoodList(ci,list){
        <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
        <button class="gray foodMoveUp" data-food-up="${selectedStore}-${ci}-${fi}" type="button" title="Move food up" aria-label="Move food up">↑</button>
        <button class="gray foodMoveDown" data-food-down="${selectedStore}-${ci}-${fi}" type="button" title="Move food down" aria-label="Move food down">↓</button>
-       <button class="gray editDirectFood" data-fi="${fi}">✏️ EDIT FOOD</button>
+       <button class="gray editDirectFood" data-fi="${fi}">EDIT FOOD</button>
        <div class="directFoodEditor hidden" data-editor="${fi}"></div>
      </div>`).join("")}
    <div class="addFoodInline">
