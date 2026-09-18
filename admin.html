@@ -652,6 +652,23 @@ button.danger,.danger{
 .storeCategoryHeader b{font-size:16px}
 .storeCategoryHeader .categoryBtns{display:flex;gap:5px}
 .storeCategoryHeader button{width:auto!important;margin:0!important;padding:7px 9px!important;font-size:8px!important}
+/* V4.1.76 CATEGORY/FOOD ARROWS ONLY: uniform control sizing + stable reorder state */
+.categoryBtns,.storeHeaderActions{display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:nowrap!important}
+.categoryBtns button,.storeHeaderActions button,.foodLine > button{box-sizing:border-box!important;height:54px!important;min-height:54px!important;width:54px!important;min-width:54px!important;padding:0!important;margin:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;font-size:22px!important;line-height:1!important}
+.categoryBtns button[data-cat-edit],.categoryBtns button[data-cat-delete],.storeHeaderActions .storeEditToggle,.storeHeaderActions .storeDelete,.foodLine .editDirectFood{width:86px!important;min-width:86px!important;font-size:12px!important;line-height:1.1!important}
+.storeCategoryHeader{min-height:72px!important;box-sizing:border-box!important}
+.storeCategoryHeader b{flex:1 1 auto!important;min-width:0!important}
+.storeCategory{box-sizing:border-box!important;width:100%!important}
+.storeFoodItem{box-sizing:border-box!important;width:100%!important}
+.foodLine{display:grid!important;grid-template-columns:minmax(0,1fr) 54px 54px 86px!important;gap:6px!important;align-items:center!important}
+.foodLineMain{grid-column:1!important;min-width:0!important}
+.foodLine .foodSummary{grid-column:1!important}
+@media(max-width:600px){
+ .categoryBtns,.storeHeaderActions{gap:5px!important}
+ .categoryBtns button,.storeHeaderActions button,.foodLine > button{height:50px!important;min-height:50px!important;width:50px!important;min-width:50px!important;font-size:20px!important}
+ .categoryBtns button[data-cat-edit],.categoryBtns button[data-cat-delete],.storeHeaderActions .storeEditToggle,.storeHeaderActions .storeDelete,.foodLine .editDirectFood{width:78px!important;min-width:78px!important;font-size:11px!important}
+ .foodLine{grid-template-columns:minmax(0,1fr) 50px 50px 78px!important}
+}
 .storeFoodList{padding:0 7px 7px}
 .storeFoodList.hidden{display:none!important}
 .storeFoodItem{background:#fff;border:1px solid #ddd;border-radius:10px;padding:8px;margin:5px 0}
@@ -3244,19 +3261,37 @@ function renderStores(){
    saveDraftMenu();
    renderStores();
  });
- host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=()=>{
+ function reorderCategoryKeepOpen(si,ci,dir){
+   const cats=draft?.stores?.[si]?.categories||[];
+   const ni=ci+dir;
+   if(ci<0||ci>=cats.length||ni<0||ni>=cats.length)return;
+   const storeCard=host.querySelector(`[data-store-card="${si}"]`);
+   const wasStoreOpen=!!storeCard?.classList.contains("storeOpen");
+   const openCat=storeCard?.querySelector('[data-cat-open][aria-expanded="true"]');
+   const wasCatOpen=!!openCat;
+   const tmp=cats[ci]; cats[ci]=cats[ni]; cats[ni]=tmp;
+   saveDraftMenu();
+   renderStores();
+   if(wasStoreOpen){
+     const newStore=host.querySelector(`[data-store-card="${si}"]`);
+     const storeToggle=newStore?.querySelector("[data-store-toggle]");
+     if(storeToggle && !newStore.classList.contains("storeOpen")) storeToggle.click();
+     if(wasCatOpen){
+       const movedCi=ci+dir;
+       const catToggle=host.querySelector(`[data-cat-open="${si}-${movedCi}"]`);
+       if(catToggle) catToggle.click();
+     }
+   }
+ }
+host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=e=>{
+   e.preventDefault(); e.stopPropagation();
    const [si,ci]=b.dataset.catUp.split("-").map(Number);
-   const cats=draft?.stores?.[si]?.categories||[];
-   if(ci<=0)return;
-   const tmp=cats[ci-1]; cats[ci-1]=cats[ci]; cats[ci]=tmp;
-   saveDraftMenu(); renderStores();
+   reorderCategoryKeepOpen(si,ci,-1);
  });
- host.querySelectorAll("[data-cat-down]").forEach(b=>b.onclick=()=>{
+ host.querySelectorAll("[data-cat-down]").forEach(b=>b.onclick=e=>{
+   e.preventDefault(); e.stopPropagation();
    const [si,ci]=b.dataset.catDown.split("-").map(Number);
-   const cats=draft?.stores?.[si]?.categories||[];
-   if(ci>=cats.length-1)return;
-   const tmp=cats[ci+1]; cats[ci+1]=cats[ci]; cats[ci]=tmp;
-   saveDraftMenu(); renderStores();
+   reorderCategoryKeepOpen(si,ci,1);
  });
  host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
@@ -3366,20 +3401,24 @@ function renderNestedFoods(si,ci,list){
    }
  });
  list.querySelectorAll("[data-food-up]").forEach(b=>b.onclick=e=>{
-   e.stopPropagation();
+   e.preventDefault(); e.stopPropagation();
    const [x,y,z]=b.dataset.foodUp.split("-").map(Number);
    const items=draft?.stores?.[x]?.categories?.[y]?.items||[];
    if(z<=0)return;
+   const scrollY=window.scrollY;
    const tmp=items[z-1]; items[z-1]=items[z]; items[z]=tmp;
    saveDraftMenu(); renderNestedFoods(x,y,list);
+   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
  });
  list.querySelectorAll("[data-food-down]").forEach(b=>b.onclick=e=>{
-   e.stopPropagation();
+   e.preventDefault(); e.stopPropagation();
    const [x,y,z]=b.dataset.foodDown.split("-").map(Number);
    const items=draft?.stores?.[x]?.categories?.[y]?.items||[];
    if(z>=items.length-1)return;
+   const scrollY=window.scrollY;
    const tmp=items[z+1]; items[z+1]=items[z]; items[z]=tmp;
    saveDraftMenu(); renderNestedFoods(x,y,list);
+   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
  });
 }
 function renderEditor(){
