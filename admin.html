@@ -2540,6 +2540,217 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 }
 </style>
 
+
+<style id="MHAC_FINAL_CATEGORY_FOOD_LAYOUT_FIX_V4">
+/* V4 FINAL PATCH — visual/layout only + order-control usability.
+   Store row remains on the already-approved compact style. Category and food rows
+   use the same compact family; food editor always gets the full drawer width. */
+#stores .storeCategoryHeader{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:6px!important;
+  min-height:48px!important;
+  padding:7px 9px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+#stores .storeCategoryHeader>b{
+  min-width:0!important;
+  margin:0!important;
+  font-size:15px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+  white-space:normal!important;
+}
+#stores .categoryBtns{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:3px!important;
+  flex:0 0 auto!important;
+  min-width:0!important;
+  overflow:visible!important;
+}
+#stores .categoryBtns button{
+  flex:0 0 auto!important;
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:14px!important;
+  line-height:1!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  z-index:30!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#stores .categoryBtns .categoryEditBtn{width:60px!important;min-width:60px!important;font-size:9px!important;}
+#stores .categoryBtns .categoryDeleteBtn{width:60px!important;min-width:60px!important;font-size:9px!important;}
+
+/* Food list = same compact row family. */
+#stores .storeFoodItem{
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:6px!important;
+  margin:6px 0!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  overflow:visible!important;
+}
+#stores .storeFoodItem .foodLine{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto auto!important;
+  align-items:center!important;
+  gap:5px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+#stores .storeFoodItem .foodContent{
+  min-width:0!important;
+  width:100%!important;
+  overflow:hidden!important;
+}
+#stores .storeFoodItem .foodLineMain{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  min-width:0!important;
+  width:100%!important;
+  margin:0!important;
+}
+#stores .foodHeaderPhoto{
+  flex:0 0 42px!important;
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  object-fit:cover!important;
+  border:1px solid #ddd!important;
+  border-radius:7px!important;
+  background:#f3f3f3!important;
+}
+#stores .foodNamePrice{
+  min-width:0!important;
+  width:100%!important;
+  display:block!important;
+}
+#stores .storeFoodItem .foodLineMain b{
+  display:block!important;
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+  white-space:normal!important;
+}
+#stores .storeFoodItem .foodLineMain span{
+  display:block!important;
+  margin-top:2px!important;
+  font-size:13px!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+#stores .storeFoodItem .foodSummary{
+  font-size:11px!important;
+  line-height:1.25!important;
+  margin:3px 0 0!important;
+  color:#666!important;
+  overflow-wrap:break-word!important;
+}
+#stores .foodOrderTools{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:3px!important;
+  flex-wrap:nowrap!important;
+  flex:0 0 auto!important;
+  min-width:0!important;
+}
+#stores .foodOrderTools button{
+  flex:0 0 auto!important;
+  width:32px!important;
+  min-width:32px!important;
+  height:32px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:14px!important;
+  line-height:1!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  z-index:30!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#stores .foodOrderTools .editDirectFood{width:72px!important;min-width:72px!important;font-size:8.5px!important;padding:3px!important;}
+#stores .foodOrderTools .deleteDirectFood{width:58px!important;min-width:58px!important;font-size:8.5px!important;padding:3px!important;}
+
+/* Critical: EDIT FOOD drawer must span the entire food row, not inherit the
+   narrow name column. This fixes the one-letter-per-line editor screenshot. */
+#stores .storeFoodItem .directFoodEditor{
+  grid-column:1 / -1!important;
+  grid-row:2!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  margin:6px 0 0!important;
+  overflow:visible!important;
+}
+#stores .storeFoodItem .directFoodEditor.hidden{display:none!important;}
+#stores .storeFoodItem .directFoodEditor .oneFoodBox,
+#stores .storeFoodItem .directFoodEditor .compactFoodEditor{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+}
+#stores .storeFoodItem .directFoodEditor input,
+#stores .storeFoodItem .directFoodEditor select,
+#stores .storeFoodItem .directFoodEditor textarea{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+#stores .storeFoodItem .directFoodEditor .foodEditOptionRow{
+  width:100%!important;
+  min-width:0!important;
+  grid-template-columns:minmax(0,1fr) 98px 40px!important;
+}
+#stores .storeFoodItem .directFoodEditor .foodEditOptionRow input{min-width:0!important;}
+#stores .storeFoodItem .directFoodEditor .foodEditAccordion[data-role="chickenParts"] .foodEditOptionRow{
+  grid-template-columns:minmax(0,1fr) 40px!important;
+}
+
+@media(max-width:600px){
+  #stores .storeCategoryHeader{min-height:48px!important;padding:7px 8px!important;}
+  #stores .storeCategoryHeader>b{font-size:15px!important;}
+  #stores .categoryBtns button{width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important;font-size:14px!important;}
+  #stores .categoryBtns .categoryEditBtn{width:58px!important;min-width:58px!important;font-size:8.5px!important;}
+  #stores .categoryBtns .categoryDeleteBtn{width:58px!important;min-width:58px!important;font-size:8.5px!important;}
+  #stores .foodHeaderPhoto{flex-basis:40px!important;width:40px!important;height:40px!important;min-width:40px!important;}
+  #stores .storeFoodItem .foodLineMain b{font-size:15px!important;}
+  #stores .foodOrderTools button{width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important;font-size:13px!important;}
+  #stores .foodOrderTools .editDirectFood{width:68px!important;min-width:68px!important;font-size:8px!important;}
+  #stores .foodOrderTools .deleteDirectFood{width:56px!important;min-width:56px!important;font-size:8px!important;}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -3478,35 +3689,52 @@ function renderStores(){
    saveDraftMenu();
    renderStores();
  });
- host.querySelectorAll("[data-cat-move-up]").forEach(b=>b.onclick=async(e)=>{
+ function restoreMenuPath(si,ci,scrollY){
+ const host=$('stores');
+ const card=host.querySelector(`[data-store-card="${si}"]`);
+ if(!card)return;
+ // Re-open the exact Store without firing the header click handler.
+ host.querySelectorAll('.storeBox').forEach(x=>{
+   x.classList.remove('storeOpen');
+   x.querySelector('.storeInner')?.classList.add('storeCollapsed');
+ });
+ card.classList.add('storeOpen');
+ card.querySelector('.storeInner')?.classList.remove('storeCollapsed');
+ const sh=card.querySelector(`[data-store-toggle="${si}"]`);
+ if(sh){sh.setAttribute('aria-expanded','true'); const ic=sh.querySelector('.storeToggleIcon'); if(ic)ic.textContent='▼';}
+ const ch=card.querySelector(`[data-cat-open="${si}-${ci}"]`);
+ if(ch){
+   card.querySelectorAll('.storeFoodList').forEach(x=>{x.classList.add('hidden');x.innerHTML='';});
+   card.querySelectorAll('[data-cat-open]').forEach(x=>x.setAttribute('aria-expanded','false'));
+   const list=card.querySelector(`#store-food-${si}-${ci}`);
+   if(list){list.classList.remove('hidden');ch.setAttribute('aria-expanded','true');renderNestedFoods(si,ci,list);}
+ }
+ if(typeof scrollY==='number') requestAnimationFrame(()=>window.scrollTo(0,scrollY));
+}
+host.querySelectorAll("[data-cat-move-up]").forEach(b=>b.onclick=async(e)=>{
    e.preventDefault(); e.stopPropagation();
    const [si,ci]=b.dataset.catMoveUp.split("-").map(Number);
-   if(!Number.isInteger(si)||!Number.isInteger(ci)||ci<=0)return;
    const cats=draft.stores?.[si]?.categories;
-   if(!Array.isArray(cats)||ci>=cats.length)return;
+   if(!Number.isInteger(si)||!Number.isInteger(ci)||!Array.isArray(cats)||ci<=0||ci>=cats.length)return;
+   const scrollY=window.scrollY;
    [cats[ci-1],cats[ci]]=[cats[ci],cats[ci-1]];
    await saveDraftMenu();
    renderStores();
-   // Stay inside the same store after reordering.
-   const sh=host.querySelector(`[data-store-toggle="${si}"]`);
-   if(sh) sh.click();
-   const ch=host.querySelector(`[data-cat-open="${si}-${ci-1}"]`);
-   if(ch) ch.click();
+   restoreMenuPath(si,ci-1,scrollY);
  });
  host.querySelectorAll("[data-cat-move-down]").forEach(b=>b.onclick=async(e)=>{
    e.preventDefault(); e.stopPropagation();
    const [si,ci]=b.dataset.catMoveDown.split("-").map(Number);
    const cats=draft.stores?.[si]?.categories;
    if(!Number.isInteger(si)||!Number.isInteger(ci)||!Array.isArray(cats)||ci<0||ci>=cats.length-1)return;
+   const scrollY=window.scrollY;
    [cats[ci],cats[ci+1]]=[cats[ci+1],cats[ci]];
    await saveDraftMenu();
    renderStores();
-   const sh=host.querySelector(`[data-store-toggle="${si}"]`);
-   if(sh) sh.click();
-   const ch=host.querySelector(`[data-cat-open="${si}-${ci+1}"]`);
-   if(ch) ch.click();
+   restoreMenuPath(si,ci+1,scrollY);
  });
- host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
+ 
+host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
    const card=host.querySelector(`[data-category-card="${si}-${ci}"]`);
    card.querySelector(".categoryInlineEdit").classList.toggle("hidden");
@@ -3584,8 +3812,8 @@ function renderNestedFoods(si,ci,list){
  list.innerHTML=(c.items||[]).map((f,fi)=>`
   <div class="storeFoodItem">
    <div class="foodLine">
-    <div>
-      <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
+    <div class="foodContent">
+      <div class="foodLineMain">${f.photo?`<img class="foodHeaderPhoto" src="${esc(f.photo)}" alt="Food photo">`:''}<div class="foodNamePrice"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div></div>
       <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
     </div>
     <div class="foodOrderTools" onclick="event.stopPropagation()">
@@ -3615,28 +3843,25 @@ function renderNestedFoods(si,ci,list){
    const [x,y,z]=b.dataset.foodMoveUp.split("-").map(Number);
    const items=draft.stores?.[x]?.categories?.[y]?.items;
    if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||!Array.isArray(items)||z<=0||z>=items.length)return;
+   const scrollY=window.scrollY;
    [items[z-1],items[z]]=[items[z],items[z-1]];
    await saveDraftMenu();
    renderStores();
-   const sh=host.querySelector(`[data-store-toggle="${x}"]`);
-   if(sh) sh.click();
-   const ch=host.querySelector(`[data-cat-open="${x}-${y}"]`);
-   if(ch) ch.click();
+   restoreMenuPath(x,y,scrollY);
  });
  list.querySelectorAll("[data-food-move-down]").forEach(b=>b.onclick=async(e)=>{
    e.preventDefault(); e.stopPropagation();
    const [x,y,z]=b.dataset.foodMoveDown.split("-").map(Number);
    const items=draft.stores?.[x]?.categories?.[y]?.items;
    if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||!Array.isArray(items)||z<0||z>=items.length-1)return;
+   const scrollY=window.scrollY;
    [items[z],items[z+1]]=[items[z+1],items[z]];
    await saveDraftMenu();
    renderStores();
-   const sh=host.querySelector(`[data-store-toggle="${x}"]`);
-   if(sh) sh.click();
-   const ch=host.querySelector(`[data-cat-open="${x}-${y}"]`);
-   if(ch) ch.click();
+   restoreMenuPath(x,y,scrollY);
  });
- list.querySelectorAll("[data-nested-delete]").forEach(b=>b.onclick=async(e)=>{
+ 
+list.querySelectorAll("[data-nested-delete]").forEach(b=>b.onclick=async(e)=>{
    e.preventDefault(); e.stopPropagation();
    const [x,y,z]=b.dataset.nestedDelete.split("-").map(Number);
    const items=draft.stores?.[x]?.categories?.[y]?.items;
