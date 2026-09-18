@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.69 CHOICE ORDER SAVE FIX</title>
-<meta name="build-version" content="V4.1.67 CHOICE ORDER SAVE FIX">
+<meta name="build-version" content="V4.1.83 ONE DRAWER ORDER LIST">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1887,7 +1887,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 </style>
 
 <style>
-/* V4.1.75 MENU / FOOD EDITOR — compact accordion flow */
+/* V4.1.74 MENU / FOOD EDITOR — compact accordion flow */
 #stores .storeBox{padding:8px!important;margin:8px 0!important;border-radius:14px!important}
 #stores .storeBoxHeader{min-height:48px!important;padding:7px 9px!important}
 #stores .storeBoxHeader b{font-size:18px!important}
@@ -1937,7 +1937,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 .storeHeaderActions{display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:nowrap!important}
 .storeHeaderActions .storeDelete{width:auto!important}
 @media(max-width:600px){.storeHeaderActions{gap:4px!important}.storeHeaderActions .storeDelete{font-size:9px!important;padding:5px 7px!important}}
-/* V4.1.75 UI fix: clicking a Store opens a very compact CATEGORY-ONLY drawer.
+/* V4.1.74 UI fix: clicking a Store opens a very compact CATEGORY-ONLY drawer.
    Store editing controls remain available through the small EDIT STORE toggle. */
 .storeBox.storeOpen .storeInner.storeCollapsed{display:block!important}
 .storeBox.storeOpen .storeInner > .label,
@@ -2019,7 +2019,7 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 
 
 <style id="MHAC_V4_1_74_CHOICE_NAME_PRICE_PUBLISH_FIX">
-/* V4.1.75 follow-up: wider choice-name field, compact 3-digit price, restore store publish control. */
+/* V4.1.74 follow-up: wider choice-name field, compact 3-digit price, restore store publish control. */
 .foodEditorV2 .foodEditOptionRow{grid-template-columns:minmax(0,1fr) 66px 42px!important;gap:6px!important}
 .foodEditorV2 .foodEditOptionRow .groupOptionName{min-width:0!important;width:100%!important;font-size:16px!important}
 .foodEditorV2 .foodEditOptionRow .groupOptionPrice{width:66px!important;min-width:66px!important;max-width:66px!important;font-size:14px!important;padding:7px 5px!important;text-align:center!important}
@@ -2149,20 +2149,16 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   }
 }
 </style>
-<style id="MHAC_UNIFIED_BREAKDOWN_STYLE_RESTORED">
-.unifiedBreakdown{background:#fff!important;border:2px solid #222!important;border-radius:12px!important;padding:14px!important;box-shadow:none!important}
-.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin-bottom:14px!important}
-.unifiedStoreSection{padding:0!important;margin:0!important}
-.unifiedStoreName{font-size:17px!important;font-weight:900!important;margin:2px 0 3px!important}
-.unifiedCategoryName{font-size:14px!important;font-weight:800!important;margin:0 0 10px!important}
-.unifiedFoodRow{padding:0 0 12px!important;margin:0!important;border:0!important;background:transparent!important}
-.unifiedFoodName{font-size:15px!important;font-weight:900!important;line-height:1.35!important}
-.unifiedChoice{font-size:14px!important;padding-left:16px!important;line-height:1.45!important}
-.unifiedFoodTotal{font-size:14px!important;font-weight:900!important;margin-top:5px!important}
-.unifiedStoreDivider{height:1px!important;background:#bbb!important;margin:10px 0 12px!important}
-.unifiedBill{border-top:1px solid #bbb!important;margin-top:4px!important;padding-top:8px!important}
-.unifiedBillRow{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:3px 0!important;font-size:14px!important}
-.unifiedBillRow.grand{border-top:1px solid #222!important;margin-top:5px!important;padding-top:8px!important;font-size:16px!important;font-weight:900!important}
+<style id="MHAC_UNIFIED_BREAKDOWN_STYLE_FINAL">
+.unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
+.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
+.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
+.unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
+.unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
+.unifiedFoodRow:first-child{border-top:0!important}
+.unifiedFoodName{font-size:18px!important;line-height:1.35!important}
+.unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
+.unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
 </style>
 <style id="MHAC_UNIVERSAL_CHOICE_COUNT_V1">
 .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 112px 62px 44px 44px!important;gap:5px!important;align-items:center!important}
@@ -2174,181 +2170,49 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  .foodEditHead .foodEditCountMode{width:96px!important;font-size:10px!important}
  .foodEditHead .foodEditRequiredCount{width:56px!important}
 }
-</style>
-<style id="MHAC_CHOICE_GROUP_MOVE_V2_COMPACT">
-/* Compact move controls stay on the side of each Choice Group header. */
-.foodEditHead{position:relative!important;}
-.foodEditHead .choiceGroupOrderTools{display:flex!important;flex-direction:row!important;gap:2px!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;white-space:nowrap!important;}
-.foodEditHead .choiceGroupOrderTools button{width:26px!important;min-width:26px!important;height:26px!important;min-height:26px!important;margin:0!important;padding:0!important;font-size:15px!important;line-height:1!important;font-weight:900!important;border-radius:6px!important;}
-.foodEditHead .choiceGroupOrderTools button:disabled{opacity:.35!important}
-@media(min-width:601px){
- .foodEditHead{grid-template-columns:minmax(0,1fr) 112px 62px 34px 58px 34px!important}
-}
-@media(max-width:600px){
- .foodEditHead{grid-template-columns:minmax(0,1fr) 96px 50px 34px 58px 34px!important}
- .foodEditHead .foodEditCountMode{width:96px!important;font-size:10px!important}
- .foodEditHead .foodEditRequiredCount{width:50px!important}
-}
+<style id="MHAC_CHOICE_GROUP_MOVE_V1">
+.choiceGroupOrderTools{display:flex;gap:6px;margin:0 0 8px;padding:0}
+.choiceGroupOrderTools button{flex:1;min-height:40px!important;margin:0!important;padding:6px 8px!important;font-size:12px!important;font-weight:800!important;border-radius:8px!important}
+.choiceGroupOrderTools button:disabled{opacity:.4!important}
 /* Long-press / drag whole Choice Group on mobile */
 .foodEditAccordion.choiceGroupDragging{opacity:.55!important;outline:2px dashed #222!important;transform:scale(.99);}
 .foodEditAccordion.choiceGroupDragReady{user-select:none;-webkit-user-select:none;}
 .foodEditAccordion .foodEditHead{touch-action:manipulation;}
 .foodEditAccordion.choiceGroupDragging .foodEditHead{touch-action:none;}
 </style>
-<style id="MHAC_CHOICE_GROUP_TINY_ARROWS_V175">
-/* FINAL compact Choice Group bar: keep every group listed, arrows INSIDE the bar */
-#stores .foodEditAccordion .foodEditHead{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 82px 34px 32px 56px 34px!important;
-  align-items:center!important;
-  gap:4px!important;
-  min-height:48px!important;
-  height:auto!important;
-  padding:5px!important;
-  position:relative!important;
+<style id="MHAC_ONE_DRAWER_ORDERLIST_V183">
+/* V4.1.83: ONE drawer box per order. All stores/categories/items stay inside
+   the same opened drawer. Do not create separate drawer boxes per store. */
+#orders .orderInfo [id^="details-"]{
+  width:100%!important; box-sizing:border-box!important;
+  margin:8px 0 0!important; padding:0!important;
+}
+#orders .orderInfo [id^="details-"]:not(.hidden){display:block!important;}
+#orders .orderDetailPanel{
+  width:100%!important; box-sizing:border-box!important;
+  background:#fff!important; border:2px solid #222!important;
+  border-radius:14px!important; padding:12px!important; margin:0!important;
   overflow:hidden!important;
 }
-#stores .foodEditAccordion .foodEditGroupTitle{
-  width:100%!important; min-width:0!important; margin:0!important;
-  font-weight:900!important; font-size:16px!important;
+#orders .unifiedBreakdown{
+  width:100%!important; box-sizing:border-box!important;
+  margin:10px 0 0!important; padding:0!important;
+  border:0!important; background:transparent!important;
 }
-#stores .foodEditAccordion .foodEditCountMode{
-  width:82px!important; min-width:0!important; height:38px!important;
-  min-height:38px!important; padding:4px!important; font-size:10px!important;
+#orders .unifiedStoreSection{
+  width:100%!important; box-sizing:border-box!important;
+  margin:0!important; padding:8px 0!important;
+  border:0!important; background:transparent!important;
 }
-#stores .foodEditAccordion .foodEditRequiredCount{
-  width:34px!important; min-width:34px!important; height:38px!important;
-  min-height:38px!important; padding:4px!important; font-size:12px!important;
+#orders .unifiedStoreSection + .unifiedStoreSection{
+  border-top:1px solid #999!important;
 }
-#stores .foodEditAccordion .foodEditToggle{
-  width:32px!important; min-width:32px!important; height:38px!important;
-  min-height:38px!important; margin:0!important; padding:0!important;
-}
-#stores .foodEditAccordion .choiceGroupOrderTools{
-  display:flex!important; flex-direction:row!important; align-items:center!important;
-  justify-content:center!important; gap:2px!important; width:56px!important;
-  min-width:56px!important; height:38px!important; margin:0!important; padding:0!important;
-}
-#stores .foodEditAccordion .choiceGroupOrderTools button{
-  display:inline-flex!important; align-items:center!important; justify-content:center!important;
-  width:26px!important; min-width:26px!important; height:26px!important; min-height:26px!important;
-  margin:0!important; padding:0!important; font-size:15px!important; line-height:1!important;
-  border-radius:6px!important; font-weight:900!important;
-}
-#stores .foodEditAccordion .deleteGroup{
-  width:34px!important; min-width:34px!important; height:38px!important;
-  min-height:38px!important; margin:0!important; padding:0!important;
-}
-/* Never render move controls as full-width rows */
-#stores .foodEditAccordion > .moveChoiceUp,
-#stores .foodEditAccordion > .moveChoiceDown{
-  display:none!important;
-}
-@media(max-width:600px){
-  #stores .foodEditAccordion .foodEditHead{
-    grid-template-columns:minmax(0,1fr) 76px 32px 30px 54px 32px!important;
-    gap:3px!important; padding:4px!important;
-  }
-  #stores .foodEditAccordion .foodEditCountMode{width:76px!important;font-size:9px!important;}
-  #stores .foodEditAccordion .foodEditRequiredCount{width:32px!important;min-width:32px!important;}
-  #stores .foodEditAccordion .foodEditToggle{width:30px!important;min-width:30px!important;}
-  #stores .foodEditAccordion .choiceGroupOrderTools{width:54px!important;min-width:54px!important;}
-  #stores .foodEditAccordion .choiceGroupOrderTools button{width:25px!important;min-width:25px!important;height:25px!important;min-height:25px!important;font-size:14px!important;}
-  #stores .foodEditAccordion .deleteGroup{width:32px!important;min-width:32px!important;}
-}
-</style>
-<style id="MHAC_CHOICE_GROUP_SIMPLE_BAR_V176">
-#stores .foodEditAccordion .foodEditHead{display:grid!important;grid-template-columns:minmax(0,1fr) 34px 58px 34px!important;gap:5px!important;align-items:center!important;min-height:48px!important;padding:5px!important;}
-#stores .foodEditAccordion .foodEditGroupTitle{min-width:0!important;width:100%!important;font-weight:900!important;font-size:16px!important;text-transform:uppercase!important;}
-#stores .foodEditAccordion .foodEditToggle{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
-#stores .foodEditAccordion .choiceGroupOrderTools{width:58px!important;min-width:58px!important;height:34px!important;display:flex!important;gap:3px!important;align-items:center!important;justify-content:center!important;}
-#stores .foodEditAccordion .choiceGroupOrderTools button{width:27px!important;min-width:27px!important;height:27px!important;min-height:27px!important;font-size:15px!important;padding:0!important;margin:0!important;}
-#stores .foodEditAccordion .deleteGroup{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0!important;}
-#stores .foodEditAccordion .choiceCountBar{display:flex!important;align-items:center!important;gap:6px!important;padding:7px 8px!important;margin:0 0 7px!important;border:1px solid #ddd!important;border-radius:8px!important;}
-#stores .foodEditAccordion .choiceCountBar .foodEditCountMode{width:120px!important;min-width:120px!important;min-height:34px!important;height:34px!important;}
-#stores .foodEditAccordion .choiceCountBar .foodEditRequiredCount{width:58px!important;min-width:58px!important;min-height:34px!important;height:34px!important;text-align:center!important;}
-#stores .foodEditAccordion .choiceCountBar span{font-weight:900!important;font-size:12px!important;}
-#stores .allChoiceAutoCount{width:100%!important;min-height:44px!important;margin:8px 0!important;font-weight:900!important;}
-@media(max-width:600px){
- #stores .foodEditAccordion .foodEditHead{grid-template-columns:minmax(0,1fr) 32px 56px 32px!important;gap:3px!important;padding:4px!important;}
- #stores .foodEditAccordion .foodEditGroupTitle{font-size:15px!important;}
- #stores .foodEditAccordion .choiceGroupOrderTools{width:56px!important;min-width:56px!important;}
- #stores .foodEditAccordion .choiceGroupOrderTools button{width:26px!important;min-width:26px!important;height:26px!important;min-height:26px!important;}
-}
-</style>
-
-<style id="MHAC_MENU_MANAGER_EXACT_CENTERED_V4">
-/* MENU MANAGER ONLY — exact compact centered layout. No business logic changes. */
-#stores .storeCategory{box-sizing:border-box!important;width:100%!important;margin:5px 0!important;border:2px solid #ddd!important;border-radius:12px!important;overflow:hidden!important;background:#fff!important}
-#stores .storeCategoryHeader{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:0!important;padding:9px 8px 8px!important;text-align:center!important;cursor:pointer!important}
-#stores .storeCategoryHeader .categoryNameTop{width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-width:0!important}
-#stores .storeCategoryHeader .categoryNameTop b{display:block!important;max-width:100%!important;font-size:17px!important;line-height:1.15!important;font-weight:900!important;text-align:center!important;overflow-wrap:anywhere!important;word-break:normal!important}
-#stores .storeCategoryHeader .categoryNameTop span{font-size:20px!important;line-height:1!important;flex:0 0 auto!important}
-#stores .storeCategoryHeader .categoryBtns{width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;flex-wrap:nowrap!important;margin:0!important}
-#stores .storeCategoryHeader .categoryBtns button{box-sizing:border-box!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0 10px!important;border-radius:9px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;font-size:11px!important;line-height:1!important;font-weight:900!important}
-#stores .storeCategoryHeader .categoryBtns .categoryMoveUp,#stores .storeCategoryHeader .categoryBtns .categoryMoveDown{width:34px!important;min-width:34px!important;font-size:17px!important;padding:0!important}
-#stores .storeCategoryHeader .categoryBtns button[data-cat-edit]{width:68px!important;min-width:68px!important}
-#stores .storeCategoryHeader .categoryBtns button[data-cat-delete]{width:76px!important;min-width:76px!important}
-
-#stores .storeFoodList{padding:5px 7px 7px!important;border-top:1px solid #ddd!important;background:#fff!important}
-#stores .storeFoodItem{box-sizing:border-box!important;width:100%!important;margin:5px 0!important;padding:8px!important;border:1px solid #ddd!important;border-radius:10px!important;overflow:hidden!important;background:#fff!important}
-#stores .foodLine{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;gap:4px!important;margin:0!important;padding:0!important;border:0!important;background:#fff!important;text-align:center!important}
-#stores .foodLineMain{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;gap:3px!important;margin:0!important;text-align:center!important}
-#stores .foodLineMain .foodListPhoto{width:64px!important;height:64px!important;min-width:64px!important;object-fit:cover!important;border:1px solid #ddd!important;border-radius:9px!important;background:#f3f3f3!important;display:block!important}
-#stores .foodLineMain>b{display:block!important;width:100%!important;font-size:16px!important;line-height:1.15!important;font-weight:900!important;text-align:center!important;overflow-wrap:anywhere!important;word-break:normal!important}
-#stores .foodLineMain>span{display:block!important;font-size:14px!important;line-height:1.1!important;font-weight:900!important;text-align:center!important;white-space:nowrap!important}
-#stores .foodChoiceSummary{width:100%!important;text-align:center!important;margin:2px auto!important;min-height:0!important}
-#stores .foodChoiceSummaryText{display:block!important;width:100%!important;font-size:12px!important;line-height:1.25!important;color:#666!important;text-align:center!important;white-space:normal!important;overflow:hidden!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important}
-#stores .foodActionRow{width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;margin:4px 0 0!important;flex-wrap:nowrap!important}
-#stores .foodActionRow button{box-sizing:border-box!important;height:34px!important;min-height:34px!important;margin:0!important;padding:0 10px!important;border-radius:9px!important;font-size:10px!important;line-height:1!important;font-weight:900!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
-#stores .foodActionRow .editDirectFood{width:88px!important;min-width:88px!important}
-#stores .foodActionRow .deleteNestedFood,#stores .foodActionRow .deleteDirectFoodList{width:76px!important;min-width:76px!important}
-/* No reorder arrows inside Food List. */
-#stores .foodLine>.foodMoveUp,#stores .foodLine>.foodMoveDown{display:none!important}
-#stores .foodLineCentered{width:100%!important}
-#stores .directFoodEditor{width:100%!important;grid-column:auto!important}
-#stores .directFoodEditor.hidden{display:none!important}
-
-/* Keep store header compact; preserve store photo and store reorder arrows. */
-#stores .storeBoxHeader{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:5px!important;min-height:46px!important;padding:4px 6px!important}
-#stores .storeTitleCompact{display:grid!important;grid-template-columns:18px 34px minmax(0,1fr)!important;align-items:center!important;gap:5px!important;min-width:0!important}
-#stores .storeTitleCompact .storeToggleIcon{width:18px!important;min-width:18px!important;font-size:15px!important;line-height:1!important}
-#stores .storeHeaderPhoto{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;object-fit:cover!important;border-radius:8px!important}
-#stores .storeTitleCompact>b{font-size:16px!important;line-height:1.1!important;font-weight:900!important;min-width:0!important;overflow-wrap:anywhere!important;word-break:normal!important}
-#stores .storeHeaderActions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:3px!important;flex-wrap:nowrap!important}
-#stores .storeHeaderActions button{height:32px!important;min-height:32px!important;margin:0!important;padding:0!important;border-radius:8px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
-#stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:30px!important;min-width:30px!important;font-size:16px!important}
-#stores .storeHeaderActions .storeEditToggle{width:62px!important;min-width:62px!important;font-size:9px!important}
-#stores .storeHeaderActions .storeDelete{width:72px!important;min-width:72px!important;font-size:9px!important;line-height:1.05!important}
-
-@media(max-width:600px){
- #stores .storeCategoryHeader{padding:8px 7px 7px!important}
- #stores .storeCategoryHeader .categoryNameTop b{font-size:16px!important}
- #stores .storeCategoryHeader .categoryNameTop span{font-size:19px!important}
- #stores .storeCategoryHeader .categoryBtns{gap:4px!important}
- #stores .storeCategoryHeader .categoryBtns button{height:32px!important;min-height:32px!important;font-size:10px!important}
- #stores .storeCategoryHeader .categoryBtns .categoryMoveUp,#stores .storeCategoryHeader .categoryBtns .categoryMoveDown{width:32px!important;min-width:32px!important;font-size:16px!important}
- #stores .storeCategoryHeader .categoryBtns button[data-cat-edit]{width:64px!important;min-width:64px!important}
- #stores .storeCategoryHeader .categoryBtns button[data-cat-delete]{width:72px!important;min-width:72px!important}
- #stores .storeFoodList{padding:4px 5px 6px!important}
- #stores .storeFoodItem{padding:7px!important;margin:4px 0!important}
- #stores .foodLineMain .foodListPhoto{width:58px!important;height:58px!important;min-width:58px!important}
- #stores .foodLineMain>b{font-size:15px!important}
- #stores .foodLineMain>span{font-size:13px!important}
- #stores .foodChoiceSummaryText{font-size:11px!important;-webkit-line-clamp:2!important}
- #stores .foodActionRow{gap:5px!important}
- #stores .foodActionRow button{height:32px!important;min-height:32px!important;font-size:9.5px!important}
- #stores .foodActionRow .editDirectFood{width:84px!important;min-width:84px!important}
- #stores .foodActionRow .deleteNestedFood,#stores .foodActionRow .deleteDirectFoodList{width:72px!important;min-width:72px!important}
- #stores .storeTitleCompact{grid-template-columns:17px 30px minmax(0,1fr)!important;gap:4px!important}
- #stores .storeHeaderPhoto{width:30px!important;height:30px!important;min-width:30px!important;max-width:30px!important}
- #stores .storeTitleCompact>b{font-size:15px!important}
- #stores .storeHeaderActions{gap:2px!important}
- #stores .storeHeaderActions button{height:30px!important;min-height:30px!important}
- #stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:28px!important;min-width:28px!important;font-size:15px!important}
- #stores .storeHeaderActions .storeEditToggle{width:58px!important;min-width:58px!important;font-size:8.5px!important}
- #stores .storeHeaderActions .storeDelete{width:66px!important;min-width:66px!important;font-size:8.5px!important}
-}
+#orders .unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 4px!important;}
+#orders .unifiedCategoryName{font-size:16px!important;font-weight:900!important;margin:0 0 7px!important;}
+#orders .unifiedFoodRow{padding:8px 0!important;border-top:1px solid #ddd!important;}
+#orders .unifiedFoodRow:first-child{border-top:0!important;}
+#orders .unifiedChoice{font-size:15px!important;line-height:1.35!important;margin-top:3px!important;}
+#orders .unifiedBill{border-top:1px solid #999!important;margin-top:10px!important;padding-top:8px!important;}
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
@@ -2760,7 +2624,7 @@ function countdownText(o){
 function refreshCountdowns(){document.querySelectorAll('[data-countdown]').forEach(el=>{const o=orders.find(x=>x.id===el.dataset.countdown);if(o)el.textContent=countdownText(o)})}
 setInterval(refreshCountdowns,1000);
 
-function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
+function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];const addExtra=(name,price,q,label)=>{const n=String(name||"").trim();if(!n)return;const pr=Number(price||0);const qq=Math.max(1,Number(q||1));extras.push({name:n,price:pr,qty:qq,label:label||"Choice"});};if(i.choice)addExtra(i.choice,i.choicePrice,1,"Drink");if(i.bucketChoice)addExtra(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name,i.bucketChoicePrice??i.bucketChoice?.price,1,"Choice");(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);const q=typeof x==="string"?1:Number(x?.qty||x?.quantity||x?.count||1);if(n)addExtra(n,pr,q,g.group||g.name||"Choice");}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);const q=typeof x==="string"?1:Number(x?.qty||x?.quantity||x?.count||1);if(n)addExtra(n,pr,q,"Add-on")});let extraTotal=extras.reduce((a,x)=>a+(x.price*x.qty),0);let unit=base+(extraTotal/qty);if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
  (o.items||[]).forEach(i=>{
@@ -2791,14 +2655,9 @@ function orderDetailHtml(o){
    :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
  const second=Number(f.secondStoreFee||0);
  return `<div class="orderDetailPanel">
+   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||'')}</b><br>CP #: ${esc(c.contact||'—')}<br>Address Location: ${esc(c.gps?.display||c.address||'Customer GPS')}</div>
+   ${payment}
    <div class="unifiedBreakdown">
-     <div class="orderDetailCustomer">
-       <b>${esc(o.orderNo||o.id)}</b><br>
-       <b>${esc(c.name||'')}</b><br>
-       CP #: ${esc(c.contact||'—')}<br>
-       ${(()=>{const loc=String(c.gps?.display||c.address||'Customer GPS').replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,'').trim();return `Address Location: 📍 LOCATION DETECTED: ${esc(loc)}`})()}
-     </div>
-     ${payment}
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${sections}
      <div class="unifiedBill">
@@ -3070,10 +2929,8 @@ function renderStores(){
  host.innerHTML=(draft.stores||[]).map((st,si)=>`
   <div class="storeBox" data-store-card="${si}">
    <div class="storeBoxHeader" data-store-toggle="${si}" role="button" tabindex="0" aria-expanded="false">
-    <div class="storeTitleCompact"><span class="storeToggleIcon">▶</span><img class="storeHeaderPhoto" src="${esc(st.photo||photoSvgData(st.name,"store"))}" alt="Store photo"><b>${esc(st.name)}</b></div>
+    <b><span class="storeToggleIcon">▶</span> 🏪 ${esc(st.name)}</b>
     <div class="storeHeaderActions">
-     <button class="gray storeMoveUp" data-store-up="${si}" type="button" title="Move store up" aria-label="Move store up">↑</button>
-     <button class="gray storeMoveDown" data-store-down="${si}" type="button" title="Move store down" aria-label="Move store down">↓</button>
      <button type="button" class="storeEditToggle" data-store-edit="${si}">EDIT STORE</button>
      <button class="danger storeDelete" data-store-delete="${si}">🗑️ DELETE STORE</button>
     </div>
@@ -3088,10 +2945,8 @@ function renderStores(){
      ${(st.categories||[]).map((c,ci)=>`
       <div class="storeCategory" data-category-card="${si}-${ci}">
        <div class="storeCategoryHeader categoryTapRow" data-cat-open="${si}-${ci}" role="button" tabindex="0" aria-expanded="false">
-        <div class="categoryNameTop"><span>📂</span><b>${esc(c.name)}</b></div>
+        <b>📂 ${esc(c.name)}</b>
         <div class="categoryBtns" onclick="event.stopPropagation()">
-         <button class="gray categoryMoveUp" data-cat-up="${si}-${ci}" type="button" title="Move category up" aria-label="Move category up">↑</button>
-         <button class="gray categoryMoveDown" data-cat-down="${si}-${ci}" type="button" title="Move category down" aria-label="Move category down">↓</button>
          <button class="gray" data-cat-edit="${si}-${ci}">EDIT</button>
          <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
         </div>
@@ -3154,26 +3009,6 @@ function renderStores(){
    h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("[data-store-delete]")){e.preventDefault();toggle();} };
  });
 
- host.querySelectorAll("[data-store-up]").forEach(b=>b.onclick=()=>{
-   const scrollY=window.scrollY;
-   const si=+b.dataset.storeUp;
-   if(si<=0)return;
-   const stores=draft?.stores||[];
-   const tmp=stores[si-1]; stores[si-1]=stores[si]; stores[si]=tmp;
-   if(selectedStore===si)selectedStore=si-1; else if(selectedStore===si-1)selectedStore=si;
-   saveDraftMenu(); renderStores();
-   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
- });
- host.querySelectorAll("[data-store-down]").forEach(b=>b.onclick=()=>{
-   const scrollY=window.scrollY;
-   const si=+b.dataset.storeDown;
-   const stores=draft?.stores||[];
-   if(si>=stores.length-1)return;
-   const tmp=stores[si+1]; stores[si+1]=stores[si]; stores[si]=tmp;
-   if(selectedStore===si)selectedStore=si+1; else if(selectedStore===si+1)selectedStore=si;
-   saveDraftMenu(); renderStores();
-   requestAnimationFrame(()=>window.scrollTo(0,scrollY));
- });
  host.querySelectorAll("[data-store-edit]").forEach(b=>{
    b.onclick=(e)=>{
      e.preventDefault();
@@ -3233,58 +3068,10 @@ function renderStores(){
    saveDraftMenu();
    renderStores();
  });
- function reorderCategoryKeepOpen(si,ci,dir){
-   const cats=draft?.stores?.[si]?.categories||[];
-   const ni=ci+dir;
-   if(ci<0||ci>=cats.length||ni<0||ni>=cats.length)return;
-   const storeCard=host.querySelector(`[data-store-card="${si}"]`);
-   const wasStoreOpen=!!storeCard?.classList.contains("storeOpen");
-   const openCat=storeCard?.querySelector('[data-cat-open][aria-expanded="true"]');
-   const wasCatOpen=!!openCat;
-   const tmp=cats[ci]; cats[ci]=cats[ni]; cats[ni]=tmp;
-   saveDraftMenu();
-   renderStores();
-   if(wasStoreOpen){
-     const newStore=host.querySelector(`[data-store-card="${si}"]`);
-     const storeToggle=newStore?.querySelector("[data-store-toggle]");
-     if(storeToggle && !newStore.classList.contains("storeOpen")) storeToggle.click();
-     if(wasCatOpen){
-       const movedCi=ci+dir;
-       const catToggle=host.querySelector(`[data-cat-open="${si}-${movedCi}"]`);
-       if(catToggle) catToggle.click();
-     }
-   }
- }
-host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=e=>{
-   e.preventDefault(); e.stopPropagation();
-   const [si,ci]=b.dataset.catUp.split("-").map(Number);
-   reorderCategoryKeepOpen(si,ci,-1);
- });
- host.querySelectorAll("[data-cat-down]").forEach(b=>b.onclick=e=>{
-   e.preventDefault(); e.stopPropagation();
-   const [si,ci]=b.dataset.catDown.split("-").map(Number);
-   reorderCategoryKeepOpen(si,ci,1);
- });
- host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=(e)=>{
-   e.preventDefault(); e.stopPropagation();
+ host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
    const card=host.querySelector(`[data-category-card="${si}-${ci}"]`);
-   if(!card)return;
-   const list=card.querySelector(".storeFoodList");
-   if(!list)return;
-   const opening=list.classList.contains("hidden");
-   // EDIT on a category is the compact entry point to its food list.
-   // Keep the category itself in place and do not navigate/exit the store.
-   card.closest(".storeBox")?.querySelectorAll(".storeFoodList").forEach(x=>{
-     if(x!==list){x.classList.add("hidden");x.innerHTML="";}
-   });
-   card.closest(".storeBox")?.querySelectorAll("[data-cat-open]").forEach(x=>{
-     if(x!==card.querySelector("[data-cat-open]"))x.setAttribute("aria-expanded","false");
-   });
-   list.classList.toggle("hidden",!opening);
-   const toggle=card.querySelector("[data-cat-open]");
-   if(toggle)toggle.setAttribute("aria-expanded",String(opening));
-   if(opening) renderNestedFoods(si,ci,list); else list.innerHTML="";
+   card.querySelector(".categoryInlineEdit").classList.toggle("hidden");
  });
  host.querySelectorAll(".categoryInlineSave").forEach(b=>b.onclick=()=>{
    const card=b.closest(".storeCategory");
@@ -3319,7 +3106,7 @@ host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=e=>{
    b.onclick=(e)=>{if(e.target.closest("button"))return;toggleCategory();};
    b.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleCategory();}};
  });
- // V4.1.75: bind Publish/Unpublish directly after every Store Manager render.
+ // V4.1.72: bind Publish/Unpublish directly after every Store Manager render.
  // This avoids mobile/browser event-bubbling or stale-delegation issues.
  // Existing publish/unpublish Firestore logic and business rules are unchanged.
  host.querySelectorAll("[data-publish-store],[data-unpublish-store]").forEach(b=>{
@@ -3358,27 +3145,19 @@ function renderNestedFoods(si,ci,list){
  const s=draft.stores[si],c=s.categories[ci];
  list.innerHTML=(c.items||[]).map((f,fi)=>`
   <div class="storeFoodItem">
-   <div class="foodLine foodLineCentered">
-    <div class="foodLineMain foodLineMainCentered">
-      ${f.photo?`<img class="foodListPhoto" src="${esc(f.photo)}" alt="Food photo">`:``}
-      <b>${esc(f.name)}</b>
-      <span>₱${Number(f.price||0).toFixed(2)}</span>
-    </div>
-    <div class="foodChoiceSummary">${renderFoodChoiceSummary(f)}</div>
-    <div class="foodActionRow">
-      <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}" type="button">✏️ EDIT FOOD</button>
-      <button class="danger deleteNestedFood" data-nested-delete="${si}-${ci}-${fi}" type="button">🗑️ DELETE FOOD</button>
-    </div>
+   <div class="foodLine">
+    <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
+    <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
+    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
     <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
    </div>
-  </div>`).join("")+`
-  <div class="addFoodInline">
+  </div>`).join("")+
+  `<div class="addFoodInline">
     <input class="nestedFoodName" placeholder="Food name">
     <input class="nestedFoodPrice" type="number" min="0" step="0.01" placeholder="Base price">
     <button class="red nestedAddFood">➕ ADD FOOD</button>
    </div>`;
- const add=list.querySelector(".nestedAddFood");
- if(add) add.onclick=()=>{
+ list.querySelector(".nestedAddFood").onclick=()=>{
    const n=list.querySelector(".nestedFoodName").value.trim();
    const p=Number(list.querySelector(".nestedFoodPrice").value);
    if(!n||!Number.isFinite(p)||p<0)return toast("Enter food name and valid price.");
@@ -3386,42 +3165,15 @@ function renderNestedFoods(si,ci,list){
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[]});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
- list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=(e)=>{
-   e.preventDefault(); e.stopPropagation();
+ list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
    const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
    const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
-   if(!ed)return;
-   const opening=ed.classList.contains("hidden");
-   // Keep the category drawer open. Editing a food must never exit the store/category.
-   list.querySelectorAll(".directFoodEditor").forEach(other=>{if(other!==ed)other.classList.add("hidden");});
-   ed.classList.toggle("hidden",!opening);
-   if(opening && typeof renderDirectFoodEditor==="function") renderDirectFoodEditor(x,y,z,ed,list);
- });
- list.querySelectorAll("[data-nested-delete]").forEach(b=>b.onclick=async(e)=>{
-   e.preventDefault(); e.stopPropagation();
-   const [x,y,z]=b.dataset.nestedDelete.split("-").map(Number);
-   const items=draft?.stores?.[x]?.categories?.[y]?.items||[];
-   if(!items[z])return;
-   if(!confirm("DELETE FOOD?\n\n"+items[z].name))return;
-   items.splice(z,1);
-   await saveDraftMenu();
-   renderNestedFoods(x,y,list);
+   ed.classList.toggle("hidden");
+   if(!ed.classList.contains("hidden") && typeof renderDirectFoodEditor==="function"){
+     renderDirectFoodEditor(x,y,z,ed,list);
+   }
  });
 }
-function renderFoodChoiceSummary(f){
- const groups=Array.isArray(f?.choiceGroups)?f.choiceGroups:[];
- const legacy=[];
- if(!groups.length){
-   if(Array.isArray(f?.chickenParts)&&f.chickenParts.length) legacy.push(...f.chickenParts.map(x=>String(x?.name??x)).filter(Boolean));
-   if(Array.isArray(f?.choices)&&f.choices.length) legacy.push(...f.choices.map(x=>String(x?.name??x?.[0]??x)).filter(Boolean));
-   if(Array.isArray(f?.fries)&&f.fries.length) legacy.push(...f.fries.map(x=>String(x?.name??x)).filter(Boolean));
-   if(Array.isArray(f?.addOns)&&f.addOns.length) legacy.push(...f.addOns.map(x=>String(x?.name??x?.[0]??x)).filter(Boolean));
- }
- const names=groups.length?groups.flatMap(g=>(g?.options||[]).map(o=>String(o?.name??o?.[0]??o)).filter(Boolean)):legacy;
- if(!names.length)return '';
- return `<div class="foodChoiceSummaryText">${esc(names.join(', '))}</div>`;
-}
-
 function renderEditor(){
  const s=draft.stores[selectedStore];
  if(!s){$("editor").classList.add("hidden");return}
@@ -3567,7 +3319,6 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
    </div>
 
    <label class="label">AVAILABILITY</label><select class="availability"><option value="true">AVAILABLE</option><option value="false">UNAVAILABLE</option></select>
-   <button type="button" class="gray allChoiceAutoCount">☑ ALL CHOICE AUTO COUNT</button>
    <button type="button" class="green saveDirectFood">💾 SAVE FOOD</button>
    <button type="button" class="danger deleteDirectFood">🗑️ DELETE FOOD</button>
  </div>`;
@@ -3631,11 +3382,9 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  let open=null;
  const closeOther=(box)=>{if(open&&open!==box){open.classList.remove('open');open.querySelector('.foodEditDrawer')?.classList.add('hidden');open.querySelector('.foodEditToggle span').textContent='›';} };
  const addGroup=(g)=>{
-   const standardTitle={chickenParts:'PART',flavor:'FLAVOR',fries:'FRIES',drinks:'DRINK'};
-   if(standardTitle[g.role] && (!g.name || /^(parts?|flavou?rs?|fries|drinks?|beverages?)$/i.test(String(g.name).trim()))) g.name=standardTitle[g.role];
    const box=document.createElement('div'); box.className='foodEditAccordion'; box.dataset.role=g.role||'';
-   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><div class="choiceGroupOrderTools"><button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">↑</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">↓</button></div><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="choiceCountBar"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><span>COUNT</span></div><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
-   const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions'), orderTools=box.querySelector('.choiceGroupOrderTools');
+   box.innerHTML=`<div class="foodEditHead"><input class="foodEditGroupTitle" value="${esc(g.name||'Choices')}" aria-label="Choice group name"><select class="foodEditCountMode" aria-label="Choice count mode"><option value="auto">AUTO COUNT</option><option value="fixed">CHOOSE N</option></select><input class="foodEditRequiredCount" type="number" min="1" step="1" value="${Math.max(1,Number(g.requiredCount||1))}" aria-label="Required choice count"><button type="button" class="foodEditToggle" aria-label="Open choices"><span>›</span></button><button type="button" class="danger deleteGroup" aria-label="Delete choice group">✕</button></div><div class="foodEditDrawer hidden"><div class="foodEditOptions"></div><div class="choiceTools"><button type="button" class="gray copyChoices">📋 COPY</button><button type="button" class="gray pasteChoices">📥 PASTE</button></div><button type="button" class="blue addGroupOption">➕ ADD CHOICE</button></div>`;
+   const drawer=box.querySelector('.foodEditDrawer'), opts=box.querySelector('.foodEditOptions');
    box.querySelector('.foodEditCountMode').value=String(g.countMode||'auto')==='fixed'?'fixed':'auto';
    box.querySelector('.foodEditRequiredCount').value=Math.max(1,Number(g.requiredCount||1));
    box.querySelector('.foodEditRequiredCount').disabled=box.querySelector('.foodEditCountMode').value!=='fixed';
@@ -3647,8 +3396,12 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
      r.querySelector('button').onclick=()=>r.remove(); opts.appendChild(r);
    };
    (g.options||[]).forEach(addOpt);
-   // Compact Choice Group ordering controls live in the card header.
+   // Mobile-safe Choice Group ordering: move the WHOLE group up/down.
    // The DOM order is the draft order and is saved exactly as displayed.
+   const orderTools=document.createElement('div');
+   orderTools.className='choiceGroupOrderTools';
+   orderTools.innerHTML='<button type="button" class="gray moveChoiceUp" aria-label="Move choice group up">⬆️ UP</button><button type="button" class="gray moveChoiceDown" aria-label="Move choice group down">⬇️ DOWN</button>';
+   box.insertBefore(orderTools,drawer);
    const syncOrderButtons=()=>{
      const parent=box.parentElement;
      if(!parent)return;
@@ -3756,30 +3509,9 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  };
  rawGroups.forEach(addGroup);
 
- // Standard first-load order: PART → FLAVOR → FRIES → DRINK.
- // Once choiceOrder exists, preserve the exact saved/manual order.
- if(Array.isArray(rawGroups) && rawGroups.length && !rawGroups.some(g=>Number.isFinite(Number(g.choiceOrder)))){
-   const rank={chickenParts:0,flavor:1,fries:2,drinks:3};
-   rawGroups.sort((a,b)=>{
-     const ra=Object.prototype.hasOwnProperty.call(rank,a.role)?rank[a.role]:99;
-     const rb=Object.prototype.hasOwnProperty.call(rank,b.role)?rank[b.role]:99;
-     return ra-rb;
-   });
- }
-
  // Copy/Paste lives at the bottom of every Choice Group, including Parts.
  // Extra custom choice groups remain fully editable and deletable.
  const addCustom=document.createElement('button');addCustom.type='button';addCustom.className='blue addChoiceGroup';addCustom.textContent='➕ ADD CHOICE GROUP';addCustom.onclick=()=>addGroup({name:'New Choice Group',role:'',options:[]});groupsBox.after(addCustom);
- const allAutoBtn=ed.querySelector('.allChoiceAutoCount');
- if(allAutoBtn){ allAutoBtn.onclick=()=>{
-   groupsBox.querySelectorAll('.foodEditAccordion').forEach(box=>{
-     const mode=box.querySelector('.foodEditCountMode');
-     const req=box.querySelector('.foodEditRequiredCount');
-     if(mode) mode.value='auto';
-     if(req) req.disabled=true;
-   });
-   toast('✅ ALL CHOICE GROUPS set to AUTO COUNT.');
- }; }
 
  const priceBox=ed.querySelector('[data-kind="price"]');
  priceBox.querySelector('.foodEditToggle').onclick=()=>{const was=open===priceBox;closeOther(priceBox);if(was){open=null;priceBox.classList.remove('open');priceBox.querySelector('.foodEditDrawer').classList.add('hidden');priceBox.querySelector('.foodEditToggle span').textContent='›';}else{open=priceBox;priceBox.classList.add('open');priceBox.querySelector('.foodEditDrawer').classList.remove('hidden');priceBox.querySelector('.foodEditToggle span').textContent='⌄';}};
@@ -4170,7 +3902,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.76 EXACT CENTERED CATEGORY FOOD MENU MANAGER";
+window.__MHAC_BUILD__="V4.1.74 STORE CLICK CATEGORY-ONLY COMPACT |  FINAL MENU PRICE + STORE PHOTO CLEAN";
 </script>
 <script>
 setTimeout(function(){
