@@ -2346,6 +2346,105 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  #stores .storeHeaderActions .storeDelete{width:66px!important;min-width:66px!important;font-size:8.5px!important}
 }
 </style>
+
+<style id="MHAC_STORE_NAME_ONLY_CENTERED_V5">
+/* V5: STORE NAME ONLY — centered store identity, action bar centered below.
+   Do not alter category/food/choice layouts or existing behavior. */
+#stores .storeBoxHeader{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  padding:10px 10px 9px!important;
+  min-height:0!important;
+}
+#stores .storeTitleCompact{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  text-align:center!important;
+}
+#stores .storeTitleCompact .storeToggleIcon{
+  position:absolute!important;
+  left:12px!important;
+  top:12px!important;
+  width:20px!important;
+  min-width:20px!important;
+  font-size:16px!important;
+  line-height:1!important;
+}
+#stores .storeTitleCompact .storeHeaderPhoto{
+  width:48px!important;
+  height:48px!important;
+  min-width:48px!important;
+  max-width:48px!important;
+  object-fit:cover!important;
+  border-radius:10px!important;
+  margin:0!important;
+}
+#stores .storeTitleCompact>b{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  text-align:center!important;
+  font-size:20px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+#stores .storeHeaderActions{
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  flex-wrap:nowrap!important;
+  margin:0!important;
+}
+#stores .storeHeaderActions button{
+  height:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:0 9px!important;
+  border-radius:9px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{
+  width:40px!important;
+  min-width:40px!important;
+  font-size:18px!important;
+}
+#stores .storeHeaderActions .storeEditToggle{
+  width:112px!important;
+  min-width:112px!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+#stores .storeHeaderActions .storeDelete{
+  width:116px!important;
+  min-width:116px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+}
+@media(max-width:600px){
+  #stores .storeBoxHeader{padding:9px 8px 8px!important;gap:6px!important}
+  #stores .storeTitleCompact .storeHeaderPhoto{width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important}
+  #stores .storeTitleCompact>b{font-size:19px!important}
+  #stores .storeHeaderActions{gap:5px!important}
+  #stores .storeHeaderActions button{height:36px!important;min-height:36px!important;padding:0 7px!important}
+  #stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:38px!important;min-width:38px!important}
+  #stores .storeHeaderActions .storeEditToggle{width:104px!important;min-width:104px!important;font-size:11px!important}
+  #stores .storeHeaderActions .storeDelete{width:108px!important;min-width:108px!important;font-size:10px!important}
+}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2759,12 +2858,55 @@ setInterval(refreshCountdowns,1000);
 function adminItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function orderDetailHtml(o){
  const c=o.customer||{}, f=o.fees||{}, groups={};
- (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||"STORE").trim()||"STORE";(groups[st] ||= []).push(i);});
- const rows=Object.entries(groups).map(([store,items])=>`<div class="unifiedStoreCard"><div class="unifiedStoreName">${esc(store)}</div>${items.map(i=>{const p=adminItemPricing(i);const ds=[];const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}`).join(", ");if(parts)ds.push(`Part: ${parts}`);if(i.choice){const n=typeof i.choice==='string'?i.choice:i.choice?.name;const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);if(n)ds.push(`Drink: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}if(i.bucketChoice)ds.push(`Choice: ${esc(typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name||"")}`);(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);if(n)ds.push(`${esc(g.group||"Choice")}: ${esc(n)}${pr?` (${peso(pr)})`:""}`)}));if(i.addOns?.length)ds.push(`Add-ons: ${i.addOns.map(x=>{const n=typeof x==='string'?x:x?.name;const pr=typeof x==='string'?0:Number(x?.price||0);return n?`${esc(n)}${pr?` (${peso(pr)})`:""}`:""}).filter(Boolean).join(", ")}`);return `<div class="unifiedFoodRow"><div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>${ds.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}<div class="unifiedChoice"><b>Line Total: ${peso(p.line)}</b></div></div>`}).join("")}</div>`).join("")||'<div class="unifiedStoreCard">No item details.</div>';
- const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`:`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel"><div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>${payment}<div class="unifiedBreakdown"><div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>${rows}<div class="unifiedBill"><b>Sub Total: ${peso(f.foodOrder)}</b><br><b>10% Service Fee:</b> ${peso(f.serviceFee)}<br><b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br><b>Grand Total: ${peso(f.total)}</b></div></div></div>`;
+ (o.items||[]).forEach(i=>{
+   const st=String(i.store||i.storeName||'STORE').trim()||'STORE';
+   const cat=String(i.category||i.categoryName||i.categoryLabel||findOrderCategory(st,i.name)||'Category Name').trim()||'Category Name';
+   const key=st+'\u0000'+cat;
+   (groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
+ });
+ const vals=Object.values(groups);
+ const sections=vals.map((g,idx)=>{
+   const foodRows=g.items.map(i=>{
+     const p=adminItemPricing(i), choices=orderChoiceLines(i,p);
+     return `<div class="unifiedFoodRow">
+       <div class="unifiedFoodName">${p.qty}x ${esc(i.name||'Food')} ${peso(p.unit)}</div>
+       ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join('')}
+       <div class="unifiedFoodTotal">Food Total: ${peso(p.line)}</div>
+     </div>`;
+   }).join('');
+   return `<div class="unifiedStoreSection">
+     <div class="unifiedStoreName">${esc(g.store)}</div>
+     <div class="unifiedCategoryName">${esc(g.category)}</div>
+     ${foodRows}
+     ${idx<vals.length-1?'<div class="unifiedStoreDivider"></div>':''}
+   </div>`;
+ }).join('') || '<div class="unifiedStoreSection">No item details.</div>';
+ const payment=String(o.payment||'Cash on Delivery').toUpperCase()==='GCASH'
+   ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||'PENDING').toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:''} ${String(o.paymentStatus||'PENDING').toUpperCase()!=='RECEIVED'?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:''}</div>`
+   :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+ const second=Number(f.secondStoreFee||0);
+ return `<div class="orderDetailPanel">
+   <div class="unifiedBreakdown">
+     <div class="orderDetailCustomer">
+       <b>${esc(o.orderNo||o.id)}</b><br>
+       <b>${esc(c.name||'')}</b><br>
+       CP #: ${esc(c.contact||'—')}<br>
+       ${(()=>{const loc=String(c.gps?.display||c.address||'Customer GPS').replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,'').trim();return `Address Location: 📍 LOCATION DETECTED: ${esc(loc)}`})()}
+     </div>
+     ${payment}
+     <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
+     ${sections}
+     <div class="unifiedBill">
+       <div class="unifiedBillRow"><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
+       <div class="unifiedBillRow"><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>
+       ${second?`<div class="unifiedBillRow"><span>Additional Store</span><b>${peso(second)}</b></div>`:''}
+       <div class="unifiedBillRow"><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div>
+       <div class="unifiedBillRow grand"><span>Grand Total</span><b>${peso(f.total)}</b></div>
+     </div>
+   </div>
+ </div>`;
 }
-function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
+function toast(function toast(msg){const t=$("appToast");if(!t)return;t.textContent=msg;t.style.display="block";clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.style.display="none",2200)}
 function renderOrders(){
  const active=orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"NEW").toUpperCase()));
  if(!active.length){$("orders").innerHTML="<div class=item>No active orders.</div>";return}
