@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.76 CENTERED CATEGORY FOOD LOCK</title>
-<meta name="build-version" content="V4.1.76 CENTERED CATEGORY FOOD LOCK">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MHAC DELIVERY — ADMIN V4.1.69 CHOICE ORDER SAVE FIX</title>
+<meta name="build-version" content="V4.1.67 CHOICE ORDER SAVE FIX">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2317,14 +2317,6 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 #stores .storeHeaderActions .storeEditToggle{width:62px!important;min-width:62px!important;font-size:9px!important}
 #stores .storeHeaderActions .storeDelete{width:72px!important;min-width:72px!important;font-size:9px!important;line-height:1.05!important}
 
-/* V4.1.76 LOCKED MENU MANAGER: category and food rows share one centered layout.
-   Food reorder arrows are part of the same bottom action bar as EDIT/DELETE. */
-#stores .foodActionRow .foodMoveUp,#stores .foodActionRow .foodMoveDown{width:34px!important;min-width:34px!important;font-size:16px!important;padding:0!important}
-#stores .foodActionRow .editDirectFood{width:88px!important;min-width:88px!important}
-#stores .foodActionRow .deleteNestedFood{width:76px!important;min-width:76px!important}
-#stores .storeFoodItem{overflow:hidden!important}
-#stores .foodLineMainCentered{width:100%!important;align-items:center!important;justify-content:center!important;text-align:center!important}
-#stores .foodLineMainCentered>b{max-width:100%!important;text-align:center!important;overflow-wrap:anywhere!important;word-break:normal!important}
 @media(max-width:600px){
  #stores .storeCategoryHeader{padding:8px 7px 7px!important}
  #stores .storeCategoryHeader .categoryNameTop b{font-size:16px!important}
@@ -2342,7 +2334,6 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  #stores .foodChoiceSummaryText{font-size:11px!important;-webkit-line-clamp:2!important}
  #stores .foodActionRow{gap:5px!important}
  #stores .foodActionRow button{height:32px!important;min-height:32px!important;font-size:9.5px!important}
- #stores .foodActionRow .foodMoveUp,#stores .foodActionRow .foodMoveDown{width:30px!important;min-width:30px!important;font-size:15px!important}
  #stores .foodActionRow .editDirectFood{width:84px!important;min-width:84px!important}
  #stores .foodActionRow .deleteNestedFood,#stores .foodActionRow .deleteDirectFoodList{width:72px!important;min-width:72px!important}
  #stores .storeTitleCompact{grid-template-columns:17px 30px minmax(0,1fr)!important;gap:4px!important}
@@ -2353,6 +2344,112 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  #stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:28px!important;min-width:28px!important;font-size:15px!important}
  #stores .storeHeaderActions .storeEditToggle{width:58px!important;min-width:58px!important;font-size:8.5px!important}
  #stores .storeHeaderActions .storeDelete{width:66px!important;min-width:66px!important;font-size:8.5px!important}
+}
+</style>
+
+<style id="mhac-store-list-same-as-category-final">
+/* STORE LIST — same compact centered structure as CATEGORY LIST.
+   Appearance/layout only; preserve store data, photos, Firebase and controls. */
+#stores .storeBoxHeader{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-height:0!important;
+  padding:9px 8px 8px!important;
+  text-align:center!important;
+}
+#stores .storeTitleCompact{
+  position:relative!important;
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-width:0!important;
+  min-height:34px!important;
+  text-align:center!important;
+}
+#stores .storeTitleCompact .storeToggleIcon{
+  position:absolute!important;
+  left:2px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  width:22px!important;
+  min-width:22px!important;
+  font-size:17px!important;
+  line-height:1!important;
+}
+#stores .storeHeaderPhoto{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  max-width:34px!important;
+  object-fit:cover!important;
+  border-radius:8px!important;
+}
+#stores .storeTitleCompact>b{
+  display:block!important;
+  max-width:calc(100% - 70px)!important;
+  font-size:17px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+  text-align:center!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+#stores .storeHeaderActions{
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  flex-wrap:nowrap!important;
+  margin:0!important;
+}
+#stores .storeHeaderActions button{
+  box-sizing:border-box!important;
+  height:34px!important;
+  min-height:34px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  border-radius:9px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  font-weight:900!important;
+}
+#stores .storeHeaderActions .storeMoveUp,
+#stores .storeHeaderActions .storeMoveDown{
+  width:34px!important;
+  min-width:34px!important;
+  font-size:17px!important;
+  padding:0!important;
+}
+#stores .storeHeaderActions .storeEditToggle{
+  width:82px!important;
+  min-width:82px!important;
+  font-size:10px!important;
+}
+#stores .storeHeaderActions .storeDelete{
+  width:86px!important;
+  min-width:86px!important;
+  font-size:10px!important;
+  line-height:1.05!important;
+}
+@media(max-width:430px){
+  #stores .storeBoxHeader{padding:8px 7px 7px!important;gap:5px!important}
+  #stores .storeTitleCompact{min-height:32px!important}
+  #stores .storeHeaderPhoto{width:32px!important;height:32px!important;min-width:32px!important;max-width:32px!important}
+  #stores .storeTitleCompact>b{font-size:16px!important;max-width:calc(100% - 64px)!important}
+  #stores .storeTitleCompact .storeToggleIcon{font-size:16px!important;left:1px!important}
+  #stores .storeHeaderActions{gap:4px!important}
+  #stores .storeHeaderActions button{height:32px!important;min-height:32px!important}
+  #stores .storeHeaderActions .storeMoveUp,#stores .storeHeaderActions .storeMoveDown{width:32px!important;min-width:32px!important;font-size:16px!important}
+  #stores .storeHeaderActions .storeEditToggle{width:76px!important;min-width:76px!important;font-size:9.5px!important}
+  #stores .storeHeaderActions .storeDelete{width:80px!important;min-width:80px!important;font-size:9px!important}
 }
 </style>
 </head><body>
@@ -3112,8 +3209,8 @@ function renderStores(){
        });
      }
    };
-   h.onclick=(e)=>{ if(e.target.closest("[data-store-delete]")) return; toggle(); };
-   h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("[data-store-delete]")){e.preventDefault();toggle();} };
+   h.onclick=(e)=>{ if(e.target.closest(".storeHeaderActions button")) return; toggle(); };
+   h.onkeydown=(e)=>{ if((e.key==="Enter"||e.key===" ")&&!e.target.closest(".storeHeaderActions button")){e.preventDefault();toggle();} };
  });
 
  host.querySelectorAll("[data-store-up]").forEach(b=>b.onclick=()=>{
@@ -3319,7 +3416,7 @@ host.querySelectorAll("[data-cat-up]").forEach(b=>b.onclick=e=>{
 function renderNestedFoods(si,ci,list){
  const s=draft.stores[si],c=s.categories[ci];
  list.innerHTML=(c.items||[]).map((f,fi)=>`
-  <div class="storeFoodItem" data-food-card="${si}-${ci}-${fi}">
+  <div class="storeFoodItem">
    <div class="foodLine foodLineCentered">
     <div class="foodLineMain foodLineMainCentered">
       ${f.photo?`<img class="foodListPhoto" src="${esc(f.photo)}" alt="Food photo">`:``}
@@ -3328,8 +3425,6 @@ function renderNestedFoods(si,ci,list){
     </div>
     <div class="foodChoiceSummary">${renderFoodChoiceSummary(f)}</div>
     <div class="foodActionRow">
-      <button class="gray foodMoveUp" data-nested-up="${si}-${ci}-${fi}" type="button" title="Move food up" aria-label="Move food up">↑</button>
-      <button class="gray foodMoveDown" data-nested-down="${si}-${ci}-${fi}" type="button" title="Move food down" aria-label="Move food down">↓</button>
       <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}" type="button">✏️ EDIT FOOD</button>
       <button class="danger deleteNestedFood" data-nested-delete="${si}-${ci}-${fi}" type="button">🗑️ DELETE FOOD</button>
     </div>
@@ -3350,33 +3445,13 @@ function renderNestedFoods(si,ci,list){
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[]});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
- function reorderNestedFood(fi,dir){
-   const items=draft?.stores?.[si]?.categories?.[ci]?.items||[];
-   const ni=fi+dir;
-   if(fi<0||fi>=items.length||ni<0||ni>=items.length)return;
-   const tmp=items[fi]; items[fi]=items[ni]; items[ni]=tmp;
-   saveDraftMenu();
-   renderNestedFoods(si,ci,list);
-   // Keep the current category drawer open and scroll the moved food into view.
-   const moved=list.querySelector(`[data-food-card="${si}-${ci}-${ni}"]`);
-   if(moved) moved.scrollIntoView({block:"nearest",behavior:"instant"});
- }
- list.querySelectorAll("[data-nested-up]").forEach(b=>b.onclick=e=>{
-   e.preventDefault(); e.stopPropagation();
-   const [x,y,z]=b.dataset.nestedUp.split("-").map(Number);
-   if(x===si&&y===ci) reorderNestedFood(z,-1);
- });
- list.querySelectorAll("[data-nested-down]").forEach(b=>b.onclick=e=>{
-   e.preventDefault(); e.stopPropagation();
-   const [x,y,z]=b.dataset.nestedDown.split("-").map(Number);
-   if(x===si&&y===ci) reorderNestedFood(z,1);
- });
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=(e)=>{
    e.preventDefault(); e.stopPropagation();
    const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
    const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
    if(!ed)return;
    const opening=ed.classList.contains("hidden");
+   // Keep the category drawer open. Editing a food must never exit the store/category.
    list.querySelectorAll(".directFoodEditor").forEach(other=>{if(other!==ed)other.classList.add("hidden");});
    ed.classList.toggle("hidden",!opening);
    if(opening && typeof renderDirectFoodEditor==="function") renderDirectFoodEditor(x,y,z,ed,list);
