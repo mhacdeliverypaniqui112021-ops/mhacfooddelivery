@@ -2429,6 +2429,117 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
  #stores .storeHeaderActions .storeDelete{flex-basis:66px!important;width:66px!important;min-width:66px!important;font-size:7.5px!important;}
 }
 </style>
+
+<style id="MHAC_CATEGORY_FOOD_ARROWS_COMPACT_V3">
+/* CATEGORY + FOOD ORDER CONTROLS — compact, same style/size family as approved arrows. */
+#stores .storeCategoryHeader{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:6px!important;
+  box-sizing:border-box!important;
+}
+#stores .storeCategoryHeader > b{
+  min-width:0!important;
+  font-size:16px!important;
+  line-height:1.15!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+#stores .categoryBtns{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:4px!important;
+  flex-wrap:nowrap!important;
+  min-width:0!important;
+}
+#stores .categoryBtns button{
+  box-sizing:border-box!important;
+  width:38px!important;
+  min-width:38px!important;
+  height:36px!important;
+  min-height:36px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:15px!important;
+  line-height:1!important;
+}
+#stores .categoryBtns .categoryEditBtn{
+  width:68px!important;min-width:68px!important;font-size:10px!important;padding:4px!important;
+}
+#stores .categoryBtns .categoryDeleteBtn{
+  width:68px!important;min-width:68px!important;font-size:10px!important;padding:4px!important;
+}
+#stores .storeFoodItem{
+  box-sizing:border-box!important;
+  width:100%!important;
+}
+#stores .storeFoodItem .foodLine{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:5px!important;
+  align-items:center!important;
+}
+#stores .storeFoodItem .foodLineMain{
+  min-width:0!important;
+  margin:0!important;
+  display:block!important;
+}
+#stores .storeFoodItem .foodLineMain b{
+  display:block!important;
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1.15!important;
+  overflow-wrap:anywhere!important;
+}
+#stores .storeFoodItem .foodLineMain span{
+  display:block!important;
+  font-size:14px!important;
+  line-height:1.1!important;
+  margin-top:2px!important;
+}
+#stores .foodOrderTools{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:3px!important;
+  flex-wrap:nowrap!important;
+}
+#stores .foodOrderTools button{
+  box-sizing:border-box!important;
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:8px!important;
+  font-size:15px!important;
+  line-height:1!important;
+}
+#stores .foodOrderTools .editDirectFood{
+  width:78px!important;min-width:78px!important;font-size:9px!important;padding:3px!important;
+}
+#stores .foodOrderTools .deleteDirectFood{
+  width:64px!important;min-width:64px!important;font-size:9px!important;padding:3px!important;
+}
+#stores .storeCategoryHeader .categoryArrowBtn,
+#stores .foodOrderTools .foodMoveBtn{cursor:pointer!important;touch-action:manipulation!important;}
+@media(max-width:600px){
+  #stores .storeCategoryHeader > b{font-size:15px!important;}
+  #stores .categoryBtns{gap:3px!important;}
+  #stores .categoryBtns button{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;font-size:14px!important;}
+  #stores .categoryBtns .categoryEditBtn{width:60px!important;min-width:60px!important;font-size:9px!important;}
+  #stores .categoryBtns .categoryDeleteBtn{width:60px!important;min-width:60px!important;font-size:9px!important;}
+  #stores .foodOrderTools{gap:3px!important;}
+  #stores .foodOrderTools button{width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important;font-size:14px!important;}
+  #stores .foodOrderTools .editDirectFood{width:72px!important;min-width:72px!important;font-size:8.5px!important;}
+  #stores .foodOrderTools .deleteDirectFood{width:58px!important;min-width:58px!important;font-size:8.5px!important;}
+}
+</style>
+
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -3225,8 +3336,10 @@ function renderStores(){
        <div class="storeCategoryHeader categoryTapRow" data-cat-open="${si}-${ci}" role="button" tabindex="0" aria-expanded="false">
         <b>📂 ${esc(c.name)}</b>
         <div class="categoryBtns" onclick="event.stopPropagation()">
-         <button class="gray" data-cat-edit="${si}-${ci}">EDIT</button>
-         <button class="danger" data-cat-delete="${si}-${ci}">DELETE</button>
+         <button type="button" class="gray categoryArrowBtn" data-cat-move-up="${si}-${ci}" aria-label="Move category up">↑</button>
+         <button type="button" class="gray categoryArrowBtn" data-cat-move-down="${si}-${ci}" aria-label="Move category down">↓</button>
+         <button type="button" class="gray categoryEditBtn" data-cat-edit="${si}-${ci}">EDIT</button>
+         <button type="button" class="danger categoryDeleteBtn" data-cat-delete="${si}-${ci}">DELETE</button>
         </div>
        </div>
        <div class="categoryInlineEdit hidden">
@@ -3365,6 +3478,34 @@ function renderStores(){
    saveDraftMenu();
    renderStores();
  });
+ host.querySelectorAll("[data-cat-move-up]").forEach(b=>b.onclick=async(e)=>{
+   e.preventDefault(); e.stopPropagation();
+   const [si,ci]=b.dataset.catMoveUp.split("-").map(Number);
+   if(!Number.isInteger(si)||!Number.isInteger(ci)||ci<=0)return;
+   const cats=draft.stores?.[si]?.categories;
+   if(!Array.isArray(cats)||ci>=cats.length)return;
+   [cats[ci-1],cats[ci]]=[cats[ci],cats[ci-1]];
+   await saveDraftMenu();
+   renderStores();
+   // Stay inside the same store after reordering.
+   const sh=host.querySelector(`[data-store-toggle="${si}"]`);
+   if(sh) sh.click();
+   const ch=host.querySelector(`[data-cat-open="${si}-${ci-1}"]`);
+   if(ch) ch.click();
+ });
+ host.querySelectorAll("[data-cat-move-down]").forEach(b=>b.onclick=async(e)=>{
+   e.preventDefault(); e.stopPropagation();
+   const [si,ci]=b.dataset.catMoveDown.split("-").map(Number);
+   const cats=draft.stores?.[si]?.categories;
+   if(!Number.isInteger(si)||!Number.isInteger(ci)||!Array.isArray(cats)||ci<0||ci>=cats.length-1)return;
+   [cats[ci],cats[ci+1]]=[cats[ci+1],cats[ci]];
+   await saveDraftMenu();
+   renderStores();
+   const sh=host.querySelector(`[data-store-toggle="${si}"]`);
+   if(sh) sh.click();
+   const ch=host.querySelector(`[data-cat-open="${si}-${ci+1}"]`);
+   if(ch) ch.click();
+ });
  host.querySelectorAll("[data-cat-edit]").forEach(b=>b.onclick=()=>{
    const [si,ci]=b.dataset.catEdit.split("-").map(Number);
    const card=host.querySelector(`[data-category-card="${si}-${ci}"]`);
@@ -3443,9 +3584,16 @@ function renderNestedFoods(si,ci,list){
  list.innerHTML=(c.items||[]).map((f,fi)=>`
   <div class="storeFoodItem">
    <div class="foodLine">
-    <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
-    <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
-    <button class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT FOOD</button>
+    <div>
+      <div class="foodLineMain"><b>${esc(f.name)}</b><span>₱${Number(f.price||0).toFixed(2)}</span></div>
+      <div class="foodSummary">${(f.chickenParts||[]).length?"🍗 "+(f.chickenParts||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.choices||[]).length?"🥤 "+(f.choices||[]).map(x=>esc(x.name||x)).join(", ")+" • ":""}${(f.addOns||[]).length?"➕ "+(f.addOns||[]).map(x=>esc(x.name||x)).join(", "):""}</div>
+    </div>
+    <div class="foodOrderTools" onclick="event.stopPropagation()">
+      <button type="button" class="gray foodMoveBtn" data-food-move-up="${si}-${ci}-${fi}" aria-label="Move food up">↑</button>
+      <button type="button" class="gray foodMoveBtn" data-food-move-down="${si}-${ci}-${fi}" aria-label="Move food down">↓</button>
+      <button type="button" class="gray editDirectFood" data-nested-edit="${si}-${ci}-${fi}">✏️ EDIT</button>
+      <button type="button" class="danger deleteDirectFood" data-nested-delete="${si}-${ci}-${fi}">DELETE</button>
+    </div>
     <div class="directFoodEditor hidden" data-nested-editor="${si}-${ci}-${fi}"></div>
    </div>
   </div>`).join("")+
@@ -3462,6 +3610,46 @@ function renderNestedFoods(si,ci,list){
    c.items.push({name:n,price:p,available:true,choices:[],addOns:[],chickenParts:[],choiceGroups:[]});
    renderNestedFoods(si,ci,list); saveDraftMenu();
  };
+ list.querySelectorAll("[data-food-move-up]").forEach(b=>b.onclick=async(e)=>{
+   e.preventDefault(); e.stopPropagation();
+   const [x,y,z]=b.dataset.foodMoveUp.split("-").map(Number);
+   const items=draft.stores?.[x]?.categories?.[y]?.items;
+   if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||!Array.isArray(items)||z<=0||z>=items.length)return;
+   [items[z-1],items[z]]=[items[z],items[z-1]];
+   await saveDraftMenu();
+   renderStores();
+   const sh=host.querySelector(`[data-store-toggle="${x}"]`);
+   if(sh) sh.click();
+   const ch=host.querySelector(`[data-cat-open="${x}-${y}"]`);
+   if(ch) ch.click();
+ });
+ list.querySelectorAll("[data-food-move-down]").forEach(b=>b.onclick=async(e)=>{
+   e.preventDefault(); e.stopPropagation();
+   const [x,y,z]=b.dataset.foodMoveDown.split("-").map(Number);
+   const items=draft.stores?.[x]?.categories?.[y]?.items;
+   if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||!Array.isArray(items)||z<0||z>=items.length-1)return;
+   [items[z],items[z+1]]=[items[z+1],items[z]];
+   await saveDraftMenu();
+   renderStores();
+   const sh=host.querySelector(`[data-store-toggle="${x}"]`);
+   if(sh) sh.click();
+   const ch=host.querySelector(`[data-cat-open="${x}-${y}"]`);
+   if(ch) ch.click();
+ });
+ list.querySelectorAll("[data-nested-delete]").forEach(b=>b.onclick=async(e)=>{
+   e.preventDefault(); e.stopPropagation();
+   const [x,y,z]=b.dataset.nestedDelete.split("-").map(Number);
+   const items=draft.stores?.[x]?.categories?.[y]?.items;
+   if(!Array.isArray(items)||z<0||z>=items.length)return;
+   if(!confirm("Delete this food?"))return;
+   items.splice(z,1);
+   await saveDraftMenu();
+   renderStores();
+   const sh=host.querySelector(`[data-store-toggle="${x}"]`);
+   if(sh) sh.click();
+   const ch=host.querySelector(`[data-cat-open="${x}-${y}"]`);
+   if(ch) ch.click();
+ });
  list.querySelectorAll("[data-nested-edit]").forEach(b=>b.onclick=()=>{
    const [x,y,z]=b.dataset.nestedEdit.split("-").map(Number);
    const ed=list.querySelector(`[data-nested-editor="${x}-${y}-${z}"]`);
