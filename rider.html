@@ -706,6 +706,42 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   text-align:center!important;
 }
 </style>
+<style id="MHAC_RIDER_FINAL_BOX_BUTTON_FIX">
+/* FINAL: outer Order Breakdown box same thick outline as Admin/Customer */
+.riderUnifiedDrawer{
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  border:2px solid #222!important;
+  border-radius:12px!important;
+  background:#fff!important;
+}
+
+/* Restore Navigate + Call Customer to the original two-column bar.
+   Each label is centered inside its own button. */
+.riderActionTop{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:6px!important;
+  margin-top:6px!important;
+}
+.riderActionTop .nav:first-child{
+  grid-column:auto!important;
+  width:100%!important;
+  justify-self:stretch!important;
+  text-align:center!important;
+}
+.riderActionTop .nav,
+.riderActionTop button{
+  width:100%!important;
+  text-align:center!important;
+  justify-content:center!important;
+  align-items:center!important;
+  display:flex!important;
+  margin:0!important;
+}
+</style>
 </head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">
