@@ -2586,7 +2586,7 @@ function orderDetailHtml(o){
  const storeRows=Object.entries(stores).map(([store,items])=>{
    const cats={};
    items.forEach(i=>{
-     const cat=String(i.category||"Category Name").trim()||"Category Name";
+     const cat=String(i.category||i.categoryName||i.category_name||i.cat||i.menuCategory||"Category Name").trim()||"Category Name";
      (cats[cat] ||= []).push(i);
    });
    return `<div style="margin:0 0 14px;padding:0;background:#fff">
@@ -2635,7 +2635,7 @@ function orderDetailHtml(o){
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
    ? `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
    : `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel" style="border:2px solid #222;border-radius:16px;background:#fff;padding:16px 16px 10px;box-sizing:border-box">
+ return `<div class="orderDetailPanel" style="border:3px solid #222;border-radius:16px;background:#fff;padding:16px 16px 10px;box-sizing:border-box">
    <div class="orderDetailCustomer" style="padding:0 0 10px;border-bottom:1px solid #eee;font-size:14px;line-height:1.55">
      <div style="font-size:17px;font-weight:800">${esc(o.orderNo||o.id)}</div>
      <div style="font-size:16px;font-weight:800">${esc(c.name||"NEW ORDER")}</div>
