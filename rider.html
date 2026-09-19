@@ -1030,7 +1030,7 @@ window.addEventListener("load",function(){
   <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
-<script>window.MHAC_RIDER_BUILD="V4.1.84 RIDER UNIFIED ADMIN CUSTOMER ORDER BREAKDOWN FINAL";</script>
+<script>window.MHAC_RIDER_BUILD="V4.1.95 GOOGLE LOGIN FINAL + ADMIN CUSTOMER ORDER BREAKDOWN";</script>
 <script>
 (function(){
   var started=Date.now();
@@ -1056,7 +1056,7 @@ import {getAuth,initializeAuth,browserPopupRedirectResolver,GoogleAuthProvider,s
 import {getFirestore,doc,getDoc,setDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence,popupRedirectResolver:browserPopupRedirectResolver}),db=getFirestore(app),googleProvider=new GoogleAuthProvider();googleProvider.setCustomParameters({prompt:"select_account"});
-const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set(),riderMenuData={stores:[]},riderMenuUnsub=null;
+const TEST_MODE=false,DEFAULT_HOURS={openTime:"09:00",closeTime:"19:30",enabled:true};let businessHours={...DEFAULT_HOURS},uid="",unsub=null,hoursTimer=null,soundReady=false,soundCtx=null,soundMediaSource=null,soundGain=null,seenAssigned=new Set(),riderMenuData={stores:[]},riderMenuUnsub=null,authFlowBusy=false,authFlowUid="";
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function riderOpen(){if(TEST_MODE)return true;if(businessHours.manualClosed===true)return false;if(businessHours.enabled===false)return false;const n=new Date(),cur=n.getHours()*60+n.getMinutes(),op=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return op<=cl?cur>=op&&cur<cl:(cur>=op||cur<cl)}
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...DEFAULT_HOURS,...s.data()};updateRiderBusinessStatus()})}catch(e){console.warn("Business hours settings unavailable:",e)}}
@@ -1153,16 +1153,17 @@ async function googleLogin(){
    // Popup-first keeps Android Chrome on the same page and lets us immediately
    // continue into the rider approval/dashboard flow. If popup is blocked or
    // unsupported, fall back to Firebase redirect.
+   let result;
    try{
-     const result=await signInWithPopup(auth,googleProvider);
-     $("googleStatus").textContent="✅ Google account selected. Checking rider account…";
-     await afterLogin(result.user);
-     return;
+     result=await signInWithPopup(auth,googleProvider);
    }catch(popupErr){
      console.warn("Google popup failed; using redirect",popupErr);
      await signInWithRedirect(auth,googleProvider);
      return;
    }
+   $("googleStatus").textContent="✅ Google account selected. Checking rider account…";
+   await afterLogin(result.user);
+   return;
  }catch(e){
    console.error("Google sign-in:",e);
    const code=e?.code||"";let message=e?.message||String(e);
@@ -1692,8 +1693,12 @@ getRedirectResult(auth).then(async result=>{
     authFlowUid=result.user.uid;
     try{
       await afterLogin(result.user);
+    }catch(e){
+      console.error("Google redirect afterLogin:",e);
+      $("googleStatus").innerHTML='<span class="error">❌ Rider account check failed: '+esc(e?.message||String(e))+"</span>";
     }finally{
       authFlowBusy=false;
+      authFlowUid="";
     }
   }
 }).catch(e=>{
