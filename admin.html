@@ -324,6 +324,25 @@ button.danger,.danger{
   background:#fff!important;
 }
 
+\n</style><style id="new-order-breakdown-css">
+.newOB-drawer{border:4px solid #222!important;border-radius:16px!important;background:#fff!important;padding:16px 12px 12px!important;box-sizing:border-box!important;color:#111!important}
+.newOB-customer{padding:0 0 10px!important;border-bottom:1px solid #e5e5e5!important;font-size:14px!important;line-height:1.55!important}
+.newOB-orderNo,.newOB-statusName{font-size:17px!important;font-weight:900!important}
+.newOB-payment{font-size:14px!important;padding:10px 0!important;border-bottom:1px solid #e5e5e5!important;line-height:1.5!important}
+.newOB-title{font-size:19px!important;font-weight:900!important;padding:14px 0 10px!important}
+.newOB-store{margin:0!important;padding:0!important}
+.newOB-storeName{font-size:20px!important;font-weight:900!important;line-height:1.25!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
+.newOB-category{padding:0!important;margin:0!important}
+.newOB-categoryName{font-size:16px!important;font-weight:900!important;line-height:1.3!important;padding:10px 0 8px!important;border-bottom:1px solid #eee!important}
+.newOB-food{padding:9px 0 10px!important;border-bottom:1px solid #eee!important}
+.newOB-foodName{font-size:16px!important;font-weight:800!important;line-height:1.35!important}
+.newOB-foodPrice{font-size:16px!important;font-weight:800!important;line-height:1.35!important}
+.newOB-choice{font-size:14px!important;line-height:1.45!important;margin:1px 0 0!important;padding-left:16px!important;font-weight:400!important}
+.newOB-foodTotal{font-size:14px!important;font-weight:900!important;line-height:1.4!important;margin-top:5px!important}
+.newOB-bill{margin-top:12px!important;padding-top:12px!important;border-top:1px solid #ddd!important;font-size:15px!important;line-height:2!important}
+.newOB-bill>div{display:flex!important;justify-content:space-between!important;gap:12px!important}
+.newOB-grand{border-top:2px solid #888!important;margin-top:4px!important;padding-top:8px!important;font-size:17px!important;line-height:1.5!important}
+.newOB-empty{padding:8px 0!important}
 </style>
 </style>
 </style>
@@ -2896,78 +2915,81 @@ function orderDetailHtml(o){
  const choiceLine=(name,price,qty)=>{
    if(!name)return "";
    const q=Math.max(1,Number(qty||1));
-   return `<div style="font-size:14px;line-height:1.35;margin:2px 0 0;padding-left:16px">${q}x ${esc(name)}${Number(price||0)?` + ${peso(price)}`:""}</div>`;
+   return `<div class="newOB-choice">${q}x ${esc(name)}${Number(price||0)?` + ${peso(price)}`:""}</div>`;
+ };
+ const itemChoices=(i)=>{
+   const out=[];
+   (i.chickenParts||[]).forEach(x=>{
+     const q=Number(x?.qty||0); const n=typeof x==='string'?x:x?.name;
+     if(n && (typeof x==='string'||q>0)) out.push(choiceLine(n,typeof x==='string'?0:Number(x?.price||0),typeof x==='string'?1:q));
+   });
+   if(i.choice){
+     const n=typeof i.choice==='string'?i.choice:i.choice?.name;
+     const p=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);
+     const q=typeof i.choice==='string'?1:Number(i.choice?.qty||1);
+     if(n)out.push(choiceLine(n,p,q));
+   }
+   if(i.bucketChoice){
+     const n=typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name;
+     const p=typeof i.bucketChoice==='string'?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
+     const q=typeof i.bucketChoice==='string'?1:Number(i.bucketChoice?.qty||1);
+     if(n)out.push(choiceLine(n,p,q));
+   }
+   (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+     const n=typeof x==='string'?x:x?.name;
+     const p=typeof x==='string'?0:Number(x?.price||0);
+     const q=typeof x==='string'?1:Number(x?.qty||0);
+     if(n && (typeof x==='string'||q>0)) out.push(choiceLine(n,p,q));
+   }));
+   (i.addOns||[]).forEach(x=>{
+     const n=typeof x==='string'?x:x?.name;
+     const p=typeof x==='string'?0:Number(x?.price||0);
+     const q=typeof x==='string'?1:Number(x?.qty||0);
+     if(n && (typeof x==='string'||q>0)) out.push(choiceLine(n,p,q));
+   });
+   return out.join('');
  };
  const storeRows=Object.entries(stores).map(([store,items])=>{
    const cats={};
    items.forEach(i=>{
-     const cat=adminItemCategoryName(i,st)||String(i.cat||i.menuCategory||"").trim()||"Category Name";
+     const cat=adminItemCategoryName(i,store)||String(i.cat||i.menuCategory||"Category Name").trim()||"Category Name";
      (cats[cat] ||= []).push(i);
    });
-   return `<div style="margin:0 0 14px;padding:0;background:#fff">
-     <div style="font-size:20px;font-weight:900;line-height:1.25;margin:0;padding:0 0 8px;border-bottom:1px solid #ddd">${esc(store)}</div>
-     ${Object.entries(cats).map(([category,catItems])=>`
-       <div style="font-size:16px;font-weight:800;line-height:1.3;margin:10px 0 8px;padding:0 0 7px;border-bottom:1px solid #eee">${esc(category)}</div>
+   return `<section class="newOB-store">
+     <div class="newOB-storeName">${esc(store)}</div>
+     ${Object.entries(cats).map(([category,catItems])=>`<div class="newOB-category">
+       <div class="newOB-categoryName">${esc(category)}</div>
        ${catItems.map(i=>{
-         const p=adminItemPricing(i);
-         const choices=[];
-         const parts=(i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).map(x=>({name:x?.name||x,qty:Number(x?.qty||1),price:Number(x?.price||0)}));
-         parts.forEach(x=>choices.push(choiceLine(x.name,x.price,x.qty)));
-         if(i.choice){
-           const n=typeof i.choice==='string'?i.choice:i.choice?.name;
-           const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);
-           const q=typeof i.choice==='string'?1:Number(i.choice?.qty||1);
-           choices.push(choiceLine(n,pr,q));
-         }
-         if(i.bucketChoice){
-           const n=typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name;
-           const pr=typeof i.bucketChoice==='string'?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
-           const q=typeof i.bucketChoice==='string'?1:Number(i.bucketChoice?.qty||1);
-           choices.push(choiceLine(n,pr,q));
-         }
-         (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
-           const n=typeof x==='string'?x:x?.name;
-           const pr=typeof x==='string'?0:Number(x?.price||0);
-           const q=typeof x==='string'?1:Number(x?.qty||1);
-           choices.push(choiceLine(n,pr,q));
-         }));
-         (i.addOns||[]).forEach(x=>{
-           const n=typeof x==='string'?x:x?.name;
-           const pr=typeof x==='string'?0:Number(x?.price||0);
-           const q=typeof x==='string'?1:Number(x?.qty||1);
-           choices.push(choiceLine(n,pr,q));
-         });
-         return `<div style="padding:5px 0 10px;border-bottom:1px solid #eee">
-           <div style="font-size:16px;line-height:1.35;font-weight:800">${p.qty}x ${esc(i.name||"Food")}</div>
-           <div style="font-size:16px;line-height:1.35;font-weight:800">${peso(p.line)}</div>
-           ${choices.join("")}
-           <div style="font-size:14px;line-height:1.35;margin-top:5px;font-weight:800">Food Total: ${peso(p.line)}</div>
+         const p=adminItemPricing(i), choices=itemChoices(i);
+         return `<div class="newOB-food">
+           <div class="newOB-foodName">${p.qty}x ${esc(i.name||"Food")}</div>
+           <div class="newOB-foodPrice">${peso(p.line)}</div>
+           ${choices}
+           <div class="newOB-foodTotal">Food Total: ${peso(p.line)}</div>
          </div>`;
-       }).join("")}
-     `).join("")}
-   </div>`;
- }).join("") || '<div style="padding:8px 0">No item details.</div>';
+       }).join('')}
+     </div>`).join('')}
+   </section>`;
+ }).join('') || '<div class="newOB-empty">No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
-   ? `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
-   : `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel" style="border:4px solid #222 !important;border-radius:16px;background:#fff;padding:16px 16px 10px;box-sizing:border-box">
-   <div class="orderDetailCustomer" style="padding:0 0 10px;border-bottom:1px solid #eee;font-size:14px;line-height:1.55">
-     <div style="font-size:17px;font-weight:800">${esc(o.orderNo||o.id)}</div>
-     <div style="font-size:16px;font-weight:800">${esc(c.name||"NEW ORDER")}</div>
+   ? `<div class="newOB-payment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
+   : `<div class="newOB-payment"><b>💵 CASH ON DELIVERY</b></div>`;
+ return `<div class="newOB-drawer">
+   <div class="newOB-customer">
+     <div class="newOB-orderNo">${esc(o.orderNo||o.id)}</div>
+     <div class="newOB-statusName">${esc(c.name||"NEW ORDER")}</div>
      <div>CP #: ${esc(c.contact||"—")}</div>
      <div>Address Location: 📍 ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
    </div>
    ${payment}
-   <div class="unifiedBreakdown" style="margin-top:12px;padding:0">
-     <div class="unifiedBreakdownTitle" style="font-size:19px;font-weight:900;margin:0 0 14px">🧾 ORDER BREAKDOWN</div>
-     ${storeRows}
-     <div class="unifiedBill" style="margin-top:4px;padding:12px 0 0;border-top:1px solid #ddd;font-size:15px;line-height:2">
-       <div style="display:flex;justify-content:space-between;gap:12px"><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
-       <div style="display:flex;justify-content:space-between;gap:12px"><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>
-       ${Number(f.secondStoreFee||0)?`<div style="display:flex;justify-content:space-between;gap:12px"><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}
-       <div style="display:flex;justify-content:space-between;gap:12px"><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div>
-       <div style="border-top:1px solid #222;margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;gap:12px;font-size:17px"><b>Grand Total</b><b>${peso(f.total)}</b></div>
-     </div>
+   <div class="newOB-title">🧾 ORDER BREAKDOWN</div>
+   <div class="newOB-content">${storeRows}</div>
+   <div class="newOB-bill">
+     <div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
+     <div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>
+     ${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}
+     <div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div>
+     <div class="newOB-grand"><b>Grand Total</b><b>${peso(f.total)}</b></div>
    </div>
  </div>`;
 }
@@ -4330,7 +4352,7 @@ onAuthStateChanged(auth,u=>{
   setInterval(center,500);
 })();
 
-window.__MHAC_BUILD__="V4.1.76 EXACT CENTERED CATEGORY FOOD MENU MANAGER";
+window.__MHAC_BUILD__="V4.1.76 MENU MANAGER PRESERVED + CUSTOMER MATCHED ORDER BREAKDOWN";
 </script>
 <script>
 setTimeout(function(){
@@ -4411,4 +4433,7 @@ body{font-size:15px!important;line-height:1.35!important}
 .foodEditorV2 .foodEditGroupTitle{width:100%!important;min-width:0!important;min-height:50px!important;border:0!important;background:#fff!important;padding:11px 12px!important;font-size:18px!important;font-weight:900!important;color:#111!important;outline:none!important}
 .foodEditorV2 .foodEditHead .foodEditToggle{min-height:50px!important;width:48px!important;padding:0!important;justify-content:center!important}
 .foodEditorV2 .foodEditHead .deleteGroup{min-height:44px!important;width:44px!important;margin:0 2px!important;padding:6px!important}
+
+/* V4.1.76 PRESERVE MENU MANAGER — ORDER DRAWER BORDER ONLY */
+.orderDetailPanel{border:4px solid #222 !important;}
 </style>
