@@ -2578,68 +2578,80 @@ function orderDetailHtml(o){
    const st=String(i.store||i.storeName||"STORE").trim()||"STORE";
    (stores[st] ||= []).push(i);
  });
+ const choiceLine=(name,price,qty)=>{
+   if(!name)return "";
+   const q=Math.max(1,Number(qty||1));
+   return `<div style="font-size:14px;line-height:1.35;margin:2px 0 0;padding-left:16px">${q}x ${esc(name)}${Number(price||0)?` + ${peso(price)}`:""}</div>`;
+ };
  const storeRows=Object.entries(stores).map(([store,items])=>{
    const cats={};
    items.forEach(i=>{
-     const cat=String(i.category||"CATEGORY").trim()||"CATEGORY";
+     const cat=String(i.category||"Category Name").trim()||"Category Name";
      (cats[cat] ||= []).push(i);
    });
-   return `<div style="margin:10px 0 0;padding:0;border:0;background:#fff">
-     <div style="font-size:18px;font-weight:900;line-height:1.25;margin:0 0 7px;padding:0 0 6px;border-bottom:1px solid #ddd">${esc(store)}</div>
+   return `<div style="margin:0 0 14px;padding:0;background:#fff">
+     <div style="font-size:20px;font-weight:900;line-height:1.25;margin:0;padding:0 0 8px;border-bottom:1px solid #ddd">${esc(store)}</div>
      ${Object.entries(cats).map(([category,catItems])=>`
-       <div style="font-size:15px;font-weight:900;line-height:1.25;margin:7px 0 4px">${esc(category)}</div>
+       <div style="font-size:16px;font-weight:800;line-height:1.3;margin:10px 0 8px;padding:0 0 7px;border-bottom:1px solid #eee">${esc(category)}</div>
        ${catItems.map(i=>{
          const p=adminItemPricing(i);
          const choices=[];
-         const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>({name:x.name||x,qty:Number(x.qty||1),price:Number(x.price||0)}));
-         parts.forEach(x=>choices.push(`${x.qty>1?x.qty+'x ':''}${esc(x.name)}${x.price?` + ${peso(x.price)}`:""}`));
+         const parts=(i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).map(x=>({name:x?.name||x,qty:Number(x?.qty||1),price:Number(x?.price||0)}));
+         parts.forEach(x=>choices.push(choiceLine(x.name,x.price,x.qty)));
          if(i.choice){
            const n=typeof i.choice==='string'?i.choice:i.choice?.name;
            const pr=typeof i.choice==='string'?Number(i.choicePrice||0):Number(i.choice?.price||0);
-           if(n)choices.push(`${esc(n)}${pr?` + ${peso(pr)}`:""}`);
+           const q=typeof i.choice==='string'?1:Number(i.choice?.qty||1);
+           choices.push(choiceLine(n,pr,q));
          }
          if(i.bucketChoice){
            const n=typeof i.bucketChoice==='string'?i.bucketChoice:i.bucketChoice?.name;
            const pr=typeof i.bucketChoice==='string'?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
-           if(n)choices.push(`${esc(n)}${pr?` + ${peso(pr)}`:""}`);
+           const q=typeof i.bucketChoice==='string'?1:Number(i.bucketChoice?.qty||1);
+           choices.push(choiceLine(n,pr,q));
          }
-         (i.choiceGroups||[]).forEach(g=>{
-           (g.options||[]).forEach(x=>{
-             const n=typeof x==='string'?x:x?.name;
-             const pr=typeof x==='string'?0:Number(x?.price||0);
-             if(n)choices.push(`${esc(n)}${pr?` + ${peso(pr)}`:""}`);
-           });
+         (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+           const n=typeof x==='string'?x:x?.name;
+           const pr=typeof x==='string'?0:Number(x?.price||0);
+           const q=typeof x==='string'?1:Number(x?.qty||1);
+           choices.push(choiceLine(n,pr,q));
+         }));
+         (i.addOns||[]).forEach(x=>{
+           const n=typeof x==='string'?x:x?.name;
+           const pr=typeof x==='string'?0:Number(x?.price||0);
+           const q=typeof x==='string'?1:Number(x?.qty||1);
+           choices.push(choiceLine(n,pr,q));
          });
-         if(i.addOns?.length){
-           i.addOns.forEach(x=>{
-             const n=typeof x==='string'?x:x?.name;
-             const pr=typeof x==='string'?0:Number(x?.price||0);
-             if(n)choices.push(`${esc(n)}${pr?` + ${peso(pr)}`:""}`);
-           });
-         }
-         return `<div style="padding:5px 0 7px;border-top:1px solid #eee">
-           <div style="font-size:15px;line-height:1.35"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>
-           ${choices.map(x=>`<div style="font-size:14px;line-height:1.3;margin-top:2px;padding-left:14px">${x}</div>`).join("")}
-           <div style="font-size:14px;line-height:1.3;margin-top:3px"><b>Food Total: ${peso(p.line)}</b></div>
+         return `<div style="padding:5px 0 10px;border-bottom:1px solid #eee">
+           <div style="font-size:16px;line-height:1.35;font-weight:800">${p.qty}x ${esc(i.name||"Food")}</div>
+           <div style="font-size:16px;line-height:1.35;font-weight:800">${peso(p.line)}</div>
+           ${choices.join("")}
+           <div style="font-size:14px;line-height:1.35;margin-top:5px;font-weight:800">Food Total: ${peso(p.line)}</div>
          </div>`;
        }).join("")}
      `).join("")}
    </div>`;
  }).join("") || '<div style="padding:8px 0">No item details.</div>';
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
-   ? `<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
-   : `<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
- return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   ? `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
+   : `<div class="orderDetailPayment" style="font-size:14px;padding:8px 0;border-bottom:1px solid #eee"><b>💵 CASH ON DELIVERY</b></div>`;
+ return `<div class="orderDetailPanel" style="border:2px solid #222;border-radius:16px;background:#fff;padding:16px 16px 10px;box-sizing:border-box">
+   <div class="orderDetailCustomer" style="padding:0 0 10px;border-bottom:1px solid #eee;font-size:14px;line-height:1.55">
+     <div style="font-size:17px;font-weight:800">${esc(o.orderNo||o.id)}</div>
+     <div style="font-size:16px;font-weight:800">${esc(c.name||"NEW ORDER")}</div>
+     <div>CP #: ${esc(c.contact||"—")}</div>
+     <div>Address Location: 📍 ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   </div>
    ${payment}
-   <div class="unifiedBreakdown" style="margin-top:8px;border-top:1px solid #eee;padding-top:8px">
-     <div class="unifiedBreakdownTitle" style="font-size:16px;font-weight:900;margin-bottom:7px">🧾 ORDER BREAKDOWN</div>
+   <div class="unifiedBreakdown" style="margin-top:12px;padding:0">
+     <div class="unifiedBreakdownTitle" style="font-size:19px;font-weight:900;margin:0 0 14px">🧾 ORDER BREAKDOWN</div>
      ${storeRows}
-     <div class="unifiedBill" style="margin-top:10px;padding-top:8px;border-top:1px solid #eee;font-size:14px;line-height:1.4">
-       <b>Food Total: ${peso(f.foodOrder)}</b><br>
-       <b>10% Service Fee: ${peso(f.serviceFee)}</b><br>
-       <b>Delivery Fee: ${peso(f.deliveryFee)}</b>${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee: ${peso(f.secondStoreFee)}</b>`:""}<br>
-       <b>GRAND TOTAL: ${peso(f.total)}</b>
+     <div class="unifiedBill" style="margin-top:4px;padding:12px 0 0;border-top:1px solid #ddd;font-size:15px;line-height:2">
+       <div style="display:flex;justify-content:space-between;gap:12px"><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div>
+       <div style="display:flex;justify-content:space-between;gap:12px"><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>
+       ${Number(f.secondStoreFee||0)?`<div style="display:flex;justify-content:space-between;gap:12px"><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}
+       <div style="display:flex;justify-content:space-between;gap:12px"><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div>
+       <div style="border-top:1px solid #222;margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;gap:12px;font-size:17px"><b>Grand Total</b><b>${peso(f.total)}</b></div>
      </div>
    </div>
  </div>`;
