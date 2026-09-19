@@ -1291,13 +1291,46 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .orderDetailPayment{margin-top:6px!important;font-size:13px!important}
 .unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
 .unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
-.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
+.unifiedStoreCard{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important}
 .unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
 .unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 2px!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
 .unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
 .unifiedFoodName{font-size:18px!important;line-height:1.35!important}
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
 .unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
+</style>
+<style id="MHAC_CUSTOMER_ORDER_DRAWER_MATCH_ADMIN">
+/* CUSTOMER: match locked Admin Order Breakdown drawer.
+   One thick outer box only; no separate thick boxes per store. */
+.customerUnifiedDetailWrap .orderDetailPanel{
+  border:2px solid #222!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  overflow:hidden!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreCard{
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreCard + .unifiedStoreCard{
+  margin-top:10px!important;
+  padding-top:10px!important;
+  border-top:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreName{
+  border-bottom:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedCategoryName{
+  border-bottom:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedFoodRow{
+  border-top:1px solid #ddd!important;
+}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2224,7 +2257,7 @@ $("myOrders").onclick=async e=>{
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.87 CUSTOMER CATEGORY REFRESH RACE FIX";
+window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY + ADMIN DRAWER FIX";
 </script>
 
 <script>
