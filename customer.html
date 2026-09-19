@@ -1040,6 +1040,265 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerOrderActions button{margin:0!important;width:100%!important;max-width:100%!important;display:block!important;text-align:center!important}
 .customerOrderActions.single .orderChatBtn{width:100%!important;max-width:100%!important;display:block!important;}
 </style>
+<style id="MHAC_CUSTOMER_UNIFIED_FINAL_V4_1_84">
+.customerViewFullOrder{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100%!important;
+  min-height:46px!important;
+  margin:10px 0 0!important;
+  padding:10px 12px!important;
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #222!important;
+  border-radius:9px!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  text-align:center!important;
+}
+.customerUnifiedDetailWrap.hidden{display:none!important}
+.customerUnifiedDetailWrap:not(.hidden){display:block!important}
+</style>
+
+<style data-source="ADMIN_ORDER_BREAKDOWN" id="MHAC_FINAL_ADMIN_COMPACT_ORDER_FIX_20260831">
+/* FINAL ADMIN COMPACT ORDER FIX
+   - Initial incoming order shows only order number + customer name.
+   - VIEW FULL ORDER expands directly underneath that header, before action buttons.
+   - GCash panel and metrics use compact, consistent boxes.
+*/
+#metrics{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+  align-items:stretch!important;
+}
+#metrics .metric{
+  min-width:0!important;
+  min-height:58px!important;
+  height:auto!important;
+  padding:7px 4px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+#metrics .metric span{font-size:11px!important;line-height:1.1!important;font-weight:600!important;white-space:nowrap!important}
+#metrics .metric b{font-size:18px!important;line-height:1.05!important;margin-top:4px!important;font-weight:800!important}
+
+.card:has(.gcSettings){
+  padding:9px!important;
+  margin:6px 0!important;
+}
+.card:has(.gcSettings)>h2{
+  font-size:21px!important;
+  margin:3px 0 5px!important;
+}
+.card:has(.gcSettings)>p.status{
+  font-size:13px!important;
+  line-height:1.2!important;
+  margin:2px 0 5px!important;
+}
+.gcSettings{
+  padding:6px!important;
+  margin:0!important;
+  border-radius:8px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings .label{
+  font-size:12px!important;
+  line-height:1.15!important;
+  margin:2px 0!important;
+}
+.gcSettings input{
+  min-height:36px!important;
+  height:36px!important;
+  padding:5px 8px!important;
+  margin:2px 0 4px!important;
+  font-size:14px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings .small,.gcSettings .status{
+  font-size:11px!important;
+  line-height:1.15!important;
+  margin:2px 0!important;
+}
+.gcSettings .row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:5px!important;
+  margin-top:4px!important;
+}
+.gcSettings .row button{
+  min-height:34px!important;
+  height:34px!important;
+  padding:5px 6px!important;
+  font-size:11px!important;
+  box-sizing:border-box!important;
+}
+.gcSettings img,#adminGcashQrPreview{
+  width:70px!important;
+  height:70px!important;
+  max-width:70px!important;
+  max-height:70px!important;
+  margin:4px auto!important;
+  object-fit:contain!important;
+}
+
+#orders .order{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 260px!important;
+  gap:8px!important;
+  align-items:start!important;
+}
+#orders .orderInfo{
+  min-width:0!important;
+}
+#orders .orderPreviewHead{
+  margin:0 0 2px!important;
+  align-items:center!important;
+}
+#orders .orderPreviewHead b{
+  font-size:16px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+}
+#orders .orderPreviewCustomer{
+  font-size:19px!important;
+  line-height:1.15!important;
+  font-weight:800!important;
+  margin:4px 0!important;
+}
+#orders .orderActions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:5px!important;
+}
+#orders .orderActions button,
+#orders .orderActions a,
+#orders .orderActions select{
+  width:100%!important;
+  min-width:0!important;
+  min-height:38px!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+  font-size:13px!important;
+  line-height:1.15!important;
+  padding:7px 6px!important;
+  margin:0!important;
+}
+#orders .orderActions [data-view]{
+  grid-column:1 / -1!important;
+}
+#orders .orderActions [data-accept],
+#orders .orderActions [data-cancel-order]{
+  grid-column:1 / -1!important;
+}
+#orders .orderActions [data-time],
+#orders .orderActions [data-a],
+#orders .orderActions [data-c]{
+  min-height:36px!important;
+}
+#orders .orderActions [id^="details-"]{
+  display:none!important;
+}
+#orders .orderInfo [id^="details-"]{
+  grid-column:auto!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:6px 0 0!important;
+  padding:0!important;
+}
+#orders .orderInfo [id^="details-"]:not(.hidden){
+  display:block!important;
+  animation:mhacOrderSlideDown .18s ease-out!important;
+}
+.orderDetailPanel{
+  background:#fff!important;
+  border:1px solid #ddd!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+  overflow:hidden!important;
+}
+.orderDetailCustomer{
+  padding-bottom:6px!important;
+  border-bottom:1px solid #eee!important;
+}
+.orderDetailHeading{
+  margin-top:7px!important;
+  font-size:15px!important;
+}
+.orderDetailStore{
+  padding:7px!important;
+  margin:5px 0!important;
+  background:#fff!important;
+  border:1px solid #eee!important;
+  border-radius:7px!important;
+}
+.orderDetailStore h3{
+  font-size:17px!important;
+  line-height:1.15!important;
+}
+.orderDetailFood{
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+.orderDetailFood b{font-size:15px!important}
+.orderDetailPayment{
+  margin-top:6px!important;
+  font-size:13px!important;
+}
+.orderDetailPayment button{
+  min-height:32px!important;
+  font-size:11px!important;
+  padding:5px 7px!important;
+  margin-top:4px!important;
+}
+.orderDetailBill{
+  margin-top:6px!important;
+  padding-top:6px!important;
+  border-top:1px solid #eee!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+@keyframes mhacOrderSlideDown{
+  from{opacity:0;transform:translateY(-5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(max-width:700px){
+  #metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  #metrics .metric{min-height:56px!important;padding:6px 2px!important}
+  #metrics .metric span{font-size:10px!important}
+  #metrics .metric b{font-size:17px!important}
+  .card:has(.gcSettings){padding:8px!important}
+  .card:has(.gcSettings)>h2{font-size:20px!important}
+  .card:has(.gcSettings)>p.status{font-size:12px!important}
+  .gcSettings .row{grid-template-columns:1fr 1fr!important}
+  .gcSettings img,#adminGcashQrPreview{width:64px!important;height:64px!important;max-width:64px!important;max-height:64px!important}
+  #orders .order{grid-template-columns:1fr!important;gap:6px!important}
+  #orders .orderActions{grid-template-columns:1fr 1fr!important}
+  #orders .orderActions [data-view],
+  #orders .orderActions [data-accept],
+  #orders .orderActions [data-cancel-order]{grid-column:1 / -1!important}
+}
+</style>
+<style id="MHAC_ADMIN_SOURCE_OF_TRUTH_ORDERBREAKDOWN_FINAL">
+.orderDetailPanel{background:#fff!important;border:2px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
+.orderDetailCustomer{padding-bottom:6px!important;border-bottom:1px solid #eee!important}
+.orderDetailPayment{margin-top:6px!important;font-size:13px!important}
+.unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
+.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
+.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
+.unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
+.unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 2px!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
+.unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
+.unifiedFoodName{font-size:18px!important;line-height:1.35!important}
+.unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
+.unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1112,15 +1371,22 @@ function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
-  menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
-    data=snap.exists()?snap.data():{stores:[]};
-    const count=(data.stores||[]).filter(s=>s.published!==false).length;
-    $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
-    renderStores();
-    renderCart();
-  },err=>{
-    console.warn("Published menu listener failed",err);
-    $("menuStatus").textContent="⚠️ Unable to load published menu.";
+  return await new Promise(resolve=>{
+    let first=true;
+    menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
+      data=snap.exists()?snap.data():{stores:[]};
+      rebuildCustomerCategoryCache();
+      const count=(data.stores||[]).filter(s=>s.published!==false).length;
+      $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
+      renderStores();
+      renderCart();
+      refreshCustomerOrderBreakdowns();
+      if(first){first=false;resolve(true)}
+    },err=>{
+      console.warn("Published menu listener failed",err);
+      $("menuStatus").textContent="⚠️ Unable to load published menu.";
+      if(first){first=false;resolve(false)}
+    });
   });
 }
 async function boot(){await loadHours();await loadMenu();applyHours()}
@@ -1135,6 +1401,197 @@ function loadGcashLocal(){
   try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||""),qrHidden:!!x.qrHidden};}catch(_){}
   return {number:"",qrUrl:"",qrHidden:false};
 }
+function customerTruthItemPricing(i){
+ const qty=Math.max(1,Number(i.qty||1));
+ const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
+ const extras=[];
+ if(i.choice){
+   const n=typeof i.choice==="string"?i.choice:i.choice?.name;
+   const pr=typeof i.choice==="string"?Number(i.choicePrice||0):Number(i.choice?.price||0);
+   if(n)extras.push({name:n,price:pr});
+ }
+ if(i.bucketChoice){
+   const n=typeof i.bucketChoice==="string"?i.bucketChoice:i.bucketChoice?.name;
+   const pr=typeof i.bucketChoice==="string"?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
+   if(n)extras.push({name:n,price:pr});
+ }
+ (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+   const n=typeof x==="string"?x:x?.name;
+   const pr=typeof x==="string"?0:Number(x?.price||0);
+   if(n)extras.push({name:n,price:pr});
+ }));
+ (i.addOns||[]).forEach(x=>{
+   const n=typeof x==="string"?x:x?.name;
+   const pr=typeof x==="string"?0:Number(x?.price||0);
+   if(n)extras.push({name:n,price:pr});
+ });
+ let extraTotal=extras.reduce((a,x)=>a+x.price,0);
+ let unit=base+extraTotal;
+ if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);
+ return{qty,base,extras,unit,line:unit*qty};
+}
+
+const CUSTOMER_CATEGORY_CACHE_KEY="mhac_customer_category_cache_v188";
+let customerCategoryCache={};
+function customerCategoryKey(storeName,itemName){
+  const n=v=>String(v??"").trim().toLowerCase().replace(/\s+/g," ");
+  return n(storeName)+"|||"+n(itemName);
+}
+function loadCustomerCategoryCache(){
+  try{
+    const x=JSON.parse(localStorage.getItem(CUSTOMER_CATEGORY_CACHE_KEY)||"{}");
+    if(x&&typeof x==="object")customerCategoryCache=x;
+  }catch(_){}
+}
+function saveCustomerCategoryCache(){
+  try{localStorage.setItem(CUSTOMER_CATEGORY_CACHE_KEY,JSON.stringify(customerCategoryCache))}catch(_){}
+}
+function rebuildCustomerCategoryCache(){
+  const next={...customerCategoryCache};
+  for(const st of (Array.isArray(data?.stores)?data.stores:[])){
+    const store=String(st?.name||"").trim();
+    if(!store)continue;
+    for(const cat of (st?.categories||[])){
+      const cn=String(cat?.name||cat?.label||"").trim();
+      if(!cn||/^category\s*name$/i.test(cn)||/^category$/i.test(cn))continue;
+      for(const f of (cat?.items||[])){
+        const name=String(f?.name??f?.title??f?.foodName??"").trim();
+        if(name)next[customerCategoryKey(store,name)]=cn;
+      }
+    }
+  }
+  customerCategoryCache=next;
+  saveCustomerCategoryCache();
+}
+loadCustomerCategoryCache();
+
+function customerTruthItemCategoryName(i,storeName){
+ const norm=v=>String(v??"").trim().toLowerCase().replace(/[\s\u00a0]+/g," ").replace(/[–—]/g,"-");
+ const key=v=>norm(v).replace(/[^a-z0-9]+/g,"");
+ const valid=v=>{const x=String(v??"").trim();return !!x&&!/^category\s*name$/i.test(x)&&!/^category$/i.test(x)};
+ const direct=[
+   i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,
+   i?.category_name,i?.categoryLabel,
+   i?.food?.categoryName,i?.food?.category
+ ].map(v=>String(v??"").trim()).find(valid);
+ if(direct){
+   customerCategoryCache[customerCategoryKey(storeName,i?.name)]=direct;
+   saveCustomerCategoryCache();
+   return direct;
+ }
+
+ const cached=customerCategoryCache[customerCategoryKey(storeName,i?.name)];
+ if(valid(cached))return cached;
+
+ const foodKey=key(i?.name), storeKey=key(storeName);
+ const stores=Array.isArray(data?.stores)?data.stores:[];
+ const findIn=(list,strict)=>{
+   for(const st of list){
+     if(strict && storeKey && key(st?.name)!==storeKey)continue;
+     for(const cat of (st?.categories||[])){
+       const cn=String(cat?.name||cat?.label||"").trim();
+       if(!valid(cn))continue;
+       for(const f of (cat?.items||[])){
+         const fk=key(f?.name??f?.title??f?.foodName);
+         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk))){
+           customerCategoryCache[customerCategoryKey(storeName,i?.name)]=cn;
+           saveCustomerCategoryCache();
+           return cn;
+         }
+       }
+     }
+   }
+   return "";
+ };
+ return findIn(stores,true)||findIn(stores,false)||"";
+}
+
+function customerTruthChoiceLines(i){
+ const lines=[];
+ const add=(name,price,qty=1)=>{
+   name=String(name||"").trim();
+   if(!name)return;
+   const q=Math.max(1,Number(qty||1));
+   const extra=Number(price||0);
+   lines.push(`${q}x ${esc(name)}${extra?` + ${peso(extra)}`:""}`);
+ };
+
+ (i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).forEach(x=>add(x?.name??x,0,x?.qty||1));
+
+ if(i.choice){
+   const n=typeof i.choice==="string"?i.choice:i.choice?.name;
+   const p=typeof i.choice==="string"?Number(i.choicePrice||0):Number(i.choice?.price||0);
+   add(n,p,i.choice?.qty||1);
+ }
+
+ if(i.bucketChoice){
+   const n=typeof i.bucketChoice==="string"?i.bucketChoice:i.bucketChoice?.name;
+   const p=typeof i.bucketChoice==="string"?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
+   add(n,p,i.bucketChoice?.qty||1);
+ }
+
+ (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
+   const n=typeof x==="string"?x:x?.name;
+   const p=typeof x==="string"?0:Number(x?.price||0);
+   add(n,p,x?.qty||1);
+ }));
+
+ (i.addOns||[]).forEach(x=>{
+   const n=typeof x==="string"?x:x?.name;
+   const p=typeof x==="string"?0:Number(x?.price||0);
+   add(n,p,x?.qty||1);
+ });
+
+ return lines;
+}
+
+function customerTruthOrderDetailHtml(o){
+ const c=o.customer||{}, f=o.fees||{};
+ const stores={};
+
+ (o.items||[]).forEach(i=>{
+   const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+   const category=customerTruthItemCategoryName(i,store)||"";
+   const key=store+"|||"+category;
+   (stores[key] ||= {store,category,items:[]}).items.push(i);
+ });
+
+ const rows=Object.values(stores).map(group=>`
+   <div class="unifiedStoreCard">
+     <div class="unifiedStoreName">${esc(group.store)}</div>
+     ${group.category?`<div class="unifiedCategoryName">${esc(group.category)}</div>`:""}
+     ${group.items.map(i=>{
+       const p=customerTruthItemPricing(i);
+       const choices=customerTruthChoiceLines(i);
+       return `<div class="unifiedFoodRow">
+         <div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>
+         ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}
+         <div class="unifiedChoice"><b>Food Total: ${peso(p.line)}</b></div>
+       </div>`;
+     }).join("")}
+   </div>
+ `).join("") || '<div class="unifiedStoreCard">No item details.</div>';
+
+ const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
+   ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
+   :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+
+ return `<div class="orderDetailPanel">
+   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   ${payment}
+   <div class="unifiedBreakdown">
+     <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
+     ${rows}
+     <div class="unifiedBill">
+       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
+       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
+       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
+       <b>Grand Total: ${peso(f.total)}</b>
+     </div>
+   </div>
+ </div>`;
+}
+
 function renderGcashSettings(){
   $("gcashNumberDisplay").textContent=gcashSettings.number||"GCash number not set yet.";
   const wrap=$("gcashQrWrap"),img=$("gcashQrDisplay");
@@ -1177,7 +1634,7 @@ $("payment").onchange=()=>{
   if(isG)renderGcashSettings();
 };
 
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}startOrders();$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
 function photoSvgData(name,type="food"){
  const n=String(name||type||"Photo").trim().slice(0,18),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><rect width="30" height="30" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="18">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="6" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
@@ -1364,7 +1821,7 @@ function customize(si,ci,fi){
    const spicyExtra=(isBucket?Number(styleSel.spicy||0)*Number(f.spicyPrice||0):0);
    const groupExtra=selectedGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+Number(n.price||0)*Number(n.qty||1),0),0);
    const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
-   draftCart.push({key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),price:Number(f.price)+(extra/Math.max(1,qty)),basePrice:Number(f.price),qty,choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups:selectedGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:!hasPartGroup&&f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)});
+   draftCart.push({key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),categoryName:String(c.name||"").trim(),category:String(c.name||"").trim(),price:Number(f.price)+(extra/Math.max(1,qty)),basePrice:Number(f.price),qty,choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups:selectedGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:!hasPartGroup&&f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)});
    renderCart();openCat(si,ci);
  };
  update();
@@ -1606,12 +2063,34 @@ function syncCustomerChatWatchers(active){
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
 
+function refreshCustomerOrderBreakdowns(){
+ const orders=Array.isArray(window.__mhacOrders)?window.__mhacOrders:[];
+ orders.forEach(o=>{
+   const el=$("customer-order-details-"+String(o.id));
+   if(el)el.innerHTML=customerUnifiedOrderDetailHtml(o);
+ });
+}
 function customerOrderCategory(storeName,itemName){
   const norm=v=>String(v||"").trim().toLowerCase().replace(/\s+/g," ");
-  const valid=v=>{const x=String(v||"").trim();return x && !/^category\s*name$/i.test(x) && !/^category$/i.test(x)};
+  const valid=v=>{
+    const x=String(v||"").trim();
+    return !!x && !/^category\s*name$/i.test(x) && !/^category$/i.test(x);
+  };
   const sk=norm(storeName),ik=norm(itemName);
+
+  // 1) Exact Store + Food from the published menu.
   for(const s of (data?.stores||[])){
     if(norm(s?.name)!==sk)continue;
+    for(const c of (s?.categories||[])){
+      const cn=String(c?.name||c?.label||"").trim();
+      if(!valid(cn))continue;
+      const items=Array.isArray(c?.items)?c.items:[];
+      if(items.some(x=>norm(x?.name)===ik))return cn;
+    }
+  }
+
+  // 2) Exact Food name anywhere in the published menu.
+  for(const s of (data?.stores||[])){
     for(const c of (s?.categories||[])){
       const cn=String(c?.name||c?.label||"").trim();
       if(!valid(cn))continue;
@@ -1623,7 +2102,7 @@ function customerOrderCategory(storeName,itemName){
 }
 function customerOrderCategoryValue(i){
   const direct=[i?.category,i?.categoryName,i?.categoryLabel].map(v=>String(v||"").trim()).find(validCustomerCategory);
-  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "Category Name";
+  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "";
 }
 function validCustomerCategory(v){
   const x=String(v||"").trim();
@@ -1656,23 +2135,50 @@ function customerOrderChoiceLines(i){
   return lines;
 }
 function customerUnifiedOrderDetailHtml(o){
-  const c=o.customer||{},f=o.fees||{},groups={};
-  (o.items||[]).forEach(i=>{
-    const st=String(i.store||i.storeName||"STORE").trim()||"STORE";
-    const cat=customerOrderCategoryValue(i);
-    const key=st+"\u0000"+cat;(groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
-  });
-  const vals=Object.values(groups);
-  const sections=vals.map((g,idx)=>{
-    const foods=g.items.map(i=>{
-      const p=customerOrderPrice(i),lines=customerOrderChoiceLines(i);
-      return `<div class="customerUnifiedFoodRow"><div class="customerUnifiedFoodName">${p.qty}x ${esc(i.name||"Food")} ${peso(p.unit)}</div>${lines.map(x=>`<div class="customerUnifiedChoice">${x}</div>`).join("")}<div class="customerUnifiedFoodTotal">Food Total: ${peso(p.line)}</div></div>`;
-    }).join("");
-    return `<div class="customerUnifiedStoreSection"><div class="customerUnifiedStoreName">${esc(g.store)}</div><div class="customerUnifiedCategoryName">${esc(g.category)}</div>${foods}${idx<vals.length-1?'<div class="customerUnifiedStoreDivider"></div>':""}</div>`;
-  }).join("")||"<div>No item details.</div>";
-  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="customerUnifiedPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}</div>`:`<div class="customerUnifiedPayment"><b>💵 CASH ON DELIVERY</b></div>`;
-  const loc=String(c.gps?.display||c.address||"Customer GPS").replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,"").trim();
-  return `<div class="customerUnifiedDrawer"><div class="customerUnifiedCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: 📍 LOCATION DETECTED: ${esc(loc)}</div>${payment}<div class="customerUnifiedTitle">🧾 ORDER BREAKDOWN</div>${sections}<div class="customerUnifiedBill"><div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div><div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}<div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div><div class="grand"><span>Grand Total</span><b>${peso(f.total)}</b></div></div></div>`;
+ const c=o.customer||{}, f=o.fees||{};
+ const stores={};
+
+ (o.items||[]).forEach(i=>{
+   const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+   const category=customerTruthItemCategoryName(i,store)||"";
+   const key=store+"|||"+category;
+   (stores[key] ||= {store,category,items:[]}).items.push(i);
+ });
+
+ const rows=Object.values(stores).map(group=>`
+   <div class="unifiedStoreCard">
+     <div class="unifiedStoreName">${esc(group.store)}</div>
+     ${group.category?`<div class="unifiedCategoryName">${esc(group.category)}</div>`:""}
+     ${group.items.map(i=>{
+       const p=customerTruthItemPricing(i);
+       const choices=customerTruthChoiceLines(i);
+       return `<div class="unifiedFoodRow">
+         <div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>
+         ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}
+         <div class="unifiedChoice"><b>Food Total: ${peso(p.line)}</b></div>
+       </div>`;
+     }).join("")}
+   </div>
+ `).join("") || '<div class="unifiedStoreCard">No item details.</div>';
+
+ const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
+   ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
+   :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+
+ return `<div class="orderDetailPanel">
+   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
+   ${payment}
+   <div class="unifiedBreakdown">
+     <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
+     ${rows}
+     <div class="unifiedBill">
+       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
+       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
+       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
+       <b>Grand Total: ${peso(f.total)}</b>
+     </div>
+   </div>
+ </div>`;
 }
 
 function startOrders(){
@@ -1691,6 +2197,8 @@ function startOrders(){
         <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
       </div>`;
     }).join(""):"No active orders.";
+    refreshCustomerOrderBreakdowns();
+    requestAnimationFrame(()=>refreshCustomerOrderBreakdowns());
     syncCustomerChatWatchers(arr);
   });
 }
@@ -1716,7 +2224,7 @@ $("myOrders").onclick=async e=>{
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.64 CUSTOMER MASTER UNIFIED WHITE UI — TIME LIMIT TEST MODE";
+window.__MHAC_BUILD__="V4.1.87 CUSTOMER CATEGORY REFRESH RACE FIX";
 </script>
 
 <script>
@@ -1733,5 +2241,5 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-</script>
+window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY FORCE FIX";\n</script>
 </body></html>
