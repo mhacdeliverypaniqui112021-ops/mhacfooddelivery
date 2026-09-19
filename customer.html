@@ -1040,6 +1040,25 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerOrderActions button{margin:0!important;width:100%!important;max-width:100%!important;display:block!important;text-align:center!important}
 .customerOrderActions.single .orderChatBtn{width:100%!important;max-width:100%!important;display:block!important;}
 </style>
+
+<style id="MHAC_SHARED_ORDER_BREAKDOWN_V1">
+.mhacSharedOB{border:4px solid #222!important;border-radius:14px!important;background:#fff!important;padding:12px!important;color:#111!important;box-sizing:border-box!important}
+.mhacSharedOB *{box-sizing:border-box!important}
+.mhacSharedOBCustomer{padding:0 0 12px!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.45!important}
+.mhacSharedOBPayment{padding:12px 0!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.35!important}
+.mhacSharedOBTitle{font-size:22px!important;font-weight:900!important;padding:14px 0 10px!important}
+.mhacSharedOBStore{font-size:22px!important;font-weight:900!important;padding:0 0 8px!important;border-bottom:1px solid #eee!important}
+.mhacSharedOBCategory{font-size:18px!important;font-weight:800!important;padding:10px 0!important;border-bottom:1px solid #eee!important}
+.mhacSharedOBFood{padding:11px 0!important;border-bottom:1px solid #eee!important}
+.mhacSharedOBFoodName{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
+.mhacSharedOBFoodPrice{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
+.mhacSharedOBChoice{padding-left:12px!important;font-size:15px!important;line-height:1.4!important}
+.mhacSharedOBFoodTotal{font-size:16px!important;font-weight:800!important;margin-top:6px!important}
+.mhacSharedOBStoreDivider{border-top:1px solid #ddd!important;margin:10px 0!important}
+.mhacSharedOBBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
+.mhacSharedOBBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important;line-height:1.25!important}
+.mhacSharedOBBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1645,23 +1664,25 @@ function customerOrderChoiceLines(i){
   return lines;
 }
 function customerUnifiedOrderDetailHtml(o){
-  const c=o.customer||{},f=o.fees||{},groups={};
+  const c=o.customer||{}, f=o.fees||{}, groups={};
   (o.items||[]).forEach(i=>{
-    const st=String(i.store||i.storeName||"STORE").trim()||"STORE";
-    const cat=String(i.category||i.categoryName||i.categoryLabel||customerOrderCategory(st,i.name)||"Category Name").trim()||"Category Name";
-    const key=st+"\u0000"+cat;(groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
+    const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
+    const category=String(i.category||i.categoryName||i.categoryLabel||customerOrderCategory(store,i.name)||"Category Name").trim()||"Category Name";
+    const key=store+"\u0000"+category;
+    (groups[key] ||= {store,category,items:[]}).items.push(i);
   });
-  const vals=Object.values(groups);
-  const sections=vals.map((g,idx)=>{
+  const sections=Object.values(groups).map((g,idx)=>{
     const foods=g.items.map(i=>{
-      const p=customerOrderPrice(i),lines=customerOrderChoiceLines(i);
-      return `<div class="customerUnifiedFoodRow"><div class="customerUnifiedFoodName">${p.qty}x ${esc(i.name||"Food")} ${peso(p.unit)}</div>${lines.map(x=>`<div class="customerUnifiedChoice">${x}</div>`).join("")}<div class="customerUnifiedFoodTotal">Food Total: ${peso(p.line)}</div></div>`;
+      const p=customerOrderPrice(i), lines=customerOrderChoiceLines(i);
+      return `<div class="mhacSharedOBFood"><div class="mhacSharedOBFoodName">${p.qty}x ${esc(i.name||"Food")}</div><div class="mhacSharedOBFoodPrice">${peso(p.line)}</div>${lines.map(x=>`<div class="mhacSharedOBChoice">${x}</div>`).join("")}<div class="mhacSharedOBFoodTotal">Food Total: ${peso(p.line)}</div></div>`;
     }).join("");
-    return `<div class="customerUnifiedStoreSection"><div class="customerUnifiedStoreName">${esc(g.store)}</div><div class="customerUnifiedCategoryName">${esc(g.category)}</div>${foods}${idx<vals.length-1?'<div class="customerUnifiedStoreDivider"></div>':""}</div>`;
-  }).join("")||"<div>No item details.</div>";
-  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="customerUnifiedPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}</div>`:`<div class="customerUnifiedPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+    return `<section><div class="mhacSharedOBStore">${esc(g.store)}</div><div class="mhacSharedOBCategory">${esc(g.category)}</div>${foods}</section>${idx<Object.values(groups).length-1?'<div class="mhacSharedOBStoreDivider"></div>':''}`;
+  }).join("") || '<div>No item details.</div>';
+  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
+    ? `<div class="mhacSharedOBPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}</div>`
+    : `<div class="mhacSharedOBPayment"><b>💵 CASH ON DELIVERY</b></div>`;
   const loc=String(c.gps?.display||c.address||"Customer GPS").replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,"").trim();
-  return `<div class="customerUnifiedDrawer"><div class="customerUnifiedCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: 📍 LOCATION DETECTED: ${esc(loc)}</div>${payment}<div class="customerUnifiedTitle">🧾 ORDER BREAKDOWN</div>${sections}<div class="customerUnifiedBill"><div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div><div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}<div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div><div class="grand"><span>Grand Total</span><b>${peso(f.total)}</b></div></div></div>`;
+  return `<div class="mhacSharedOB"><div class="mhacSharedOBCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: 📍 LOCATION DETECTED: ${esc(loc)}</div>${payment}<div class="mhacSharedOBTitle">🧾 ORDER BREAKDOWN</div>${sections}<div class="mhacSharedOBBill"><div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div><div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}<div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div><div class="grand"><span>Grand Total</span><b>${peso(f.total)}</b></div></div></div>`;
 }
 
 function startOrders(){
