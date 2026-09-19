@@ -1672,17 +1672,17 @@ function customerTruthOrderDetailHtml(o){
          <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
        </div>
        <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>10% Service Fee</b></span>
+         <span class="unifiedBillLabel"><b>Service Fee 10%</b></span>
          <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
        </div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>Additional Store</b></span>
+         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
+       </div>`:""}
        <div class="unifiedBillRow">
          <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
          <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
        </div>
-       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>2nd Store Fee</b></span>
-         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
-       </div>`:""}
        <div class="unifiedBillRow unifiedBillGrand">
          <span class="unifiedBillLabel"><b>Grand Total</b></span>
          <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
@@ -2343,3 +2343,51 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY FORCE FIX";\n</script>
 </body></html>
+
+<style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
+.customerUnifiedDetailWrap .orderDetailPanel{
+  border:3px solid #222!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  background:#fff!important;
+}
+.customerUnifiedDetailWrap .orderDetailPayment{
+  margin-top:8px!important;
+  padding:10px 0!important;
+  border-top:1px solid #ddd!important;
+  border-bottom:1px solid #ddd!important;
+  font-size:16px!important;
+  line-height:1.4!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreCard{
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+}
+.customerUnifiedDetailWrap .unifiedBill{
+  margin:12px 0 0!important;
+  padding-top:8px!important;
+  border-top:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedBillRow{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  padding:8px 0!important;
+}
+.customerUnifiedDetailWrap .unifiedBillAmount{
+  min-width:92px!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  font-weight:700!important;
+}
+.customerUnifiedDetailWrap .unifiedBillGrand{
+  margin-top:5px!important;
+  padding-top:10px!important;
+  border-top:2px solid #999!important;
+  font-weight:900!important;
+}
+</style>
