@@ -1324,17 +1324,15 @@ function riderOrderChoiceLines(i){
 
 /* This is the locked Customer Order Breakdown structure, reproduced in Rider. */
 function riderExactOrderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{};
- const stores={};
-
+ const c=o.customer||{}, f=o.fees||{}, stores={};
  (o.items||[]).forEach(i=>{
    const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
    const category=riderTruthItemCategoryName(i,store)||"";
    const key=store+"|||"+category;
    (stores[key] ||= {store,category,items:[]}).items.push(i);
  });
-
- const rows=Object.values(stores).map(group=>`
+ const groups=Object.values(stores);
+ const rows=groups.map((group,idx)=>`
    <div class="unifiedStoreCard">
      <div class="unifiedStoreName">${esc(group.store)}</div>
      ${group.category?`<div class="unifiedCategoryName">${esc(group.category)}</div>`:""}
@@ -1347,13 +1345,12 @@ function riderExactOrderDetailHtml(o){
          <div class="unifiedChoice"><b>Food Total: ${peso(p.line)}</b></div>
        </div>`;
      }).join("")}
+     ${idx<groups.length-1?'<div class="unifiedStoreDivider"></div>':''}
    </div>
  `).join("") || '<div class="unifiedStoreCard">No item details.</div>';
-
  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
    ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
    :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
-
  return `<div class="orderDetailPanel">
    <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
    ${payment}
@@ -1361,26 +1358,11 @@ function riderExactOrderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${rows}
      <div class="unifiedBill">
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Sub Total</b></span>
-         <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
-       </div>
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Service Fee 10%</b></span>
-         <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
-       </div>
-       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Additional Store</b></span>
-         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
-       </div>`:""}
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
-         <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
-       </div>
-       <div class="unifiedBillRow unifiedBillGrand">
-         <span class="unifiedBillLabel"><b>Grand Total</b></span>
-         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
-       </div>
+       <div class="unifiedBillRow"><span class="unifiedBillLabel">Sub Total</span><span class="unifiedBillAmount"><b>${peso(f.foodOrder)}</b></span></div>
+       <div class="unifiedBillRow"><span class="unifiedBillLabel">Service Fee 10%</span><span class="unifiedBillAmount"><b>${peso(f.serviceFee)}</b></span></div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow"><span class="unifiedBillLabel">Additional Store</span><span class="unifiedBillAmount"><b>${peso(f.secondStoreFee)}</b></span></div>`:""}
+       <div class="unifiedBillRow"><span class="unifiedBillLabel">Delivery Fee</span><span class="unifiedBillAmount"><b>${peso(f.deliveryFee)}</b></span></div>
+       <div class="unifiedBillRow unifiedBillGrand"><span class="unifiedBillLabel"><b>Grand Total</b></span><span class="unifiedBillAmount"><b>${peso(f.total)}</b></span></div>
      </div>
    </div>
  </div>`;
@@ -1751,6 +1733,39 @@ setTimeout(function(){
   setInterval(()=>{ const now=day(); try { const last=localStorage.getItem(key); if(last!==now){ localStorage.setItem(key,now); refreshDailyView(); location.reload(); } }catch(e){} },60000);
 })();
 </script>
+
+<style id="MHAC_RIDER_ADMIN_SAME_FLOW_FINAL">
+.riderExactDetailWrap .orderDetailPanel{
+  border:3px solid #222!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  background:#fff!important;
+}
+.riderExactDetailWrap .orderDetailPayment{
+  margin-top:8px!important;
+  padding:10px 0!important;
+  border-top:1px solid #ddd!important;
+  border-bottom:1px solid #ddd!important;
+  font-size:16px!important;
+  line-height:1.4!important;
+}
+.riderExactDetailWrap .unifiedStoreCard{
+  margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;
+}
+.riderExactDetailWrap .unifiedStoreName{font-size:22px!important;font-weight:900!important;padding:10px 0 8px!important;border-bottom:1px solid #ddd!important}
+.riderExactDetailWrap .unifiedCategoryName{font-size:18px!important;font-weight:800!important;padding:8px 0!important;border-bottom:1px solid #ddd!important}
+.riderExactDetailWrap .unifiedFoodRow{padding:8px 0!important;border-bottom:1px solid #eee!important}
+.riderExactDetailWrap .unifiedFoodName{font-size:17px!important;line-height:1.3!important}
+.riderExactDetailWrap .unifiedChoice{padding-left:0!important;font-size:15px!important;line-height:1.45!important}
+.riderExactDetailWrap .unifiedChoice b{font-size:16px!important}
+.riderExactDetailWrap .unifiedStoreDivider{border-top:1px solid #ddd!important;margin:10px 0!important}
+.riderExactDetailWrap .unifiedBill{border-top:1px solid #ddd!important;margin-top:12px!important;padding-top:14px!important;font-size:17px!important;line-height:2!important}
+.riderExactDetailWrap .unifiedBillRow{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;gap:16px!important;min-height:34px!important;box-sizing:border-box!important}
+.riderExactDetailWrap .unifiedBillLabel{flex:1 1 auto!important;min-width:0!important;text-align:left!important}
+.riderExactDetailWrap .unifiedBillAmount{flex:0 0 auto!important;min-width:105px!important;text-align:right!important;white-space:nowrap!important}
+.riderExactDetailWrap .unifiedBillGrand{margin-top:6px!important;padding-top:8px!important;border-top:2px solid #777!important;font-size:20px!important;line-height:1.5!important;min-height:42px!important}
+</style>
+
 </body></html>
 
 <script>
@@ -1781,56 +1796,4 @@ body{font-size:15px!important;line-height:1.35!important}
 .riderCustomerName{font-size:24px!important;line-height:1.15!important;font-weight:800!important}
 .riderChatBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
 .riderActionTop .nav,.riderActionTop button,.riderActionBottom button{font-size:13px!important}
-</style>
-
-<style id="MHAC_RIDER_ADMIN_EXACT_FLOW_FINAL">
-.orderDetailPanel{
-  border:3px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  background:#fff!important;
-}
-.orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
-.unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
-  border-top:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.45!important;
-}
-.unifiedBillRow{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  padding:8px 0!important;
-}
-.unifiedBillLabel{flex:1 1 auto!important;min-width:0!important;text-align:left!important}
-.unifiedBillAmount{
-  flex:0 0 auto!important;
-  min-width:92px!important;
-  text-align:right!important;
-  white-space:nowrap!important;
-  font-weight:700!important;
-}
-.unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
-}
 </style>
