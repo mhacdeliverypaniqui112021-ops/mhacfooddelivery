@@ -1672,17 +1672,17 @@ function customerTruthOrderDetailHtml(o){
          <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
        </div>
        <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Service Fee 10%</b></span>
+         <span class="unifiedBillLabel"><b>10% Service Fee</b></span>
          <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
        </div>
-       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Additional Store</b></span>
-         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
-       </div>`:""}
        <div class="unifiedBillRow">
          <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
          <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
        </div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>2nd Store Fee</b></span>
+         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
+       </div>`:""}
        <div class="unifiedBillRow unifiedBillGrand">
          <span class="unifiedBillLabel"><b>Grand Total</b></span>
          <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
@@ -2272,10 +2272,26 @@ function customerUnifiedOrderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${rows}
      <div class="unifiedBill">
-       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
-       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
-       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
-       <b>Grand Total: ${peso(f.total)}</b>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Sub Total</span>
+         <span class="unifiedBillAmount"><b>${peso(f.foodOrder)}</b></span>
+       </div>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Service Fee 10%</span>
+         <span class="unifiedBillAmount"><b>${peso(f.serviceFee)}</b></span>
+       </div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Additional Store</span>
+         <span class="unifiedBillAmount"><b>${peso(f.secondStoreFee)}</b></span>
+       </div>`:""}
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Delivery Fee</span>
+         <span class="unifiedBillAmount"><b>${peso(f.deliveryFee)}</b></span>
+       </div>
+       <div class="unifiedBillRow unifiedBillGrand">
+         <span class="unifiedBillLabel"><b>Grand Total</b></span>
+         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
+       </div>
      </div>
    </div>
  </div>`;
@@ -2342,52 +2358,45 @@ setTimeout(function(){
   }catch(_){}
 },4500);
 window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY FORCE FIX";\n</script>
-</body></html>
 
-<style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
-.customerUnifiedDetailWrap .orderDetailPanel{
-  border:3px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
+<style id="MHAC_CUSTOMER_ADMIN_PAYMENT_SPACING_FINAL">
 .customerUnifiedDetailWrap .unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
   border-top:1px solid #ddd!important;
+  margin-top:12px!important;
+  padding-top:14px!important;
+  font-size:17px!important;
+  line-height:2!important;
 }
 .customerUnifiedDetailWrap .unifiedBillRow{
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
-  gap:14px!important;
-  padding:8px 0!important;
+  width:100%!important;
+  gap:16px!important;
+  padding:0!important;
+  margin:0!important;
+  min-height:34px!important;
+  box-sizing:border-box!important;
+}
+.customerUnifiedDetailWrap .unifiedBillLabel{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  text-align:left!important;
 }
 .customerUnifiedDetailWrap .unifiedBillAmount{
-  min-width:92px!important;
+  flex:0 0 auto!important;
+  min-width:105px!important;
   text-align:right!important;
   white-space:nowrap!important;
-  font-weight:700!important;
 }
 .customerUnifiedDetailWrap .unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
+  margin-top:6px!important;
+  padding-top:8px!important;
+  border-top:2px solid #777!important;
+  font-size:20px!important;
+  line-height:1.5!important;
+  min-height:42px!important;
 }
 </style>
+
+</body></html>
