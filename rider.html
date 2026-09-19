@@ -585,26 +585,7 @@ h2{font-size:21px!important;line-height:1.15!important}
 .riderItemPrice{font-size:14px!important;font-weight:800!important;margin-left:4px;white-space:nowrap}
 @media(max-width:600px){.riderItemPrice{font-size:14px!important}}
 </style>
-
-<style id="MHAC_SHARED_ORDER_BREAKDOWN_V1">
-.mhacSharedOB{border:4px solid #222!important;border-radius:14px!important;background:#fff!important;padding:12px!important;color:#111!important;box-sizing:border-box!important}
-.mhacSharedOB *{box-sizing:border-box!important}
-.mhacSharedOBCustomer{padding:0 0 12px!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.45!important}
-.mhacSharedOBPayment{padding:12px 0!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.35!important}
-.mhacSharedOBTitle{font-size:22px!important;font-weight:900!important;padding:14px 0 10px!important}
-.mhacSharedOBStore{font-size:22px!important;font-weight:900!important;padding:0 0 8px!important;border-bottom:1px solid #eee!important}
-.mhacSharedOBCategory{font-size:18px!important;font-weight:800!important;padding:10px 0!important;border-bottom:1px solid #eee!important}
-.mhacSharedOBFood{padding:11px 0!important;border-bottom:1px solid #eee!important}
-.mhacSharedOBFoodName{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
-.mhacSharedOBFoodPrice{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
-.mhacSharedOBChoice{padding-left:12px!important;font-size:15px!important;line-height:1.4!important}
-.mhacSharedOBFoodTotal{font-size:16px!important;font-weight:800!important;margin-top:6px!important}
-.mhacSharedOBStoreDivider{border-top:1px solid #ddd!important;margin:10px 0!important}
-.mhacSharedOBBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
-.mhacSharedOBBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important;line-height:1.25!important}
-.mhacSharedOBBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
-</style>
-<style id="MHAC_SHARED_RIDER_DETAIL">.riderSharedDetailWrap{margin:10px 0!important}.riderSharedDetailWrap .mhacSharedOB{width:100%!important}</style></head>
+</head>
 <body>
 <div id="mhacRiderSplash" class="mhacRiderSplash">
   <div class="mhacRiderSplashInner">
@@ -866,8 +847,9 @@ function riderItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=N
 function render(arr){
  if(!arr.length){$("orders").innerHTML='<div class="card"><h3>No assigned orders.</h3><p class="status">New assigned orders will appear here automatically.</p></div>';return}
  $("orders").innerHTML=arr.map(o=>{
-   const st=String(o.status||"ASSIGNED").toUpperCase();
-   return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><div id="rider-order-details-${esc(o.id)}" class="riderSharedDetailWrap">${riderUnifiedOrderDetailHtml(o)}</div><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div><div class="riderChatBottom"><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div></div>`
+ const grouped={};(o.items||[]).forEach(i=>{const s=String(i.store||"").trim()||"Store";(grouped[s] ||= []).push(i);});
+ const items=Object.entries(grouped).map(([store,arr])=>`<div class="riderOrderGroup"><div class="riderStoreName">${esc(store)}</div>${arr.map(i=>{const p=riderItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`<div class="riderParts">Part: ${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}</div>`).join("");const details=[];if(i.category)details.push(`Category: ${esc(i.category)}`);if(i.choice)details.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` + ${peso(i.choicePrice)}`:""}`);(i.choiceGroups||[]).forEach(g=>{const m={};(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(!n)return;(m[n] ||= {n,pr,c:0}).c++;});const opts=Object.values(m).map(v=>`${esc(v.n)}${v.c>1?` ×${v.c}`:""}${v.pr?` + ${peso(v.pr)}`:""}`).join(", ");if(opts)details.push(`${esc(g.group||"Choice")}: ${opts}`)});if(i.addOns?.length)details.push(`Add-ons: ${i.addOns.map(a=>{const n=typeof a==="string"?a:a?.name;const pr=typeof a==="string"?0:Number(a?.price||0);return `${esc(n)}${pr?` + ${peso(pr)}`:""}`}).join(", ")}`);return `<div class="riderFoodRow"><div class="riderFoodName"><b>${p.qty}x ${esc(i.name||"Food")}</b>${details.map(x=>`<div class="riderChoice">${x}</div>`).join("")}${parts}<div class="riderChoice"><b>Line Total: ${peso(p.line)}</b></div></div></div>`}).join("")}</div>`).join("");
+ return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Sub Total:</b> ${peso(o.fees?.foodOrder)}<br><b>10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Delivery Fee:</b> ${peso(o.fees?.deliveryFee)}<br><b>Grand Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div><div class="riderChatBottom"><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div></div>`
  }).join("")
 }
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
@@ -982,20 +964,10 @@ function startOrdersListener(){
    for(const o of active)if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
    render(active);syncRiderChatWatchers(active);$("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
  }
- // PRIMARY: complete order snapshot under rider UID. No /orders query is required.
- listeners.push(onSnapshot(collection(db,"riderInbox",uid,"orders"),snap=>{
-   const ids=new Set();
-   snap.docs.forEach(d=>{const a=d.data()||{},base=(a.order&&typeof a.order==="object")?a.order:a,id=String(a.orderId||base.id||d.id),au=String(base.assignedRiderUid||base.riderUid||a.assignedRiderUid||""),ae=String(base.assignedRiderEmail||base.riderEmail||a.assignedRiderEmail||"").trim().toLowerCase();if(id&&(au===riderUidForSync||(riderEmail&&ae===riderEmail))){buckets.set(id,{...base,id});ids.add(id)}});
-   for(const id of [...buckets.keys()])if(!ids.has(id)&&!orderWatchers.has(id))buckets.delete(id);
-   $("conn").textContent="🟢 LIVE INBOX — "+ids.size+" assigned";
-   paint();
- },e=>{
-   const code=e?.code||"unknown";
-   const msg=e?.message||String(e);
-   console.error("Dedicated riderInbox ERROR",e);
-   $("conn").textContent="❌ RIDER INBOX ERROR — "+code;
-   console.warn("Dedicated riderInbox unavailable; canonical fallback active",e);
- }));
+ // PRIMARY rider inbox is intentionally skipped here. The current Firestore rules
+ // return permission-denied for riderInbox/{uid}/orders. Use the canonical assigned
+ // order queries below so a denied private index cannot break the Rider dashboard.
+ $("conn").textContent="🟢 LIVE — checking assigned orders";
  // SECONDARY: canonical assigned-field queries for older orders.
  for(const [field,value] of [["assignedRiderUid",uid],["riderUid",uid],["assignedRiderEmail",riderEmail],["riderEmail",riderEmail]]){
    if(!value)continue;
