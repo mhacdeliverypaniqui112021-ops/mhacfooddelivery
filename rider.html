@@ -846,12 +846,78 @@ function businessDayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMon
 function riderItemPricing(i){const qty=Math.max(1,Number(i.qty||1));const base=Number(i.basePrice!=null?i.basePrice:i.price||0);const extras=[];if(i.choice)extras.push({name:i.choice,price:Number(i.choicePrice||0),label:"Drink"});if(i.bucketChoice)extras.push({name:i.bucketChoice,price:Number(i.bucketChoicePrice||0),label:"Choice"});(i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:g.group||"Choice"})}));(i.addOns||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(n)extras.push({name:n,price:pr,label:"Add-on"})});let extraTotal=extras.reduce((a,x)=>a+x.price,0);let unit=base+extraTotal;if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);return{qty,base,extras,unit,line:unit*qty};}
 function render(arr){
  if(!arr.length){$("orders").innerHTML='<div class="card"><h3>No assigned orders.</h3><p class="status">New assigned orders will appear here automatically.</p></div>';return}
+ const money=v=>peso(Number(v||0));
+ const categoryOf=i=>{
+   const candidates=[i.category,i.categoryName,i.category_name,i.menuCategory,i.menuCategoryName,i.cat];
+   for(const v of candidates){const x=String(v||'').trim();if(x && x.toLowerCase()!=='category name')return x}
+   return 'Category Name';
+ };
+ const choiceLines=i=>{
+   const lines=[];
+   if(i.choice){lines.push({n:String(i.choice),p:Number(i.choicePrice||0),q:1});}
+   if(i.bucketChoice){lines.push({n:String(i.bucketChoice),p:Number(i.bucketChoicePrice||0),q:1});}
+   (i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).forEach(x=>lines.push({n:String(x?.name||x),p:0,q:Number(x?.qty||1)}));
+   (i.choiceGroups||[]).forEach(g=>{
+     const m={};
+     (g.options||[]).forEach(x=>{
+       const n=typeof x==='string'?x:x?.name;
+       const pr=typeof x==='string'?0:Number(x?.price||0);
+       if(!n)return;
+       const k=String(n); (m[k] ||= {n:k,p:pr,q:0}).q++;
+     });
+     Object.values(m).forEach(v=>lines.push(v));
+   });
+   (i.addOns||[]).forEach(x=>{
+     const n=typeof x==='string'?x:x?.name,pr=typeof x==='string'?0:Number(x?.price||0);
+     if(n)lines.push({n:String(n),p:pr,q:1});
+   });
+   return lines;
+ };
+ const groups={};
+ (arr.length?arr:[]).forEach(o=>{});
  $("orders").innerHTML=arr.map(o=>{
- const grouped={};(o.items||[]).forEach(i=>{const s=String(i.store||"").trim()||"Store";(grouped[s] ||= []).push(i);});
- const items=Object.entries(grouped).map(([store,arr])=>`<div class="riderOrderGroup"><div class="riderStoreName">${esc(store)}</div>${arr.map(i=>{const p=riderItemPricing(i);const parts=(i.chickenParts||[]).filter(x=>Number(x.qty||1)>0).map(x=>`<div class="riderParts">Part: ${esc(x.name||x)}${Number(x.qty||1)>1?` ×${Number(x.qty||1)}`:""}</div>`).join("");const details=[];if(i.category)details.push(`Category: ${esc(i.category)}`);if(i.choice)details.push(`Drink: ${esc(i.choice)}${Number(i.choicePrice||0)?` + ${peso(i.choicePrice)}`:""}`);(i.choiceGroups||[]).forEach(g=>{const m={};(g.options||[]).forEach(x=>{const n=typeof x==="string"?x:x?.name;const pr=typeof x==="string"?0:Number(x?.price||0);if(!n)return;(m[n] ||= {n,pr,c:0}).c++;});const opts=Object.values(m).map(v=>`${esc(v.n)}${v.c>1?` ×${v.c}`:""}${v.pr?` + ${peso(v.pr)}`:""}`).join(", ");if(opts)details.push(`${esc(g.group||"Choice")}: ${opts}`)});if(i.addOns?.length)details.push(`Add-ons: ${i.addOns.map(a=>{const n=typeof a==="string"?a:a?.name;const pr=typeof a==="string"?0:Number(a?.price||0);return `${esc(n)}${pr?` + ${peso(pr)}`:""}`}).join(", ")}`);return `<div class="riderFoodRow"><div class="riderFoodName"><b>${p.qty}x ${esc(i.name||"Food")}</b>${details.map(x=>`<div class="riderChoice">${x}</div>`).join("")}${parts}<div class="riderChoice"><b>Line Total: ${peso(p.line)}</b></div></div></div>`}).join("")}</div>`).join("");
- return `<div class="order"><div class="row"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"ASSIGNED")}</span></div><h2 class="riderCustomerName">${esc(o.customer?.name||"")}</h2><p>${o.customer?.contact ? `<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,""))}">📞 ${esc(o.customer.contact)}</a>` : "📞 No contact number"}<br>📍 ${esc(o.customer?.gps?.display||"Customer location")}</p><p>${items}</p><p><b>Sub Total:</b> ${peso(o.fees?.foodOrder)}<br><b>10% Service Fee:</b> ${peso(o.fees?.serviceFee)}<br><b>Delivery Fee:</b> ${peso(o.fees?.deliveryFee)}<br><b>Grand Total:</b> ${peso(o.fees?.total)}</p><div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a></div><div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div><div class="riderChatBottom"><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div></div>`
- }).join("")
+   const stores={};
+   (o.items||[]).forEach(i=>{const st=String(i.store||i.storeName||'STORE').trim()||'STORE';(stores[st] ||= []).push(i);});
+   const storeBlocks=Object.entries(stores).map(([store,items])=>{
+     const cats={}; items.forEach(i=>{const c=categoryOf(i);(cats[c] ||= []).push(i);});
+     const catBlocks=Object.entries(cats).map(([cat,catItems])=>{
+       const foodHtml=catItems.map(i=>{
+         const p=riderItemPricing(i);
+         const choices=choiceLines(i);
+         const choiceHtml=choices.map(x=>`<div style="margin-left:18px;font-weight:400">${x.q>1?x.q+'x ': '1x '}${esc(x.n)}${x.p?` + ${money(x.p)}`:''}</div>`).join('');
+         return `<div style="padding:14px 0;border-bottom:1px solid #eee"><div style="font-weight:800;font-size:18px">${p.qty}x ${esc(i.name||'Food')}</div><div style="font-weight:800;font-size:18px">${money(p.base*p.qty)}</div>${choiceHtml}<div style="font-weight:800;font-size:17px;margin-top:8px">Food Total: ${money(p.line)}</div></div>`;
+       }).join('');
+       return `<div><div style="font-weight:800;font-size:18px;padding:12px 0;border-bottom:1px solid #eee">${esc(cat)}</div>${foodHtml}</div>`;
+     }).join('');
+     return `<div><div style="font-weight:900;font-size:27px;padding:13px 0;border-bottom:1px solid #ddd">${esc(store)}</div>${catBlocks}</div>`;
+   }).join('');
+   const f=o.fees||{};
+   const additional=Number(f.additionalStoreFee||f.secondStoreFee||f.storeFee||0);
+   const foodTotal=Number(f.foodOrder||f.subTotal||0);
+   const service=Number(f.serviceFee||0),delivery=Number(f.deliveryFee||0),grand=Number(f.total||0);
+   return `<div class="order" style="background:#fff;border:4px solid #222;border-radius:18px;padding:20px;margin:10px 0;box-sizing:border-box">
+     <div style="font-size:18px;font-weight:900">${esc(o.orderNo||o.id)}</div>
+     <div style="font-size:28px;font-weight:900;margin:8px 0 10px">${esc(o.status||'ASSIGNED')}</div>
+     <div style="font-size:18px;line-height:1.5">📞 ${o.customer?.contact?`<a class="customerPhone" href="tel:${esc(String(o.customer.contact).replace(/[^0-9+]/g,''))}">${esc(o.customer.contact)}</a>`:'No contact number'}<br>📍 ${esc(o.customer?.gps?.display||o.customer?.address||'Customer location')}</div>
+     <hr style="border:0;border-top:1px solid #eee;margin:14px 0">
+     <div style="font-size:18px;font-weight:900;margin-bottom:14px">💵 CASH ON DELIVERY</div>
+     <hr style="border:0;border-top:1px solid #eee;margin:0 0 14px">
+     <div style="font-size:26px;font-weight:900;margin-bottom:10px">🧾 ORDER BREAKDOWN</div>
+     ${storeBlocks}
+     <div style="border-top:1px solid #ddd;margin-top:12px;padding-top:14px;font-size:17px;line-height:2">
+       <div style="display:flex;justify-content:space-between"><span>Sub Total</span><b>${money(foodTotal)}</b></div>
+       <div style="display:flex;justify-content:space-between"><span>Service Fee 10%</span><b>${money(service)}</b></div>
+       ${additional?`<div style="display:flex;justify-content:space-between"><span>Additional Store</span><b>${money(additional)}</b></div>`:''}
+       <div style="display:flex;justify-content:space-between"><span>Delivery Fee</span><b>${money(delivery)}</b></div>
+       <div style="border-top:2px solid #777;margin-top:6px;padding-top:8px;display:flex;justify-content:space-between;font-size:20px"><b>Grand Total</b><b>${money(grand)}</b></div>
+     </div>
+   </div>
+   <div class="riderActionTop"><a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a><a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||'').replace(/[^0-9+]/g,''))}" ${o.customer?.contact?'':'aria-disabled=true'}>📞 CALL CUSTOMER</a></div>
+   <div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div>
+   <div class="riderChatBottom"><button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button></div>`;
+ }).join('');
 }
+
 let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
 let authFlowBusy=false,authFlowUid="";
 async function playRiderChatAlert(){
