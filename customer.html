@@ -1410,13 +1410,14 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or search the manual delivery location below without Google Maps billing.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or search the manual delivery location below.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
 <div class="manualLocationBox" id="manualLocationBox">
   <b>🔎 MANUAL DELIVERY LOCATION — WAZE STYLE</b><br>
   <span class="small">Type anything — street, school, store, market, barangay, building, mall or landmark — then select the matching place with its address.</span>
   <input id="manualLocationInput" type="text" placeholder="Search street, school, store, market, barangay, building or place…" autocomplete="off" enterkeyhint="search">
   <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
   <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
+  <button type="button" id="manualChangeBtn" style="display:none;margin-top:8px;padding:9px 12px;border:1px solid #222;border-radius:8px;background:#fff;font-weight:700">↔ CHANGE LOCATION MODE</button>
 </div>
 <button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
@@ -2025,17 +2026,42 @@ function updateTotals(){
  </div>`;
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
-async function calculateByGPS(e){
+async function setLocationMode(mode){
+ const gpsBtn=$("gpsBtn"), manualBox=byId("manualLocationBox"), input=byId("manualLocationInput"), change=byId("manualChangeBtn");
+ if(mode==="GPS"){
+   if(gpsBtn)gpsBtn.disabled=false;
+   if(input){input.disabled=true;input.placeholder="Manual search disabled while GPS is selected.";}
+   if(manualBox){manualBox.style.opacity="0.58";manualBox.style.pointerEvents="none";}
+   if(change){change.style.display="block";change.textContent="↔ CHANGE TO MANUAL LOCATION";}
+ }else if(mode==="MANUAL"){
+   if(gpsBtn){gpsBtn.disabled=true;gpsBtn.textContent="📍 GPS DISABLED — MANUAL SELECTED";}
+   if(input){input.disabled=false;input.placeholder="Search street, school, store, market, barangay, building or place…";}
+   if(manualBox){manualBox.style.opacity="1";manualBox.style.pointerEvents="auto";}
+   if(change){change.style.display="block";change.textContent="↔ CHANGE TO GPS LOCATION";}
+ }else{
+   if(gpsBtn){gpsBtn.disabled=false;gpsBtn.textContent="📍 ALLOW GPS LOCATION";}
+   if(input){input.disabled=false;input.placeholder="Search street, school, store, market, barangay, building or place…";}
+   if(manualBox){manualBox.style.opacity="1";manualBox.style.pointerEvents="auto";}
+   if(change)change.style.display="none";
+ }
+}
+function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
+ if(manualLocationSelected){
+   $("locStatus").textContent="Manual location is selected. Change location mode first if you want GPS.";
+   return;
+ }
+ try{setLocationMode("GPS")}catch(_){}
  const btn=$("gpsBtn");
- if(!window.isSecureContext){$("locStatus").textContent="❌ GPS requires HTTPS. Please open the GitHub Pages HTTPS link.";return}
- if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";return}
- btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
+ if(!window.isSecureContext){$("locStatus").textContent="❌ GPS requires HTTPS. Please open the GitHub Pages HTTPS link.";setLocationMode(null);return}
+ if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";setLocationMode(null);return}
+ btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$('locStatus').textContent="Requesting GPS permission…";$('gpsLocationDisplay').textContent="";$('gpsAccuracy').textContent="";
  navigator.geolocation.getCurrentPosition(async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
+   manualLat=null;manualLon=null;manualLabel="";manualLocationSelected=false;
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
-   $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
+   $("locStatus").textContent="GPS location detected. Manual search is disabled while GPS is selected.";
    $("calculateFeeBtn").disabled=false;
    btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
    try{
@@ -2047,7 +2073,7 @@ async function calculateByGPS(e){
    }
  },err=>{
    gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
-   btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
+   setLocationMode(null);
    const msg={1:"Location permission was denied. Please allow Location for Chrome.",2:"GPS position is unavailable. Turn on phone Location and try again.",3:"GPS request timed out. Move to an open area and try again."}[err.code]||"Unable to get GPS location.";
    $("locStatus").textContent="❌ "+msg;
    $("gpsLocationDisplay").textContent="";
@@ -2401,7 +2427,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <script id="MHAC_MANUAL_LOCATION_V4_1_101_WAZE_STYLE_UNIVERSAL">
 (function(){
   "use strict";
-  // V4.1.101: Waze-style universal manual place/address search, NO BILLING.
+  // V4.1.101: Waze-style universal manual place/address search, .
   // GPS remains separate. Manual selection stores its own coordinates and only
   // becomes the order destination after the customer explicitly selects it.
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
@@ -2451,60 +2477,75 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
       lat>=MHAC_SEARCH_BOX.latMin&&lat<=MHAC_SEARCH_BOX.latMax&&
       lon>=MHAC_SEARCH_BOX.lonMin&&lon<=MHAC_SEARCH_BOX.lonMax;
   }
+  function normalizeQuery(q){return String(q||"").toLowerCase().replace(/[^a-z0-9\s.-]/g," ").replace(/\s+/g," ").trim()}
+  function queryInfo(q){
+    const n=normalizeQuery(q), toks=n.split(" ").filter(t=>t.length>=2);
+    const street=/\b(st|street|str|road|rd|avenue|ave|highway|hwy|drive|dr|lane|ln|boulevard|blvd)\.?\b/i.test(n);
+    const school=/\b(school|college|academy|elementary|high school|university|univ)\b/i.test(n);
+    const market=/\b(market|palengke|grocery|supermarket)\b/i.test(n);
+    const barangay=/\b(barangay|brgy)\b/i.test(n);
+    const building=/\b(building|bldg|mall|plaza|center|centre|hospital|clinic|church|chapel|store|shop|pharmacy|botika|restaurant)\b/i.test(n);
+    return {n,toks,street,school,market,barangay,building};
+  }
   function score(x,q){
-    const needle=q.toLowerCase().replace(/[.,]/g," ").replace(/\s+/g," ").trim();
-    const hay=(String(x.name||"")+" "+String(x.display_name||"")+" "+String(x.shortAddress||"")).toLowerCase();
-    const tokens=needle.split(" ").filter(t=>t.length>=2);
-    let s=0;
-    if(String(x.name||"").toLowerCase()===needle)s+=1000;
-    if(String(x.name||"").toLowerCase().includes(needle))s+=500;
-    for(const t of tokens){
-      if(String(x.name||"").toLowerCase().includes(t))s+=90;
-      if(hay.includes(t))s+=20;
+    const qi=queryInfo(q), name=normalizeQuery(x.name), hay=normalizeQuery((x.name||"")+" "+(x.display_name||"")+" "+(x.shortAddress||""));
+    let s=0, hits=0;
+    if(name===qi.n)s+=1600;
+    if(name.includes(qi.n))s+=900;
+    for(const t of qi.toks){
+      if(name.includes(t)){s+=180;hits++} else if(hay.includes(t)){s+=55;hits++}
     }
+    const streetHit=/\b(street|st|road|rd|avenue|ave|highway|hwy|drive|dr|lane|ln|boulevard|blvd)\b/i.test(hay);
+    const schoolHit=/school|college|academy|elementary|university|high school/i.test(hay);
+    if(qi.street){
+      if(streetHit)s+=700; else s-=900;
+      for(const t of qi.toks.filter(t=>!['st','street','str','road','rd','avenue','ave','highway','hwy','drive','dr','lane','ln','boulevard','blvd'].includes(t))) if(hay.includes(t))s+=120;
+    }
+    if(qi.school){if(schoolHit)s+=650; else s-=1200;}
+    if((qi.market||qi.building)&&!schoolHit){/* keep category relevance from provider text */}
+    if(qi.toks.length && hits===0)s-=1200;
     const dLat=Number(x.lat)-MHAC_MAPS_CENTER.lat,dLon=Number(x.lon)-MHAC_MAPS_CENTER.lng;
-    s-=Math.sqrt(dLat*dLat+dLon*dLon)*20;
+    s-=Math.sqrt(dLat*dLat+dLon*dLon)*12;
     return s;
   }
+  function canonicalName(v){return normalizeQuery(v).replace(/\b(inc|incorporated|foundation|corp|corporation|company|co|ltd)\b/g," ").replace(/\s+/g," ").trim()}
+  function canonicalAddress(v){return normalizeQuery(v).replace(/\bphilippines\b/g," ").replace(/\s+/g," ").trim()}
   function dedupe(arr,q){
-    const seen=new Set(),out=[];
+    const out=[];
     for(const x of arr){
       if(!inCoverage(x))continue;
-      const lat=Number(x.lat),lon=Number(x.lon);
-      if(!Number.isFinite(lat)||!Number.isFinite(lon))continue;
-      const key=(String(x.name||"")+"|"+String(x.display_name||"")+"|"+lat.toFixed(5)+"|"+lon.toFixed(5)).toLowerCase();
-      if(seen.has(key))continue;
-      seen.add(key);out.push({...x,_score:score(x,q)});
+      const lat=Number(x.lat),lon=Number(x.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon))continue;
+      const sc=score(x,q); if(sc<0)continue;
+      const n=canonicalName(x.name),a=canonicalAddress(x.shortAddress||x.display_name);
+      const dup=out.find(y=>canonicalName(y.name)===n && (canonicalAddress(y.shortAddress||y.display_name)===a || Math.hypot(Number(y.lat)-lat,Number(y.lon)-lon)<0.00035));
+      if(dup){if(sc>(dup._score||-Infinity))Object.assign(dup,x,{_score:sc});continue;}
+      out.push({...x,_score:sc});
     }
-    return out.sort((a,b)=>b._score-a._score).slice(0,10);
+    const qi=queryInfo(q);
+    out.sort((a,b)=>b._score-a._score);
+    // Street searches intentionally keep multiple different places on the same street.
+    if(qi.street){
+      const streetToken=qi.toks.filter(t=>!['st','street','str','road','rd','avenue','ave','highway','hwy','drive','dr','lane','ln','boulevard','blvd'].includes(t));
+      const filtered=out.filter(x=>streetToken.every(t=>normalizeQuery((x.shortAddress||"")+" "+(x.display_name||"")).includes(t)));
+      if(filtered.length)return filtered.slice(0,15);
+    }
+    return out.slice(0,10);
   }
   async function fetchNominatim(q){
-    const terms=[
-      q+", Paniqui, Tarlac, Philippines",
-      q+", Tarlac, Philippines",
-      q
-    ];
+    const qi=queryInfo(q), terms=[q+", Paniqui, Tarlac, Philippines",q+", Tarlac, Philippines",q];
+    if(qi.street){terms.push(q+", Poblacion Norte, Paniqui, Tarlac, Philippines",q+", Poblacion Sur, Paniqui, Tarlac, Philippines);}
     const all=[];
-    for(const term of terms){
-      try{
-        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=ph&q="+encodeURIComponent(term);
-        const r=await fetch(url,{headers:{Accept:"application/json"}});
-        if(r.ok){
-          const a=await r.json();
-          if(Array.isArray(a))all.push(...a.map(normalizeNominatim));
-        }
-      }catch(_){}
-    }
+    for(const term of terms){try{
+      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=20&countrycodes=ph&q="+encodeURIComponent(term);
+      const r=await fetch(url,{headers:{Accept:"application/json"}}); if(r.ok){const a=await r.json();if(Array.isArray(a))all.push(...a.map(normalizeNominatim));}
+    }catch(_){} }
     return all;
   }
   async function fetchPhoton(q){
     try{
-      const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q+", Paniqui, Tarlac, Philippines")+
-        "&limit=15&lat="+MHAC_MAPS_CENTER.lat+"&lon="+MHAC_MAPS_CENTER.lng+"&location_bias_scale=0.35";
-      const r=await fetch(url,{headers:{Accept:"application/json"}});
-      if(!r.ok)return [];
-      const j=await r.json();
-      return Array.isArray(j?.features)?j.features.map(normalizePhoton):[];
+      const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q+", Paniqui, Tarlac, Philippines")+"&limit=30&lat="+MHAC_MAPS_CENTER.lat+"&lon="+MHAC_MAPS_CENTER.lng+"&location_bias_scale=0.35";
+      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)return [];
+      const j=await r.json();return Array.isArray(j?.features)?j.features.map(normalizePhoton):[];
     }catch(_){return []}
   }
   function resultType(x){
@@ -2557,15 +2598,17 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     // IMPORTANT: do NOT overwrite gpsLat/gpsLon.
     manualLat=lat;manualLon=lon;manualLabel=String(x.name||x.display_name||"").trim();
     manualLocationSelected=true;
+    gpsLat=null;gpsLon=null;gpsAccuracy=null;
+    setLocationMode("MANUAL");
     distanceKm=null;deliveryFee=null;
 
-    const full=String(x.display_name||x.shortAddress||x.name||"").trim();
+    const full=String(x.shortAddress||x.display_name||x.name||"").replace(/\s*,\s*/g,", ").trim();
     const input=byId("manualLocationInput");
     if(input)input.value=manualLabel;
 
     setStatus("📍 SELECTED MANUAL LOCATION<br><b>"+esc(manualLabel)+"</b><br>"+esc(full),true);
     if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 MANUAL DESTINATION: "+full;
-    if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual place selected. Phone GPS was not changed.";
+    if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual location selected. GPS is disabled until you change location mode.";
     if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
     if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
     clearBox();
@@ -2577,7 +2620,15 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
       clearTimeout(mhacManualTimer);
       mhacManualTimer=setTimeout(searchManual,500);
     });
+    input.addEventListener("focus",()=>{ if(!manualLocationSelected && gpsLat===null) setLocationMode("MANUAL"); });
     input.addEventListener("keydown",e=>{if(e.key==="Escape")clearBox();});
+    const change=byId("manualChangeBtn");
+    if(change)change.addEventListener("click",()=>{
+      if(manualLocationSelected || gpsLat!==null){
+        gpsLat=null;gpsLon=null;gpsAccuracy=null;manualLat=null;manualLon=null;manualLabel="";manualLocationSelected=false;distanceKm=null;deliveryFee=null;
+        $("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";$("feeView").textContent="";$("locStatus").textContent="Choose GPS or manual location.";setLocationMode(null);clearBox();
+      }
+    });
     box.addEventListener("click",e=>{
       const b=e.target.closest("[data-mhac-universal-index]");
       if(!b)return;
@@ -2588,8 +2639,8 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     });
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
-  window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.101 CUSTOMER WAZE-STYLE UNIVERSAL MANUAL LOCATION";
+  window.__MHAC_MANUAL_LOCATION_SEARCH__={search:searchManual,select:selectResult};
+  window.__MHAC_BUILD__="V4.1.102 CUSTOMER UNIVERSAL LOCATION MODE + RELEVANT SEARCH";
 })();
 </script>
 </html>
