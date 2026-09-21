@@ -1315,31 +1315,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .manualLocationSuggestion b{display:block;font-size:15px;line-height:1.2}.manualLocationSuggestion span{display:block;color:#666;font-size:13px;line-height:1.25;margin-top:3px}
 </style></head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
-<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn" type="button" onclick="window.__MHAC_GOOGLE_LOGIN_FALLBACK__&&window.__MHAC_GOOGLE_LOGIN_FALLBACK__()">🔵 CONTINUE WITH GOOGLE</button>
-<script>
-window.__MHAC_GOOGLE_LOGIN_BUSY__=false;
-window.__MHAC_GOOGLE_LOGIN_FALLBACK__=async function(){
-  if(window.__MHAC_GOOGLE_LOGIN_BUSY__)return;
-  window.__MHAC_GOOGLE_LOGIN_BUSY__=true;
-  var b=document.getElementById("googleLogin"),st=document.getElementById("authStatus");
-  if(b)b.disabled=true; if(st)st.textContent="Opening Google sign-in…";
-  try{
-    const [{initializeApp,getApps},{getAuth,setPersistence,browserLocalPersistence,GoogleAuthProvider,signInWithRedirect}]=await Promise.all([
-      import("https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js")
-    ]);
-    const cfg={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
-    const app=getApps().find(x=>x.name==="[DEFAULT]")||initializeApp(cfg);
-    const a=getAuth(app),p=new GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
-    await setPersistence(a,browserLocalPersistence);
-    await signInWithRedirect(a,p);
-  }catch(e){
-    console.error("MHAC Google fallback",e);
-    if(st)st.textContent="❌ "+(e&&e.message?e.message:String(e));
-    if(b)b.disabled=false; window.__MHAC_GOOGLE_LOGIN_BUSY__=false;
-  }
-};
-</script><p id="authStatus" class="status">Google sign-in required.</p></div></div>
+<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn" type="button">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC DELIVERY</div><div class="appName">CUSTOMER APP</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
@@ -1394,7 +1370,7 @@ function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.clas
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import{getFirestore,doc,getDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import{getStorage,ref as storageRef,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-storage.js";
 
@@ -1425,13 +1401,30 @@ async function loadMenu(){
 async function boot(){await loadHours();await loadMenu();applyHours()}
 function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}
 async function customerGoogleLogin(){
-  if(window.__MHAC_GOOGLE_LOGIN_FALLBACK__)return window.__MHAC_GOOGLE_LOGIN_FALLBACK__();
-  const b=$("googleLogin"),st=$("authStatus");if(!b||b.disabled)return;b.disabled=true;st.textContent="Opening Google sign-in…";
-  try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders();}
-  catch(e){console.error("Customer Google sign-in:",e);st.textContent="❌ "+(e?.message||String(e));b.disabled=false}
+  const b=$("googleLogin"),st=$("authStatus");if(!b||b.disabled)return;
+  b.disabled=true;st.textContent="Opening Google sign-in…";
+  try{
+    await setPersistence(auth,browserLocalPersistence);
+    const r=await signInWithPopup(auth,gp);
+    currentUser=r?.user||auth.currentUser;
+    if(!currentUser)throw new Error("Google sign-in completed but no Firebase user was returned.");
+    await boot();
+    startOrders();
+  }catch(e){
+    console.error("Customer Google popup sign-in:",e);
+    const code=e?.code||"";
+    let msg=e?.message||String(e);
+    if(code==="auth/popup-blocked")msg="Google sign-in popup was blocked. Please allow popups for mhacdelivery.devs.surf and try again.";
+    else if(code==="auth/popup-closed-by-user")msg="Google sign-in window was closed. Please try again.";
+    else if(code==="auth/cancelled-popup-request")msg="Google sign-in request was cancelled. Please try again.";
+    else if(code==="auth/unauthorized-domain")msg="This website domain is not authorized in Firebase Authentication.";
+    st.textContent="❌ "+msg;
+  }finally{
+    b.disabled=false;
+  }
 }
 window.__mhacCustomerGoogleLogin=customerGoogleLogin;
-getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
+$("googleLogin").addEventListener("click",customerGoogleLogin,{passive:false});
 
 const GCASH_LOCAL_KEY="mhac_gcash_settings_v432";
 function saveGcashLocal(){
@@ -2215,7 +2208,7 @@ window.openStore=openStore;window.openCat=openCat;window.customize=customize;win
 
 /* V4.1.105: Google Maps-style manual location uses the SAME gpsLat/gpsLon + distance/fee path as device GPS. */
 let manualGeoapifyTimer=null,manualGeoapifyRequestId=0;
-const MHAC_GEOAPIFY_API_KEY="4b41c949caa6454e8576b361d30c2cd2"
+const MHAC_GEOAPIFY_API_KEY="YOUR_GEOAPIFY_API_KEY";
 function clearManualLocation(){ $("manualLocationSelected").textContent=""; $("manualLocationSuggestions").innerHTML=""; $("manualLocationSuggestions").style.display="none"; }
 function geoapifyServiceAreaFilter(){ return "rect:120.30,15.45,120.85,15.90"; }
 async function searchManualGeoapifyLocation(){
@@ -2254,7 +2247,7 @@ function selectManualGeoapifyLocation(feature){
  input.addEventListener("focus",()=>{if(input.value.trim().length>=3)searchManualGeoapifyLocation();});
  document.addEventListener("click",e=>{if(!$("manualLocationBox")?.contains(e.target))box.style.display="none";});
 })();
-window.__MHAC_BUILD__="V4.1.108 CUSTOMER GEOAPIFY + GOOGLE LOGIN DIRECT REDIRECT FALLBACK — GPS/FEE PATH PRESERVED";
+window.__MHAC_BUILD__="V4.1.109 CUSTOMER GOOGLE POPUP-ONLY TEST — GEOAPIFY + GPS/FEE PATH PRESERVED";
 </script>
 
 <script>
