@@ -1383,6 +1383,61 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   border-top:1px solid #ddd!important;
 }
 </style>
+
+<style id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_98">
+.manualLocationBox{
+  margin:7px 0!important;
+  padding:10px!important;
+  border:1px solid #ddd!important;
+  border-radius:10px!important;
+  background:#fff!important;
+}
+.manualLocationBox input{
+  width:100%!important;
+  min-height:48px!important;
+  margin:6px 0 0!important;
+  padding:10px 12px!important;
+  font-size:17px!important;
+  box-sizing:border-box!important;
+}
+.manualLocationSuggestions{
+  display:none;
+  margin-top:6px!important;
+  border:1px solid #ccc!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  overflow:hidden!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.12)!important;
+}
+.manualLocationSuggestion{
+  display:block!important;
+  width:100%!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:9px 11px!important;
+  border:0!important;
+  border-bottom:1px solid #eee!important;
+  border-radius:0!important;
+  background:#fff!important;
+  color:#111!important;
+  text-align:left!important;
+  font-size:15px!important;
+  line-height:1.25!important;
+}
+.manualLocationSuggestion:last-child{border-bottom:0!important}
+.manualLocationSuggestion b{display:block!important;font-size:16px!important}
+.manualLocationSuggestion span{display:block!important;color:#666!important;margin-top:3px!important}
+.manualLocationSelected{
+  margin-top:7px!important;
+  padding:8px!important;
+  border:1px solid #222!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:14px!important;
+  line-height:1.3!important;
+}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1402,7 +1457,15 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or use the Google Maps search below to select a manual delivery location.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
+<div class="manualLocationBox" id="manualLocationBox">
+  <b>🔎 MANUAL DELIVERY LOCATION — GOOGLE MAPS</b><br>
+  <span class="small">Type the street, barangay, landmark or place, then select the exact Google Maps result.</span>
+  <input id="manualLocationInput" type="text" placeholder="Search street, barangay, landmark or place…" autocomplete="off" enterkeyhint="search">
+  <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
+  <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
+</div>
+<button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2361,7 +2424,196 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-</body></html>
+</body>
+<script id="MHAC_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_98">
+(function(){
+  "use strict";
+
+  // V4.1.98: Google Maps-style manual location search.
+  // GPS, OSRM distance calculation, fee formula, cart, choices and order flow are untouched.
+  const MHAC_GOOGLE_MAPS_API_KEY="YOUR_GOOGLE_MAPS_API_KEY";
+  const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
+  let mhacMapsReady=null;
+  let mhacMapsRequestId=0;
+  let mhacManualFeatures=[];
+  let mhacManualSelected=false;
+
+  const byId=id=>document.getElementById(id);
+  const escapeHtml=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+  function setManualStatus(text,show=true){
+    const el=byId("manualLocationSelected");
+    if(!el)return;
+    el.textContent=text||"";
+    el.style.display=show&&text?"block":"none";
+  }
+
+  function clearManualSuggestions(){
+    const box=byId("manualLocationSuggestions");
+    if(box){
+      box.innerHTML="";
+      box.style.display="none";
+    }
+    mhacManualFeatures=[];
+  }
+
+  function loadGoogleMapsPlaces(){
+    if(mhacMapsReady)return mhacMapsReady;
+    mhacMapsReady=new Promise((resolve,reject)=>{
+      if(window.google?.maps?.importLibrary){
+        resolve(window.google.maps);
+        return;
+      }
+      if(MHAC_GOOGLE_MAPS_API_KEY==="YOUR_GOOGLE_MAPS_API_KEY"){
+        reject(new Error("Google Maps API key is not configured."));
+        return;
+      }
+      const existing=document.querySelector('script[data-mhac-google-maps="1"]');
+      if(existing){
+        existing.addEventListener("load",()=>resolve(window.google.maps),{once:true});
+        existing.addEventListener("error",()=>reject(new Error("Google Maps JavaScript API failed to load.")),{once:true});
+        return;
+      }
+      const script=document.createElement("script");
+      script.dataset.mhacGoogleMaps="1";
+      script.async=true;
+      script.defer=true;
+      script.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(MHAC_GOOGLE_MAPS_API_KEY)+"&v=weekly&loading=async";
+      script.onload=()=>window.google?.maps?.importLibrary
+        ?resolve(window.google.maps)
+        :reject(new Error("Google Maps Places library is unavailable."));
+      script.onerror=()=>reject(new Error("Google Maps JavaScript API failed to load."));
+      document.head.appendChild(script);
+    });
+    return mhacMapsReady;
+  }
+
+  async function searchGoogleMapsManualLocation(){
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    const q=(input?.value||"").trim();
+    if(!box)return;
+    if(q.length<3){
+      clearManualSuggestions();
+      return;
+    }
+    const requestId=++mhacMapsRequestId;
+    try{
+      const maps=await loadGoogleMapsPlaces();
+      const {AutocompleteSuggestion}=await maps.importLibrary("places");
+      if(requestId!==mhacMapsRequestId)return;
+
+      const request={
+        input:q,
+        language:"en",
+        region:"PH",
+        includedRegionCodes:["ph"],
+        locationBias:{center:MHAC_MAPS_CENTER,radius:50000}
+      };
+      const result=await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+      if(requestId!==mhacMapsRequestId)return;
+
+      const suggestions=Array.isArray(result?.suggestions)?result.suggestions:[];
+      mhacManualFeatures=suggestions;
+      if(!suggestions.length){
+        box.innerHTML='<div style="padding:10px;color:#666">No Google Maps result found.</div>';
+        box.style.display="block";
+        return;
+      }
+
+      box.innerHTML=suggestions.slice(0,8).map((s,i)=>{
+        const p=s?.placePrediction;
+        const main=p?.mainText?.text||p?.text?.text||"Location";
+        const secondary=p?.secondaryText?.text||"";
+        return `<button type="button" class="manualLocationSuggestion" data-mhac-map-index="${i}">
+          <b>${escapeHtml(main)}</b><span>${escapeHtml(secondary)}</span>
+        </button>`;
+      }).join("");
+      box.style.display="block";
+    }catch(e){
+      if(requestId!==mhacMapsRequestId)return;
+      box.innerHTML='<div style="padding:10px;color:#a00000">Google Maps search unavailable. Check the Maps API key/API setup.</div>';
+      box.style.display="block";
+      console.warn("MHAC Google Maps manual location:",e);
+    }
+  }
+
+  async function selectGoogleMapsManualLocation(index){
+    const suggestion=mhacManualFeatures[index];
+    if(!suggestion?.placePrediction)return;
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    try{
+      const maps=await loadGoogleMapsPlaces();
+      const place=suggestion.placePrediction.toPlace();
+      await place.fetchFields({fields:["displayName","formattedAddress","location"]});
+      const lat=Number(place?.location?.lat?.());
+      const lon=Number(place?.location?.lng?.());
+      if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new Error("Google Maps result has no coordinates.");
+
+      // Reuse the existing GPS variables so the exact same OSRM/fee/order path is used.
+      gpsLat=lat;
+      gpsLon=lon;
+      gpsAccuracy=null;
+      distanceKm=null;
+      deliveryFee=null;
+      mhacManualSelected=true;
+
+      const label=String(place?.formattedAddress||place?.displayName?.text||input?.value||"").trim();
+      if(input)input.value=label;
+      setManualStatus("📍 SELECTED GOOGLE MAPS LOCATION: "+label,true);
+      if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
+      if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual Google Maps location selected.";
+      if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
+      if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
+      clearManualSuggestions();
+    }catch(e){
+      setManualStatus("❌ Unable to use this Google Maps result.",true);
+      console.warn("MHAC Google Maps selection:",e);
+    }
+  }
+
+  function installManualLocation(){
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    if(!input||!box)return;
+
+    let timer=null;
+    input.addEventListener("input",()=>{
+      mhacManualSelected=false;
+      setManualStatus("",false);
+      clearTimeout(timer);
+      timer=setTimeout(searchGoogleMapsManualLocation,220);
+    });
+
+    input.addEventListener("keydown",e=>{
+      if(e.key==="Escape"){
+        clearManualSuggestions();
+        input.blur();
+      }
+    });
+
+    box.addEventListener("click",e=>{
+      const b=e.target.closest("[data-mhac-map-index]");
+      if(!b)return;
+      e.preventDefault();
+      selectGoogleMapsManualLocation(Number(b.dataset.mhacMapIndex));
+    });
+
+    document.addEventListener("click",e=>{
+      if(!e.target.closest("#manualLocationBox"))clearManualSuggestions();
+    });
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installManualLocation,{once:true});
+  else installManualLocation();
+
+  window.__MHAC_GOOGLE_MAPS_MANUAL_LOCATION__={
+    search:searchGoogleMapsManualLocation,
+    select:selectGoogleMapsManualLocation,
+    load:loadGoogleMapsPlaces
+  };
+  window.__MHAC_BUILD__="V4.1.98 CUSTOMER GOOGLE MAPS MANUAL LOCATION — V4.1.97 BASE PRESERVED";
+})();
+</script>
+</html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
 .customerUnifiedDetailWrap .orderDetailPanel{
