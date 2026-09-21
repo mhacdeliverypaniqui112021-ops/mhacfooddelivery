@@ -1384,59 +1384,11 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
-<style id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_98">
-.manualLocationBox{
-  margin:7px 0!important;
-  padding:10px!important;
-  border:1px solid #ddd!important;
-  border-radius:10px!important;
-  background:#fff!important;
-}
-.manualLocationBox input{
-  width:100%!important;
-  min-height:48px!important;
-  margin:6px 0 0!important;
-  padding:10px 12px!important;
-  font-size:17px!important;
-  box-sizing:border-box!important;
-}
-.manualLocationSuggestions{
-  display:none;
-  margin-top:6px!important;
-  border:1px solid #ccc!important;
-  border-radius:9px!important;
-  background:#fff!important;
-  overflow:hidden!important;
-  box-shadow:0 4px 14px rgba(0,0,0,.12)!important;
-}
-.manualLocationSuggestion{
-  display:block!important;
-  width:100%!important;
-  min-height:58px!important;
-  margin:0!important;
-  padding:9px 11px!important;
-  border:0!important;
-  border-bottom:1px solid #eee!important;
-  border-radius:0!important;
-  background:#fff!important;
-  color:#111!important;
-  text-align:left!important;
-  font-size:15px!important;
-  line-height:1.25!important;
-}
-.manualLocationSuggestion:last-child{border-bottom:0!important}
-.manualLocationSuggestion b{display:block!important;font-size:16px!important}
-.manualLocationSuggestion span{display:block!important;color:#666!important;margin-top:3px!important}
-.manualLocationSelected{
-  margin-top:7px!important;
-  padding:8px!important;
-  border:1px solid #222!important;
-  border-radius:8px!important;
-  background:#fff!important;
-  color:#111!important;
-  font-size:14px!important;
-  line-height:1.3!important;
-}
+<style id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_99">
+.manualLocationBox{margin:7px 0!important;padding:10px!important;border:1px solid #ddd!important;border-radius:10px!important;background:#fff!important}
+#mhacGoogleMapsAutocomplete{display:block!important;width:100%!important;margin:7px 0 0!important;min-height:50px!important}
+#mhacGoogleMapsAutocomplete::part(input){width:100%!important;min-height:50px!important}
+.manualLocationSelected{margin-top:7px!important;padding:8px!important;border:1px solid #222!important;border-radius:8px!important;background:#fff!important;color:#111!important;font-size:14px!important;line-height:1.3!important}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2425,36 +2377,25 @@ setTimeout(function(){
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body>
-<script id="MHAC_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_98">
+<script id="MHAC_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_99_NO_BILLING">
 (function(){
   "use strict";
 
-  // V4.1.98: Google Maps-style manual location search.
-  // GPS, OSRM distance calculation, fee formula, cart, choices and order flow are untouched.
+  // V4.1.99: NO-BILLING Google Maps Demo Key + Place Autocomplete Widget.
+  // V4.1.97 Drink Gate, GPS, OSRM fee calculation, cart, choices and order flow are untouched.
   const MHAC_GOOGLE_MAPS_API_KEY="AIzaSyAximeqaO9U2kGmsSzr-V8tdZGS2FepIJo";
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
   let mhacMapsReady=null;
-  let mhacMapsRequestId=0;
-  let mhacManualFeatures=[];
+  let mhacPlaceAutocomplete=null;
   let mhacManualSelected=false;
 
   const byId=id=>document.getElementById(id);
-  const escapeHtml=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 
   function setManualStatus(text,show=true){
     const el=byId("manualLocationSelected");
     if(!el)return;
     el.textContent=text||"";
     el.style.display=show&&text?"block":"none";
-  }
-
-  function clearManualSuggestions(){
-    const box=byId("manualLocationSuggestions");
-    if(box){
-      box.innerHTML="";
-      box.style.display="none";
-    }
-    mhacManualFeatures=[];
   }
 
   function loadGoogleMapsPlaces(){
@@ -2465,12 +2406,12 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
         return;
       }
       if(MHAC_GOOGLE_MAPS_API_KEY==="YOUR_GOOGLE_MAPS_API_KEY"){
-        reject(new Error("Google Maps API key is not configured."));
+        reject(new Error("Google Maps Demo Key is not configured."));
         return;
       }
       const existing=document.querySelector('script[data-mhac-google-maps="1"]');
       if(existing){
-        existing.addEventListener("load",()=>resolve(window.google.maps),{once:true});
+        existing.addEventListener("load",()=>window.google?.maps?.importLibrary?resolve(window.google.maps):reject(new Error("Google Maps library unavailable.")),{once:true});
         existing.addEventListener("error",()=>reject(new Error("Google Maps JavaScript API failed to load.")),{once:true});
         return;
       }
@@ -2481,136 +2422,72 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
       script.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(MHAC_GOOGLE_MAPS_API_KEY)+"&v=weekly&loading=async";
       script.onload=()=>window.google?.maps?.importLibrary
         ?resolve(window.google.maps)
-        :reject(new Error("Google Maps Places library is unavailable."));
+        :reject(new Error("Google Maps library is unavailable."));
       script.onerror=()=>reject(new Error("Google Maps JavaScript API failed to load."));
       document.head.appendChild(script);
     });
     return mhacMapsReady;
   }
 
-  async function searchGoogleMapsManualLocation(){
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
-    const q=(input?.value||"").trim();
+  async function installGoogleMapsAutocomplete(){
+    const box=byId("manualLocationBox");
+    const oldInput=byId("manualLocationInput");
     if(!box)return;
-    if(q.length<3){
-      clearManualSuggestions();
-      return;
-    }
-    const requestId=++mhacMapsRequestId;
     try{
       const maps=await loadGoogleMapsPlaces();
-      const {AutocompleteSuggestion}=await maps.importLibrary("places");
-      if(requestId!==mhacMapsRequestId)return;
+      const {PlaceAutocompleteElement}=await maps.importLibrary("places");
+      if(mhacPlaceAutocomplete)return;
 
-      const request={
-        input:q,
-        language:"en",
-        region:"PH",
-        includedRegionCodes:["ph"],
-        locationBias:{center:MHAC_MAPS_CENTER,radius:50000}
-      };
-      const result=await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-      if(requestId!==mhacMapsRequestId)return;
+      const widget=new PlaceAutocompleteElement();
+      widget.id="mhacGoogleMapsAutocomplete";
+      widget.placeholder="Search street, barangay, landmark or place…";
+      widget.includedRegionCodes=["ph"];
+      widget.locationBias={center:MHAC_MAPS_CENTER,radius:50000};
+      widget.setAttribute("aria-label","Google Maps manual delivery location");
 
-      const suggestions=Array.isArray(result?.suggestions)?result.suggestions:[];
-      mhacManualFeatures=suggestions;
-      if(!suggestions.length){
-        box.innerHTML='<div style="padding:10px;color:#666">No Google Maps result found.</div>';
-        box.style.display="block";
-        return;
-      }
+      if(oldInput)oldInput.replaceWith(widget);
+      else box.appendChild(widget);
+      mhacPlaceAutocomplete=widget;
 
-      box.innerHTML=suggestions.slice(0,8).map((s,i)=>{
-        const p=s?.placePrediction;
-        const main=p?.mainText?.text||p?.text?.text||"Location";
-        const secondary=p?.secondaryText?.text||"";
-        return `<button type="button" class="manualLocationSuggestion" data-mhac-map-index="${i}">
-          <b>${escapeHtml(main)}</b><span>${escapeHtml(secondary)}</span>
-        </button>`;
-      }).join("");
-      box.style.display="block";
+      widget.addEventListener("gmp-select",async({placePrediction})=>{
+        try{
+          const place=placePrediction?.toPlace?.();
+          if(!place)throw new Error("No Google Maps place was returned.");
+          await place.fetchFields({fields:["displayName","formattedAddress","location"]});
+          const lat=Number(place?.location?.lat?.());
+          const lon=Number(place?.location?.lng?.());
+          if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new Error("Selected Google Maps place has no coordinates.");
+
+          // Reuse the existing GPS variables so the exact same OSRM/fee/order path is used.
+          gpsLat=lat;
+          gpsLon=lon;
+          gpsAccuracy=null;
+          distanceKm=null;
+          deliveryFee=null;
+          mhacManualSelected=true;
+
+          const label=String(place?.formattedAddress||place?.displayName||"Selected Google Maps location").trim();
+          setManualStatus("📍 SELECTED GOOGLE MAPS LOCATION: "+label,true);
+          if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
+          if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual Google Maps location selected.";
+          if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
+          if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
+        }catch(e){
+          setManualStatus("❌ Unable to use this Google Maps result.",true);
+          console.warn("MHAC Google Maps selection:",e);
+        }
+      });
     }catch(e){
-      if(requestId!==mhacMapsRequestId)return;
-      box.innerHTML='<div style="padding:10px;color:#a00000">Google Maps search unavailable. Check the Maps API key/API setup.</div>';
-      box.style.display="block";
-      console.warn("MHAC Google Maps manual location:",e);
+      setManualStatus("❌ Google Maps manual location unavailable. Check the Demo Key/setup.",true);
+      console.warn("MHAC Google Maps Demo Key:",e);
     }
   }
 
-  async function selectGoogleMapsManualLocation(index){
-    const suggestion=mhacManualFeatures[index];
-    if(!suggestion?.placePrediction)return;
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
-    try{
-      const maps=await loadGoogleMapsPlaces();
-      const place=suggestion.placePrediction.toPlace();
-      await place.fetchFields({fields:["displayName","formattedAddress","location"]});
-      const lat=Number(place?.location?.lat?.());
-      const lon=Number(place?.location?.lng?.());
-      if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new Error("Google Maps result has no coordinates.");
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installGoogleMapsAutocomplete,{once:true});
+  else installGoogleMapsAutocomplete();
 
-      // Reuse the existing GPS variables so the exact same OSRM/fee/order path is used.
-      gpsLat=lat;
-      gpsLon=lon;
-      gpsAccuracy=null;
-      distanceKm=null;
-      deliveryFee=null;
-      mhacManualSelected=true;
-
-      const label=String(place?.formattedAddress||place?.displayName?.text||input?.value||"").trim();
-      if(input)input.value=label;
-      setManualStatus("📍 SELECTED GOOGLE MAPS LOCATION: "+label,true);
-      if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
-      if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual Google Maps location selected.";
-      if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
-      if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
-      clearManualSuggestions();
-    }catch(e){
-      setManualStatus("❌ Unable to use this Google Maps result.",true);
-      console.warn("MHAC Google Maps selection:",e);
-    }
-  }
-
-  function installManualLocation(){
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
-    if(!input||!box)return;
-
-    let timer=null;
-    input.addEventListener("input",()=>{
-      mhacManualSelected=false;
-      setManualStatus("",false);
-      clearTimeout(timer);
-      timer=setTimeout(searchGoogleMapsManualLocation,220);
-    });
-
-    input.addEventListener("keydown",e=>{
-      if(e.key==="Escape"){
-        clearManualSuggestions();
-        input.blur();
-      }
-    });
-
-    box.addEventListener("click",e=>{
-      const b=e.target.closest("[data-mhac-map-index]");
-      if(!b)return;
-      e.preventDefault();
-      selectGoogleMapsManualLocation(Number(b.dataset.mhacMapIndex));
-    });
-
-    document.addEventListener("click",e=>{
-      if(!e.target.closest("#manualLocationBox"))clearManualSuggestions();
-    });
-  }
-
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installManualLocation,{once:true});
-  else installManualLocation();
-
-  window.__MHAC_GOOGLE_MAPS_MANUAL_LOCATION__={
-    search:searchGoogleMapsManualLocation,
-    select:selectGoogleMapsManualLocation,
-    load:loadGoogleMapsPlaces
-  };
-  window.__MHAC_BUILD__="V4.1.98 CUSTOMER GOOGLE MAPS MANUAL LOCATION — V4.1.97 BASE PRESERVED";
+  window.__MHAC_GOOGLE_MAPS_MANUAL_LOCATION__={load:loadGoogleMapsPlaces};
+  window.__MHAC_BUILD__="V4.1.99 CUSTOMER NO-BILLING GOOGLE MAPS AUTOCOMPLETE — V4.1.97 BASE PRESERVED";
 })();
 </script>
 </html>
