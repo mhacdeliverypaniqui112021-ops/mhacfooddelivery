@@ -2167,11 +2167,34 @@ async function searchManualAddress(){
       const wantsElementary=/\belementary\b/.test(queryNorm);
       const wantsHighSchool=/\bhigh\s+school\b/.test(queryNorm);
 
+      // Rank ANY street/landmark/address typed by the customer.
+      // We do not maintain a fixed street list: every street inside the
+      // seven MHAC DELIVERY service municipalities remains searchable.
       const scored=deduped.map((x,idx)=>{
         const text=norm(x.display_name);
+        const p=x.properties||x.address||{};
+        const street=norm([p.street,p.road,p.pedestrian,p.path,p.footway].filter(Boolean).join(" "));
         let score=0;
-        if(text.includes(queryNorm))score+=1200;
+
+        if(text===queryNorm)score+=3000;
+        if(text.includes(queryNorm))score+=1800;
+
+        // Street/road token matching gets a strong priority.
+        const streetTokens=norm(q).split(" ").filter(t=>t.length>=3);
+        for(const t of streetTokens){
+          if(street.includes(t))score+=180;
+          else if(text.includes(t))score+=25;
+        }
+
+        // Common street suffixes should still match even when the provider
+        // formats them differently (St / Street / Road / Highway).
+        const streetStem=norm(q)
+          .replace(/\b(st|street|rd|road|ave|avenue|highway|hwy|brgy|barangay)\b/g," ")
+          .replace(/\s+/g," ").trim();
+        if(streetStem && street.includes(streetStem))score+=700;
+
         for(const t of qTokens)if(text.includes(t))score+=15;
+
         if(wantsElementary){
           if(/\belementary\b/.test(text))score+=600;
           if(/\bhigh\s+school\b/.test(text))score-=900;
@@ -2577,7 +2600,7 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-<script>window.__MHAC_BUILD__="V4.1.102 CUSTOMER MANUAL ADDRESS SERVICE AREA SEARCH FIX";</script></body></html>
+<script>window.__MHAC_BUILD__="V4.1.103 CUSTOMER MANUAL ADDRESS ALL COVERED STREETS SEARCH";</script></body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
 .customerUnifiedDetailWrap .orderDetailPanel{
