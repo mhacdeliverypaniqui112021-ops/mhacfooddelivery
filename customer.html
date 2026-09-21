@@ -2024,6 +2024,16 @@ function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(
 // V4.1.98 — Manual Address Search: selected coordinates use the SAME distance/fee calculation as GPS.
 let manualSearchTimer=null,manualSearchRequest=0,selectedLocationType="";
 function clearManualAddressSuggestions(){const box=$("manualAddressSuggestions");if(box){box.innerHTML="";box.classList.add("hidden");}}
+function manualSearchVariants(q){
+  const base=String(q||"").trim();
+  const variants=[];
+  const add=v=>{v=String(v||"").replace(/\s+/g," ").trim();if(v.length>=3&&!variants.some(x=>x.toLowerCase()===v.toLowerCase()))variants.push(v)};
+  add(base);
+  add(base.replace(/\bPob\.?\b/ig,"Poblacion").replace(/\bBrgy\.?\b/ig,"Barangay"));
+  add(base.replace(/^Po\.?\s+/i,"Sto. "));
+  add(base.replace(/\bElementary\s+School\b/ig,"School"));
+  return variants.slice(0,4);
+}
 async function searchManualAddress(){
   const input=$("manualAddressInput"),box=$("manualAddressSuggestions"),status=$("manualAddressStatus");
   if(!input||!box)return;
@@ -2032,22 +2042,31 @@ async function searchManualAddress(){
   if(q.length<3){clearManualAddressSuggestions();if(status)status.textContent="Type at least 3 characters to search.";return;}
   manualSearchTimer=setTimeout(async()=>{
     const req=++manualSearchRequest;
-    box.innerHTML='<div class="status">🔎 Searching address…</div>';box.classList.remove("hidden");
+    box.innerHTML='<div class="status">🔎 Searching schools, landmarks and addresses…</div>';box.classList.remove("hidden");
     try{
-      const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(q)}`;
-      const r=await fetch(url,{headers:{"Accept":"application/json"}});
-      if(!r.ok)throw new Error("Address search failed");
-      const results=await r.json();
+      const variants=manualSearchVariants(q);
+      const responses=await Promise.all(variants.map(v=>fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(v)}`,{headers:{"Accept":"application/json"}})));
+      if(responses.some(r=>!r.ok))throw new Error("Address search failed");
+      const groups=await Promise.all(responses.map(r=>r.json()));
       if(req!==manualSearchRequest)return;
-      if(!Array.isArray(results)||!results.length){box.innerHTML='<div class="status">❌ No matching address found. Try a barangay, landmark, street, or municipality.</div>';return;}
-      box.innerHTML=results.map((x,i)=>`<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`).join("");
-      box.querySelectorAll("[data-manual-index]").forEach(btn=>btn.onclick=()=>selectManualAddress(results[Number(btn.dataset.manualIndex)]));
-      if(status)status.textContent="Select one of the matching locations below.";
+      const seen=new Set(),results=[];
+      for(const list of groups){
+        if(!Array.isArray(list))continue;
+        for(const x of list){
+          const key=String(x.place_id||`${x.lat},${x.lon},${x.display_name}`);
+          if(!seen.has(key)){seen.add(key);results.push(x);}
+        }
+      }
+      if(!results.length){box.innerHTML='<div class="status">❌ No matching school/address found. Try the school name, barangay, landmark, street, or municipality.</div>';return;}
+      const shown=results.slice(0,8);
+      box.innerHTML=shown.map((x,i)=>`<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`).join("");
+      box.querySelectorAll("[data-manual-index]").forEach(btn=>btn.onclick=()=>selectManualAddress(shown[Number(btn.dataset.manualIndex)]));
+      if(status)status.textContent=`${shown.length} matching location${shown.length===1?"":"s"} found. Select one below.`;
     }catch(e){
       if(req!==manualSearchRequest)return;
       box.innerHTML='<div class="status">❌ Address search unavailable. Please try again or use GPS.</div>';
     }
-  },450);
+  },300);
 }
 function selectManualAddress(x){
   const lat=Number(x?.lat),lon=Number(x?.lon);
@@ -2427,7 +2446,7 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-<script>window.__MHAC_BUILD__="V4.1.98 CUSTOMER MANUAL ADDRESS SEARCH + SAME GPS DISTANCE FEE";</script></body></html>
+<script>window.__MHAC_BUILD__="V4.1.99 CUSTOMER MANUAL ADDRESS SCHOOL SEARCH FIX + SAME GPS DISTANCE FEE";</script></body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
 .customerUnifiedDetailWrap .orderDetailPanel{
