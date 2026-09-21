@@ -1630,7 +1630,7 @@ function openCat(si,ci){
 }
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
- const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
+ const s=published[si], c=s?.categories?.[ci], f=c?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
  /* SIMPLE FOOD AUTO-ADD: foods with no configurable choices are added immediately.
