@@ -1842,10 +1842,12 @@ function customize(si,ci,fi){
  const bucketPieces=Math.max(0,Number(f.bucketPieces||0));
  // V4.1.96 TEST: conditional No Drink / With Drink choices.
  const isNoDrinkText=(v)=>/^no\s*drink(?:s)?$/i.test(String(v||'').trim());
+ const isWithDrinkText=(v)=>/^with\s*drink(?:s)?$/i.test(String(v||'').trim());
  const isDrinkGroup=(g)=>String(g?.role||'').toLowerCase()==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||''));
- const groupHasNoDrinkOption=(g)=>Array.isArray(g?.options)&&g.options.some(o=>isNoDrinkText(o?.name||o?.choice||o?.value));
- const noDrinkSelected=()=>groups.some((g,gi)=>(groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isNoDrinkText(g?.options?.[oi]?.name||g?.options?.[oi]?.choice||g?.options?.[oi]?.value)));
- const shouldHideDrinkGroup=(gi)=>isDrinkGroup(groups[gi])&&!groupHasNoDrinkOption(groups[gi])&&noDrinkSelected();
+ const drinkGateIndex=()=>groups.findIndex(g=>Array.isArray(g?.options)&&g.options.some(o=>isNoDrinkText(o?.name||o?.choice||o?.value)||isWithDrinkText(o?.name||o?.choice||o?.value)));
+ const withDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isWithDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
+ const noDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isNoDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
+ const shouldHideDrinkGroup=(gi)=>isDrinkGroup(groups[gi])&&drinkGateIndex()>=0&&!withDrinkSelected();
  const requiredForGroup=(g)=>{
    /* Read the count rule saved by Admin for THIS FOOD and THIS CHOICE GROUP. */
    const rawMode=String(g?.selectionMode||g?.countMode||'perItem').trim();
@@ -1886,7 +1888,7 @@ function customize(si,ci,fi){
  const changeGroupChoice=(gi,oi,d)=>{
    const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateAllGroups();
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -2357,7 +2359,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
+window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body></html>
 
