@@ -1286,36 +1286,106 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 <style id="MHAC_ADMIN_SOURCE_OF_TRUTH_ORDERBREAKDOWN_FINAL">
-.orderDetailPanel{background:#fff!important;border:2px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
+.orderDetailPanel{background:#fff!important;border:3px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
 .orderDetailCustomer{padding-bottom:6px!important;border-bottom:1px solid #eee!important}
 .orderDetailPayment{margin-top:6px!important;font-size:13px!important}
 .unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
+.orderDetailPayment{
+  margin-top:8px!important;
+  padding:10px 0!important;
+  border-top:1px solid #ddd!important;
+  border-bottom:1px solid #ddd!important;
+  font-size:16px!important;
+  line-height:1.4!important;
+}
+.orderDetailPayment b{font-weight:900!important}
+
 .unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
-.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
+.unifiedStoreCard{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important}
 .unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
 .unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 2px!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
 .unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
 .unifiedFoodName{font-size:18px!important;line-height:1.35!important}
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
-.unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
+.unifiedBill{
+  margin:12px 0 0!important;
+  padding-top:8px!important;
+  border-top:1px solid #ddd!important;
+  font-size:16px!important;
+  line-height:1.45!important;
+}
+.unifiedBillRow{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  width:100%!important;
+  padding:8px 0!important;
+  margin:0!important;
+  border-bottom:0!important;
+}
+.unifiedBillLabel{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+.unifiedBillAmount{
+  flex:0 0 auto!important;
+  min-width:92px!important;
+  text-align:right!important;
+  font-weight:700!important;
+  white-space:nowrap!important;
+}
+.unifiedBillGrand{
+  margin-top:5px!important;
+  padding-top:10px!important;
+  border-top:2px solid #999!important;
+  font-weight:900!important;
+}
+@media(max-width:600px){
+  .unifiedBillRow{
+    padding:9px 0!important;
+    gap:10px!important;
+  }
+  .unifiedBillAmount{min-width:88px!important}
+}
 </style>
-
-<style id="mhac-manual-location-v105">
-.manualLocationSuggestions{display:none;margin-top:4px;border:1px solid #bbb;border-radius:10px;background:#fff;overflow:hidden;max-height:280px;overflow-y:auto;box-shadow:0 4px 14px #0002;position:relative;z-index:20}
-.manualLocationSuggestion{display:block;width:100%;text-align:left;background:#fff!important;color:#111!important;border:0!important;border-bottom:1px solid #eee!important;border-radius:0!important;padding:11px 12px!important;min-height:52px!important;font-size:15px!important;line-height:1.25!important}
-.manualLocationSuggestion:last-child{border-bottom:0!important}
-.manualLocationSuggestion b{display:block;font-size:16px}
-.manualLocationSuggestion span{display:block;color:#666;margin-top:3px}
-#manualLocationInput{width:100%;box-sizing:border-box;margin-top:7px!important}
+<style id="MHAC_CUSTOMER_ORDER_DRAWER_MATCH_ADMIN">
+/* CUSTOMER: match locked Admin Order Breakdown drawer.
+   One thick outer box only; no separate thick boxes per store. */
+.customerUnifiedDetailWrap .orderDetailPanel{
+  border:2px solid #222!important;
+  border-radius:9px!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+  overflow:hidden!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreCard{
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreCard + .unifiedStoreCard{
+  margin-top:10px!important;
+  padding-top:10px!important;
+  border-top:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedStoreName{
+  border-bottom:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedCategoryName{
+  border-bottom:1px solid #ddd!important;
+}
+.customerUnifiedDetailWrap .unifiedFoodRow{
+  border-top:1px solid #ddd!important;
+}
 </style>
-<style id="MHAC_GEOAPIFY_MANUAL_LOCATION_TEST">
-.manualLocationSuggestions{display:none;margin-top:5px;border:1px solid #ccc;border-radius:9px;background:#fff;overflow:hidden}
-.manualLocationSuggestion{display:block;width:100%;min-height:48px;text-align:left;background:#fff!important;color:#111!important;border:0!important;border-bottom:1px solid #eee!important;border-radius:0!important;padding:9px 10px!important}
-.manualLocationSuggestion:last-child{border-bottom:0!important}
-.manualLocationSuggestion b{display:block;font-size:15px;line-height:1.2}.manualLocationSuggestion span{display:block;color:#666;font-size:13px;line-height:1.25;margin-top:3px}
-</style></head><body>
+</head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
-<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn" type="button">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
+<div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC DELIVERY</div><div class="appName">CUSTOMER APP</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
@@ -1332,8 +1402,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div>
-<div class="field" id="manualLocationBox"><b>🔎 MANUAL DELIVERY LOCATION</b><br>Search like Google Maps, select the exact place, then use the selected coordinates for the same delivery-fee calculation as GPS.<input id="manualLocationInput" type="text" placeholder="Search street, barangay, landmark or place…" autocomplete="off"><div id="manualLocationSuggestions" class="manualLocationSuggestions"></div><div id="manualLocationSelected" class="status"></div></div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -1370,13 +1439,13 @@ function hideSplash(){const x=document.getElementById("mhacSplash");if(x){x.clas
 </script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import{getAuth,initializeAuth,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import{getFirestore,doc,getDoc,addDoc,collection,query,where,onSnapshot,updateDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import{getStorage,ref as storageRef,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/12.17.1/firebase-storage.js";
 
 const firebaseConfig={apiKey:"AIzaSyASKXih0yLfpHqnU8xDYxk1EVi1aZVEc_I",authDomain:"mhac-delivery-53099.firebaseapp.com",projectId:"mhac-delivery-53099",storageBucket:"mhac-delivery-53099.firebasestorage.app",messagingSenderId:"878081137607",appId:"1:878081137607:web:00d3041a1aa0bcbc4f57e2",measurementId:"G-7NZEK618YC"};
 
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
+const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:browserLocalPersistence,popupRedirectResolver:browserPopupRedirectResolver}),db=getFirestore(app),storage=getStorage(app),gp=new GoogleAuthProvider();gp.setCustomParameters({prompt:"select_account"});
 // V4.1.67: explicitly keep Customer Firebase auth persistent across refresh/browser restarts.
 setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Customer auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
@@ -1386,45 +1455,27 @@ function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
-  menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
-    data=snap.exists()?snap.data():{stores:[]};
-    const count=(data.stores||[]).filter(s=>s.published!==false).length;
-    $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
-    renderStores();
-    renderCart();
-    refreshCustomerOrderBreakdowns();
-  },err=>{
-    console.warn("Published menu listener failed",err);
-    $("menuStatus").textContent="⚠️ Unable to load published menu.";
+  return await new Promise(resolve=>{
+    let first=true;
+    menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
+      data=snap.exists()?snap.data():{stores:[]};
+      rebuildCustomerCategoryCache();
+      const count=(data.stores||[]).filter(s=>s.published!==false).length;
+      $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
+      renderStores();
+      renderCart();
+      refreshCustomerOrderBreakdowns();
+      if(first){first=false;resolve(true)}
+    },err=>{
+      console.warn("Published menu listener failed",err);
+      $("menuStatus").textContent="⚠️ Unable to load published menu.";
+      if(first){first=false;resolve(false)}
+    });
   });
 }
 async function boot(){await loadHours();await loadMenu();applyHours()}
-function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}
-async function customerGoogleLogin(){
-  const b=$("googleLogin"),st=$("authStatus");if(!b||b.disabled)return;
-  b.disabled=true;st.textContent="Opening Google sign-in…";
-  try{
-    await setPersistence(auth,browserLocalPersistence);
-    const r=await signInWithPopup(auth,gp);
-    currentUser=r?.user||auth.currentUser;
-    if(!currentUser)throw new Error("Google sign-in completed but no Firebase user was returned.");
-    await boot();
-    startOrders();
-  }catch(e){
-    console.error("Customer Google popup sign-in:",e);
-    const code=e?.code||"";
-    let msg=e?.message||String(e);
-    if(code==="auth/popup-blocked")msg="Google sign-in popup was blocked. Please allow popups for mhacdelivery.devs.surf and try again.";
-    else if(code==="auth/popup-closed-by-user")msg="Google sign-in window was closed. Please try again.";
-    else if(code==="auth/cancelled-popup-request")msg="Google sign-in request was cancelled. Please try again.";
-    else if(code==="auth/unauthorized-domain")msg="This website domain is not authorized in Firebase Authentication.";
-    st.textContent="❌ "+msg;
-  }finally{
-    b.disabled=false;
-  }
-}
-window.__mhacCustomerGoogleLogin=customerGoogleLogin;
-$("googleLogin").addEventListener("click",customerGoogleLogin,{passive:false});
+function showLogin(){ $("authGate").style.display="flex";$("closedScreen").style.display="none"}$("googleLogin").onclick=async()=>{try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);currentUser=r.user;await boot();startOrders()}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("authStatus").textContent="❌ "+(e.message||e)}};
+getRedirectResult(auth).catch(e=>{if(e)$("authStatus").textContent="❌ "+e.message});
 
 const GCASH_LOCAL_KEY="mhac_gcash_settings_v432";
 function saveGcashLocal(){
@@ -1464,22 +1515,73 @@ function customerTruthItemPricing(i){
  return{qty,base,extras,unit,line:unit*qty};
 }
 
+const CUSTOMER_CATEGORY_CACHE_KEY="mhac_customer_category_cache_v188";
+let customerCategoryCache={};
+function customerCategoryKey(storeName,itemName){
+  const n=v=>String(v??"").trim().toLowerCase().replace(/\s+/g," ");
+  return n(storeName)+"|||"+n(itemName);
+}
+function loadCustomerCategoryCache(){
+  try{
+    const x=JSON.parse(localStorage.getItem(CUSTOMER_CATEGORY_CACHE_KEY)||"{}");
+    if(x&&typeof x==="object")customerCategoryCache=x;
+  }catch(_){}
+}
+function saveCustomerCategoryCache(){
+  try{localStorage.setItem(CUSTOMER_CATEGORY_CACHE_KEY,JSON.stringify(customerCategoryCache))}catch(_){}
+}
+function rebuildCustomerCategoryCache(){
+  const next={...customerCategoryCache};
+  for(const st of (Array.isArray(data?.stores)?data.stores:[])){
+    const store=String(st?.name||"").trim();
+    if(!store)continue;
+    for(const cat of (st?.categories||[])){
+      const cn=String(cat?.name||cat?.label||"").trim();
+      if(!cn||/^category\s*name$/i.test(cn)||/^category$/i.test(cn))continue;
+      for(const f of (cat?.items||[])){
+        const name=String(f?.name??f?.title??f?.foodName??"").trim();
+        if(name)next[customerCategoryKey(store,name)]=cn;
+      }
+    }
+  }
+  customerCategoryCache=next;
+  saveCustomerCategoryCache();
+}
+loadCustomerCategoryCache();
+
 function customerTruthItemCategoryName(i,storeName){
  const norm=v=>String(v??"").trim().toLowerCase().replace(/[\s\u00a0]+/g," ").replace(/[–—]/g,"-");
  const key=v=>norm(v).replace(/[^a-z0-9]+/g,"");
  const valid=v=>{const x=String(v??"").trim();return !!x&&!/^category\s*name$/i.test(x)&&!/^category$/i.test(x)};
- const direct=[i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,i?.category_name,i?.categoryLabel].map(v=>String(v??"").trim()).find(valid);
- if(direct)return direct;
+ const direct=[
+   i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,
+   i?.category_name,i?.categoryLabel,
+   i?.food?.categoryName,i?.food?.category
+ ].map(v=>String(v??"").trim()).find(valid);
+ if(direct){
+   customerCategoryCache[customerCategoryKey(storeName,i?.name)]=direct;
+   saveCustomerCategoryCache();
+   return direct;
+ }
+
+ const cached=customerCategoryCache[customerCategoryKey(storeName,i?.name)];
+ if(valid(cached))return cached;
+
  const foodKey=key(i?.name), storeKey=key(storeName);
  const stores=Array.isArray(data?.stores)?data.stores:[];
  const findIn=(list,strict)=>{
    for(const st of list){
      if(strict && storeKey && key(st?.name)!==storeKey)continue;
      for(const cat of (st?.categories||[])){
-       const cn=String(cat?.name||cat?.label||"").trim(); if(!valid(cn))continue;
+       const cn=String(cat?.name||cat?.label||"").trim();
+       if(!valid(cn))continue;
        for(const f of (cat?.items||[])){
          const fk=key(f?.name??f?.title??f?.foodName);
-         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk)))return cn;
+         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk))){
+           customerCategoryCache[customerCategoryKey(storeName,i?.name)]=cn;
+           saveCustomerCategoryCache();
+           return cn;
+         }
        }
      }
    }
@@ -1565,10 +1667,26 @@ function customerTruthOrderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${rows}
      <div class="unifiedBill">
-       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
-       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
-       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
-       <b>Grand Total: ${peso(f.total)}</b>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>Sub Total</b></span>
+         <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
+       </div>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>10% Service Fee</b></span>
+         <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
+       </div>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
+         <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
+       </div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
+         <span class="unifiedBillLabel"><b>2nd Store Fee</b></span>
+         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
+       </div>`:""}
+       <div class="unifiedBillRow unifiedBillGrand">
+         <span class="unifiedBillLabel"><b>Grand Total</b></span>
+         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
+       </div>
      </div>
    </div>
  </div>`;
@@ -1616,7 +1734,7 @@ $("payment").onchange=()=>{
   if(isG)renderGcashSettings();
 };
 
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}startOrders();$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
 function photoSvgData(name,type="food"){
  const n=String(name||type||"Photo").trim().slice(0,18),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><rect width="30" height="30" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="18">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="6" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
@@ -1659,7 +1777,7 @@ function openCat(si,ci){
 }
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
- const s=published[si], c=s?.categories?.[ci], f=c?.items?.[fi];
+ const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
  if(!s||!f){closeMenu();return;}
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
  /* SIMPLE FOOD AUTO-ADD: foods with no configurable choices are added immediately.
@@ -1715,7 +1833,7 @@ function customize(si,ci,fi){
  if(f.addOns?.length){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
+ h+=`<div class=counter><button type="button" class=mini id=qminus>−</button><b id=foodQty>1</b><button type="button" class=mini id=qplus>+</button></div><button type="button" class="add" id="addConfigured">ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
@@ -2048,7 +2166,7 @@ function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.valu
 function refreshCustomerOrderBreakdowns(){
  const orders=Array.isArray(window.__mhacOrders)?window.__mhacOrders:[];
  orders.forEach(o=>{
-   const el=document.querySelector(`[data-customer-order-detail="${CSS.escape(String(o.id))}"]`);
+   const el=$("customer-order-details-"+String(o.id));
    if(el)el.innerHTML=customerUnifiedOrderDetailHtml(o);
  });
 }
@@ -2084,7 +2202,7 @@ function customerOrderCategory(storeName,itemName){
 }
 function customerOrderCategoryValue(i){
   const direct=[i?.category,i?.categoryName,i?.categoryLabel].map(v=>String(v||"").trim()).find(validCustomerCategory);
-  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "Category Name";
+  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "";
 }
 function validCustomerCategory(v){
   const x=String(v||"").trim();
@@ -2154,10 +2272,26 @@ function customerUnifiedOrderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${rows}
      <div class="unifiedBill">
-       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
-       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
-       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
-       <b>Grand Total: ${peso(f.total)}</b>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Sub Total</span>
+         <span class="unifiedBillAmount"><b>${peso(f.foodOrder)}</b></span>
+       </div>
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Service Fee 10%</span>
+         <span class="unifiedBillAmount"><b>${peso(f.serviceFee)}</b></span>
+       </div>
+       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Additional Store</span>
+         <span class="unifiedBillAmount"><b>${peso(f.secondStoreFee)}</b></span>
+       </div>`:""}
+       <div class="unifiedBillRow">
+         <span class="unifiedBillLabel">Delivery Fee</span>
+         <span class="unifiedBillAmount"><b>${peso(f.deliveryFee)}</b></span>
+       </div>
+       <div class="unifiedBillRow unifiedBillGrand">
+         <span class="unifiedBillLabel"><b>Grand Total</b></span>
+         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
+       </div>
      </div>
    </div>
  </div>`;
@@ -2180,6 +2314,7 @@ function startOrders(){
       </div>`;
     }).join(""):"No active orders.";
     refreshCustomerOrderBreakdowns();
+    requestAnimationFrame(()=>refreshCustomerOrderBreakdowns());
     syncCustomerChatWatchers(arr);
   });
 }
@@ -2205,49 +2340,7 @@ $("myOrders").onclick=async e=>{
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-
-/* V4.1.105: Google Maps-style manual location uses the SAME gpsLat/gpsLon + distance/fee path as device GPS. */
-let manualGeoapifyTimer=null,manualGeoapifyRequestId=0;
-const MHAC_GEOAPIFY_API_KEY="YOUR_GEOAPIFY_API_KEY";
-function clearManualLocation(){ $("manualLocationSelected").textContent=""; $("manualLocationSuggestions").innerHTML=""; $("manualLocationSuggestions").style.display="none"; }
-function geoapifyServiceAreaFilter(){ return "rect:120.30,15.45,120.85,15.90"; }
-async function searchManualGeoapifyLocation(){
- const input=$("manualLocationInput"),box=$("manualLocationSuggestions"),q=input?.value.trim()||"";
- if(q.length<3){clearManualLocation();return;}
- const rid=++manualGeoapifyRequestId;
- try{
-  if(MHAC_GEOAPIFY_API_KEY==="YOUR_GEOAPIFY_API_KEY")throw new Error("Geoapify API key is not configured.");
-  const u=new URL("https://api.geoapify.com/v1/geocode/autocomplete");
-  u.searchParams.set("text",q);u.searchParams.set("apiKey",MHAC_GEOAPIFY_API_KEY);u.searchParams.set("lang","en");u.searchParams.set("limit","8");
-  u.searchParams.set("filter",geoapifyServiceAreaFilter());u.searchParams.set("bias","proximity:120.57765,15.66789");
-  const r=await fetch(u.toString(),{headers:{Accept:"application/json"}});
-  if(!r.ok)throw new Error("Geoapify search failed ("+r.status+").");
-  const data=await r.json(); if(rid!==manualGeoapifyRequestId)return;
-  const fs=Array.isArray(data.features)?data.features:[];
-  if(!fs.length){box.innerHTML='<div class="small" style="padding:12px">No matching MHAC service-area location found.</div>';box.style.display="block";return;}
-  box.innerHTML=fs.slice(0,8).map((f,i)=>{const p=f.properties||{},main=p.name||p.street||p.address_line1||p.formatted||"Location",sec=[p.address_line2,p.suburb||p.district,p.city||p.town||p.village||p.municipality,p.state].filter(Boolean).join(", ");return `<button type="button" class="manualLocationSuggestion" data-manual-index="${i}"><b>${esc(main)}</b><span>${esc(sec||p.formatted||"")}</span></button>`;}).join("");
-  box.style.display="block";box.querySelectorAll("[data-manual-index]").forEach((b,i)=>b.onclick=()=>selectManualGeoapifyLocation(fs[i]));
- }catch(e){if(rid!==manualGeoapifyRequestId)return;box.innerHTML='<div class="small" style="padding:12px;color:#a00000">❌ '+esc(e.message||String(e))+'</div>';box.style.display="block";}
-}
-function selectManualGeoapifyLocation(feature){
- const box=$("manualLocationSuggestions"),input=$("manualLocationInput");
- try{
-  box.style.display="none";const p=feature?.properties||{},c=feature?.geometry?.coordinates||[],lon=Number(c[0]),lat=Number(c[1]);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new Error("Selected location has no coordinates.");
-  gpsLat=lat;gpsLon=lon;gpsAccuracy=null;distanceKm=null;deliveryFee=null;
-  const label=String(p.formatted||[p.address_line1,p.address_line2].filter(Boolean).join(", ")||p.name||input.value||"").trim();
-  input.value=label;$("manualLocationSelected").textContent="📍 SELECTED LOCATION: "+label;$("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+label;
-  $("gpsAccuracy").textContent="Manual location selected from Geoapify.";$("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
-  $("calculateFeeBtn").disabled=false;
- }catch(e){$("locStatus").textContent="❌ Unable to select this location: "+(e.message||String(e));}
-}
-(function setupManualGeoapifyLocation(){
- const input=$("manualLocationInput"),box=$("manualLocationSuggestions");if(!input||!box)return;
- input.addEventListener("input",()=>{clearTimeout(manualGeoapifyTimer);manualGeoapifyTimer=setTimeout(searchManualGeoapifyLocation,300);});
- input.addEventListener("focus",()=>{if(input.value.trim().length>=3)searchManualGeoapifyLocation();});
- document.addEventListener("click",e=>{if(!$("manualLocationBox")?.contains(e.target))box.style.display="none";});
-})();
-window.__MHAC_BUILD__="V4.1.109 CUSTOMER GOOGLE POPUP-ONLY TEST — GEOAPIFY + GPS/FEE PATH PRESERVED";
+window.__MHAC_BUILD__="V4.1.89 CUSTOMER CATEGORY + ADD TO CART ALL STORES FIX";
 </script>
 
 <script>
@@ -2264,5 +2357,86 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
+window.__MHAC_BUILD__="V4.1.89 CUSTOMER CATEGORY + ADD TO CART ALL STORES FIX";\n</script>
+
+<style id="MHAC_CUSTOMER_ADMIN_PAYMENT_SPACING_FINAL">
+.customerUnifiedDetailWrap .unifiedBill{
+  border-top:1px solid #ddd!important;
+  margin-top:12px!important;
+  padding-top:14px!important;
+  font-size:17px!important;
+  line-height:2!important;
+}
+.customerUnifiedDetailWrap .unifiedBillRow{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  width:100%!important;
+  gap:16px!important;
+  padding:0!important;
+  margin:0!important;
+  min-height:34px!important;
+  box-sizing:border-box!important;
+}
+.customerUnifiedDetailWrap .unifiedBillLabel{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+.customerUnifiedDetailWrap .unifiedBillAmount{
+  flex:0 0 auto!important;
+  min-width:105px!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+}
+.customerUnifiedDetailWrap .unifiedBillGrand{
+  margin-top:6px!important;
+  padding-top:8px!important;
+  border-top:2px solid #777!important;
+  font-size:20px!important;
+  line-height:1.5!important;
+  min-height:42px!important;
+}
+
+
+
+
+<style id="MHAC_CUSTOMER_ADD_TO_CART_SAFE_V4_1_90">
+/* V4.1.90 — ADD TO CART touch/click safety only. No cart/choice/Firebase logic changed. */
+#menuModal{z-index:200!important;pointer-events:auto!important;}
+#menuModal .panel{position:relative!important;z-index:201!important;pointer-events:auto!important;}
+#menuModal #menuBody{position:relative!important;z-index:202!important;pointer-events:auto!important;}
+#menuModal #addConfigured{
+  position:relative!important;
+  z-index:203!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+  cursor:pointer!important;
+}
+</style>
+<script>
+/* V4.1.90: one delegated CLICK path for dynamically-created ADD TO CART.
+   Capture + stopImmediatePropagation prevents duplicate execution of onclick. */
+(function(){
+  if(window.__mhacAddToCartSafeInstalled)return;
+  window.__mhacAddToCartSafeInstalled=true;
+  document.addEventListener('click',function(e){
+    const b=e.target && e.target.closest ? e.target.closest('#addConfigured') : null;
+    if(!b)return;
+    if(b.dataset.mhacSafeClick==='1')return;
+    if(typeof b.onclick!=='function')return;
+    b.dataset.mhacSafeClick='1';
+    try{
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      b.onclick.call(b,e);
+    }catch(err){
+      console.error('MHAC ADD TO CART:',err);
+    }finally{
+      setTimeout(()=>{try{delete b.dataset.mhacSafeClick}catch(_){}},0);
+    }
+  },true);
+})();
 </script>
 </body></html>
