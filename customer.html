@@ -1383,6 +1383,16 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   border-top:1px solid #ddd!important;
 }
 </style>
+
+<style id="MHAC_CUSTOMER_MANUAL_ADDRESS_V4_1_98">
+/* V4.1.98 — additive location option only; existing GPS/fee/order flow preserved */
+.manualLocationBox{margin:8px 0;padding:10px;background:#fff;border:1px solid #ddd;border-radius:10px}
+.manualLocationBox input{width:100%!important;min-height:46px!important;margin:7px 0 4px!important;padding:9px 11px!important;font-size:16px!important}
+.manualAddressSuggestions{display:flex;flex-direction:column;gap:5px;margin-top:5px;max-height:220px;overflow:auto}
+.manualAddressSuggestions.hidden{display:none!important}
+.manualAddressSuggestion{width:100%;text-align:left;background:#fff!important;color:#111!important;border:1px solid #ccc!important;border-radius:8px!important;padding:9px 10px!important;min-height:44px!important;font-size:14px!important;line-height:1.25!important}
+.manualAddressSuggestion:active{background:#f2f2f2!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1402,7 +1412,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>DELIVERY LOCATION</b><br>Choose <b>GPS LOCATION</b> or <b>SEARCH MANUAL ADDRESS</b>. The selected location will be used for delivery-distance and delivery-fee calculation.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><div class="manualLocationBox"><b>🏠 SEARCH MANUAL ADDRESS</b><input id="manualAddressInput" type="search" placeholder="Type address / barangay / landmark…" autocomplete="street-address"><div id="manualAddressSuggestions" class="manualAddressSuggestions hidden"></div><div id="manualAddressStatus" class="status">Type an address, then choose a matching location.</div></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please choose GPS or select a manual address first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2009,6 +2019,52 @@ function updateTotals(){
  </div>`;
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
+
+
+// V4.1.98 — Manual Address Search: selected coordinates use the SAME distance/fee calculation as GPS.
+let manualSearchTimer=null,manualSearchRequest=0,selectedLocationType="";
+function clearManualAddressSuggestions(){const box=$("manualAddressSuggestions");if(box){box.innerHTML="";box.classList.add("hidden");}}
+async function searchManualAddress(){
+  const input=$("manualAddressInput"),box=$("manualAddressSuggestions"),status=$("manualAddressStatus");
+  if(!input||!box)return;
+  const q=String(input.value||"").trim();
+  clearTimeout(manualSearchTimer);
+  if(q.length<3){clearManualAddressSuggestions();if(status)status.textContent="Type at least 3 characters to search.";return;}
+  manualSearchTimer=setTimeout(async()=>{
+    const req=++manualSearchRequest;
+    box.innerHTML='<div class="status">🔎 Searching address…</div>';box.classList.remove("hidden");
+    try{
+      const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(q)}`;
+      const r=await fetch(url,{headers:{"Accept":"application/json"}});
+      if(!r.ok)throw new Error("Address search failed");
+      const results=await r.json();
+      if(req!==manualSearchRequest)return;
+      if(!Array.isArray(results)||!results.length){box.innerHTML='<div class="status">❌ No matching address found. Try a barangay, landmark, street, or municipality.</div>';return;}
+      box.innerHTML=results.map((x,i)=>`<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`).join("");
+      box.querySelectorAll("[data-manual-index]").forEach(btn=>btn.onclick=()=>selectManualAddress(results[Number(btn.dataset.manualIndex)]));
+      if(status)status.textContent="Select one of the matching locations below.";
+    }catch(e){
+      if(req!==manualSearchRequest)return;
+      box.innerHTML='<div class="status">❌ Address search unavailable. Please try again or use GPS.</div>';
+    }
+  },450);
+}
+function selectManualAddress(x){
+  const lat=Number(x?.lat),lon=Number(x?.lon);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+  gpsLat=lat;gpsLon=lon;gpsAccuracy=null;selectedLocationType="MANUAL";distanceKm=null;deliveryFee=null;
+  const label=String(x?.display_name||`${lat.toFixed(6)}, ${lon.toFixed(6)}`);
+  $("manualAddressInput").value=label;
+  clearManualAddressSuggestions();
+  $("gpsLocationDisplay").textContent="🏠 SELECTED ADDRESS: "+label;
+  $("gpsAccuracy").textContent="";
+  $("manualAddressStatus").textContent="✅ Manual address selected. This exact location will be used for delivery distance.";
+  $("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
+  $("calculateFeeBtn").disabled=false;
+  $("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 USE CURRENT GPS LOCATION";
+}
+function resetSelectedLocationForGPS(){selectedLocationType="GPS";}
+
 async function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
@@ -2017,7 +2073,7 @@ async function calculateByGPS(e){
  if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";return}
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  navigator.geolocation.getCurrentPosition(async p=>{
-   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
+   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;selectedLocationType="GPS";distanceKm=null;deliveryFee=null;
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
    $("calculateFeeBtn").disabled=false;
@@ -2037,12 +2093,22 @@ async function calculateByGPS(e){
    $("gpsLocationDisplay").textContent="";
  });
 }
+
+function initManualAddressSearch(){
+ const input=$("manualAddressInput");
+ if(!input||input.dataset.bound)return;
+ input.dataset.bound="1";
+ input.addEventListener("input",searchManualAddress);
+ input.addEventListener("focus",()=>{if(String(input.value||"").trim().length>=3)searchManualAddress()});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initManualAddressSearch);else initManualAddressSearch();
+
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){
  if(!isOpen())return alert("MHAC Delivery is closed.");
  const name=$("custName").value.trim(),contact=$("custContact").value.trim();
  if(!name||!contact)return alert("Complete name and contact.");
- if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");
+ if(gpsLat===null||distanceKm===null)return alert("Choose GPS or select a manual address, then calculate delivery fee first.");
  const payment=String($("payment").value||"Cash on Delivery");
  const isGcash=payment.toUpperCase()==="GCASH";
  const screenshot=$("gcashScreenshot")?.files?.[0];
@@ -2065,7 +2131,7 @@ async function placeOrder(){
    };
    const ref=await addDoc(collection(db,"orders"),o);
    $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
-   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
+   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;selectedLocationType="";
    $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
    renderCart();setTimeout(closeCheckout,1000);
  }catch(e){
@@ -2361,7 +2427,7 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-</body></html>
+<script>window.__MHAC_BUILD__="V4.1.98 CUSTOMER MANUAL ADDRESS SEARCH + SAME GPS DISTANCE FEE";</script></body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
 .customerUnifiedDetailWrap .orderDetailPanel{
