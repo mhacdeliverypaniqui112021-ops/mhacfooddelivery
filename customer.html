@@ -2381,35 +2381,51 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <script id="MHAC_MANUAL_LOCATION_V4_1_100_NO_BILLING">
 (function(){
   "use strict";
-  // V4.1.100: NO-BILLING manual location search using OpenStreetMap Nominatim.
-  // V4.1.97 Drink Gate, GPS, OSRM fee calculation, cart, choices and order flow untouched.
+  // V4.1.100 NO-BILLING MANUAL LOCATION SEARCH.
+  // Uses free OpenStreetMap-based search only. Existing GPS/OSRM/order flow untouched.
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
   const MHAC_SEARCH_BOX={latMin:15.40,latMax:15.95,lonMin:120.20,lonMax:120.90};
-  let mhacManualTimer=null;
-  let mhacManualRequestId=0;
-  let mhacManualSelected=false;
+  let mhacManualTimer=null, mhacManualRequestId=0, mhacManualSelected=false;
   const byId=id=>document.getElementById(id);
   const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   function setStatus(t,show=true){const e=byId("manualLocationSelected");if(!e)return;e.innerHTML=show&&t?t:"";e.style.display=show&&t?"block":"none";}
-  function clearBox(){const e=byId("manualLocationSuggestions");if(e){e.innerHTML="";e.style.display="none";}}
+  function clearBox(){const e=byId("manualLocationSuggestions");if(e){e.innerHTML="";e.style.display="none";delete e.__mhacResults;}}
   function renderResults(arr){
     const box=byId("manualLocationSuggestions");if(!box)return;
     if(!arr.length){box.innerHTML='<div style="padding:10px;color:#666">No matching location found.</div>';box.style.display="block";return;}
-    box.innerHTML=arr.map((x,i)=>`<button type="button" data-mhac-osm-index="${i}" style="display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #ddd;border-radius:0;padding:11px 10px;min-height:0"><b>${esc(x.name||x.display_name||"Location")}</b><br><span style="font-size:13px;color:#555">${esc(x.display_name||"")}</span></button>`).join("");
-    box.style.display="block";
-    box.__mhacResults=arr;
+    box.innerHTML=arr.map((x,i)=>`<button type="button" data-mhac-osm-index="${i}" style="display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #ddd;border-radius:0;padding:11px 10px;min-height:0"><b>${esc(x.name||x.display_name||x.label||"Location")}</b><br><span style="font-size:13px;color:#555">${esc(x.display_name||x.label||x.address||"")}</span></button>`).join("");
+    box.style.display="block";box.__mhacResults=arr;
+  }
+  function normalizeNominatim(a){return {name:a.name||a.display_name?.split(",")[0]||"Location",display_name:a.display_name,lat:a.lat,lon:a.lon,source:"OSM"};}
+  function normalizePhoton(f){const p=f?.properties||{},c=f?.geometry?.coordinates||[];return {name:p.name||p.street||p.city||"Location",display_name:[p.name,p.street,p.locality,p.district,p.city,p.state,p.country].filter(Boolean).join(", "),lat:c[1],lon:c[0],source:"Photon"};}
+  function inCoverage(x){const lat=Number(x.lat),lon=Number(x.lon);return Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=MHAC_SEARCH_BOX.latMin&&lat<=MHAC_SEARCH_BOX.latMax&&lon>=MHAC_SEARCH_BOX.lonMin&&lon<=MHAC_SEARCH_BOX.lonMax;}
+  function dedupe(arr){const seen=new Set();return arr.filter(x=>{if(!inCoverage(x))return false;const k=(String(x.display_name||"")+"|"+Number(x.lat).toFixed(5)+"|"+Number(x.lon).toFixed(5)).toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).slice(0,8);}
+  async function nominatim(q){
+    const qs=[q, q+", Paniqui, Tarlac, Philippines", q+", Tarlac, Philippines"];
+    for(const term of qs){
+      try{
+        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&q="+encodeURIComponent(term);
+        const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)continue;
+        const a=await r.json();if(Array.isArray(a)&&a.length)return a.map(normalizeNominatim);
+      }catch(_){ }
+    }
+    return [];
+  }
+  async function photon(q){
+    try{
+      const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q+", Paniqui, Tarlac, Philippines")+"&limit=8&lat="+MHAC_MAPS_CENTER.lat+"&lon="+MHAC_MAPS_CENTER.lng+"&location_bias_scale=0.2";
+      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)return [];
+      const j=await r.json();return Array.isArray(j?.features)?j.features.map(normalizePhoton):[];
+    }catch(_){return []}
   }
   async function searchManual(){
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
-    const q=(input?.value||"").trim();if(!box)return;
-    mhacManualSelected=false;setStatus("",false);
-    if(q.length<3){clearBox();return;}
-    const id=++mhacManualRequestId;
-    try{
-      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&viewbox="+encodeURIComponent(`${MHAC_SEARCH_BOX.lonMin},${MHAC_SEARCH_BOX.latMax},${MHAC_SEARCH_BOX.lonMax},${MHAC_SEARCH_BOX.latMin}`)+"&q="+encodeURIComponent(q+", Tarlac, Philippines");
-      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)throw new Error("Search service returned "+r.status);
-      const arr=await r.json();if(id!==mhacManualRequestId)return;renderResults(Array.isArray(arr)?arr:[]);
-    }catch(e){if(id!==mhacManualRequestId)return;box.innerHTML='<div style="padding:10px;color:#a00000">❌ Manual location search unavailable. Try again.</div>';box.style.display="block";console.warn("MHAC manual location search:",e)}
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");if(!box)return;
+    const q=(input?.value||"").trim();if(q.length<3){clearBox();return;}
+    mhacManualSelected=false;setStatus("",false);const id=++mhacManualRequestId;
+    box.innerHTML='<div style="padding:10px;color:#666">🔎 Searching…</div>';box.style.display="block";
+    let arr=await nominatim(q);if(!arr.length)arr=await photon(q);if(id!==mhacManualRequestId)return;
+    arr=dedupe(arr);
+    renderResults(arr);
   }
   function selectResult(i){
     const box=byId("manualLocationSuggestions"),arr=box?.__mhacResults||[],x=arr[i];if(!x)return;
@@ -2426,14 +2442,14 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
   }
   function install(){
     const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");if(!input||!box)return;
-    input.addEventListener("input",()=>{clearTimeout(mhacManualTimer);mhacManualTimer=setTimeout(searchManual,300)});
+    input.addEventListener("input",()=>{clearTimeout(mhacManualTimer);mhacManualTimer=setTimeout(searchManual,450)});
     input.addEventListener("keydown",e=>{if(e.key==="Escape")clearBox()});
     box.addEventListener("click",e=>{const b=e.target.closest("[data-mhac-osm-index]");if(!b)return;e.preventDefault();selectResult(Number(b.dataset.mhacOsmIndex))});
     document.addEventListener("click",e=>{if(!e.target.closest("#manualLocationBox"))clearBox()});
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
   window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.100 CUSTOMER NO-BILLING MANUAL LOCATION — V4.1.97 BASE PRESERVED";
+  window.__MHAC_BUILD__="V4.1.100 CUSTOMER NO-BILLING MANUAL LOCATION — SEARCH FALLBACK FIX";
 })();
 </script>
 </html>
