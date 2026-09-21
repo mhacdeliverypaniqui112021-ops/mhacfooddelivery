@@ -2041,70 +2041,158 @@ async function searchManualAddress(){
   const q=String(input.value||"").trim();
   clearTimeout(manualSearchTimer);
   if(q.length<3){clearManualAddressSuggestions();if(status)status.textContent="Type at least 3 characters to search.";return;}
+
   manualSearchTimer=setTimeout(async()=>{
     const req=++manualSearchRequest;
-    box.innerHTML='<div class="status">🔎 Searching schools, landmarks and addresses…</div>';box.classList.remove("hidden");
+    box.innerHTML='<div class="status">🔎 Searching within MHAC DELIVERY service areas…</div>';
+    box.classList.remove("hidden");
+
     try{
-      const variants=manualSearchVariants(q);
-      let groups=[];
-      // Primary search provider: Photon. It supports search-as-you-type/POI lookup and
-      // is more suitable here for schools/landmarks than a strict address-only search.
+      // MHAC DELIVERY covered municipalities only.
+      const coverage=[
+        "Paniqui, Tarlac",
+        "Moncada, Tarlac",
+        "Ramos, Tarlac",
+        "Gerona, Tarlac",
+        "Pura, Tarlac",
+        "Anao, Tarlac",
+        "Nampicuan, Nueva Ecija"
+      ];
+      const coverageNorm=coverage.map(v=>v.toLowerCase().replace(/[^a-z0-9]+/g," ").trim());
+
+      const inCoverage=(x)=>{
+        const p=x?.properties||x?.address||{};
+        const text=String(
+          x?.display_name ||
+          [
+            p.name,p.street,p.housenumber,p.village,p.suburb,p.district,
+            p.town,p.city,p.municipality,p.county,p.state,p.country
+          ].filter(Boolean).join(", ")
+        ).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+
+        return coverageNorm.some(c=>text.includes(c));
+      };
+
+      // Search locally in every covered municipality so a customer does not
+      // get schools/landmarks from outside the MHAC DELIVERY service area.
+      const queryList=[];
+      const addQuery=v=>{
+        v=String(v||"").replace(/\s+/g," ").trim();
+        if(v.length>=3&&!queryList.some(x=>x.toLowerCase()===v.toLowerCase()))queryList.push(v);
+      };
+      addQuery(q);
+      const normalized=q
+        .replace(/\bPob\.?\b/ig,"Poblacion")
+        .replace(/\bBrgy\.?\b/ig,"Barangay")
+        .replace(/\bElem\.?\b/ig,"Elementary")
+        .replace(/\bHS\b/ig,"High School");
+      addQuery(normalized);
+
+      const providerQueries=[];
+      for(const base of queryList){
+        for(const area of coverage){
+          providerQueries.push(`${base} ${area}`);
+        }
+      }
+
+      let results=[];
+      // Photon primary.
       try{
-        const photonResponses=await Promise.all(variants.slice(0,3).map(v=>fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(v)}&limit=8&lang=en`,{headers:{"Accept":"application/json"}})));
-        if(photonResponses.every(r=>r.ok)){
-          const photonGroups=await Promise.all(photonResponses.map(r=>r.json()));
-          groups=photonGroups.map(j=>(j&&Array.isArray(j.features)?j.features:[]).map(f=>{
-            const p=f?.properties||{},c=f?.geometry?.coordinates||[];
-            const name=[p.name,p.street,p.housenumber,p.district,p.city,p.state,p.country].filter(Boolean).join(", ");
-            return {lat:c[1],lon:c[0],display_name:name||String(p.name||""),place_id:`photon:${p.osm_type||""}:${p.osm_id||""}:${c[0]},${c[1]}`};
-          }));
+        const responses=await Promise.all(
+          providerQueries.slice(0,16).map(v=>
+            fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(v)}&limit=8&lang=en`,
+              {headers:{"Accept":"application/json"}})
+          )
+        );
+        const good=responses.filter(r=>r.ok);
+        if(good.length){
+          const photonGroups=await Promise.all(good.map(r=>r.json()));
+          for(const j of photonGroups){
+            for(const f of (j&&Array.isArray(j.features)?j.features:[])){
+              const p=f?.properties||{},c=f?.geometry?.coordinates||[];
+              const display=[
+                p.name,p.street,p.housenumber,p.district,p.city,p.state,p.country
+              ].filter(Boolean).join(", ");
+              const x={
+                lat:c[1],lon:c[0],
+                display_name:display||String(p.name||""),
+                place_id:`photon:${p.osm_type||""}:${p.osm_id||""}:${c[0]},${c[1]}`,
+                properties:p
+              };
+              if(inCoverage(x))results.push(x);
+            }
+          }
         }
-      }catch(_){/* fallback below */}
-      // Fallback: Nominatim if Photon is unavailable.
-      if(!groups.length){
-        const responses=await Promise.all(variants.map(v=>fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(v)}`,{headers:{"Accept":"application/json"}})));
-        if(responses.some(r=>!r.ok))throw new Error("Address search failed");
-        groups=await Promise.all(responses.map(r=>r.json()));
+      }catch(_){}
+
+      // Nominatim fallback, also restricted to covered municipalities.
+      if(!results.length){
+        try{
+          const responses=await Promise.all(
+            providerQueries.slice(0,10).map(v=>
+              fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&q=${encodeURIComponent(v)}`,
+                {headers:{"Accept":"application/json"}})
+            )
+          );
+          for(const r of responses){
+            if(!r.ok)continue;
+            const arr=await r.json();
+            for(const x of (Array.isArray(arr)?arr:[])){
+              if(inCoverage(x))results.push(x);
+            }
+          }
+        }catch(_){}
       }
+
       if(req!==manualSearchRequest)return;
-      const seen=new Set(),results=[];
-      for(const list of groups){
-        if(!Array.isArray(list))continue;
-        for(const x of list){
-          const key=String(x.place_id||`${x.lat},${x.lon},${x.display_name}`);
-          if(!seen.has(key)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon))){seen.add(key);results.push(x);}
+
+      const seen=new Set(),deduped=[];
+      for(const x of results){
+        const key=String(x.place_id||`${x.lat},${x.lon},${x.display_name}`);
+        if(!seen.has(key)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon))){
+          seen.add(key);deduped.push(x);
         }
       }
-      if(!results.length){box.innerHTML='<div class="status">❌ No matching school/address found. Try the school name, barangay, landmark, street, or municipality.</div>';return;}
-      // Rank results so the thing the customer actually typed comes first.
-      // In particular, never let a HIGH SCHOOL outrank an ELEMENTARY SCHOOL
-      // when the search explicitly contains "Elementary School".
-      const norm=v=>String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+
+      if(!deduped.length){
+        box.innerHTML='<div class="status">❌ No matching location found inside MHAC DELIVERY service areas: Paniqui, Moncada, Ramos, Gerona, Pura, Anao, and Nampicuan.</div>';
+        if(status)status.textContent="Try the school/landmark name plus barangay or municipality.";
+        return;
+      }
+
+      // Rank what the customer actually typed, while keeping only service-area results.
+      const norm=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]+/g," ").replace(/\s+/g," ").trim();
       const queryNorm=norm(q);
-      const qTokens=queryNorm.split(' ').filter(t=>t.length>=2);
+      const qTokens=queryNorm.split(" ").filter(t=>t.length>=2);
       const wantsElementary=/\belementary\b/.test(queryNorm);
       const wantsHighSchool=/\bhigh\s+school\b/.test(queryNorm);
-      const scored=results.map((x,idx)=>{
+
+      const scored=deduped.map((x,idx)=>{
         const text=norm(x.display_name);
         let score=0;
-        if(text.includes(queryNorm))score+=1000;
-        for(const t of qTokens)if(text.includes(t))score+=12;
+        if(text.includes(queryNorm))score+=1200;
+        for(const t of qTokens)if(text.includes(t))score+=15;
         if(wantsElementary){
-          if(/\belementary\b/.test(text))score+=500;
-          if(/\bhigh\s+school\b/.test(text))score-=700;
+          if(/\belementary\b/.test(text))score+=600;
+          if(/\bhigh\s+school\b/.test(text))score-=900;
         }
         if(wantsHighSchool){
-          if(/\bhigh\s+school\b/.test(text))score+=500;
-          if(/\belementary\b/.test(text))score-=700;
+          if(/\bhigh\s+school\b/.test(text))score+=600;
+          if(/\belementary\b/.test(text))score-=900;
         }
-        const first=norm(String(x.display_name||'').split(',')[0]);
-        if(first&&queryNorm.includes(first))score+=80;
         return {x,score,idx};
       }).sort((a,b)=>b.score-a.score||a.idx-b.idx).map(v=>v.x);
+
       const shown=scored.slice(0,8);
-      box.innerHTML=shown.map((x,i)=>`<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`).join("");
-      box.querySelectorAll("[data-manual-index]").forEach(btn=>btn.onclick=()=>selectManualAddress(shown[Number(btn.dataset.manualIndex)]));
-      if(status)status.textContent=`${shown.length} matching location${shown.length===1?"":"s"} found. Select one below.`;
+      box.innerHTML=shown.map((x,i)=>
+        `<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`
+      ).join("");
+
+      box.querySelectorAll("[data-manual-index]").forEach(btn=>
+        btn.onclick=()=>selectManualAddress(shown[Number(btn.dataset.manualIndex)])
+      );
+
+      if(status)status.textContent=`${shown.length} matching location${shown.length===1?"":"s"} found within MHAC DELIVERY service areas. Select one below.`;
     }catch(e){
       if(req!==manualSearchRequest)return;
       box.innerHTML='<div class="status">❌ Address search unavailable. Please try again or use GPS.</div>';
@@ -2489,7 +2577,7 @@ setTimeout(function(){
 },4500);
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-<script>window.__MHAC_BUILD__="V4.1.99 CUSTOMER MANUAL ADDRESS SCHOOL SEARCH FIX + SAME GPS DISTANCE FEE";</script></body></html>
+<script>window.__MHAC_BUILD__="V4.1.102 CUSTOMER MANUAL ADDRESS SERVICE AREA SEARCH FIX";</script></body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
 .customerUnifiedDetailWrap .orderDetailPanel{
