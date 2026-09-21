@@ -1412,9 +1412,9 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
 <div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or search the manual delivery location below without Google Maps billing.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
 <div class="manualLocationBox" id="manualLocationBox">
-  <b>🔎 MANUAL DELIVERY LOCATION — NO BILLING</b><br>
-  <span class="small">Type the street, barangay, landmark or place, then select the matching location.</span>
-  <input id="manualLocationInput" type="text" placeholder="Search street, barangay, landmark or place…" autocomplete="off" enterkeyhint="search">
+  <b>🔎 MANUAL DELIVERY LOCATION — WAZE STYLE</b><br>
+  <span class="small">Type anything — street, school, store, market, barangay, building, mall or landmark — then select the matching place with its address.</span>
+  <input id="manualLocationInput" type="text" placeholder="Search street, school, store, market, barangay, building or place…" autocomplete="off" enterkeyhint="search">
   <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
   <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
 </div>
@@ -1465,7 +1465,7 @@ const app=initializeApp(firebaseConfig),auth=initializeAuth(app,{persistence:bro
 // V4.1.67: explicitly keep Customer Firebase auth persistent across refresh/browser restarts.
 setPersistence(auth,browserLocalPersistence).catch(e=>console.warn("Customer auth persistence setup failed:",e));
 const $=x=>document.getElementById(x),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),peso=n=>"₱"+Number(n||0).toFixed(2);
-const TEST_MODE=false;let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null,menuUnsub=null;
+const TEST_MODE=false;let currentUser=null,data={stores:[]},draftCart=[],distanceKm=null,deliveryFee=null,gpsLat=null,gpsLon=null,gpsAccuracy=null,manualLat=null,manualLon=null,manualLabel="",manualLocationSelected=false,businessHours={openTime:"09:00",closeTime:"19:30",enabled:true},ordersUnsub=null,menuUnsub=null;
 let gcashSettings={number:"",qrUrl:"",qrHidden:false},gcashSettingsUnsub=null;
 function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m}function isOpen(){if(TEST_MODE)return true;if(businessHours.manualClosed===true)return false;if(businessHours.enabled===false)return false;const n=new Date(),c=n.getHours()*60+n.getMinutes(),o=mins(businessHours.openTime),cl=mins(businessHours.closeTime);return o<=cl?c>=o&&c<cl:(c>=o||c<cl)}
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
@@ -2053,12 +2053,28 @@ async function calculateByGPS(e){
    $("gpsLocationDisplay").textContent="";
  });
 }
-async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
+async function calculateGPSFee(){
+ const useManual=manualLocationSelected&&Number.isFinite(Number(manualLat))&&Number.isFinite(Number(manualLon));
+ const lat=useManual?Number(manualLat):gpsLat,lon=useManual?Number(manualLon):gpsLon;
+ if(lat===null||lon===null||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))return;
+ $("locStatus").textContent="Calculating driving distance…";
+ try{
+   const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${lon},${lat}?overview=false`);
+   const j=await r.json();
+   if(!j?.routes?.[0])throw new Error("No route");
+   distanceKm=j.routes[0].distance/1000;
+   deliveryFee=feeForKm(distanceKm);
+   $("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;
+   $("locStatus").textContent=useManual?"Manual location route calculated.":"GPS location route calculated.";
+   renderCart();updateTotals();
+ }catch(e){$("locStatus").textContent="❌ Route calculation failed."}
+ finally{$("calculateFeeBtn").disabled=false}
+}
 async function placeOrder(){
  if(!isOpen())return alert("MHAC Delivery is closed.");
  const name=$("custName").value.trim(),contact=$("custContact").value.trim();
  if(!name||!contact)return alert("Complete name and contact.");
- if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");
+ if((gpsLat===null&&!manualLocationSelected)||distanceKm===null)return alert("Select a manual location or allow GPS, then calculate the delivery fee first.");
  const payment=String($("payment").value||"Cash on Delivery");
  const isGcash=payment.toUpperCase()==="GCASH";
  const screenshot=$("gcashScreenshot")?.files?.[0];
@@ -2075,13 +2091,17 @@ async function placeOrder(){
    }
    const o={
      orderNo:"MHAC-"+Date.now(),createdAt:serverTimestamp(),status:"NEW",assignedRiderUid:"",
-     customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,gps:{lat:gpsLat,lon:gpsLon,accuracy:gpsAccuracy,display:$("gpsLocationDisplay").textContent}},
+     customer:{uid:currentUser.uid,email:currentUser.email||"",name,contact,
+      gps:{lat:manualLocationSelected?manualLat:gpsLat,lon:manualLocationSelected?manualLon:gpsLon,accuracy:manualLocationSelected?null:gpsAccuracy,display:$("gpsLocationDisplay").textContent},
+      locationMode:manualLocationSelected?"MANUAL":"GPS",
+      manualLocation:manualLocationSelected?{name:manualLabel,lat:manualLat,lon:manualLon}:null
+    },
      items:draftCart,fees:{foodOrder:sub,serviceFee:sf,deliveryFee,distanceKm,secondStoreFee:second,total},
      payment,paymentStatus:isGcash?"PENDING":"COD",paymentScreenshotUrl,paymentSubmittedAt:isGcash?serverTimestamp():null
    };
    const ref=await addDoc(collection(db,"orders"),o);
    $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
-   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
+   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;manualLat=null;manualLon=null;manualLabel="";manualLocationSelected=false;
    $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
    renderCart();setTimeout(closeCheckout,1000);
  }catch(e){
@@ -2378,78 +2398,198 @@ setTimeout(function(){
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body>
-<script id="MHAC_MANUAL_LOCATION_V4_1_100_NO_BILLING">
+<script id="MHAC_MANUAL_LOCATION_V4_1_101_WAZE_STYLE_UNIVERSAL">
 (function(){
   "use strict";
-  // V4.1.100 NO-BILLING MANUAL LOCATION SEARCH.
-  // Uses free OpenStreetMap-based search only. Existing GPS/OSRM/order flow untouched.
+  // V4.1.101: Waze-style universal manual place/address search, NO BILLING.
+  // GPS remains separate. Manual selection stores its own coordinates and only
+  // becomes the order destination after the customer explicitly selects it.
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
   const MHAC_SEARCH_BOX={latMin:15.40,latMax:15.95,lonMin:120.20,lonMax:120.90};
-  let mhacManualTimer=null, mhacManualRequestId=0, mhacManualSelected=false;
+  let mhacManualTimer=null,mhacManualRequestId=0;
   const byId=id=>document.getElementById(id);
   const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-  function setStatus(t,show=true){const e=byId("manualLocationSelected");if(!e)return;e.innerHTML=show&&t?t:"";e.style.display=show&&t?"block":"none";}
-  function clearBox(){const e=byId("manualLocationSuggestions");if(e){e.innerHTML="";e.style.display="none";delete e.__mhacResults;}}
-  function renderResults(arr){
-    const box=byId("manualLocationSuggestions");if(!box)return;
-    if(!arr.length){box.innerHTML='<div style="padding:10px;color:#666">No matching location found.</div>';box.style.display="block";return;}
-    box.innerHTML=arr.map((x,i)=>`<button type="button" data-mhac-osm-index="${i}" style="display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #ddd;border-radius:0;padding:11px 10px;min-height:0"><b>${esc(x.name||x.display_name||x.label||"Location")}</b><br><span style="font-size:13px;color:#555">${esc(x.display_name||x.label||x.address||"")}</span></button>`).join("");
-    box.style.display="block";box.__mhacResults=arr;
+
+  function setStatus(t,show=true){
+    const e=byId("manualLocationSelected");
+    if(!e)return;
+    e.innerHTML=show&&t?t:"";
+    e.style.display=show&&t?"block":"none";
   }
-  function normalizeNominatim(a){return {name:a.name||a.display_name?.split(",")[0]||"Location",display_name:a.display_name,lat:a.lat,lon:a.lon,source:"OSM"};}
-  function normalizePhoton(f){const p=f?.properties||{},c=f?.geometry?.coordinates||[];return {name:p.name||p.street||p.city||"Location",display_name:[p.name,p.street,p.locality,p.district,p.city,p.state,p.country].filter(Boolean).join(", "),lat:c[1],lon:c[0],source:"Photon"};}
-  function inCoverage(x){const lat=Number(x.lat),lon=Number(x.lon);return Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=MHAC_SEARCH_BOX.latMin&&lat<=MHAC_SEARCH_BOX.latMax&&lon>=MHAC_SEARCH_BOX.lonMin&&lon<=MHAC_SEARCH_BOX.lonMax;}
-  function dedupe(arr){const seen=new Set();return arr.filter(x=>{if(!inCoverage(x))return false;const k=(String(x.display_name||"")+"|"+Number(x.lat).toFixed(5)+"|"+Number(x.lon).toFixed(5)).toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).slice(0,8);}
-  async function nominatim(q){
-    const qs=[q, q+", Paniqui, Tarlac, Philippines", q+", Tarlac, Philippines"];
-    for(const term of qs){
-      try{
-        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&q="+encodeURIComponent(term);
-        const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)continue;
-        const a=await r.json();if(Array.isArray(a)&&a.length)return a.map(normalizeNominatim);
-      }catch(_){ }
+  function clearBox(){
+    const e=byId("manualLocationSuggestions");
+    if(e){e.innerHTML="";e.style.display="none";delete e.__mhacResults;}
+  }
+  function addressOfNominatim(a){
+    const d=a?.address||{};
+    return [
+      d.road||d.pedestrian||d.footway,
+      d.neighbourhood||d.suburb||d.village||d.town||d.city_district,
+      d.city||d.municipality,
+      d.state,
+      d.country
+    ].filter(Boolean).join(", ");
+  }
+  function normalizeNominatim(a){
+    const name=a?.name||a?.display_name?.split(",")[0]||"Location";
+    return {
+      name,
+      display_name:a?.display_name||"",
+      shortAddress:addressOfNominatim(a),
+      lat:a?.lat,lon:a?.lon,source:"OpenStreetMap"
+    };
+  }
+  function normalizePhoton(f){
+    const p=f?.properties||{},c=f?.geometry?.coordinates||[];
+    const name=p.name||p.street||p.city||"Location";
+    const address=[p.street,p.housenumber,p.locality,p.district,p.city,p.state,p.country].filter(Boolean).join(", ");
+    return {name,display_name:address||name,shortAddress:address,lat:c[1],lon:c[0],source:"Photon"};
+  }
+  function inCoverage(x){
+    const lat=Number(x.lat),lon=Number(x.lon);
+    return Number.isFinite(lat)&&Number.isFinite(lon)&&
+      lat>=MHAC_SEARCH_BOX.latMin&&lat<=MHAC_SEARCH_BOX.latMax&&
+      lon>=MHAC_SEARCH_BOX.lonMin&&lon<=MHAC_SEARCH_BOX.lonMax;
+  }
+  function score(x,q){
+    const needle=q.toLowerCase().replace(/[.,]/g," ").replace(/\s+/g," ").trim();
+    const hay=(String(x.name||"")+" "+String(x.display_name||"")+" "+String(x.shortAddress||"")).toLowerCase();
+    const tokens=needle.split(" ").filter(t=>t.length>=2);
+    let s=0;
+    if(String(x.name||"").toLowerCase()===needle)s+=1000;
+    if(String(x.name||"").toLowerCase().includes(needle))s+=500;
+    for(const t of tokens){
+      if(String(x.name||"").toLowerCase().includes(t))s+=90;
+      if(hay.includes(t))s+=20;
     }
-    return [];
+    const dLat=Number(x.lat)-MHAC_MAPS_CENTER.lat,dLon=Number(x.lon)-MHAC_MAPS_CENTER.lng;
+    s-=Math.sqrt(dLat*dLat+dLon*dLon)*20;
+    return s;
   }
-  async function photon(q){
+  function dedupe(arr,q){
+    const seen=new Set(),out=[];
+    for(const x of arr){
+      if(!inCoverage(x))continue;
+      const lat=Number(x.lat),lon=Number(x.lon);
+      if(!Number.isFinite(lat)||!Number.isFinite(lon))continue;
+      const key=(String(x.name||"")+"|"+String(x.display_name||"")+"|"+lat.toFixed(5)+"|"+lon.toFixed(5)).toLowerCase();
+      if(seen.has(key))continue;
+      seen.add(key);out.push({...x,_score:score(x,q)});
+    }
+    return out.sort((a,b)=>b._score-a._score).slice(0,10);
+  }
+  async function fetchNominatim(q){
+    const terms=[
+      q+", Paniqui, Tarlac, Philippines",
+      q+", Tarlac, Philippines",
+      q
+    ];
+    const all=[];
+    for(const term of terms){
+      try{
+        const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=ph&q="+encodeURIComponent(term);
+        const r=await fetch(url,{headers:{Accept:"application/json"}});
+        if(r.ok){
+          const a=await r.json();
+          if(Array.isArray(a))all.push(...a.map(normalizeNominatim));
+        }
+      }catch(_){}
+    }
+    return all;
+  }
+  async function fetchPhoton(q){
     try{
-      const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q+", Paniqui, Tarlac, Philippines")+"&limit=8&lat="+MHAC_MAPS_CENTER.lat+"&lon="+MHAC_MAPS_CENTER.lng+"&location_bias_scale=0.2";
-      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)return [];
-      const j=await r.json();return Array.isArray(j?.features)?j.features.map(normalizePhoton):[];
+      const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q+", Paniqui, Tarlac, Philippines")+
+        "&limit=15&lat="+MHAC_MAPS_CENTER.lat+"&lon="+MHAC_MAPS_CENTER.lng+"&location_bias_scale=0.35";
+      const r=await fetch(url,{headers:{Accept:"application/json"}});
+      if(!r.ok)return [];
+      const j=await r.json();
+      return Array.isArray(j?.features)?j.features.map(normalizePhoton):[];
     }catch(_){return []}
   }
+  function resultType(x){
+    const s=(String(x.name||"")+" "+String(x.display_name||"")).toLowerCase();
+    if(/school|college|academy|elementary|high school|university/.test(s))return "🏫";
+    if(/market|grocery|supermarket/.test(s))return "🛒";
+    if(/mall|shopping|store|shop|pharmacy|restaurant|jollibee|mcdonald|kfc/.test(s))return "🏪";
+    if(/street|road|avenue|highway|st\\.|rd\\.|ave\\./.test(s))return "🛣️";
+    if(/barangay|barangay hall|municipal|city hall/.test(s))return "🏛️";
+    if(/building|tower|center|centre|plaza|complex/.test(s))return "🏢";
+    return "📍";
+  }
+  function renderResults(arr,q){
+    const box=byId("manualLocationSuggestions");
+    if(!box)return;
+    if(!arr.length){
+      box.innerHTML='<div style="padding:12px;color:#666">No matching place or address found. Try a school, store, landmark, street, barangay or building name.</div>';
+      box.style.display="block";return;
+    }
+    box.innerHTML=arr.map((x,i)=>`
+      <button type="button" data-mhac-universal-index="${i}"
+        style="display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #ddd;border-radius:0;padding:12px 10px;min-height:0">
+        <div style="font-weight:800;font-size:15px">${resultType(x)} ${esc(x.name||"Location")}</div>
+        <div style="font-size:13px;color:#555;margin-top:3px;line-height:1.35">${esc(x.shortAddress||x.display_name||"")}</div>
+        <div style="font-size:11px;color:#999;margin-top:3px">📍 ${esc(x.display_name||"")}</div>
+      </button>`).join("");
+    box.style.display="block";box.__mhacResults=arr;
+  }
   async function searchManual(){
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");if(!box)return;
-    const q=(input?.value||"").trim();if(q.length<3){clearBox();return;}
-    mhacManualSelected=false;setStatus("",false);const id=++mhacManualRequestId;
-    box.innerHTML='<div style="padding:10px;color:#666">🔎 Searching…</div>';box.style.display="block";
-    let arr=await nominatim(q);if(!arr.length)arr=await photon(q);if(id!==mhacManualRequestId)return;
-    arr=dedupe(arr);
-    renderResults(arr);
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    if(!input||!box)return;
+    const q=(input.value||"").trim();
+    if(q.length<2){clearBox();return;}
+    const id=++mhacManualRequestId;
+    box.innerHTML='<div style="padding:12px;color:#666">🔎 Searching places and addresses…</div>';
+    box.style.display="block";
+    const [a,b]=await Promise.all([fetchNominatim(q),fetchPhoton(q)]);
+    if(id!==mhacManualRequestId)return;
+    const arr=dedupe([...a,...b],q);
+    renderResults(arr,q);
   }
   function selectResult(i){
-    const box=byId("manualLocationSuggestions"),arr=box?.__mhacResults||[],x=arr[i];if(!x)return;
-    const lat=Number(x.lat),lon=Number(x.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon)){setStatus("❌ Selected location has no coordinates.",true);return;}
-    gpsLat=lat;gpsLon=lon;gpsAccuracy=null;distanceKm=null;deliveryFee=null;mhacManualSelected=true;
-    const label=String(x.display_name||x.name||`${lat}, ${lon}`).trim();
-    const input=byId("manualLocationInput");if(input)input.value=String(x.name||x.display_name||"");
-    setStatus("📍 SELECTED MANUAL LOCATION: "+esc(label),true);
-    if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
-    if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual location selected.";
+    const box=byId("manualLocationSuggestions"),arr=box?.__mhacResults||[],x=arr[i];
+    if(!x)return;
+    const lat=Number(x.lat),lon=Number(x.lon);
+    if(!Number.isFinite(lat)||!Number.isFinite(lon)){
+      setStatus("❌ Selected location has no coordinates.",true);return;
+    }
+
+    // IMPORTANT: do NOT overwrite gpsLat/gpsLon.
+    manualLat=lat;manualLon=lon;manualLabel=String(x.name||x.display_name||"").trim();
+    manualLocationSelected=true;
+    distanceKm=null;deliveryFee=null;
+
+    const full=String(x.display_name||x.shortAddress||x.name||"").trim();
+    const input=byId("manualLocationInput");
+    if(input)input.value=manualLabel;
+
+    setStatus("📍 SELECTED MANUAL LOCATION<br><b>"+esc(manualLabel)+"</b><br>"+esc(full),true);
+    if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 MANUAL DESTINATION: "+full;
+    if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual place selected. Phone GPS was not changed.";
     if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
     if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
     clearBox();
   }
   function install(){
-    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");if(!input||!box)return;
-    input.addEventListener("input",()=>{clearTimeout(mhacManualTimer);mhacManualTimer=setTimeout(searchManual,450)});
-    input.addEventListener("keydown",e=>{if(e.key==="Escape")clearBox()});
-    box.addEventListener("click",e=>{const b=e.target.closest("[data-mhac-osm-index]");if(!b)return;e.preventDefault();selectResult(Number(b.dataset.mhacOsmIndex))});
-    document.addEventListener("click",e=>{if(!e.target.closest("#manualLocationBox"))clearBox()});
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    if(!input||!box)return;
+    input.addEventListener("input",()=>{
+      clearTimeout(mhacManualTimer);
+      mhacManualTimer=setTimeout(searchManual,500);
+    });
+    input.addEventListener("keydown",e=>{if(e.key==="Escape")clearBox();});
+    box.addEventListener("click",e=>{
+      const b=e.target.closest("[data-mhac-universal-index]");
+      if(!b)return;
+      e.preventDefault();selectResult(Number(b.dataset.mhacUniversalIndex));
+    });
+    document.addEventListener("click",e=>{
+      if(!e.target.closest("#manualLocationBox"))clearBox();
+    });
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
   window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.100 CUSTOMER NO-BILLING MANUAL LOCATION — SEARCH FALLBACK FIX";
+  window.__MHAC_BUILD__="V4.1.101 CUSTOMER WAZE-STYLE UNIVERSAL MANUAL LOCATION";
 })();
 </script>
 </html>
