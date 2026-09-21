@@ -2045,16 +2045,33 @@ async function searchManualAddress(){
     box.innerHTML='<div class="status">🔎 Searching schools, landmarks and addresses…</div>';box.classList.remove("hidden");
     try{
       const variants=manualSearchVariants(q);
-      const responses=await Promise.all(variants.map(v=>fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(v)}`,{headers:{"Accept":"application/json"}})));
-      if(responses.some(r=>!r.ok))throw new Error("Address search failed");
-      const groups=await Promise.all(responses.map(r=>r.json()));
+      let groups=[];
+      // Primary search provider: Photon. It supports search-as-you-type/POI lookup and
+      // is more suitable here for schools/landmarks than a strict address-only search.
+      try{
+        const photonResponses=await Promise.all(variants.slice(0,3).map(v=>fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(v)}&limit=8&lang=en`,{headers:{"Accept":"application/json"}})));
+        if(photonResponses.every(r=>r.ok)){
+          const photonGroups=await Promise.all(photonResponses.map(r=>r.json()));
+          groups=photonGroups.map(j=>(j&&Array.isArray(j.features)?j.features:[]).map(f=>{
+            const p=f?.properties||{},c=f?.geometry?.coordinates||[];
+            const name=[p.name,p.street,p.housenumber,p.district,p.city,p.state,p.country].filter(Boolean).join(", ");
+            return {lat:c[1],lon:c[0],display_name:name||String(p.name||""),place_id:`photon:${p.osm_type||""}:${p.osm_id||""}:${c[0]},${c[1]}`};
+          }));
+        }
+      }catch(_){/* fallback below */}
+      // Fallback: Nominatim if Photon is unavailable.
+      if(!groups.length){
+        const responses=await Promise.all(variants.map(v=>fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=ph&q=${encodeURIComponent(v)}`,{headers:{"Accept":"application/json"}})));
+        if(responses.some(r=>!r.ok))throw new Error("Address search failed");
+        groups=await Promise.all(responses.map(r=>r.json()));
+      }
       if(req!==manualSearchRequest)return;
       const seen=new Set(),results=[];
       for(const list of groups){
         if(!Array.isArray(list))continue;
         for(const x of list){
           const key=String(x.place_id||`${x.lat},${x.lon},${x.display_name}`);
-          if(!seen.has(key)){seen.add(key);results.push(x);}
+          if(!seen.has(key)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon))){seen.add(key);results.push(x);}
         }
       }
       if(!results.length){box.innerHTML='<div class="status">❌ No matching school/address found. Try the school name, barangay, landmark, street, or municipality.</div>';return;}
