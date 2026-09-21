@@ -2431,7 +2431,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 
   // V4.1.98: Google Maps-style manual location search.
   // GPS, OSRM distance calculation, fee formula, cart, choices and order flow are untouched.
-  const MHAC_GOOGLE_MAPS_API_KEY="YOUR_GOOGLE_MAPS_API_KEY";
+  const MHAC_GOOGLE_MAPS_API_KEY="AIzaSyAximeqaO9U2kGmsSzr-V8tdZGS2FepIJo";
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
   let mhacMapsReady=null;
   let mhacMapsRequestId=0;
@@ -2464,7 +2464,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
         resolve(window.google.maps);
         return;
       }
-      if(MHAC_GOOGLE_MAPS_API_KEY==="AIzaSyAximeqaO9U2kGmsSzr-V8tdZGS2FepIJo"){
+      if(MHAC_GOOGLE_MAPS_API_KEY==="YOUR_GOOGLE_MAPS_API_KEY"){
         reject(new Error("Google Maps API key is not configured."));
         return;
       }
