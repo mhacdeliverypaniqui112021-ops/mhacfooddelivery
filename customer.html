@@ -1384,10 +1384,11 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 
-<style id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_99">
+<style id="MHAC_CUSTOMER_MANUAL_LOCATION_V4_1_100">
 .manualLocationBox{margin:7px 0!important;padding:10px!important;border:1px solid #ddd!important;border-radius:10px!important;background:#fff!important}
-#mhacGoogleMapsAutocomplete{display:block!important;width:100%!important;margin:7px 0 0!important;min-height:50px!important}
-#mhacGoogleMapsAutocomplete::part(input){width:100%!important;min-height:50px!important}
+#manualLocationInput{width:100%!important;min-height:50px!important}
+.manualLocationSuggestions{display:none;margin-top:6px!important;border:1px solid #ccc!important;border-radius:9px!important;overflow:hidden!important;background:#fff!important;max-height:300px!important;overflow-y:auto!important}
+.manualLocationSuggestions button:active{background:#f2f2f2!important}
 .manualLocationSelected{margin-top:7px!important;padding:8px!important;border:1px solid #222!important;border-radius:8px!important;background:#fff!important;color:#111!important;font-size:14px!important;line-height:1.3!important}
 </style>
 </head><body>
@@ -1409,10 +1410,10 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or use the Google Maps search below to select a manual delivery location.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Use GPS to detect the current location, or search the manual delivery location below without Google Maps billing.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
 <div class="manualLocationBox" id="manualLocationBox">
-  <b>🔎 MANUAL DELIVERY LOCATION — GOOGLE MAPS</b><br>
-  <span class="small">Type the street, barangay, landmark or place, then select the exact Google Maps result.</span>
+  <b>🔎 MANUAL DELIVERY LOCATION — NO BILLING</b><br>
+  <span class="small">Type the street, barangay, landmark or place, then select the matching location.</span>
   <input id="manualLocationInput" type="text" placeholder="Search street, barangay, landmark or place…" autocomplete="off" enterkeyhint="search">
   <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
   <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
@@ -2377,117 +2378,62 @@ setTimeout(function(){
 window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body>
-<script id="MHAC_GOOGLE_MAPS_MANUAL_LOCATION_V4_1_99_NO_BILLING">
+<script id="MHAC_MANUAL_LOCATION_V4_1_100_NO_BILLING">
 (function(){
   "use strict";
-
-  // V4.1.99: NO-BILLING Google Maps Demo Key + Place Autocomplete Widget.
-  // V4.1.97 Drink Gate, GPS, OSRM fee calculation, cart, choices and order flow are untouched.
-  const MHAC_GOOGLE_MAPS_API_KEY="AIzaSyAximeqaO9U2kGmsSzr-V8tdZGS2FepIJo";
+  // V4.1.100: NO-BILLING manual location search using OpenStreetMap Nominatim.
+  // V4.1.97 Drink Gate, GPS, OSRM fee calculation, cart, choices and order flow untouched.
   const MHAC_MAPS_CENTER={lat:15.66789,lng:120.57765};
-  let mhacMapsReady=null;
-  let mhacPlaceAutocomplete=null;
+  const MHAC_SEARCH_BOX={latMin:15.40,latMax:15.95,lonMin:120.20,lonMax:120.90};
+  let mhacManualTimer=null;
+  let mhacManualRequestId=0;
   let mhacManualSelected=false;
-
   const byId=id=>document.getElementById(id);
-
-  function setManualStatus(text,show=true){
-    const el=byId("manualLocationSelected");
-    if(!el)return;
-    el.textContent=text||"";
-    el.style.display=show&&text?"block":"none";
+  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  function setStatus(t,show=true){const e=byId("manualLocationSelected");if(!e)return;e.innerHTML=show&&t?t:"";e.style.display=show&&t?"block":"none";}
+  function clearBox(){const e=byId("manualLocationSuggestions");if(e){e.innerHTML="";e.style.display="none";}}
+  function renderResults(arr){
+    const box=byId("manualLocationSuggestions");if(!box)return;
+    if(!arr.length){box.innerHTML='<div style="padding:10px;color:#666">No matching location found.</div>';box.style.display="block";return;}
+    box.innerHTML=arr.map((x,i)=>`<button type="button" data-mhac-osm-index="${i}" style="display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #ddd;border-radius:0;padding:11px 10px;min-height:0"><b>${esc(x.name||x.display_name||"Location")}</b><br><span style="font-size:13px;color:#555">${esc(x.display_name||"")}</span></button>`).join("");
+    box.style.display="block";
+    box.__mhacResults=arr;
   }
-
-  function loadGoogleMapsPlaces(){
-    if(mhacMapsReady)return mhacMapsReady;
-    mhacMapsReady=new Promise((resolve,reject)=>{
-      if(window.google?.maps?.importLibrary){
-        resolve(window.google.maps);
-        return;
-      }
-      if(MHAC_GOOGLE_MAPS_API_KEY==="YOUR_GOOGLE_MAPS_API_KEY"){
-        reject(new Error("Google Maps Demo Key is not configured."));
-        return;
-      }
-      const existing=document.querySelector('script[data-mhac-google-maps="1"]');
-      if(existing){
-        existing.addEventListener("load",()=>window.google?.maps?.importLibrary?resolve(window.google.maps):reject(new Error("Google Maps library unavailable.")),{once:true});
-        existing.addEventListener("error",()=>reject(new Error("Google Maps JavaScript API failed to load.")),{once:true});
-        return;
-      }
-      const script=document.createElement("script");
-      script.dataset.mhacGoogleMaps="1";
-      script.async=true;
-      script.defer=true;
-      script.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(MHAC_GOOGLE_MAPS_API_KEY)+"&v=weekly&loading=async";
-      script.onload=()=>window.google?.maps?.importLibrary
-        ?resolve(window.google.maps)
-        :reject(new Error("Google Maps library is unavailable."));
-      script.onerror=()=>reject(new Error("Google Maps JavaScript API failed to load."));
-      document.head.appendChild(script);
-    });
-    return mhacMapsReady;
-  }
-
-  async function installGoogleMapsAutocomplete(){
-    const box=byId("manualLocationBox");
-    const oldInput=byId("manualLocationInput");
-    if(!box)return;
+  async function searchManual(){
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");
+    const q=(input?.value||"").trim();if(!box)return;
+    mhacManualSelected=false;setStatus("",false);
+    if(q.length<3){clearBox();return;}
+    const id=++mhacManualRequestId;
     try{
-      const maps=await loadGoogleMapsPlaces();
-      const {PlaceAutocompleteElement}=await maps.importLibrary("places");
-      if(mhacPlaceAutocomplete)return;
-
-      const widget=new PlaceAutocompleteElement();
-      widget.id="mhacGoogleMapsAutocomplete";
-      widget.placeholder="Search street, barangay, landmark or place…";
-      widget.includedRegionCodes=["ph"];
-      widget.locationBias={center:MHAC_MAPS_CENTER,radius:50000};
-      widget.setAttribute("aria-label","Google Maps manual delivery location");
-
-      if(oldInput)oldInput.replaceWith(widget);
-      else box.appendChild(widget);
-      mhacPlaceAutocomplete=widget;
-
-      widget.addEventListener("gmp-select",async({placePrediction})=>{
-        try{
-          const place=placePrediction?.toPlace?.();
-          if(!place)throw new Error("No Google Maps place was returned.");
-          await place.fetchFields({fields:["displayName","formattedAddress","location"]});
-          const lat=Number(place?.location?.lat?.());
-          const lon=Number(place?.location?.lng?.());
-          if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new Error("Selected Google Maps place has no coordinates.");
-
-          // Reuse the existing GPS variables so the exact same OSRM/fee/order path is used.
-          gpsLat=lat;
-          gpsLon=lon;
-          gpsAccuracy=null;
-          distanceKm=null;
-          deliveryFee=null;
-          mhacManualSelected=true;
-
-          const label=String(place?.formattedAddress||place?.displayName||"Selected Google Maps location").trim();
-          setManualStatus("📍 SELECTED GOOGLE MAPS LOCATION: "+label,true);
-          if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
-          if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual Google Maps location selected.";
-          if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
-          if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
-        }catch(e){
-          setManualStatus("❌ Unable to use this Google Maps result.",true);
-          console.warn("MHAC Google Maps selection:",e);
-        }
-      });
-    }catch(e){
-      setManualStatus("❌ Google Maps manual location unavailable. Check the Demo Key/setup.",true);
-      console.warn("MHAC Google Maps Demo Key:",e);
-    }
+      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&viewbox="+encodeURIComponent(`${MHAC_SEARCH_BOX.lonMin},${MHAC_SEARCH_BOX.latMax},${MHAC_SEARCH_BOX.lonMax},${MHAC_SEARCH_BOX.latMin}`)+"&q="+encodeURIComponent(q+", Tarlac, Philippines");
+      const r=await fetch(url,{headers:{Accept:"application/json"}});if(!r.ok)throw new Error("Search service returned "+r.status);
+      const arr=await r.json();if(id!==mhacManualRequestId)return;renderResults(Array.isArray(arr)?arr:[]);
+    }catch(e){if(id!==mhacManualRequestId)return;box.innerHTML='<div style="padding:10px;color:#a00000">❌ Manual location search unavailable. Try again.</div>';box.style.display="block";console.warn("MHAC manual location search:",e)}
   }
-
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installGoogleMapsAutocomplete,{once:true});
-  else installGoogleMapsAutocomplete();
-
-  window.__MHAC_GOOGLE_MAPS_MANUAL_LOCATION__={load:loadGoogleMapsPlaces};
-  window.__MHAC_BUILD__="V4.1.99 CUSTOMER NO-BILLING GOOGLE MAPS AUTOCOMPLETE — V4.1.97 BASE PRESERVED";
+  function selectResult(i){
+    const box=byId("manualLocationSuggestions"),arr=box?.__mhacResults||[],x=arr[i];if(!x)return;
+    const lat=Number(x.lat),lon=Number(x.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon)){setStatus("❌ Selected location has no coordinates.",true);return;}
+    gpsLat=lat;gpsLon=lon;gpsAccuracy=null;distanceKm=null;deliveryFee=null;mhacManualSelected=true;
+    const label=String(x.display_name||x.name||`${lat}, ${lon}`).trim();
+    const input=byId("manualLocationInput");if(input)input.value=String(x.name||x.display_name||"");
+    setStatus("📍 SELECTED MANUAL LOCATION: "+esc(label),true);
+    if(byId("gpsLocationDisplay"))byId("gpsLocationDisplay").textContent="📍 LOCATION SELECTED: "+label;
+    if(byId("gpsAccuracy"))byId("gpsAccuracy").textContent="Manual location selected.";
+    if(byId("locStatus"))byId("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
+    if(byId("calculateFeeBtn"))byId("calculateFeeBtn").disabled=false;
+    clearBox();
+  }
+  function install(){
+    const input=byId("manualLocationInput"),box=byId("manualLocationSuggestions");if(!input||!box)return;
+    input.addEventListener("input",()=>{clearTimeout(mhacManualTimer);mhacManualTimer=setTimeout(searchManual,300)});
+    input.addEventListener("keydown",e=>{if(e.key==="Escape")clearBox()});
+    box.addEventListener("click",e=>{const b=e.target.closest("[data-mhac-osm-index]");if(!b)return;e.preventDefault();selectResult(Number(b.dataset.mhacOsmIndex))});
+    document.addEventListener("click",e=>{if(!e.target.closest("#manualLocationBox"))clearBox()});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+  window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
+  window.__MHAC_BUILD__="V4.1.100 CUSTOMER NO-BILLING MANUAL LOCATION — V4.1.97 BASE PRESERVED";
 })();
 </script>
 </html>
