@@ -1840,6 +1840,14 @@ function customize(si,ci,fi){
  const groupSelections=(f.choiceGroups||[]).map(()=>[]);
  const isBucket=String(f.type||'').toLowerCase()==='bucket';
  const bucketPieces=Math.max(0,Number(f.bucketPieces||0));
+ // V4.1.96 TEST: conditional No Drink / With Drink choices.
+ const isNoDrinkText=(v)=>/^no\s*drink(?:s)?$/i.test(String(v||'').trim());
+ const isWithDrinkText=(v)=>/^with\s*drink(?:s)?$/i.test(String(v||'').trim());
+ const isDrinkGroup=(g)=>String(g?.role||'').toLowerCase()==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||''));
+ const drinkGateIndex=()=>groups.findIndex(g=>Array.isArray(g?.options)&&g.options.some(o=>isNoDrinkText(o?.name||o?.choice||o?.value)||isWithDrinkText(o?.name||o?.choice||o?.value)));
+ const withDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isWithDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
+ const noDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isNoDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
+ const shouldHideDrinkGroup=(gi)=>isDrinkGroup(groups[gi])&&drinkGateIndex()>=0&&!withDrinkSelected();
  const requiredForGroup=(g)=>{
    /* Read the count rule saved by Admin for THIS FOOD and THIS CHOICE GROUP. */
    const rawMode=String(g?.selectionMode||g?.countMode||'perItem').trim();
@@ -1867,11 +1875,20 @@ function customize(si,ci,fi){
    const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
    groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
  };
- const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
+ const updateAllGroups=()=>groups.forEach((_,gi)=>{
+   const box=document.querySelector(`[data-choice-group="${gi}"]`);
+   const hidden=shouldHideDrinkGroup(gi);
+   if(hidden){
+     // Remove any previously selected drinks so No Drink cannot retain a drink charge.
+     groupSelections[gi]=(groupSelections[gi]||[]).map(()=>0);
+   }
+   if(box)box.style.display=hidden?'none':'';
+   updateGroup(gi);
+ });
  const changeGroupChoice=(gi,oi,d)=>{
    const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateAllGroups();
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1905,6 +1922,7 @@ function customize(si,ci,fi){
    if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
+     if(shouldHideDrinkGroup(gi))continue;
      const need=requiredForGroup(groups[gi]);
      if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
@@ -2341,7 +2359,8 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
+window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
+<!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
