@@ -2021,6 +2021,7 @@ function updateTotals(){
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
 
 
+// V4.1.101 — Manual Address Search: rank exact school type/name before weaker matches.
 // V4.1.98 — Manual Address Search: selected coordinates use the SAME distance/fee calculation as GPS.
 let manualSearchTimer=null,manualSearchRequest=0,selectedLocationType="";
 function clearManualAddressSuggestions(){const box=$("manualAddressSuggestions");if(box){box.innerHTML="";box.classList.add("hidden");}}
@@ -2075,7 +2076,32 @@ async function searchManualAddress(){
         }
       }
       if(!results.length){box.innerHTML='<div class="status">❌ No matching school/address found. Try the school name, barangay, landmark, street, or municipality.</div>';return;}
-      const shown=results.slice(0,8);
+      // Rank results so the thing the customer actually typed comes first.
+      // In particular, never let a HIGH SCHOOL outrank an ELEMENTARY SCHOOL
+      // when the search explicitly contains "Elementary School".
+      const norm=v=>String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+      const queryNorm=norm(q);
+      const qTokens=queryNorm.split(' ').filter(t=>t.length>=2);
+      const wantsElementary=/\belementary\b/.test(queryNorm);
+      const wantsHighSchool=/\bhigh\s+school\b/.test(queryNorm);
+      const scored=results.map((x,idx)=>{
+        const text=norm(x.display_name);
+        let score=0;
+        if(text.includes(queryNorm))score+=1000;
+        for(const t of qTokens)if(text.includes(t))score+=12;
+        if(wantsElementary){
+          if(/\belementary\b/.test(text))score+=500;
+          if(/\bhigh\s+school\b/.test(text))score-=700;
+        }
+        if(wantsHighSchool){
+          if(/\bhigh\s+school\b/.test(text))score+=500;
+          if(/\belementary\b/.test(text))score-=700;
+        }
+        const first=norm(String(x.display_name||'').split(',')[0]);
+        if(first&&queryNorm.includes(first))score+=80;
+        return {x,score,idx};
+      }).sort((a,b)=>b.score-a.score||a.idx-b.idx).map(v=>v.x);
+      const shown=scored.slice(0,8);
       box.innerHTML=shown.map((x,i)=>`<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`).join("");
       box.querySelectorAll("[data-manual-index]").forEach(btn=>btn.onclick=()=>selectManualAddress(shown[Number(btn.dataset.manualIndex)]));
       if(status)status.textContent=`${shown.length} matching location${shown.length===1?"":"s"} found. Select one below.`;
