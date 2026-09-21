@@ -1417,27 +1417,18 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Choose GPS for your phone location, or choose Manual to find the delivery destination on Google Maps.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
-<div class="manualLocationBox" id="manualLocationBox">
-  <b>📍 DELIVERY LOCATION METHOD</b><br>
-  <span class="small">Choose one method. GPS and Manual cannot be used at the same time.</span>
-  <div style="display:flex;gap:7px;flex-wrap:wrap;margin:8px 0">
-    <button type="button" id="locationModeGPSBtn" class="add" style="flex:1;min-width:145px">📍 USE GPS</button>
-    <button type="button" id="locationModeManualBtn" class="add" style="flex:1;min-width:145px">🔎 MANUAL LOCATION</button>
-  </div>
-  <div id="manualModePanel" style="display:none">
-    <b>🧭 FIND DELIVERY LOCATION ON GOOGLE MAPS</b><br>
-    <span class="small">Type the school, address, street, store or landmark, then open Google Maps and choose the exact place.</span>
-    <input id="manualLocationInput" type="text" placeholder="Example: Anao National High School" autocomplete="off" enterkeyhint="search">
-    <button type="button" id="openGoogleMapsBtn" class="add" style="width:100%;margin-top:7px">🧭 OPEN GOOGLE MAPS / SEARCH LOCATION</button>
-    <button type="button" id="useGoogleMapsLinkBtn" class="add" style="width:100%;margin-top:7px">📥 USE LOCATION FROM GOOGLE MAPS</button>
-    <input id="googleMapsLinkInput" type="text" placeholder="Paste the Google Maps shared link here" autocomplete="off" style="margin-top:7px;display:none">
-    <button type="button" id="applyGoogleMapsLinkBtn" class="add" style="width:100%;margin-top:7px;display:none">✅ USE THIS LOCATION</button>
-    <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
-    <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
-  </div>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="manualLocationBox" id="manualLocationBox">
+  <b>🧭 RECIPIENT DELIVERY LOCATION</b><br>
+  <span class="small">Type the recipient’s school, address, street, store or landmark, then go directly to Google Maps to choose the exact place.</span>
+  <input id="manualLocationInput" type="text" placeholder="Example: Anao National High School" autocomplete="off" enterkeyhint="search">
+  <button type="button" id="openGoogleMapsBtn" class="add" style="width:100%;margin-top:7px">🧭 NAVIGATE TO RECIPIENT IN GOOGLE MAPS</button>
+  <button type="button" id="useGoogleMapsLinkBtn" class="add" style="width:100%;margin-top:7px">📥 USE LOCATION FROM GOOGLE MAPS</button>
+  <input id="googleMapsLinkInput" type="text" placeholder="Paste the Google Maps shared link here" autocomplete="off" style="margin-top:7px;display:none">
+  <button type="button" id="applyGoogleMapsLinkBtn" class="add" style="width:100%;margin-top:7px;display:none">✅ USE THIS LOCATION</button>
+  <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
+  <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
 </div>
-<button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Select the recipient location in Google Maps first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2074,7 +2065,8 @@ async function calculateByGPS(e){
 }
 async function calculateGPSFee(){
  const useManual=manualLocationSelected&&Number.isFinite(Number(manualLat))&&Number.isFinite(Number(manualLon));
- const lat=useManual?Number(manualLat):gpsLat,lon=useManual?Number(manualLon):gpsLon;
+ if(!useManual){alert("Select the recipient location in Google Maps first.");return;}
+ const lat=Number(manualLat),lon=Number(manualLon);
  if(lat===null||lon===null||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))return;
  $("locStatus").textContent="Calculating driving distance…";
  try{
@@ -2093,7 +2085,7 @@ async function placeOrder(){
  if(!isOpen())return alert("MHAC Delivery is closed.");
  const name=$("custName").value.trim(),contact=$("custContact").value.trim();
  if(!name||!contact)return alert("Complete name and contact.");
- if((gpsLat===null&&!manualLocationSelected)||distanceKm===null)return alert("Select a manual location or allow GPS, then calculate the delivery fee first.");
+ if(!manualLocationSelected||!Number.isFinite(Number(manualLat))||!Number.isFinite(Number(manualLon))||distanceKm===null)return alert("Select the recipient location in Google Maps, use the location, then calculate the delivery fee first.");
  const payment=String($("payment").value||"Cash on Delivery");
  const isGcash=payment.toUpperCase()==="GCASH";
  const screenshot=$("gcashScreenshot")?.files?.[0];
@@ -2611,30 +2603,10 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
   window.__MHAC_BUILD__="V4.1.101 CUSTOMER WAZE-STYLE UNIVERSAL MANUAL LOCATION";
 })();
 </script>
-<script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_103">
+<script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_104">
 (function(){
   "use strict";
   const $=id=>document.getElementById(id);
-  let mode="GPS";
-  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
-  function setMode(next){
-    mode=next==="MANUAL"?"MANUAL":"GPS";
-    const gpsBtn=$("locationModeGPSBtn"),manBtn=$("locationModeManualBtn"),panel=$("manualModePanel"),g=$("gpsBtn"),calc=$("calculateFeeBtn");
-    gpsBtn?.classList.toggle("mhacModeActive",mode==="GPS");
-    manBtn?.classList.toggle("mhacModeActive",mode==="MANUAL");
-    if(panel)panel.style.display=mode==="MANUAL"?"block":"none";
-    if(g){g.disabled=mode!=="GPS";g.classList.toggle("mhacDisabled",mode!=="GPS");}
-    if(mode==="MANUAL"){
-      // Manual and GPS are mutually exclusive. Do not erase phone GPS values;
-      // simply prevent GPS from being used for this order while Manual is active.
-      distanceKm=null;deliveryFee=null;
-      if(calc)calc.disabled=!manualLocationSelected;
-      $("locStatus") && ($("locStatus").textContent=manualLocationSelected?"Manual location selected. You can now calculate the delivery fee.":"Manual mode selected. Open Google Maps and choose the delivery location.");
-    }else{
-      if(calc)calc.disabled=!(gpsLat!==null&&gpsLon!==null);
-      $("locStatus") && ($("locStatus").textContent=gpsLat!==null?"GPS mode selected. You can now calculate the delivery fee.":"GPS mode selected. Allow GPS location first.");
-    }
-  }
   function mapsUrl(){
     const q=String($("manualLocationInput")?.value||"").trim();
     const query=q||"Paniqui Tarlac Philippines";
@@ -2655,47 +2627,46 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     const inp=$("googleMapsLinkInput");
     if(!inp)return;
     inp.style.display="block";
-    try{
-      const t=await navigator.clipboard.readText();
-      if(t){inp.value=t;applyMapsLink();return;}
-    }catch(_){ }
+    try{const t=await navigator.clipboard.readText();if(t){inp.value=t;applyMapsLink();return;}}catch(_){}
     inp.focus();
-    $("manualLocationSelected").innerHTML='<b>📥 PASTE THE GOOGLE MAPS LINK</b><br>Copy the location link from Google Maps, paste it in the box above, then tap <b>USE THIS LOCATION</b>.';
+    $("manualLocationSelected").innerHTML='<b>📥 PASTE GOOGLE MAPS LOCATION</b><br>Paste the shared Google Maps link here, then tap <b>USE THIS LOCATION</b>.';
     $("manualLocationSelected").style.display="block";
   }
   function applyMapsLink(){
     const raw=String($("googleMapsLinkInput")?.value||"").trim();
     const c=extractCoords(raw);
     if(!c){
-      $("manualLocationSelected").innerHTML='<b>❌ COORDINATES NOT FOUND</b><br>Please use <b>Share</b> in Google Maps and paste the full Google Maps link here. A short <i>maps.app.goo.gl</i> link may not contain coordinates that the browser can read.';
+      $("manualLocationSelected").innerHTML='<b>❌ LOCATION NOT FOUND</b><br>Please share the exact location from Google Maps and paste the full Maps link here.';
       $("manualLocationSelected").style.display="block";return;
     }
-    manualLat=c.lat;manualLon=c.lon;manualLabel=String($("manualLocationInput")?.value||"").trim()||"Google Maps selected location";manualLocationSelected=true;
+    manualLat=c.lat;manualLon=c.lon;manualLabel=String($("manualLocationInput")?.value||"").trim()||"Google Maps recipient location";manualLocationSelected=true;
     distanceKm=null;deliveryFee=null;
-    $("gpsLocationDisplay") && ($("gpsLocationDisplay").textContent=`📍 MANUAL DESTINATION: ${manualLabel} (${c.lat.toFixed(6)}, ${c.lon.toFixed(6)})`);
-    $("gpsAccuracy") && ($("gpsAccuracy").textContent="Manual destination selected. Phone GPS is not used for this order.");
-    $("locStatus") && ($("locStatus").textContent="Manual location selected from Google Maps. Calculate the delivery fee.");
+    $("gpsLocationDisplay") && ($("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${manualLabel}`);
+    $("gpsAccuracy") && ($("gpsAccuracy").textContent="Recipient location selected from Google Maps.");
+    $("locStatus") && ($("locStatus").textContent="Recipient location selected. Calculate the delivery fee.");
     $("calculateFeeBtn") && ($("calculateFeeBtn").disabled=false);
-    $("manualLocationSelected") && ($("manualLocationSelected").innerHTML='<b>📍 SELECTED MANUAL LOCATION</b><br><b>'+esc(manualLabel)+'</b><br>Latitude: '+c.lat.toFixed(6)+'<br>Longitude: '+c.lon.toFixed(6));
-    $("manualLocationSelected") && ($("manualLocationSelected").style.display="block");
+    $("manualLocationSelected") && ($("manualLocationSelected").innerHTML='<b>📍 RECIPIENT LOCATION SELECTED</b><br><b>'+esc(manualLabel)+'</b><br>Latitude: '+c.lat.toFixed(6)+'<br>Longitude: '+c.lon.toFixed(6),$("manualLocationSelected").style.display="block");
+  }
+  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
+  function openMaps(){
+    const q=String($("manualLocationInput")?.value||"").trim();
+    if(!q){$("manualLocationInput")?.focus();$("locStatus") && ($("locStatus").textContent="Type the recipient school, address, street or place first.");return;}
+    // Navigate directly to Google Maps. On Android, the Maps URL can hand off to the installed Google Maps app.
+    window.location.href=mapsUrl();
   }
   function install(){
-    $("locationModeGPSBtn")?.addEventListener("click",()=>setMode("GPS"));
-    $("locationModeManualBtn")?.addEventListener("click",()=>setMode("MANUAL"));
-    $("openGoogleMapsBtn")?.addEventListener("click",()=>{
-      const url=mapsUrl();
-      window.open(url,"_blank","noopener,noreferrer");
-    });
+    $("openGoogleMapsBtn")?.addEventListener("click",openMaps);
     $("useGoogleMapsLinkBtn")?.addEventListener("click",pasteMapsLink);
     $("applyGoogleMapsLinkBtn")?.addEventListener("click",applyMapsLink);
     $("googleMapsLinkInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyMapsLink();}});
-    // Hide the old Nominatim/Photon suggestion workflow in this test build.
     const sug=$("manualLocationSuggestions");if(sug){sug.innerHTML="";sug.style.display="none";}
-    setMode("GPS");
+    // Remove any legacy GPS/mode controls if they exist in the base page.
+    ["gpsBtn","gpsAccuracy","gpsLocationDisplay","locationModeGPSBtn","locationModeManualBtn","manualModePanel"].forEach(id=>{const el=$(id);if(el)el.style.display="none";});
+    $("locStatus") && ($("locStatus").textContent=manualLocationSelected?"Recipient location selected. Calculate the delivery fee.":"Select the recipient location in Google Maps first.");
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
-  window.__MHAC_GOOGLE_MAPS_MANUAL__={setMode,applyMapsLink,extractCoords,mapsUrl};
-  window.__MHAC_BUILD__="V4.1.103 CUSTOMER GOOGLE MAPS MANUAL LOCATION TEST";
+  window.__MHAC_GOOGLE_MAPS_RECIPIENT__={openMaps,applyMapsLink,extractCoords,mapsUrl};
+  window.__MHAC_BUILD__="V4.1.104 CUSTOMER RECIPIENT NAVIGATION GOOGLE MAPS";
 })();
 </script>
 </html>
