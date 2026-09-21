@@ -1,25 +1,12 @@
-MHAC DELIVERY — CLEAN APPS UPLOAD
+MHAC CUSTOMER V4.1.105 - GOOGLE MAPS MANUAL LOCATION
 
-Purpose:
-Clean wrapper pages for the existing Customer, Rider, and Admin apps.
-The wrappers remove only the old V4.1.x/test/build banners.
-The existing Firebase/order/GPS/chat/menu/accounting logic remains in the original app pages.
+TEST COPY ONLY. Existing GPS/location fee path is preserved.
 
-Upload:
-1. Extract this ZIP.
-2. Upload the whole "clean" folder to the ROOT of the GitHub repository.
-3. Do NOT delete the existing customer.html, rider.html, or admin.html yet.
-4. After GitHub Pages publishes, use:
+IMPORTANT: Set your Google Maps JavaScript API key in customer.html:
+const MHAC_GOOGLE_MAPS_API_KEY="YOUR_GOOGLE_MAPS_API_KEY";
 
-Customer:
-https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/customer.html
+Enable Maps JavaScript API + Places API (New), and configure billing/restrictions in Google Cloud. Do not paste a secret key into chat.
 
-Rider:
-https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/rider.html
+Manual flow: type location -> select Google Maps result -> selected latitude/longitude are assigned to the same gpsLat/gpsLon variables -> existing Calculate Delivery Fee button -> existing OSRM distance and fee calculation -> same order GPS structure.
 
-Admin:
-https://mhacdeliverypaniqui112021-ops.github.io/mhacfooddelivery/clean/admin.html
-
-Important:
-This package does not change the original application source files.
-It is a safe clean-layer test before we replace/rename the live files.
+GPS button and all existing cart/order/Firebase functionality are otherwise untouched.

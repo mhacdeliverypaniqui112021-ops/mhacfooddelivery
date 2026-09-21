@@ -1286,112 +1286,27 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 }
 </style>
 <style id="MHAC_ADMIN_SOURCE_OF_TRUTH_ORDERBREAKDOWN_FINAL">
-.orderDetailPanel{background:#fff!important;border:3px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
+.orderDetailPanel{background:#fff!important;border:2px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
 .orderDetailCustomer{padding-bottom:6px!important;border-bottom:1px solid #eee!important}
 .orderDetailPayment{margin-top:6px!important;font-size:13px!important}
 .unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
-.orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.orderDetailPayment b{font-weight:900!important}
-
 .unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
-.unifiedStoreCard{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important}
+.unifiedStoreCard{margin:12px 0!important;padding:12px 14px!important;border:2px solid #222!important;border-radius:14px!important;background:#fff!important}
 .unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
 .unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 2px!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
 .unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
 .unifiedFoodName{font-size:18px!important;line-height:1.35!important}
 .unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
-.unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
-  border-top:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.45!important;
-}
-.unifiedBillRow{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  width:100%!important;
-  padding:8px 0!important;
-  margin:0!important;
-  border-bottom:0!important;
-}
-.unifiedBillLabel{
-  flex:1 1 auto!important;
-  min-width:0!important;
-  text-align:left!important;
-}
-.unifiedBillAmount{
-  flex:0 0 auto!important;
-  min-width:92px!important;
-  text-align:right!important;
-  font-weight:700!important;
-  white-space:nowrap!important;
-}
-.unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
-}
-@media(max-width:600px){
-  .unifiedBillRow{
-    padding:9px 0!important;
-    gap:10px!important;
-  }
-  .unifiedBillAmount{min-width:88px!important}
-}
-</style>
-<style id="MHAC_CUSTOMER_ORDER_DRAWER_MATCH_ADMIN">
-/* CUSTOMER: match locked Admin Order Breakdown drawer.
-   One thick outer box only; no separate thick boxes per store. */
-.customerUnifiedDetailWrap .orderDetailPanel{
-  border:2px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  box-sizing:border-box!important;
-  background:#fff!important;
-  overflow:hidden!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard + .unifiedStoreCard{
-  margin-top:10px!important;
-  padding-top:10px!important;
-  border-top:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreName{
-  border-bottom:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedCategoryName{
-  border-bottom:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedFoodRow{
-  border-top:1px solid #ddd!important;
-}
+.unifiedBill{margin:12px 0 0!important;font-size:16px!important;line-height:1.45!important}
 </style>
 
-<style id="MHAC_CUSTOMER_MANUAL_ADDRESS_V4_1_98">
-/* V4.1.98 — additive location option only; existing GPS/fee/order flow preserved */
-.manualLocationBox{margin:8px 0;padding:10px;background:#fff;border:1px solid #ddd;border-radius:10px}
-.manualLocationBox input{width:100%!important;min-height:46px!important;margin:7px 0 4px!important;padding:9px 11px!important;font-size:16px!important}
-.manualAddressSuggestions{display:flex;flex-direction:column;gap:5px;margin-top:5px;max-height:220px;overflow:auto}
-.manualAddressSuggestions.hidden{display:none!important}
-.manualAddressSuggestion{width:100%;text-align:left;background:#fff!important;color:#111!important;border:1px solid #ccc!important;border-radius:8px!important;padding:9px 10px!important;min-height:44px!important;font-size:14px!important;line-height:1.25!important}
-.manualAddressSuggestion:active{background:#f2f2f2!important}
+<style id="mhac-manual-location-v105">
+.manualLocationSuggestions{display:none;margin-top:4px;border:1px solid #bbb;border-radius:10px;background:#fff;overflow:hidden;max-height:280px;overflow-y:auto;box-shadow:0 4px 14px #0002;position:relative;z-index:20}
+.manualLocationSuggestion{display:block;width:100%;text-align:left;background:#fff!important;color:#111!important;border:0!important;border-bottom:1px solid #eee!important;border-radius:0!important;padding:11px 12px!important;min-height:52px!important;font-size:15px!important;line-height:1.25!important}
+.manualLocationSuggestion:last-child{border-bottom:0!important}
+.manualLocationSuggestion b{display:block;font-size:16px}
+.manualLocationSuggestion span{display:block;color:#666;margin-top:3px}
+#manualLocationInput{width:100%;box-sizing:border-box;margin-top:7px!important}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1412,7 +1327,8 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>DELIVERY LOCATION</b><br>Choose <b>GPS LOCATION</b> or <b>SEARCH MANUAL ADDRESS</b>. The selected location will be used for delivery-distance and delivery-fee calculation.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><div class="manualLocationBox"><b>🏠 SEARCH MANUAL ADDRESS</b><input id="manualAddressInput" type="search" placeholder="Type address / barangay / landmark…" autocomplete="street-address"><div id="manualAddressSuggestions" class="manualAddressSuggestions hidden"></div><div id="manualAddressStatus" class="status">Type an address, then choose a matching location.</div></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please choose GPS or select a manual address first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div>
+<div class="field" id="manualLocationBox"><b>🔎 MANUAL DELIVERY LOCATION</b><br>Search like Google Maps, select the exact place, then use the selected coordinates for the same delivery-fee calculation as GPS.<input id="manualLocationInput" type="text" placeholder="Search street, barangay, landmark or place…" autocomplete="off"><div id="manualLocationSuggestions" class="manualLocationSuggestions"></div><div id="manualLocationSelected" class="status"></div></div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -1465,22 +1381,16 @@ function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
-  return await new Promise(resolve=>{
-    let first=true;
-    menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
-      data=snap.exists()?snap.data():{stores:[]};
-      rebuildCustomerCategoryCache();
-      const count=(data.stores||[]).filter(s=>s.published!==false).length;
-      $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
-      renderStores();
-      renderCart();
-      refreshCustomerOrderBreakdowns();
-      if(first){first=false;resolve(true)}
-    },err=>{
-      console.warn("Published menu listener failed",err);
-      $("menuStatus").textContent="⚠️ Unable to load published menu.";
-      if(first){first=false;resolve(false)}
-    });
+  menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
+    data=snap.exists()?snap.data():{stores:[]};
+    const count=(data.stores||[]).filter(s=>s.published!==false).length;
+    $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
+    renderStores();
+    renderCart();
+    refreshCustomerOrderBreakdowns();
+  },err=>{
+    console.warn("Published menu listener failed",err);
+    $("menuStatus").textContent="⚠️ Unable to load published menu.";
   });
 }
 async function boot(){await loadHours();await loadMenu();applyHours()}
@@ -1525,73 +1435,22 @@ function customerTruthItemPricing(i){
  return{qty,base,extras,unit,line:unit*qty};
 }
 
-const CUSTOMER_CATEGORY_CACHE_KEY="mhac_customer_category_cache_v188";
-let customerCategoryCache={};
-function customerCategoryKey(storeName,itemName){
-  const n=v=>String(v??"").trim().toLowerCase().replace(/\s+/g," ");
-  return n(storeName)+"|||"+n(itemName);
-}
-function loadCustomerCategoryCache(){
-  try{
-    const x=JSON.parse(localStorage.getItem(CUSTOMER_CATEGORY_CACHE_KEY)||"{}");
-    if(x&&typeof x==="object")customerCategoryCache=x;
-  }catch(_){}
-}
-function saveCustomerCategoryCache(){
-  try{localStorage.setItem(CUSTOMER_CATEGORY_CACHE_KEY,JSON.stringify(customerCategoryCache))}catch(_){}
-}
-function rebuildCustomerCategoryCache(){
-  const next={...customerCategoryCache};
-  for(const st of (Array.isArray(data?.stores)?data.stores:[])){
-    const store=String(st?.name||"").trim();
-    if(!store)continue;
-    for(const cat of (st?.categories||[])){
-      const cn=String(cat?.name||cat?.label||"").trim();
-      if(!cn||/^category\s*name$/i.test(cn)||/^category$/i.test(cn))continue;
-      for(const f of (cat?.items||[])){
-        const name=String(f?.name??f?.title??f?.foodName??"").trim();
-        if(name)next[customerCategoryKey(store,name)]=cn;
-      }
-    }
-  }
-  customerCategoryCache=next;
-  saveCustomerCategoryCache();
-}
-loadCustomerCategoryCache();
-
 function customerTruthItemCategoryName(i,storeName){
  const norm=v=>String(v??"").trim().toLowerCase().replace(/[\s\u00a0]+/g," ").replace(/[–—]/g,"-");
  const key=v=>norm(v).replace(/[^a-z0-9]+/g,"");
  const valid=v=>{const x=String(v??"").trim();return !!x&&!/^category\s*name$/i.test(x)&&!/^category$/i.test(x)};
- const direct=[
-   i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,
-   i?.category_name,i?.categoryLabel,
-   i?.food?.categoryName,i?.food?.category
- ].map(v=>String(v??"").trim()).find(valid);
- if(direct){
-   customerCategoryCache[customerCategoryKey(storeName,i?.name)]=direct;
-   saveCustomerCategoryCache();
-   return direct;
- }
-
- const cached=customerCategoryCache[customerCategoryKey(storeName,i?.name)];
- if(valid(cached))return cached;
-
+ const direct=[i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,i?.category_name,i?.categoryLabel].map(v=>String(v??"").trim()).find(valid);
+ if(direct)return direct;
  const foodKey=key(i?.name), storeKey=key(storeName);
  const stores=Array.isArray(data?.stores)?data.stores:[];
  const findIn=(list,strict)=>{
    for(const st of list){
      if(strict && storeKey && key(st?.name)!==storeKey)continue;
      for(const cat of (st?.categories||[])){
-       const cn=String(cat?.name||cat?.label||"").trim();
-       if(!valid(cn))continue;
+       const cn=String(cat?.name||cat?.label||"").trim(); if(!valid(cn))continue;
        for(const f of (cat?.items||[])){
          const fk=key(f?.name??f?.title??f?.foodName);
-         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk))){
-           customerCategoryCache[customerCategoryKey(storeName,i?.name)]=cn;
-           saveCustomerCategoryCache();
-           return cn;
-         }
+         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk)))return cn;
        }
      }
    }
@@ -1677,26 +1536,10 @@ function customerTruthOrderDetailHtml(o){
      <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
      ${rows}
      <div class="unifiedBill">
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Sub Total</b></span>
-         <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
-       </div>
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Service Fee 10%</b></span>
-         <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
-       </div>
-       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Additional Store</b></span>
-         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
-       </div>`:""}
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
-         <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
-       </div>
-       <div class="unifiedBillRow unifiedBillGrand">
-         <span class="unifiedBillLabel"><b>Grand Total</b></span>
-         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
-       </div>
+       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
+       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
+       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
+       <b>Grand Total: ${peso(f.total)}</b>
      </div>
    </div>
  </div>`;
@@ -1744,7 +1587,7 @@ $("payment").onchange=()=>{
   if(isG)renderGcashSettings();
 };
 
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}startOrders();$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
 function photoSvgData(name,type="food"){
  const n=String(name||type||"Photo").trim().slice(0,18),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><rect width="30" height="30" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="18">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="6" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
@@ -1787,8 +1630,8 @@ function openCat(si,ci){
 }
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
- const s=published[si], c=s?.categories?.[ci], f=c?.items?.[fi];
- if(!s||!c||!f){closeMenu();return;}
+ const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
+ if(!s||!f){closeMenu();return;}
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
  /* SIMPLE FOOD AUTO-ADD: foods with no configurable choices are added immediately.
     After auto-add, stay inside the current store/category. */
@@ -1843,21 +1686,13 @@ function customize(si,ci,fi){
  if(f.addOns?.length){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class=counter><button type="button" class=mini id=qminus>−</button><b id=foodQty>1</b><button type="button" class=mini id=qplus>+</button></div><button type="button" class="add" id="addConfigured">ADD TO CART</button>`;
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
  const groupSelections=(f.choiceGroups||[]).map(()=>[]);
  const isBucket=String(f.type||'').toLowerCase()==='bucket';
  const bucketPieces=Math.max(0,Number(f.bucketPieces||0));
- // V4.1.96 TEST: conditional No Drink / With Drink choices.
- const isNoDrinkText=(v)=>/^no\s*drink(?:s)?$/i.test(String(v||'').trim());
- const isWithDrinkText=(v)=>/^with\s*drink(?:s)?$/i.test(String(v||'').trim());
- const isDrinkGroup=(g)=>String(g?.role||'').toLowerCase()==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||''));
- const drinkGateIndex=()=>groups.findIndex(g=>Array.isArray(g?.options)&&g.options.some(o=>isNoDrinkText(o?.name||o?.choice||o?.value)||isWithDrinkText(o?.name||o?.choice||o?.value)));
- const withDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isWithDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
- const noDrinkSelected=()=>{const gi=drinkGateIndex();if(gi<0)return false;return (groupSelections[gi]||[]).some((n,oi)=>Number(n||0)>0&&isNoDrinkText(groups[gi]?.options?.[oi]?.name||groups[gi]?.options?.[oi]?.choice||groups[gi]?.options?.[oi]?.value));};
- const shouldHideDrinkGroup=(gi)=>isDrinkGroup(groups[gi])&&drinkGateIndex()>=0&&!withDrinkSelected();
  const requiredForGroup=(g)=>{
    /* Read the count rule saved by Admin for THIS FOOD and THIS CHOICE GROUP. */
    const rawMode=String(g?.selectionMode||g?.countMode||'perItem').trim();
@@ -1885,20 +1720,11 @@ function customize(si,ci,fi){
    const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
    groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
  };
- const updateAllGroups=()=>groups.forEach((_,gi)=>{
-   const box=document.querySelector(`[data-choice-group="${gi}"]`);
-   const hidden=shouldHideDrinkGroup(gi);
-   if(hidden){
-     // Remove any previously selected drinks so No Drink cannot retain a drink charge.
-     groupSelections[gi]=(groupSelections[gi]||[]).map(()=>0);
-   }
-   if(box)box.style.display=hidden?'none':'';
-   updateGroup(gi);
- });
+ const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
  const changeGroupChoice=(gi,oi,d)=>{
    const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateAllGroups();
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1932,7 +1758,6 @@ function customize(si,ci,fi){
    if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
-     if(shouldHideDrinkGroup(gi))continue;
      const need=requiredForGroup(groups[gi]);
      if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
@@ -2019,225 +1844,6 @@ function updateTotals(){
  </div>`;
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
-
-
-// V4.1.101 — Manual Address Search: rank exact school type/name before weaker matches.
-// V4.1.98 — Manual Address Search: selected coordinates use the SAME distance/fee calculation as GPS.
-let manualSearchTimer=null,manualSearchRequest=0,selectedLocationType="";
-function clearManualAddressSuggestions(){const box=$("manualAddressSuggestions");if(box){box.innerHTML="";box.classList.add("hidden");}}
-function manualSearchVariants(q){
-  const base=String(q||"").trim();
-  const variants=[];
-  const add=v=>{v=String(v||"").replace(/\s+/g," ").trim();if(v.length>=3&&!variants.some(x=>x.toLowerCase()===v.toLowerCase()))variants.push(v)};
-  add(base);
-  add(base.replace(/\bPob\.?\b/ig,"Poblacion").replace(/\bBrgy\.?\b/ig,"Barangay"));
-  add(base.replace(/^Po\.?\s+/i,"Sto. "));
-  add(base.replace(/\bElementary\s+School\b/ig,"School"));
-  return variants.slice(0,4);
-}
-async function searchManualAddress(){
-  const input=$("manualAddressInput"),box=$("manualAddressSuggestions"),status=$("manualAddressStatus");
-  if(!input||!box)return;
-  const q=String(input.value||"").trim();
-  clearTimeout(manualSearchTimer);
-  if(q.length<3){clearManualAddressSuggestions();if(status)status.textContent="Type at least 3 characters to search.";return;}
-
-  manualSearchTimer=setTimeout(async()=>{
-    const req=++manualSearchRequest;
-    box.innerHTML='<div class="status">🔎 Searching within MHAC DELIVERY service areas…</div>';
-    box.classList.remove("hidden");
-
-    try{
-      // MHAC DELIVERY covered municipalities only.
-      const coverage=[
-        "Paniqui, Tarlac",
-        "Moncada, Tarlac",
-        "Ramos, Tarlac",
-        "Gerona, Tarlac",
-        "Pura, Tarlac",
-        "Anao, Tarlac",
-        "Nampicuan, Nueva Ecija"
-      ];
-      const coverageNorm=coverage.map(v=>v.toLowerCase().replace(/[^a-z0-9]+/g," ").trim());
-
-      const inCoverage=(x)=>{
-        const p=x?.properties||x?.address||{};
-        const text=String(
-          x?.display_name ||
-          [
-            p.name,p.street,p.housenumber,p.village,p.suburb,p.district,
-            p.town,p.city,p.municipality,p.county,p.state,p.country
-          ].filter(Boolean).join(", ")
-        ).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
-
-        return coverageNorm.some(c=>text.includes(c));
-      };
-
-      // Search locally in every covered municipality so a customer does not
-      // get schools/landmarks from outside the MHAC DELIVERY service area.
-      const queryList=[];
-      const addQuery=v=>{
-        v=String(v||"").replace(/\s+/g," ").trim();
-        if(v.length>=3&&!queryList.some(x=>x.toLowerCase()===v.toLowerCase()))queryList.push(v);
-      };
-      addQuery(q);
-      const normalized=q
-        .replace(/\bPob\.?\b/ig,"Poblacion")
-        .replace(/\bBrgy\.?\b/ig,"Barangay")
-        .replace(/\bElem\.?\b/ig,"Elementary")
-        .replace(/\bHS\b/ig,"High School");
-      addQuery(normalized);
-
-      const providerQueries=[];
-      for(const base of queryList){
-        for(const area of coverage){
-          providerQueries.push(`${base} ${area}`);
-        }
-      }
-
-      let results=[];
-      // Photon primary.
-      try{
-        const responses=await Promise.all(
-          providerQueries.slice(0,16).map(v=>
-            fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(v)}&limit=8&lang=en`,
-              {headers:{"Accept":"application/json"}})
-          )
-        );
-        const good=responses.filter(r=>r.ok);
-        if(good.length){
-          const photonGroups=await Promise.all(good.map(r=>r.json()));
-          for(const j of photonGroups){
-            for(const f of (j&&Array.isArray(j.features)?j.features:[])){
-              const p=f?.properties||{},c=f?.geometry?.coordinates||[];
-              const display=[
-                p.name,p.street,p.housenumber,p.district,p.city,p.state,p.country
-              ].filter(Boolean).join(", ");
-              const x={
-                lat:c[1],lon:c[0],
-                display_name:display||String(p.name||""),
-                place_id:`photon:${p.osm_type||""}:${p.osm_id||""}:${c[0]},${c[1]}`,
-                properties:p
-              };
-              if(inCoverage(x))results.push(x);
-            }
-          }
-        }
-      }catch(_){}
-
-      // Nominatim fallback, also restricted to covered municipalities.
-      if(!results.length){
-        try{
-          const responses=await Promise.all(
-            providerQueries.slice(0,10).map(v=>
-              fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&countrycodes=ph&q=${encodeURIComponent(v)}`,
-                {headers:{"Accept":"application/json"}})
-            )
-          );
-          for(const r of responses){
-            if(!r.ok)continue;
-            const arr=await r.json();
-            for(const x of (Array.isArray(arr)?arr:[])){
-              if(inCoverage(x))results.push(x);
-            }
-          }
-        }catch(_){}
-      }
-
-      if(req!==manualSearchRequest)return;
-
-      const seen=new Set(),deduped=[];
-      for(const x of results){
-        const key=String(x.place_id||`${x.lat},${x.lon},${x.display_name}`);
-        if(!seen.has(key)&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon))){
-          seen.add(key);deduped.push(x);
-        }
-      }
-
-      if(!deduped.length){
-        box.innerHTML='<div class="status">❌ No matching location found inside MHAC DELIVERY service areas: Paniqui, Moncada, Ramos, Gerona, Pura, Anao, and Nampicuan.</div>';
-        if(status)status.textContent="Try the school/landmark name plus barangay or municipality.";
-        return;
-      }
-
-      // Rank what the customer actually typed, while keeping only service-area results.
-      const norm=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]+/g," ").replace(/\s+/g," ").trim();
-      const queryNorm=norm(q);
-      const qTokens=queryNorm.split(" ").filter(t=>t.length>=2);
-      const wantsElementary=/\belementary\b/.test(queryNorm);
-      const wantsHighSchool=/\bhigh\s+school\b/.test(queryNorm);
-
-      // Rank ANY street/landmark/address typed by the customer.
-      // We do not maintain a fixed street list: every street inside the
-      // seven MHAC DELIVERY service municipalities remains searchable.
-      const scored=deduped.map((x,idx)=>{
-        const text=norm(x.display_name);
-        const p=x.properties||x.address||{};
-        const street=norm([p.street,p.road,p.pedestrian,p.path,p.footway].filter(Boolean).join(" "));
-        let score=0;
-
-        if(text===queryNorm)score+=3000;
-        if(text.includes(queryNorm))score+=1800;
-
-        // Street/road token matching gets a strong priority.
-        const streetTokens=norm(q).split(" ").filter(t=>t.length>=3);
-        for(const t of streetTokens){
-          if(street.includes(t))score+=180;
-          else if(text.includes(t))score+=25;
-        }
-
-        // Common street suffixes should still match even when the provider
-        // formats them differently (St / Street / Road / Highway).
-        const streetStem=norm(q)
-          .replace(/\b(st|street|rd|road|ave|avenue|highway|hwy|brgy|barangay)\b/g," ")
-          .replace(/\s+/g," ").trim();
-        if(streetStem && street.includes(streetStem))score+=700;
-
-        for(const t of qTokens)if(text.includes(t))score+=15;
-
-        if(wantsElementary){
-          if(/\belementary\b/.test(text))score+=600;
-          if(/\bhigh\s+school\b/.test(text))score-=900;
-        }
-        if(wantsHighSchool){
-          if(/\bhigh\s+school\b/.test(text))score+=600;
-          if(/\belementary\b/.test(text))score-=900;
-        }
-        return {x,score,idx};
-      }).sort((a,b)=>b.score-a.score||a.idx-b.idx).map(v=>v.x);
-
-      const shown=scored.slice(0,8);
-      box.innerHTML=shown.map((x,i)=>
-        `<button type="button" class="manualAddressSuggestion" data-manual-index="${i}">📍 ${esc(x.display_name||"")}</button>`
-      ).join("");
-
-      box.querySelectorAll("[data-manual-index]").forEach(btn=>
-        btn.onclick=()=>selectManualAddress(shown[Number(btn.dataset.manualIndex)])
-      );
-
-      if(status)status.textContent=`${shown.length} matching location${shown.length===1?"":"s"} found within MHAC DELIVERY service areas. Select one below.`;
-    }catch(e){
-      if(req!==manualSearchRequest)return;
-      box.innerHTML='<div class="status">❌ Address search unavailable. Please try again or use GPS.</div>';
-    }
-  },300);
-}
-function selectManualAddress(x){
-  const lat=Number(x?.lat),lon=Number(x?.lon);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
-  gpsLat=lat;gpsLon=lon;gpsAccuracy=null;selectedLocationType="MANUAL";distanceKm=null;deliveryFee=null;
-  const label=String(x?.display_name||`${lat.toFixed(6)}, ${lon.toFixed(6)}`);
-  $("manualAddressInput").value=label;
-  clearManualAddressSuggestions();
-  $("gpsLocationDisplay").textContent="🏠 SELECTED ADDRESS: "+label;
-  $("gpsAccuracy").textContent="";
-  $("manualAddressStatus").textContent="✅ Manual address selected. This exact location will be used for delivery distance.";
-  $("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
-  $("calculateFeeBtn").disabled=false;
-  $("gpsBtn").disabled=false;$("gpsBtn").textContent="📍 USE CURRENT GPS LOCATION";
-}
-function resetSelectedLocationForGPS(){selectedLocationType="GPS";}
-
 async function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
@@ -2246,7 +1852,7 @@ async function calculateByGPS(e){
  if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";return}
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  navigator.geolocation.getCurrentPosition(async p=>{
-   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;selectedLocationType="GPS";distanceKm=null;deliveryFee=null;
+   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
    $("calculateFeeBtn").disabled=false;
@@ -2266,22 +1872,12 @@ async function calculateByGPS(e){
    $("gpsLocationDisplay").textContent="";
  });
 }
-
-function initManualAddressSearch(){
- const input=$("manualAddressInput");
- if(!input||input.dataset.bound)return;
- input.dataset.bound="1";
- input.addEventListener("input",searchManualAddress);
- input.addEventListener("focus",()=>{if(String(input.value||"").trim().length>=3)searchManualAddress()});
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initManualAddressSearch);else initManualAddressSearch();
-
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){
  if(!isOpen())return alert("MHAC Delivery is closed.");
  const name=$("custName").value.trim(),contact=$("custContact").value.trim();
  if(!name||!contact)return alert("Complete name and contact.");
- if(gpsLat===null||distanceKm===null)return alert("Choose GPS or select a manual address, then calculate delivery fee first.");
+ if(gpsLat===null||distanceKm===null)return alert("Allow GPS and calculate delivery fee first.");
  const payment=String($("payment").value||"Cash on Delivery");
  const isGcash=payment.toUpperCase()==="GCASH";
  const screenshot=$("gcashScreenshot")?.files?.[0];
@@ -2304,7 +1900,7 @@ async function placeOrder(){
    };
    const ref=await addDoc(collection(db,"orders"),o);
    $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
-   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;gpsAccuracy=null;selectedLocationType="";
+   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
    $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
    renderCart();setTimeout(closeCheckout,1000);
  }catch(e){
@@ -2423,7 +2019,7 @@ function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.valu
 function refreshCustomerOrderBreakdowns(){
  const orders=Array.isArray(window.__mhacOrders)?window.__mhacOrders:[];
  orders.forEach(o=>{
-   const el=$("customer-order-details-"+String(o.id));
+   const el=document.querySelector(`[data-customer-order-detail="${CSS.escape(String(o.id))}"]`);
    if(el)el.innerHTML=customerUnifiedOrderDetailHtml(o);
  });
 }
@@ -2459,7 +2055,7 @@ function customerOrderCategory(storeName,itemName){
 }
 function customerOrderCategoryValue(i){
   const direct=[i?.category,i?.categoryName,i?.categoryLabel].map(v=>String(v||"").trim()).find(validCustomerCategory);
-  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "";
+  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "Category Name";
 }
 function validCustomerCategory(v){
   const x=String(v||"").trim();
@@ -2555,7 +2151,6 @@ function startOrders(){
       </div>`;
     }).join(""):"No active orders.";
     refreshCustomerOrderBreakdowns();
-    requestAnimationFrame(()=>refreshCustomerOrderBreakdowns());
     syncCustomerChatWatchers(arr);
   });
 }
@@ -2581,7 +2176,89 @@ $("myOrders").onclick=async e=>{
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
 window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
-window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY + ADMIN DRAWER FIX";
+
+/* V4.1.105: Google Maps-style manual location uses the SAME gpsLat/gpsLon + distance/fee path as device GPS. */
+let manualMapsReady=false,manualMapsToken=null,manualMapsTimer=null,manualMapsRequestId=0;
+const MHAC_GOOGLE_MAPS_API_KEY="YOUR_GOOGLE_MAPS_API_KEY";
+async function loadMHACGooglePlaces(){
+  if(manualMapsReady)return true;
+  if(MHAC_GOOGLE_MAPS_API_KEY==="YOUR_GOOGLE_MAPS_API_KEY")throw new Error("Google Maps API key is not configured.");
+  if(!window.google?.maps?.importLibrary){
+    await new Promise((resolve,reject)=>{
+      const sc=document.createElement("script");
+      sc.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(MHAC_GOOGLE_MAPS_API_KEY)+"&v=weekly";
+      sc.async=true;sc.defer=true;
+      sc.onload=resolve;sc.onerror=()=>reject(new Error("Google Maps failed to load."));
+      document.head.appendChild(sc);
+    });
+  }
+  const {AutocompleteSessionToken,AutocompleteSuggestion}=await google.maps.importLibrary("places");
+  manualMapsToken=new AutocompleteSessionToken();
+  window.__mhacAutocompleteSuggestion=AutocompleteSuggestion;
+  manualMapsReady=true;
+  return true;
+}
+function clearManualLocation(){
+  $("manualLocationSelected").textContent="";
+  $("manualLocationSuggestions").innerHTML="";
+  $("manualLocationSuggestions").style.display="none";
+}
+async function searchManualMapsLocation(){
+  const input=$("manualLocationInput"),box=$("manualLocationSuggestions");
+  const q=input?.value.trim()||"";
+  if(q.length<3){clearManualLocation();return;}
+  const rid=++manualMapsRequestId;
+  try{
+    await loadMHACGooglePlaces();
+    if(rid!==manualMapsRequestId)return;
+    const req={input:q,origin:{lat:15.66789,lng:120.57765},region:"ph",language:"en-PH",sessionToken:manualMapsToken};
+    const {suggestions}=await window.__mhacAutocompleteSuggestion.fetchAutocompleteSuggestions(req);
+    if(rid!==manualMapsRequestId)return;
+    const places=(suggestions||[]).filter(x=>x.placePrediction);
+    if(!places.length){box.innerHTML='<div class="small" style="padding:12px">No matching Google Maps location found.</div>';box.style.display="block";return;}
+    box.innerHTML=places.slice(0,8).map((x,i)=>{
+      const p=x.placePrediction;
+      return `<button type="button" class="manualLocationSuggestion" data-manual-index="${i}"><b>${esc(p.mainText?.toString?.()||p.text?.toString?.()||"Location")}</b><span>${esc(p.secondaryText?.toString?.()||"")}</span></button>`;
+    }).join("");
+    box.style.display="block";
+    box.querySelectorAll("[data-manual-index]").forEach((b,i)=>b.onclick=()=>selectManualMapsLocation(places[i]));
+  }catch(e){
+    if(rid!==manualMapsRequestId)return;
+    box.innerHTML='<div class="small" style="padding:12px;color:#a00000">❌ '+esc(e.message||String(e))+'</div>';
+    box.style.display="block";
+  }
+}
+async function selectManualMapsLocation(suggestion){
+  const box=$("manualLocationSuggestions"),input=$("manualLocationInput");
+  try{
+    box.style.display="none";
+    const place=suggestion.placePrediction.toPlace();
+    await place.fetchFields({fields:["displayName","formattedAddress","location"]});
+    if(!place.location)throw new Error("Selected location has no coordinates.");
+    gpsLat=Number(place.location.lat);
+    gpsLon=Number(place.location.lng);
+    gpsAccuracy=null;
+    distanceKm=null;deliveryFee=null;
+    const label=String(place.formattedAddress||place.displayName||input.value||"").trim();
+    input.value=label;
+    $("manualLocationSelected").textContent="📍 SELECTED LOCATION: "+label;
+    $("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+label;
+    $("gpsAccuracy").textContent="Manual location selected from Google Maps.";
+    $("locStatus").textContent="Manual location selected. You can now calculate the delivery fee.";
+    $("calculateFeeBtn").disabled=false;
+    manualMapsToken=null;
+  }catch(e){
+    $("locStatus").textContent="❌ Unable to select this location: "+(e.message||String(e));
+  }
+}
+(function setupManualMapsLocation(){
+  const input=$("manualLocationInput"),box=$("manualLocationSuggestions");
+  if(!input||!box)return;
+  input.addEventListener("input",()=>{clearTimeout(manualMapsTimer);manualMapsTimer=setTimeout(searchManualMapsLocation,250);});
+  input.addEventListener("focus",()=>{if(input.value.trim().length>=3)searchManualMapsLocation();});
+  document.addEventListener("click",e=>{if(!$("manualLocationBox")?.contains(e.target))box.style.display="none";});
+})();
+window.__MHAC_BUILD__="V4.1.105 CUSTOMER MANUAL MAPS LOCATION SAME GPS COORDINATE PATH";
 </script>
 
 <script>
@@ -2598,54 +2275,5 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
-<!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
-<script>window.__MHAC_BUILD__="V4.1.103 CUSTOMER MANUAL ADDRESS ALL COVERED STREETS SEARCH";</script></body></html>
-
-<style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
-.customerUnifiedDetailWrap .orderDetailPanel{
-  border:3px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
-  border-top:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedBillRow{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  padding:8px 0!important;
-}
-.customerUnifiedDetailWrap .unifiedBillAmount{
-  min-width:92px!important;
-  text-align:right!important;
-  white-space:nowrap!important;
-  font-weight:700!important;
-}
-.customerUnifiedDetailWrap .unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
-}
-</style>
+</script>
+</body></html>
