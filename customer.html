@@ -1427,6 +1427,12 @@ function customize(si,ci,fi){
    for(let gi=0;gi<groups.length;gi++){
      const hiddenDrink=(gi===drinkGroupIndex&&!isDrinkGroupVisible());
      if(hiddenDrink)continue;
+     const groupName=String(groups[gi]?.name||"").trim();
+     const groupRole=String(groups[gi]?.role||"").trim().toLowerCase();
+     const isAddOnGroup=/^(?:add\s*ons?|addons?)$/i.test(groupName)||/^(?:add\s*ons?|addons?)$/i.test(groupRole);
+     /* ADD-ONS are optional for every food. Zero selected is valid; selected add-ons
+        still use the same counted Choice Group flow and are saved normally. */
+     if(isAddOnGroup)continue;
      const need=requiredForGroup(groups[gi]);
      if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
