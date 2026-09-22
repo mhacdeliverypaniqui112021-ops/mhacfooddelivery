@@ -1,4 +1,4 @@
-package com.mhacdelivery.customer;
+package com.mhacdelivery.sharebridge;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,14 +1,14 @@
 plugins { id 'com.android.application' }
 
 android {
-    namespace 'com.mhacdelivery.customer'
+    namespace 'com.mhacdelivery.sharebridge'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.mhacdelivery.customer'
+        applicationId 'com.mhacdelivery.sharebridge'
         minSdk 23
         targetSdk 35
-        versionCode 5
-        versionName 'ShareTarget-V5'
+        versionCode 6
+        versionName 'ShareTarget-V6'
     }
 }
