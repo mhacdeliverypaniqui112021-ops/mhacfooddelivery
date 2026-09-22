@@ -1402,49 +1402,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .manualLocationResults{margin-top:7px;max-height:180px;overflow:auto}
 .manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}.manualLocationResult b{display:block;font-size:14px;margin-bottom:3px}.manualLocationResult span{display:block;color:#555;line-height:1.25}
 </style>
-<style id="MHAC_CUSTOMER_ORDERBREAKDOWN_SPACING_ONLY_FINAL">
-/* CUSTOMER ONLY — spacing update. Manual Location and Choice behavior are untouched. */
-.customerUnifiedDetailWrap .orderDetailPayment{
-  margin:10px 0 0!important;
-  padding:12px 0!important;
-  line-height:1.45!important;
-}
-.customerUnifiedDetailWrap .unifiedBreakdown{
-  margin:12px 0 0!important;
-}
-.customerUnifiedDetailWrap .unifiedBreakdownTitle{
-  margin:0 0 10px!important;
-  padding:0 0 8px!important;
-  border-bottom:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreName{
-  margin:0 0 10px!important;
-  padding:0 0 9px!important;
-}
-.customerUnifiedDetailWrap .unifiedCategoryName{
-  margin:0 0 2px!important;
-  padding:0 0 9px!important;
-}
-.customerUnifiedDetailWrap .unifiedFoodRow{
-  padding:11px 0!important;
-}
-.customerUnifiedDetailWrap .unifiedChoice{
-  margin-top:6px!important;
-  line-height:1.4!important;
-}
-.customerUnifiedDetailWrap .unifiedBill{
-  margin:14px 0 0!important;
-  padding-top:10px!important;
-}
-.customerUnifiedDetailWrap .unifiedBillRow{
-  padding:9px 0!important;
-  line-height:1.45!important;
-}
-.customerUnifiedDetailWrap .unifiedBillGrand{
-  margin-top:7px!important;
-  padding-top:11px!important;
-}
-</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1478,7 +1435,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
 <div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div>
-<button type="button" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button type="button" class="manualLocationBtn" id="manualLocationBtn" style="display:block!important;visibility:visible!important;opacity:1!important" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2562,7 +2519,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.95 CUSTOMER OPTIONAL CHOICES + MANUAL RESTORED + ORDERBREAKDOWN SPACING ONLY";</script>
+window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
 </body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
