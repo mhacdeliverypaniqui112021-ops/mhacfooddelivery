@@ -1906,9 +1906,14 @@ function customize(si,ci,fi){
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
      const need=requiredForGroup(groups[gi]);
-     if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
+     const selected=groupTotal(gi);
+     /* CHOICE OPTIONAL: zero selections are allowed. If the customer starts
+        selecting this group, preserve the existing automatic counted rule. */
+     if(selected!==0 && selected!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
-   if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&(Number(styleSel.original||0)+Number(styleSel.spicy||0))!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
+   const legacyFlavorTotal=Number(styleSel.original||0)+Number(styleSel.spicy||0);
+   /* Legacy bucket FLAVOR is also optional; when used, keep its counted rule. */
+   if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&legacyFlavorTotal!==0&&legacyFlavorTotal!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
    const ch=document.querySelector('input[name=choice]:checked'); const choice=ch?f.choices[+ch.value]:null;
    // Maximum 2 stores per order. Existing store(s) may continue to receive more food.
    const selectedStoreNames=[...new Set(draftCart.map(x=>String(x.store||'')))];
