@@ -2061,7 +2061,7 @@ function updateTotals(){
  <div class="cartTotalRow" style="font-size:20px"><b>Total Amount</b><b>${peso(total)}</b></div>
  </div>`;
 }
-let manualRecipientMap=null,manualRecipientSearchTimer=null;
+let manualRecipientMap=null,manualRecipientSearchTimer=null,manualRecipientSearchSeq=0;
 function openManualRecipientLocation(){
   const modal=$("manualLocationModal"); modal.style.display="block"; bindManualRecipientSearch();
   setTimeout(()=>{
