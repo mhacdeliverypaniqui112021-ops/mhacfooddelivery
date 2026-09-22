@@ -1398,6 +1398,13 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 #gpsBtn.mhacDisabled{opacity:.45!important;pointer-events:none!important}
 #manualModePanel.mhacDisabled{opacity:.55!important}
 </style>
+<style id="MHAC_CUSTOMER_LOCATION_CHOICES_V4_1_107">
+#locationModeGPSBtn,#locationModeManualBtn{width:100%!important;min-height:58px!important;border:1.5px solid #222!important;border-radius:12px!important;background:#fff!important;color:#111!important;font-size:17px!important;font-weight:900!important;padding:12px!important}
+#locationModeGPSBtn:active,#locationModeManualBtn:active{background:#f5f5f5!important}
+.locationCalculateBtn{width:100%!important;min-height:50px!important;margin:7px 0!important;border:1.5px solid #222!important;border-radius:12px!important;background:#fff!important;color:#111!important;font-size:16px!important;font-weight:900!important;padding:10px!important}
+.locationCalculateBtn:disabled{opacity:.5!important}
+#gpsModePanel,#manualModePanel{margin-top:6px!important}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1417,26 +1424,34 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS LOCATION</b><br>Use your current location when you are at the delivery location.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div>
-<div class="manualLocationBox" id="manualLocationBox">
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field" id="locationChoiceBox">
   <b>📍 DELIVERY LOCATION</b><br>
-  <span class="small">Choose your current location, or choose the recipient’s location if you are ordering for someone else.</span>
+  <span class="small">Choose GPS if you are at the delivery location, or choose Manual for a recipient in another location.</span>
   <div id="locationModeChoices" style="display:flex;gap:8px;flex-direction:column;margin:9px 0">
-    <button type="button" id="locationModeGPSBtn" class="add mhacLocationChoice">📍 GPS LOCATION</button>
-    <button type="button" id="locationModeManualBtn" class="add mhacLocationChoice">🧭 MANUAL LOCATION FOR RECIPIENT</button>
+    <button type="button" id="locationModeGPSBtn" class="mhacLocationChoice">📍 GPS LOCATION</button>
+    <button type="button" id="locationModeManualBtn" class="mhacLocationChoice">🧭 MANUAL LOCATION FOR RECIPIENT</button>
+  </div>
+  <div id="gpsModePanel" style="display:none">
+    <div class="field" style="margin:7px 0">📍 <b>GPS LOCATION</b><br><span class="small">Use your current location when you are at the delivery location.</span></div>
+    <button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button>
+    <div id="gpsAccuracy" class="status"></div>
+    <div id="gpsLocationDisplay" class="status"></div>
+    <button type="button" id="gpsCalculateFeeBtn" class="locationCalculateBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE GPS DELIVERY FEE</button>
   </div>
   <div id="manualModePanel" style="display:none">
-    <span class="small">For a recipient in another location. Google Maps will open so you can search the recipient’s school, home, address or landmark and choose the exact place.</span>
+    <div class="field" style="margin:7px 0">🧭 <b>MANUAL LOCATION FOR RECIPIENT</b><br><span class="small">For a recipient in another location. Tap Manual Location to open Google Maps, then search the recipient’s school, home, address or landmark and choose the exact place.</span></div>
     <input id="manualLocationInput" type="text" placeholder="Example: Anao National High School" autocomplete="off" enterkeyhint="search">
-    <div id="manualMapsHint" class="small" style="margin-top:6px">Google Maps will open automatically after you choose Manual Location.</div>
-    <button type="button" id="openGoogleMapsBtn" class="add" style="width:100%;margin-top:7px;display:none">🧭 OPEN GOOGLE MAPS</button>
+    <button type="button" id="openGoogleMapsBtn" class="locationCalculateBtn" style="width:100%;margin-top:7px">🧭 OPEN GOOGLE MAPS</button>
     <input id="googleMapsLinkInput" type="text" placeholder="Paste the Google Maps shared link here" autocomplete="off" style="margin-top:7px;display:none">
-    <button type="button" id="applyGoogleMapsLinkBtn" class="add" style="width:100%;margin-top:7px;display:none">✅ USE THIS LOCATION</button>
+    <button type="button" id="applyGoogleMapsLinkBtn" class="locationCalculateBtn" style="width:100%;margin-top:7px;display:none">✅ USE THIS LOCATION</button>
     <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
     <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
+    <button type="button" id="manualCalculateFeeBtn" class="locationCalculateBtn" onclick="calculateGPSFee()" disabled>🧭 CALCULATE RECIPIENT DELIVERY FEE</button>
   </div>
 </div>
-<button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Choose GPS LOCATION or MANUAL LOCATION FOR RECIPIENT.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button type="button" id="calculateFeeBtn" style="display:none" disabled>📍 CALCULATE DELIVERY FEE</button>
+<div id="locStatus" class="status">Choose GPS LOCATION or MANUAL LOCATION FOR RECIPIENT.</div><div id="feeView" class="small"></div>
+<select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2043,6 +2058,14 @@ function updateTotals(){
  </div>`;
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
+function syncLocationCalcButtons(){
+ const readyGPS=gpsLat!==null&&gpsLon!==null&&Number.isFinite(Number(gpsLat))&&Number.isFinite(Number(gpsLon));
+ const readyManual=manualLocationSelected&&Number.isFinite(Number(manualLat))&&Number.isFinite(Number(manualLon));
+ if($("gpsCalculateFeeBtn"))$("gpsCalculateFeeBtn").disabled=!readyGPS;
+ if($("manualCalculateFeeBtn"))$("manualCalculateFeeBtn").disabled=!readyManual;
+ if($("calculateFeeBtn"))$("calculateFeeBtn").disabled=modeForCalc()==="MANUAL"?!readyManual:!readyGPS;
+}
+function modeForCalc(){return window.__MHAC_LOCATION_MODE__||"GPS";}
 async function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
@@ -2054,7 +2077,7 @@ async function calculateByGPS(e){
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
-   $("calculateFeeBtn").disabled=false;
+   syncLocationCalcButtons();
    btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
    try{
      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`);
@@ -2064,7 +2087,7 @@ async function calculateByGPS(e){
      $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
    }
  },err=>{
-   gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
+   gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;syncLocationCalcButtons();
    btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
    const msg={1:"Location permission was denied. Please allow Location for Chrome.",2:"GPS position is unavailable. Turn on phone Location and try again.",3:"GPS request timed out. Move to an open area and try again."}[err.code]||"Unable to get GPS location.";
    $("locStatus").textContent="❌ "+msg;
@@ -2086,7 +2109,7 @@ async function calculateGPSFee(){
    $("locStatus").textContent=useManual?"Manual location route calculated.":"GPS location route calculated.";
    renderCart();updateTotals();
  }catch(e){$("locStatus").textContent="❌ Route calculation failed."}
- finally{$("calculateFeeBtn").disabled=false}
+ finally{syncLocationCalcButtons();}
 }
 async function placeOrder(){
  if(!isOpen())return alert("MHAC Delivery is closed.");
@@ -2607,7 +2630,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
   window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.106 CUSTOMER GPS MAIN + MANUAL LOCATION FOR RECIPIENT";
+  window.__MHAC_BUILD__="V4.1.107 CUSTOMER GPS MAIN + MANUAL RECIPIENT TO GOOGLE MAPS";
 })();
 </script>
 <script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_103">
@@ -2616,21 +2639,34 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
   const $=id=>document.getElementById(id);
   let mode="GPS";
   function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
+  function syncCalcButtons(){
+    const readyGPS=gpsLat!==null&&gpsLon!==null&&Number.isFinite(Number(gpsLat))&&Number.isFinite(Number(gpsLon));
+    const readyManual=manualLocationSelected&&Number.isFinite(Number(manualLat))&&Number.isFinite(Number(manualLon));
+    if($("gpsCalculateFeeBtn"))$("gpsCalculateFeeBtn").disabled=!readyGPS;
+    if($("manualCalculateFeeBtn"))$("manualCalculateFeeBtn").disabled=!readyManual;
+    if($("calculateFeeBtn"))$("calculateFeeBtn").disabled=mode==="MANUAL"?!readyManual:!readyGPS;
+  }
   function setMode(next,openMaps=false){
-    mode=next==="MANUAL"?"MANUAL":"GPS";
-    const gpsChoice=$("locationModeGPSBtn"),manChoice=$("locationModeManualBtn"),panel=$("manualModePanel"),g=$("gpsBtn"),calc=$("calculateFeeBtn"),box=$("manualLocationBox");
+    mode=next==="MANUAL"?"MANUAL":"GPS"; window.__MHAC_LOCATION_MODE__=mode;
+    const gpsChoice=$("locationModeGPSBtn"),manChoice=$("locationModeManualBtn"),gpsPanel=$("gpsModePanel"),panel=$("manualModePanel"),g=$("gpsBtn"),box=$("locationChoiceBox");
     if(gpsChoice)gpsChoice.style.display=mode==="GPS"?"block":"none";
     if(manChoice)manChoice.style.display=mode==="MANUAL"?"block":"none";
+    if(gpsPanel)gpsPanel.style.display=mode==="GPS"?"block":"none";
     if(panel)panel.style.display=mode==="MANUAL"?"block":"none";
-    if(g){g.style.display=mode==="GPS"?"block":"none";g.disabled=mode!=="GPS";}
-    if(calc)calc.disabled=mode==="MANUAL"?!manualLocationSelected:!(gpsLat!==null&&gpsLon!==null);
+    if(g)g.style.display=mode==="GPS"?"block":"none";
+    distanceKm=null;deliveryFee=null;
     if(mode==="MANUAL"){
-      distanceKm=null;deliveryFee=null;
+      gpsLat=null;gpsLon=null;gpsAccuracy=null;
+      if($("gpsAccuracy"))$("gpsAccuracy").textContent="";
+      if($("gpsLocationDisplay"))$("gpsLocationDisplay").textContent="";
       if($("locStatus"))$("locStatus").textContent=manualLocationSelected?"Recipient location selected. Calculate the delivery fee.":"Select the recipient location in Google Maps.";
-      if(openMaps)setTimeout(()=>$("openGoogleMapsBtn")?.click(),80);
+      syncCalcButtons();
+      if(openMaps)setTimeout(()=>$("openGoogleMapsBtn")?.click(),120);
     }else{
-      distanceKm=null;deliveryFee=null;
-      if($("locStatus"))$("locStatus").textContent=gpsLat!==null?"GPS location detected. Calculate the delivery fee.":"GPS selected. Tap ALLOW GPS LOCATION.";
+      manualLat=null;manualLon=null;manualLabel="";manualLocationSelected=false;
+      if($("manualLocationSelected")){ $("manualLocationSelected").style.display="none"; $("manualLocationSelected").innerHTML=""; }
+      if($("locStatus"))$("locStatus").textContent=gpsLat!==null?"GPS location detected. Calculate the delivery fee.":"Use GPS to detect the current delivery location.";
+      syncCalcButtons();
     }
     if(box)box.scrollIntoView({block:"nearest",behavior:"smooth"});
   }
@@ -2662,6 +2698,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     $("gpsLocationDisplay")&&($("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${manualLabel}`);
     $("gpsAccuracy")&&($("gpsAccuracy").textContent="Manual recipient destination selected. Customer GPS is not used for this order.");
     $("locStatus")&&($("locStatus").textContent="Recipient location selected. Calculate the delivery fee.");
+    syncCalcButtons();
     $("calculateFeeBtn")&&($("calculateFeeBtn").disabled=false);
     $("manualLocationSelected")&&($("manualLocationSelected").innerHTML='<b>📍 RECIPIENT LOCATION SELECTED</b><br><b>'+esc(manualLabel)+'</b><br>Latitude: '+c.lat.toFixed(6)+'<br>Longitude: '+c.lon.toFixed(6));
     $("manualLocationSelected")&&($("manualLocationSelected").style.display="block");
@@ -2671,12 +2708,19 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     $("locationModeManualBtn")?.addEventListener("click",()=>setMode("MANUAL",true));
     $("openGoogleMapsBtn")?.addEventListener("click",()=>{
       const url=mapsUrl();
-      const w=window.open(url,"_blank","noopener,noreferrer");
+      const w=window.open(url,"_blank");
       if(!w){location.href=url;}
     });
     $("applyGoogleMapsLinkBtn")?.addEventListener("click",applyMapsLink);
     $("googleMapsLinkInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyMapsLink();}});
-    setMode("GPS");
+    // Initial state: show both choices, but no mode panel until customer chooses one.
+    mode=""; window.__MHAC_LOCATION_MODE__="";
+    if($("gpsModePanel"))$("gpsModePanel").style.display="none";
+    if($("manualModePanel"))$("manualModePanel").style.display="none";
+    if($("locationModeGPSBtn"))$("locationModeGPSBtn").style.display="block";
+    if($("locationModeManualBtn"))$("locationModeManualBtn").style.display="block";
+    if($("locStatus"))$("locStatus").textContent="Choose GPS LOCATION or MANUAL LOCATION FOR RECIPIENT.";
+    syncCalcButtons();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
