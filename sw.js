@@ -1,4 +1,4 @@
-const CACHE_NAME = "mhac-share-target-v1";
+const CACHE_NAME = "mhac-share-target-v1-2";
 self.addEventListener("install", event => self.skipWaiting());
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
 self.addEventListener("fetch", event => {

@@ -1433,7 +1433,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   <span class="small">Choose GPS if you are at the delivery location, or choose Manual for a recipient in another location.</span>
   <div id="locationModeChoices" style="display:flex;gap:8px;flex-direction:column;margin:9px 0">
     <button type="button" id="locationModeGPSBtn" class="mhacLocationChoice">📍 GPS LOCATION</button>
-    <button type="button" id="locationModeManualBtn" class="mhacLocationChoice">🧭 MANUAL LOCATION FOR RECIPIENT</button>
+    <button type="button" id="locationModeManualBtn" class="mhacLocationChoice" onclick="return window.__MHAC_OPEN_RECIPIENT_MAPS__ ? window.__MHAC_OPEN_RECIPIENT_MAPS__() : true;">🧭 MANUAL LOCATION FOR RECIPIENT</button>
   </div>
   <div id="gpsModePanel" style="display:none">
     <div class="field" style="margin:7px 0">📍 <b>GPS LOCATION</b><br><span class="small">Use your current location when you are at the delivery location.</span></div>
@@ -2632,6 +2632,30 @@ window.__MHAC_BUILD__="V4.1.109 CUSTOMER SHARE TARGET + MANUAL DIRECT GOOGLE MAP
   window.__MHAC_BUILD__="V4.1.109 CUSTOMER SHARE TARGET + MANUAL DIRECT GOOGLE MAPS";
 })();
 </script>
+<script id="MHAC_CUSTOMER_GOOGLE_MAPS_DIRECT_LAUNCH_V1_2">
+(function(){
+  "use strict";
+  window.__MHAC_OPEN_RECIPIENT_MAPS__ = function(){
+    try{
+      const manual=document.getElementById("locationModeManualBtn");
+      const gps=document.getElementById("locationModeGPSBtn");
+      const gpsPanel=document.getElementById("gpsModePanel");
+      const manualPanel=document.getElementById("manualModePanel");
+      if(gps)gps.style.display="none";
+      if(manual)manual.style.display="block";
+      if(gpsPanel)gpsPanel.style.display="none";
+      if(manualPanel)manualPanel.style.display="block";
+      window.__MHAC_LOCATION_MODE__="MANUAL";
+      const url="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("Philippines");
+      window.location.assign(url);
+    }catch(e){
+      window.location.href="https://www.google.com/maps/";
+    }
+    return false;
+  };
+})();
+</script>
+
 <script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_103">
 (function(){
   "use strict";

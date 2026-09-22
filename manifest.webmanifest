@@ -7,6 +7,7 @@
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "description": "MHAC DELIVERY Customer — receive shared Google Maps recipient locations.",
+  "id": "/customer.html",
   "icons": [] ,
   "share_target": {
     "action": "/customer.html?share-target=1",
