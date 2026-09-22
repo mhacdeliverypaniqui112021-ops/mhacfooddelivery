@@ -2435,7 +2435,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOGLE MAPS";</script>
+window.__MHAC_BUILD__="V4.1.109 CUSTOMER SHARE TARGET + MANUAL DIRECT GOOGLE MAPS";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body>
 <script id="MHAC_MANUAL_LOCATION_V4_1_101_WAZE_STYLE_UNIVERSAL">
@@ -2629,7 +2629,7 @@ window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOG
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
   window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOGLE MAPS";
+  window.__MHAC_BUILD__="V4.1.109 CUSTOMER SHARE TARGET + MANUAL DIRECT GOOGLE MAPS";
 })();
 </script>
 <script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_103">
@@ -2702,11 +2702,17 @@ window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOG
   }
   function install(){
     $("locationModeGPSBtn")?.addEventListener("click",()=>setMode("GPS"));
-    $("locationModeManualBtn")?.addEventListener("click",()=>setMode("MANUAL",true));
+    // Manual Location itself is the Google Maps launcher. Do not require a second button.
+    $("locationModeManualBtn")?.addEventListener("click",()=>{
+      setMode("MANUAL",false);
+      const url=mapsUrl();
+      // Direct navigation from the real user click avoids popup blockers and lets Android
+      // hand the Google Maps URL to the installed Google Maps app when available.
+      window.location.href=url;
+    });
     $("openGoogleMapsBtn")?.addEventListener("click",()=>{
       const url=mapsUrl();
-      const w=window.open(url,"_blank");
-      if(!w){location.href=url;}
+      window.location.href=url;
     });
     $("applyGoogleMapsLinkBtn")?.addEventListener("click",applyMapsLink);
     $("googleMapsLinkInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyMapsLink();}});
