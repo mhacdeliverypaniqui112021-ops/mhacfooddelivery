@@ -1022,385 +1022,23 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerOrderPreviewHead b{font-size:18px!important}
 .customerOrderPreviewName{font-size:22px!important;font-weight:800!important;margin:8px 0!important}
 .customerViewFullOrder{background:#fff!important;color:#111!important;border:1px solid #222!important;width:100%!important;margin:8px 0!important}
-.customerUnifiedDrawer{border:2px solid #222!important;border-radius:12px!important;background:#fff!important;padding:12px!important}
-.customerUnifiedCustomer{padding:0 0 12px!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.4!important}
-.customerUnifiedPayment{padding:12px 0!important;border-bottom:1px solid #eee!important;font-size:16px!important}
+.customerUnifiedDrawer{border:4px solid #222!important;border-radius:14px!important;background:#fff!important;padding:12px!important;color:#111!important;box-sizing:border-box!important}
+.customerUnifiedDrawer *{box-sizing:border-box!important}
+.customerUnifiedCustomer{padding:0 0 12px!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.45!important}
+.customerUnifiedPayment{padding:12px 0!important;border-bottom:1px solid #eee!important;font-size:16px!important;line-height:1.35!important}
 .customerUnifiedTitle{font-size:22px!important;font-weight:900!important;padding:14px 0 10px!important}
-.customerUnifiedStoreName{font-size:22px!important;font-weight:900!important;padding-bottom:8px!important;border-bottom:1px solid #eee!important}
-.customerUnifiedCategoryName{font-size:18px!important;font-weight:800!important;padding:8px 0!important}
-.customerUnifiedFoodRow{padding:8px 0!important;border-bottom:1px solid #eee!important}
+.customerUnifiedStoreName{font-size:22px!important;font-weight:900!important;padding:0 0 8px!important;border-bottom:1px solid #eee!important}
+.customerUnifiedCategoryName{font-size:18px!important;font-weight:800!important;padding:10px 0!important;border-bottom:1px solid #eee!important}
+.customerUnifiedFoodRow{padding:11px 0!important;border-bottom:1px solid #eee!important}
 .customerUnifiedFoodName{font-size:17px!important;font-weight:800!important;line-height:1.3!important}
-.customerUnifiedChoice{padding-left:12px!important;font-size:15px!important;line-height:1.35!important}
-.customerUnifiedFoodTotal{font-size:16px!important;font-weight:800!important;margin-top:5px!important}
+.customerUnifiedChoice{padding-left:12px!important;font-size:15px!important;line-height:1.4!important}
+.customerUnifiedFoodTotal{font-size:16px!important;font-weight:800!important;margin-top:6px!important}
 .customerUnifiedStoreDivider{border-top:1px solid #ddd!important;margin:10px 0!important}
 .customerUnifiedBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
-.customerUnifiedBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important}
+.customerUnifiedBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important;line-height:1.25!important}
 .customerUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
-.customerOrderActions{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;width:100%!important}
-.customerOrderActions button{margin:0!important;width:100%!important;max-width:100%!important;display:block!important;text-align:center!important}
-.customerOrderActions.single .orderChatBtn{width:100%!important;max-width:100%!important;display:block!important;}
-</style>
-<style id="MHAC_CUSTOMER_UNIFIED_FINAL_V4_1_84">
-.customerViewFullOrder{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  width:100%!important;
-  min-height:46px!important;
-  margin:10px 0 0!important;
-  padding:10px 12px!important;
-  background:#fff!important;
-  color:#111!important;
-  border:2px solid #222!important;
-  border-radius:9px!important;
-  font-size:15px!important;
-  font-weight:900!important;
-  text-align:center!important;
-}
-.customerUnifiedDetailWrap.hidden{display:none!important}
-.customerUnifiedDetailWrap:not(.hidden){display:block!important}
-</style>
-
-<style data-source="ADMIN_ORDER_BREAKDOWN" id="MHAC_FINAL_ADMIN_COMPACT_ORDER_FIX_20260831">
-/* FINAL ADMIN COMPACT ORDER FIX
-   - Initial incoming order shows only order number + customer name.
-   - VIEW FULL ORDER expands directly underneath that header, before action buttons.
-   - GCash panel and metrics use compact, consistent boxes.
-*/
-#metrics{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:6px!important;
-  align-items:stretch!important;
-}
-#metrics .metric{
-  min-width:0!important;
-  min-height:58px!important;
-  height:auto!important;
-  padding:7px 4px!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-}
-#metrics .metric span{font-size:11px!important;line-height:1.1!important;font-weight:600!important;white-space:nowrap!important}
-#metrics .metric b{font-size:18px!important;line-height:1.05!important;margin-top:4px!important;font-weight:800!important}
-
-.card:has(.gcSettings){
-  padding:9px!important;
-  margin:6px 0!important;
-}
-.card:has(.gcSettings)>h2{
-  font-size:21px!important;
-  margin:3px 0 5px!important;
-}
-.card:has(.gcSettings)>p.status{
-  font-size:13px!important;
-  line-height:1.2!important;
-  margin:2px 0 5px!important;
-}
-.gcSettings{
-  padding:6px!important;
-  margin:0!important;
-  border-radius:8px!important;
-  box-sizing:border-box!important;
-}
-.gcSettings .label{
-  font-size:12px!important;
-  line-height:1.15!important;
-  margin:2px 0!important;
-}
-.gcSettings input{
-  min-height:36px!important;
-  height:36px!important;
-  padding:5px 8px!important;
-  margin:2px 0 4px!important;
-  font-size:14px!important;
-  box-sizing:border-box!important;
-}
-.gcSettings .small,.gcSettings .status{
-  font-size:11px!important;
-  line-height:1.15!important;
-  margin:2px 0!important;
-}
-.gcSettings .row{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:5px!important;
-  margin-top:4px!important;
-}
-.gcSettings .row button{
-  min-height:34px!important;
-  height:34px!important;
-  padding:5px 6px!important;
-  font-size:11px!important;
-  box-sizing:border-box!important;
-}
-.gcSettings img,#adminGcashQrPreview{
-  width:70px!important;
-  height:70px!important;
-  max-width:70px!important;
-  max-height:70px!important;
-  margin:4px auto!important;
-  object-fit:contain!important;
-}
-
-#orders .order{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 260px!important;
-  gap:8px!important;
-  align-items:start!important;
-}
-#orders .orderInfo{
-  min-width:0!important;
-}
-#orders .orderPreviewHead{
-  margin:0 0 2px!important;
-  align-items:center!important;
-}
-#orders .orderPreviewHead b{
-  font-size:16px!important;
-  line-height:1.15!important;
-  font-weight:800!important;
-}
-#orders .orderPreviewCustomer{
-  font-size:19px!important;
-  line-height:1.15!important;
-  font-weight:800!important;
-  margin:4px 0!important;
-}
-#orders .orderActions{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:5px!important;
-}
-#orders .orderActions button,
-#orders .orderActions a,
-#orders .orderActions select{
-  width:100%!important;
-  min-width:0!important;
-  min-height:38px!important;
-  height:auto!important;
-  box-sizing:border-box!important;
-  font-size:13px!important;
-  line-height:1.15!important;
-  padding:7px 6px!important;
-  margin:0!important;
-}
-#orders .orderActions [data-view]{
-  grid-column:1 / -1!important;
-}
-#orders .orderActions [data-accept],
-#orders .orderActions [data-cancel-order]{
-  grid-column:1 / -1!important;
-}
-#orders .orderActions [data-time],
-#orders .orderActions [data-a],
-#orders .orderActions [data-c]{
-  min-height:36px!important;
-}
-#orders .orderActions [id^="details-"]{
-  display:none!important;
-}
-#orders .orderInfo [id^="details-"]{
-  grid-column:auto!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin:6px 0 0!important;
-  padding:0!important;
-}
-#orders .orderInfo [id^="details-"]:not(.hidden){
-  display:block!important;
-  animation:mhacOrderSlideDown .18s ease-out!important;
-}
-.orderDetailPanel{
-  background:#fff!important;
-  border:1px solid #ddd!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  box-sizing:border-box!important;
-  font-size:14px!important;
-  line-height:1.3!important;
-  overflow:hidden!important;
-}
-.orderDetailCustomer{
-  padding-bottom:6px!important;
-  border-bottom:1px solid #eee!important;
-}
-.orderDetailHeading{
-  margin-top:7px!important;
-  font-size:15px!important;
-}
-.orderDetailStore{
-  padding:7px!important;
-  margin:5px 0!important;
-  background:#fff!important;
-  border:1px solid #eee!important;
-  border-radius:7px!important;
-}
-.orderDetailStore h3{
-  font-size:17px!important;
-  line-height:1.15!important;
-}
-.orderDetailFood{
-  font-size:14px!important;
-  line-height:1.3!important;
-}
-.orderDetailFood b{font-size:15px!important}
-.orderDetailPayment{
-  margin-top:6px!important;
-  font-size:13px!important;
-}
-.orderDetailPayment button{
-  min-height:32px!important;
-  font-size:11px!important;
-  padding:5px 7px!important;
-  margin-top:4px!important;
-}
-.orderDetailBill{
-  margin-top:6px!important;
-  padding-top:6px!important;
-  border-top:1px solid #eee!important;
-  font-size:14px!important;
-  line-height:1.3!important;
-}
-@keyframes mhacOrderSlideDown{
-  from{opacity:0;transform:translateY(-5px)}
-  to{opacity:1;transform:translateY(0)}
-}
-@media(max-width:700px){
-  #metrics{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
-  #metrics .metric{min-height:56px!important;padding:6px 2px!important}
-  #metrics .metric span{font-size:10px!important}
-  #metrics .metric b{font-size:17px!important}
-  .card:has(.gcSettings){padding:8px!important}
-  .card:has(.gcSettings)>h2{font-size:20px!important}
-  .card:has(.gcSettings)>p.status{font-size:12px!important}
-  .gcSettings .row{grid-template-columns:1fr 1fr!important}
-  .gcSettings img,#adminGcashQrPreview{width:64px!important;height:64px!important;max-width:64px!important;max-height:64px!important}
-  #orders .order{grid-template-columns:1fr!important;gap:6px!important}
-  #orders .orderActions{grid-template-columns:1fr 1fr!important}
-  #orders .orderActions [data-view],
-  #orders .orderActions [data-accept],
-  #orders .orderActions [data-cancel-order]{grid-column:1 / -1!important}
-}
-</style>
-<style id="MHAC_ADMIN_SOURCE_OF_TRUTH_ORDERBREAKDOWN_FINAL">
-.orderDetailPanel{background:#fff!important;border:3px solid #222!important;border-radius:9px!important;padding:8px!important;box-sizing:border-box!important;font-size:14px!important;line-height:1.3!important;overflow:hidden!important}
-.orderDetailCustomer{padding-bottom:6px!important;border-bottom:1px solid #eee!important}
-.orderDetailPayment{margin-top:6px!important;font-size:13px!important}
-.unifiedBreakdown{margin:10px 0!important;padding:0!important;border:0!important;background:transparent!important}
-.orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.orderDetailPayment b{font-weight:900!important}
-
-.unifiedBreakdownTitle{font-size:18px!important;font-weight:900!important;margin:0 0 8px!important}
-.unifiedStoreCard{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important}
-.unifiedStoreName{font-size:22px!important;font-weight:900!important;margin:0 0 8px!important;padding-bottom:8px!important;border-bottom:1px solid #ddd!important}
-.unifiedCategoryName{font-size:18px!important;font-weight:900!important;margin:0 0 2px!important;padding:0 0 8px!important;border-bottom:1px solid #ddd!important}
-.unifiedFoodRow{padding:9px 0!important;border-top:1px solid #ddd!important}
-.unifiedFoodName{font-size:18px!important;line-height:1.35!important}
-.unifiedChoice{font-size:15px!important;line-height:1.3!important;margin-top:4px!important}
-.unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
-  border-top:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.45!important;
-}
-.unifiedBillRow{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  width:100%!important;
-  padding:8px 0!important;
-  margin:0!important;
-  border-bottom:0!important;
-}
-.unifiedBillLabel{
-  flex:1 1 auto!important;
-  min-width:0!important;
-  text-align:left!important;
-}
-.unifiedBillAmount{
-  flex:0 0 auto!important;
-  min-width:92px!important;
-  text-align:right!important;
-  font-weight:700!important;
-  white-space:nowrap!important;
-}
-.unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
-}
-@media(max-width:600px){
-  .unifiedBillRow{
-    padding:9px 0!important;
-    gap:10px!important;
-  }
-  .unifiedBillAmount{min-width:88px!important}
-}
-</style>
-<style id="MHAC_CUSTOMER_ORDER_DRAWER_MATCH_ADMIN">
-/* CUSTOMER: match locked Admin Order Breakdown drawer.
-   One thick outer box only; no separate thick boxes per store. */
-.customerUnifiedDetailWrap .orderDetailPanel{
-  border:2px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  box-sizing:border-box!important;
-  background:#fff!important;
-  overflow:hidden!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard + .unifiedStoreCard{
-  margin-top:10px!important;
-  padding-top:10px!important;
-  border-top:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreName{
-  border-bottom:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedCategoryName{
-  border-bottom:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedFoodRow{
-  border-top:1px solid #ddd!important;
-}
-</style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<style id="MHAC_MANUAL_RECIPIENT_LOCATION">
-.manualLocationBtn{width:100%;min-height:50px;margin:6px 0;background:#fff;color:#111;border:2px solid #111;border-radius:12px;font-size:16px;font-weight:900}
-.manualLocationModal{display:none;position:fixed;inset:0;background:#0008;z-index:1000;padding:12px;overflow:auto}
-.manualLocationPanel{background:#fff;max-width:700px;margin:auto;border:2px solid #222;border-radius:16px;padding:12px}
-.manualLocationPanel h3{margin:4px 0 8px}
-.manualLocationSearch{display:flex;gap:7px}
-.manualLocationSearch input{flex:1;min-width:0;min-height:46px;padding:9px 11px;font-size:16px}
-.manualLocationSearch button,.manualLocationActions button{min-height:46px;padding:9px 13px;border:2px solid #111;border-radius:9px;background:#fff;font-weight:900}
-#manualLocationMap{height:360px;margin:10px 0;border:2px solid #222;border-radius:12px;overflow:hidden}
-#manualLocationMap{position:relative}
-#manualLocationMap::after{content:"📍";position:absolute;z-index:500;left:50%;top:50%;transform:translate(-50%,-100%);font-size:36px;pointer-events:none;text-shadow:0 1px 3px #fff}
-.manualLocationHint{font-size:13px;color:#555;text-align:center;margin:6px 0}
-.manualLocationActions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.manualLocationActions .confirm{background:#111;color:#fff}
-.manualLocationResults{margin-top:7px;max-height:180px;overflow:auto}
-.manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}.manualLocationResult b{display:block;font-size:14px;margin-bottom:3px}.manualLocationResult span{display:block;color:#555;line-height:1.25}
+.customerOrderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+.customerOrderActions button{margin:0!important;width:100%!important}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1420,22 +1058,8 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   <div class="customerChatInput"><input id="customerChatInput" placeholder="Type message…"><button id="customerChatSend" class="add">SEND</button></div>
 </div>
 
-<div id="manualLocationModal" class="manualLocationModal">
-  <div class="manualLocationPanel">
-    <button type="button" class="close" onclick="closeManualRecipientLocation()">CLOSE</button>
-    <h3>🗺️ RECIPIENT MANUAL LOCATION</h3>
-    <div class="manualLocationHint">Search the recipient's address, then move the map so the exact recipient location is under the fixed center pin.</div>
-    <div class="manualLocationSearch"><input id="manualLocationSearch" placeholder="Search school / street / building / establishment / barangay / landmark"><button type="button" onclick="searchManualRecipientLocation()">SEARCH</button></div>
-    <div id="manualLocationResults" class="manualLocationResults"></div>
-    <div id="manualLocationMap"></div>
-    <div class="manualLocationHint">📍 Fixed pin = exact delivery point. Drag the map, then press CONFIRM LOCATION.</div>
-    <div id="manualLocationStatus" class="status">Search or move the map to the recipient's location.</div>
-    <div class="manualLocationActions"><button type="button" onclick="closeManualRecipientLocation()">CANCEL</button><button type="button" class="confirm" onclick="confirmManualRecipientLocation()">CONFIRM LOCATION</button></div>
-  </div>
-</div>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div>
-<button type="button" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -1488,22 +1112,15 @@ function mins(t){const [h,m]=String(t||"00:00").split(":").map(Number);return h*
 let hoursUnsub=null;async function loadHours(){try{if(hoursUnsub)hoursUnsub();hoursUnsub=onSnapshot(doc(db,"settings","businessHours"),s=>{if(s.exists())businessHours={...businessHours,...s.data()};applyHours()})}catch(e){console.warn("Business hours listener failed",e)}}function applyHours(){const op=isOpen();const closed=businessHours.manualClosed===true;$("scheduleBar").textContent=closed?"🔴 CLOSED / DAY OFF":`🕘 ${businessHours.openTime} – ${businessHours.closeTime}`;if(currentUser&&!op){$("authGate").style.display="none";$("closedScreen").style.display="block";$("closedText").textContent=closed?"MHAC DELIVERY is CLOSED / DAY OFF. No new orders are being accepted.":`Ordering hours: ${businessHours.openTime} – ${businessHours.closeTime}.`}else if(currentUser){$("authGate").style.display="none";$("closedScreen").style.display="none"}}
 async function loadMenu(){
   if(menuUnsub){menuUnsub();menuUnsub=null}
-  return await new Promise(resolve=>{
-    let first=true;
-    menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
-      data=snap.exists()?snap.data():{stores:[]};
-      rebuildCustomerCategoryCache();
-      const count=(data.stores||[]).filter(s=>s.published!==false).length;
-      $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
-      renderStores();
-      renderCart();
-      refreshCustomerOrderBreakdowns();
-      if(first){first=false;resolve(true)}
-    },err=>{
-      console.warn("Published menu listener failed",err);
-      $("menuStatus").textContent="⚠️ Unable to load published menu.";
-      if(first){first=false;resolve(false)}
-    });
+  menuUnsub=onSnapshot(doc(db,"settings","menu"),snap=>{
+    data=snap.exists()?snap.data():{stores:[]};
+    const count=(data.stores||[]).filter(s=>s.published!==false).length;
+    $("menuStatus").textContent=count?"🟢 PUBLISHED MENU READY — LIVE":"⚠️ No menu has been published yet.";
+    renderStores();
+    renderCart();
+  },err=>{
+    console.warn("Published menu listener failed",err);
+    $("menuStatus").textContent="⚠️ Unable to load published menu.";
   });
 }
 async function boot(){await loadHours();await loadMenu();applyHours()}
@@ -1518,213 +1135,6 @@ function loadGcashLocal(){
   try{const x=JSON.parse(localStorage.getItem(GCASH_LOCAL_KEY)||"null");if(x&&typeof x==="object")return {number:String(x.number||""),qrUrl:String(x.qrUrl||""),qrHidden:!!x.qrHidden};}catch(_){}
   return {number:"",qrUrl:"",qrHidden:false};
 }
-function customerTruthItemPricing(i){
- const qty=Math.max(1,Number(i.qty||1));
- const base=Number(i.basePrice!=null?i.basePrice:i.price||0);
- const extras=[];
- if(i.choice){
-   const n=typeof i.choice==="string"?i.choice:i.choice?.name;
-   const pr=typeof i.choice==="string"?Number(i.choicePrice||0):Number(i.choice?.price||0);
-   if(n)extras.push({name:n,price:pr});
- }
- if(i.bucketChoice){
-   const n=typeof i.bucketChoice==="string"?i.bucketChoice:i.bucketChoice?.name;
-   const pr=typeof i.bucketChoice==="string"?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
-   if(n)extras.push({name:n,price:pr});
- }
- (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
-   const n=typeof x==="string"?x:x?.name;
-   const pr=typeof x==="string"?0:Number(x?.price||0);
-   if(n)extras.push({name:n,price:pr});
- }));
- (i.addOns||[]).forEach(x=>{
-   const n=typeof x==="string"?x:x?.name;
-   const pr=typeof x==="string"?0:Number(x?.price||0);
-   if(n)extras.push({name:n,price:pr});
- });
- let extraTotal=extras.reduce((a,x)=>a+x.price,0);
- let unit=base+extraTotal;
- if(i.price!=null&&Number(i.price)>base&&extraTotal===0)unit=Number(i.price);
- return{qty,base,extras,unit,line:unit*qty};
-}
-
-const CUSTOMER_CATEGORY_CACHE_KEY="mhac_customer_category_cache_v188";
-let customerCategoryCache={};
-function customerCategoryKey(storeName,itemName){
-  const n=v=>String(v??"").trim().toLowerCase().replace(/\s+/g," ");
-  return n(storeName)+"|||"+n(itemName);
-}
-function loadCustomerCategoryCache(){
-  try{
-    const x=JSON.parse(localStorage.getItem(CUSTOMER_CATEGORY_CACHE_KEY)||"{}");
-    if(x&&typeof x==="object")customerCategoryCache=x;
-  }catch(_){}
-}
-function saveCustomerCategoryCache(){
-  try{localStorage.setItem(CUSTOMER_CATEGORY_CACHE_KEY,JSON.stringify(customerCategoryCache))}catch(_){}
-}
-function rebuildCustomerCategoryCache(){
-  const next={...customerCategoryCache};
-  for(const st of (Array.isArray(data?.stores)?data.stores:[])){
-    const store=String(st?.name||"").trim();
-    if(!store)continue;
-    for(const cat of (st?.categories||[])){
-      const cn=String(cat?.name||cat?.label||"").trim();
-      if(!cn||/^category\s*name$/i.test(cn)||/^category$/i.test(cn))continue;
-      for(const f of (cat?.items||[])){
-        const name=String(f?.name??f?.title??f?.foodName??"").trim();
-        if(name)next[customerCategoryKey(store,name)]=cn;
-      }
-    }
-  }
-  customerCategoryCache=next;
-  saveCustomerCategoryCache();
-}
-loadCustomerCategoryCache();
-
-function customerTruthItemCategoryName(i,storeName){
- const norm=v=>String(v??"").trim().toLowerCase().replace(/[\s\u00a0]+/g," ").replace(/[–—]/g,"-");
- const key=v=>norm(v).replace(/[^a-z0-9]+/g,"");
- const valid=v=>{const x=String(v??"").trim();return !!x&&!/^category\s*name$/i.test(x)&&!/^category$/i.test(x)};
- const direct=[
-   i?.categoryName,i?.category,i?.foodCategory,i?.categoryTitle,
-   i?.category_name,i?.categoryLabel,
-   i?.food?.categoryName,i?.food?.category
- ].map(v=>String(v??"").trim()).find(valid);
- if(direct){
-   customerCategoryCache[customerCategoryKey(storeName,i?.name)]=direct;
-   saveCustomerCategoryCache();
-   return direct;
- }
-
- const cached=customerCategoryCache[customerCategoryKey(storeName,i?.name)];
- if(valid(cached))return cached;
-
- const foodKey=key(i?.name), storeKey=key(storeName);
- const stores=Array.isArray(data?.stores)?data.stores:[];
- const findIn=(list,strict)=>{
-   for(const st of list){
-     if(strict && storeKey && key(st?.name)!==storeKey)continue;
-     for(const cat of (st?.categories||[])){
-       const cn=String(cat?.name||cat?.label||"").trim();
-       if(!valid(cn))continue;
-       for(const f of (cat?.items||[])){
-         const fk=key(f?.name??f?.title??f?.foodName);
-         if(foodKey && fk && (fk===foodKey || fk.includes(foodKey) || foodKey.includes(fk))){
-           customerCategoryCache[customerCategoryKey(storeName,i?.name)]=cn;
-           saveCustomerCategoryCache();
-           return cn;
-         }
-       }
-     }
-   }
-   return "";
- };
- return findIn(stores,true)||findIn(stores,false)||"";
-}
-
-function customerTruthChoiceLines(i){
- const lines=[];
- const add=(name,price,qty=1)=>{
-   name=String(name||"").trim();
-   if(!name)return;
-   const q=Math.max(1,Number(qty||1));
-   const extra=Number(price||0);
-   lines.push(`${q}x ${esc(name)}${extra?` + ${peso(extra)}`:""}`);
- };
-
- (i.chickenParts||[]).filter(x=>Number(x?.qty||1)>0).forEach(x=>add(x?.name??x,0,x?.qty||1));
-
- if(i.choice){
-   const n=typeof i.choice==="string"?i.choice:i.choice?.name;
-   const p=typeof i.choice==="string"?Number(i.choicePrice||0):Number(i.choice?.price||0);
-   add(n,p,i.choice?.qty||1);
- }
-
- if(i.bucketChoice){
-   const n=typeof i.bucketChoice==="string"?i.bucketChoice:i.bucketChoice?.name;
-   const p=typeof i.bucketChoice==="string"?Number(i.bucketChoicePrice||0):Number(i.bucketChoice?.price||0);
-   add(n,p,i.bucketChoice?.qty||1);
- }
-
- (i.choiceGroups||[]).forEach(g=>(g.options||[]).forEach(x=>{
-   const n=typeof x==="string"?x:x?.name;
-   const p=typeof x==="string"?0:Number(x?.price||0);
-   add(n,p,x?.qty||1);
- }));
-
- (i.addOns||[]).forEach(x=>{
-   const n=typeof x==="string"?x:x?.name;
-   const p=typeof x==="string"?0:Number(x?.price||0);
-   add(n,p,x?.qty||1);
- });
-
- return lines;
-}
-
-function customerTruthOrderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{};
- const stores={};
-
- (o.items||[]).forEach(i=>{
-   const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
-   const category=customerTruthItemCategoryName(i,store)||"";
-   const key=store+"|||"+category;
-   (stores[key] ||= {store,category,items:[]}).items.push(i);
- });
-
- const rows=Object.values(stores).map(group=>`
-   <div class="unifiedStoreCard">
-     <div class="unifiedStoreName">${esc(group.store)}</div>
-     ${group.category?`<div class="unifiedCategoryName">${esc(group.category)}</div>`:""}
-     ${group.items.map(i=>{
-       const p=customerTruthItemPricing(i);
-       const choices=customerTruthChoiceLines(i);
-       return `<div class="unifiedFoodRow">
-         <div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>
-         ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}
-         <div class="unifiedChoice"><b>Food Total: ${peso(p.line)}</b></div>
-       </div>`;
-     }).join("")}
-   </div>
- `).join("") || '<div class="unifiedStoreCard">No item details.</div>';
-
- const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
-   ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
-   :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
-
- return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
-   ${payment}
-   <div class="unifiedBreakdown">
-     <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
-     ${rows}
-     <div class="unifiedBill">
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Sub Total</b></span>
-         <span class="unifiedBillAmount">${peso(f.foodOrder)}</span>
-       </div>
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Service Fee 10%</b></span>
-         <span class="unifiedBillAmount">${peso(f.serviceFee)}</span>
-       </div>
-       ${Number(f.secondStoreFee||0)?`<div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Additional Store</b></span>
-         <span class="unifiedBillAmount">${peso(f.secondStoreFee)}</span>
-       </div>`:""}
-       <div class="unifiedBillRow">
-         <span class="unifiedBillLabel"><b>Delivery Fee</b></span>
-         <span class="unifiedBillAmount">${peso(f.deliveryFee)}</span>
-       </div>
-       <div class="unifiedBillRow unifiedBillGrand">
-         <span class="unifiedBillLabel"><b>Grand Total</b></span>
-         <span class="unifiedBillAmount"><b>${peso(f.total)}</b></span>
-       </div>
-     </div>
-   </div>
- </div>`;
-}
-
 function renderGcashSettings(){
   $("gcashNumberDisplay").textContent=gcashSettings.number||"GCash number not set yet.";
   const wrap=$("gcashQrWrap"),img=$("gcashQrDisplay");
@@ -1767,7 +1177,7 @@ $("payment").onchange=()=>{
   if(isG)renderGcashSettings();
 };
 
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startGcashSettingsWatch();await autoEnableCustomerChatSound();startOrders()});
 function photoSvgData(name,type="food"){
  const n=String(name||type||"Photo").trim().slice(0,18),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><rect width="30" height="30" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="18">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="6" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
@@ -1810,11 +1220,34 @@ function openCat(si,ci){
 }
 function customize(si,ci,fi){
  const published=(data.stores||[]).filter(s=>s.published!==false);
- const s=published[si], c=s?.categories?.[ci], f=c?.items?.[fi];
- if(!s||!c||!f){closeMenu();return;}
+ const s=published[si], f=s?.categories?.[ci]?.items?.[fi];
+ if(!s||!f){closeMenu();return;}
  const groups=Array.isArray(f.choiceGroups)?f.choiceGroups:[];
  /* SIMPLE FOOD AUTO-ADD: foods with no configurable choices are added immediately.
     After auto-add, stay inside the current store/category. */
+ const simpleAutoAdd=!groups.length&&!f.chickenParts?.length&&!f.choices?.length&&!f.bucketChoices?.length&&!f.addOns?.length&&String(f.type||'').toLowerCase()!=='bucket';
+ if(simpleAutoAdd){
+   draftCart.push({
+     key:Date.now()+"-"+Math.random(),
+     store:s.name,
+     name:f.name,
+     photo:f.photo||photoSvgData(f.name,"food"),
+     price:Number(f.price||0),
+     basePrice:Number(f.price||0),
+     qty:1,
+     choice:"",
+     bucketChoice:"",
+     choiceGroups:[],
+     addOns:[],
+     chickenParts:[],
+     original:0,
+     spicy:0,
+     spicyAddPrice:0
+   });
+   renderCart();
+   openCat(si,ci);
+   return;
+ }
  const hasPartGroup=groups.some(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));
  const hasDrinkGroup=groups.some(g=>String(g?.role||'')==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
  const hasFlavorGroup=groups.some(g=>String(g?.role||'')==='flavor'||/^(?:flavor|flavors|flavour|flavours|taste)$/i.test(String(g?.name||'')));
@@ -1866,7 +1299,7 @@ function customize(si,ci,fi){
  if(f.addOns?.length){
    h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
  }
- h+=`<div class=counter><button type="button" class=mini id=qminus>−</button><b id=foodQty>1</b><button type="button" class=mini id=qplus>+</button></div><button type="button" class="add" id="addConfigured">ADD TO CART</button>`;
+ h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
  let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
@@ -1895,48 +1328,16 @@ function customize(si,ci,fi){
    return qty*(isBucket&&bucketPieces>0?bucketPieces:1);
  };
  const groupTotal=gi=>groupSelections[gi].reduce((a,n)=>a+Number(n||0),0);
- const isDrinkGroupIndex=(gi)=>{
-   const g=groups[gi];
-   return !!g && (String(g?.role||'').toLowerCase()==='drinks' || /^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
- };
- const drinkControllerIndex=()=>{
-   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
-   if(dgi<0)return -1;
-   for(let gi=0;gi<dgi;gi++){
-     const opts=Array.isArray(groups[gi]?.options)?groups[gi].options:[];
-     if(opts.some(o=>/^(?:with\s*drink|no\s*drink)$/i.test(String(o?.name||''))))return gi;
-   }
-   return -1;
- };
- const drinkGroupVisible=()=>{
-   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
-   const cgi=drinkControllerIndex();
-   if(dgi<0||cgi<0)return true;
-   const opts=groups[cgi]?.options||[];
-   const selected=opts.map((o,oi)=>({name:String(o?.name||''),qty:Number(groupSelections[cgi]?.[oi]||0)})).filter(x=>x.qty>0);
-   return selected.some(x=>/^with\s*drink$/i.test(x.name));
- };
- const syncDrinkDependency=()=>{
-   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
-   if(dgi<0)return;
-   const box=document.querySelector(`[data-choice-group="${dgi}"]`);
-   const show=drinkGroupVisible();
-   if(box)box.style.display=show?'':'none';
-   if(!show){
-     groupSelections[dgi]=(groupSelections[dgi]||[]).map(()=>0);
-     updateGroup(dgi);
-   }
- };
  const updateGroup=(gi)=>{
    const need=requiredForGroup(groups[gi]);
    const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
    groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
  };
- const updateAllGroups=()=>{groups.forEach((_,gi)=>updateGroup(gi));syncDrinkDependency()};
+ const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
  const changeGroupChoice=(gi,oi,d)=>{
    const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi); syncDrinkDependency();
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1970,29 +1371,18 @@ function customize(si,ci,fi){
    if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
-     if(isDrinkGroupIndex(gi) && !drinkGroupVisible())continue;
      const need=requiredForGroup(groups[gi]);
-     const selected=groupTotal(gi);
-     /* CHOICE OPTIONAL: zero selections are allowed. If the customer starts
-        selecting this group, preserve the existing automatic counted rule. */
-     if(selected!==0 && selected!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
+     if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
-   const legacyFlavorTotal=Number(styleSel.original||0)+Number(styleSel.spicy||0);
-   /* Legacy bucket FLAVOR is also optional; when used, keep its counted rule. */
-   if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&legacyFlavorTotal!==0&&legacyFlavorTotal!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
+   if(!hasFlavorGroup&&isBucket&&bucketPieces>0&&(Number(styleSel.original||0)+Number(styleSel.spicy||0))!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" flavor selection"+(legacyPartNeed===1?"":"s")+".");
    const ch=document.querySelector('input[name=choice]:checked'); const choice=ch?f.choices[+ch.value]:null;
-   // Maximum 2 stores per order. Existing store(s) may continue to receive more food.
-   const selectedStoreNames=[...new Set(draftCart.map(x=>String(x.store||'')))];
-   if(!selectedStoreNames.includes(String(s.name||'')) && selectedStoreNames.length>=2){
-     return alert("Maximum of 2 stores per order only. Please finish or remove an existing store before adding another store.");
-   }
    const selectedGroups=(groups||[]).map((g,gi)=>({group:g.name,options:(g.options||[]).map((o,oi)=>({name:o.name,price:Number(o.price||0),qty:Number(groupSelections[gi]?.[oi]||0)})).filter(o=>o.qty>0)})).filter(g=>g.options.length);
    const bh=document.querySelector('input[name=bucketChoice]:checked'); const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
    const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
    const spicyExtra=(isBucket?Number(styleSel.spicy||0)*Number(f.spicyPrice||0):0);
    const groupExtra=selectedGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+Number(n.price||0)*Number(n.qty||1),0),0);
    const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
-   draftCart.push({key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),categoryName:String(c.name||"").trim(),category:String(c.name||"").trim(),price:Number(f.price)+(extra/Math.max(1,qty)),basePrice:Number(f.price),qty,choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups:selectedGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:!hasPartGroup&&f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)});
+   draftCart.push({key:Date.now()+"-"+Math.random(),store:s.name,name:f.name,photo:f.photo||photoSvgData(f.name,"food"),price:Number(f.price)+(extra/Math.max(1,qty)),basePrice:Number(f.price),qty,choice:choice?.name||"",bucketChoice:bucketChoice?.name||"",choiceGroups:selectedGroups,addOns:adds.map(x=>({name:x.name,price:x.price})),chickenParts:!hasPartGroup&&f.chickenParts?.length?f.chickenParts.map((x,i)=>({name:x.name,qty:parts[i]})).filter(x=>x.qty):[],original:styleSel.original,spicy:styleSel.spicy,spicyAddPrice:Number(f.spicyPrice||0)});
    renderCart();openCat(si,ci);
  };
  update();
@@ -2060,113 +1450,6 @@ function updateTotals(){
  <div class="cartTotalRow"><b>Delivery Fee</b><span>${distanceKm===null?"—":peso(deliveryFee)}</span></div>
  <div class="cartTotalRow" style="font-size:20px"><b>Total Amount</b><b>${peso(total)}</b></div>
  </div>`;
-}
-let manualRecipientMap=null,manualRecipientSearchTimer=null,manualRecipientSearchSeq=0;
-function openManualRecipientLocation(){
-  const modal=$("manualLocationModal"); modal.style.display="block"; bindManualRecipientSearch();
-  setTimeout(()=>{
-    if(!manualRecipientMap){
-      const startLat=gpsLat!==null?gpsLat:15.66789, startLon=gpsLon!==null?gpsLon:120.57765;
-      manualRecipientMap=L.map("manualLocationMap",{zoomControl:true}).setView([startLat,startLon],16);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(manualRecipientMap);
-      manualRecipientMap.on("moveend",()=>updateManualRecipientPreview());
-    }
-    manualRecipientMap.invalidateSize(); updateManualRecipientPreview();
-  },100);
-}
-function closeManualRecipientLocation(){$("manualLocationModal").style.display="none"}
-function updateManualRecipientPreview(){
-  if(!manualRecipientMap)return;
-  const c=manualRecipientMap.getCenter();
-  $("manualLocationStatus").textContent=`Selected map point: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
-}
-function renderManualRecipientResults(arr){
-  const box=$("manualLocationResults");
-  if(!box)return;
-  if(!arr.length){box.innerHTML="";return;}
-  box.innerHTML=arr.map((x,i)=>{
-    const title=String(x.name||x.namedetails?.name||"").trim();
-    const kind=[x.type,x.class].filter(Boolean).join(" • ");
-    const display=String(x.display_name||"");
-    const secondary=title && display.toLowerCase().startsWith(title.toLowerCase()) ? display.slice(title.length).replace(/^,\s*/,"") : display;
-    return `<button type="button" class="manualLocationResult" data-manual-index="${i}"><b>${esc(title||display.split(",")[0]||"Location")}</b><span>${esc((kind?kind+" • ":"")+secondary)}</span></button>`;
-  }).join("");
-  arr.forEach((x,i)=>{
-    document.querySelector(`[data-manual-index="${i}"]`)?.addEventListener("click",()=>{
-      if(!manualRecipientMap)return;
-      manualRecipientMap.setView([Number(x.lat),Number(x.lon)],18);
-      box.innerHTML="";
-      $("manualLocationSearch").value=String(x.display_name||x.name||"");
-      $("manualLocationStatus").textContent="Location selected. Move the map if needed, then confirm the exact recipient location.";
-    });
-  });
-}
-async function fetchManualRecipientSearch(q,live=false){
-  const seq=++manualRecipientSearchSeq;
-  if(!q)return;
-  if(live)$("manualLocationStatus").textContent="Finding nearby schools, streets, buildings and establishments…";
-  try{
-    const base={format:"jsonv2",addressdetails:1,namedetails:1,extratags:1,dedupe:1,limit:10,countrycodes:"ph",layer:"address,poi,manmade"};
-    const clean=String(q).trim();
-    const lower=clean.toLowerCase();
-    const hasPaniqui=/\bpaniqui\b/i.test(clean);
-    const queries=[clean];
-    if(!hasPaniqui)queries.push(clean+" Paniqui Tarlac Philippines");
-    else if(!/\btarlac\b/i.test(clean))queries.push(clean+" Tarlac Philippines");
-    const all=[];
-    const seen=new Set();
-    for(const query of queries){
-      const params=new URLSearchParams({...base,q:query});
-      if(manualRecipientMap){
-        const c=manualRecipientMap.getCenter(),d=0.12;
-        params.set("viewbox",`${c.lng-d},${c.lat+d},${c.lng+d},${c.lat-d}`);
-      }
-      const r=await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`,{headers:{Accept:"application/json"}});
-      if(!r.ok)continue;
-      const arr=await r.json();
-      for(const x of arr){
-        const key=`${x.osm_type||""}:${x.osm_id||""}:${x.lat||""}:${x.lon||""}`;
-        if(!seen.has(key)){seen.add(key);all.push(x);}
-      }
-      if(all.length>=10)break;
-    }
-    if(seq!==manualRecipientSearchSeq)return;
-    if(!all.length){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="No matching location found. Try the place name + Paniqui, Tarlac.";return;}
-    renderManualRecipientResults(all.slice(0,10));
-    $("manualLocationStatus").textContent="Select a place, then drag the map to the exact recipient location.";
-  }catch(e){
-    if(seq===manualRecipientSearchSeq)$("manualLocationStatus").textContent="❌ Search failed. Please check your internet connection and try again.";
-  }
-}
-async function searchManualRecipientLocation(){
-  const q=$("manualLocationSearch").value.trim(); if(!q)return;
-  clearTimeout(manualRecipientSearchTimer);
-  await fetchManualRecipientSearch(q,false);
-}
-function bindManualRecipientSearch(){
-  const input=$("manualLocationSearch");
-  if(!input || input.dataset.bound==="1")return;
-  input.dataset.bound="1";
-  input.addEventListener("input",()=>{
-    clearTimeout(manualRecipientSearchTimer);
-    const q=input.value.trim();
-    if(q.length<2){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="Search for a school, street, building, establishment or landmark.";return;}
-    manualRecipientSearchTimer=setTimeout(()=>fetchManualRecipientSearch(q,true),650);
-  });
-}
-function confirmManualRecipientLocation(){
-  if(!manualRecipientMap)return;
-  const c=manualRecipientMap.getCenter();
-  gpsLat=c.lat; gpsLon=c.lng; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
-  $("gpsAccuracy").textContent="Manual recipient location selected.";
-  $("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
-  $("locStatus").textContent="Manual recipient location selected. Calculate the delivery fee.";
-  $("calculateFeeBtn").disabled=false;
-  closeManualRecipientLocation();
-  reverseGeocodeManualRecipient(c.lat,c.lng);
-}
-async function reverseGeocodeManualRecipient(lat,lon){
-  try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);const g=await r.json();if(g.display_name)$("gpsLocationDisplay").textContent="📍 RECIPIENT LOCATION: "+g.display_name;}catch(_){}
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
 async function calculateByGPS(e){
@@ -2341,50 +1624,17 @@ function syncCustomerChatWatchers(active){
 function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
 
 
-function refreshCustomerOrderBreakdowns(){
- const orders=Array.isArray(window.__mhacOrders)?window.__mhacOrders:[];
- orders.forEach(o=>{
-   const el=$("customer-order-details-"+String(o.id));
-   if(el)el.innerHTML=customerUnifiedOrderDetailHtml(o);
- });
-}
 function customerOrderCategory(storeName,itemName){
   const norm=v=>String(v||"").trim().toLowerCase().replace(/\s+/g," ");
-  const valid=v=>{
-    const x=String(v||"").trim();
-    return !!x && !/^category\s*name$/i.test(x) && !/^category$/i.test(x);
-  };
   const sk=norm(storeName),ik=norm(itemName);
-
-  // 1) Exact Store + Food from the published menu.
   for(const s of (data?.stores||[])){
     if(norm(s?.name)!==sk)continue;
     for(const c of (s?.categories||[])){
-      const cn=String(c?.name||c?.label||"").trim();
-      if(!valid(cn))continue;
       const items=Array.isArray(c?.items)?c.items:[];
-      if(items.some(x=>norm(x?.name)===ik))return cn;
+      if(items.some(x=>norm(x?.name)===ik))return String(c?.name||c?.label||"").trim()||"Category Name";
     }
   }
-
-  // 2) Exact Food name anywhere in the published menu.
-  for(const s of (data?.stores||[])){
-    for(const c of (s?.categories||[])){
-      const cn=String(c?.name||c?.label||"").trim();
-      if(!valid(cn))continue;
-      const items=Array.isArray(c?.items)?c.items:[];
-      if(items.some(x=>norm(x?.name)===ik))return cn;
-    }
-  }
-  return "";
-}
-function customerOrderCategoryValue(i){
-  const direct=[i?.category,i?.categoryName,i?.categoryLabel].map(v=>String(v||"").trim()).find(validCustomerCategory);
-  return direct || customerOrderCategory(i?.store||i?.storeName,i?.name) || "";
-}
-function validCustomerCategory(v){
-  const x=String(v||"").trim();
-  return !!x && !/^category\s*name$/i.test(x) && !/^category$/i.test(x);
+  return "Category Name";
 }
 function customerOrderPrice(i){
   const qty=Math.max(1,Number(i.qty||1));
@@ -2413,50 +1663,23 @@ function customerOrderChoiceLines(i){
   return lines;
 }
 function customerUnifiedOrderDetailHtml(o){
- const c=o.customer||{}, f=o.fees||{};
- const stores={};
-
- (o.items||[]).forEach(i=>{
-   const store=String(i.store||i.storeName||"STORE").trim()||"STORE";
-   const category=customerTruthItemCategoryName(i,store)||"";
-   const key=store+"|||"+category;
-   (stores[key] ||= {store,category,items:[]}).items.push(i);
- });
-
- const rows=Object.values(stores).map(group=>`
-   <div class="unifiedStoreCard">
-     <div class="unifiedStoreName">${esc(group.store)}</div>
-     ${group.category?`<div class="unifiedCategoryName">${esc(group.category)}</div>`:""}
-     ${group.items.map(i=>{
-       const p=customerTruthItemPricing(i);
-       const choices=customerTruthChoiceLines(i);
-       return `<div class="unifiedFoodRow">
-         <div class="unifiedFoodName"><b>${p.qty}x ${esc(i.name||"Food")} — ${peso(p.unit)}</b></div>
-         ${choices.map(x=>`<div class="unifiedChoice">${x}</div>`).join("")}
-         <div class="unifiedChoice"><b>Food Total: ${peso(p.line)}</b></div>
-       </div>`;
-     }).join("")}
-   </div>
- `).join("") || '<div class="unifiedStoreCard">No item details.</div>';
-
- const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"
-   ?`<div class="orderDetailPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}${o.paymentScreenshotUrl?` · <a target="_blank" rel="noopener" href="${esc(o.paymentScreenshotUrl)}">VIEW PAYMENT SCREENSHOT</a>`:""} ${String(o.paymentStatus||"PENDING").toUpperCase()!=="RECEIVED"?`<button class="green" data-approve-payment="${esc(o.id)}">✅ MARK PAYMENT RECEIVED</button>`:""}</div>`
-   :`<div class="orderDetailPayment"><b>💵 CASH ON DELIVERY</b></div>`;
-
- return `<div class="orderDetailPanel">
-   <div class="orderDetailCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: ${esc(c.gps?.display||c.address||"Customer GPS")}</div>
-   ${payment}
-   <div class="unifiedBreakdown">
-     <div class="unifiedBreakdownTitle">🧾 ORDER BREAKDOWN</div>
-     ${rows}
-     <div class="unifiedBill">
-       <b>Sub Total: ${peso(f.foodOrder)}</b><br>
-       <b>10% Service Fee:</b> ${peso(f.serviceFee)}<br>
-       <b>Delivery Fee:</b> ${peso(f.deliveryFee)}${Number(f.secondStoreFee||0)?`<br><b>2nd Store Fee:</b> ${peso(f.secondStoreFee)}`:""}<br>
-       <b>Grand Total: ${peso(f.total)}</b>
-     </div>
-   </div>
- </div>`;
+  const c=o.customer||{},f=o.fees||{},groups={};
+  (o.items||[]).forEach(i=>{
+    const st=String(i.store||i.storeName||"STORE").trim()||"STORE";
+    const cat=String(i.category||i.categoryName||i.categoryLabel||customerOrderCategory(st,i.name)||"Category Name").trim()||"Category Name";
+    const key=st+"\u0000"+cat;(groups[key] ||= {store:st,category:cat,items:[]}).items.push(i);
+  });
+  const vals=Object.values(groups);
+  const sections=vals.map((g,idx)=>{
+    const foods=g.items.map(i=>{
+      const p=customerOrderPrice(i),lines=customerOrderChoiceLines(i);
+      return `<div class="customerUnifiedFoodRow"><div class="customerUnifiedFoodName">${p.qty}x ${esc(i.name||"Food")} ${peso(p.unit)}</div>${lines.map(x=>`<div class="customerUnifiedChoice">${x}</div>`).join("")}<div class="customerUnifiedFoodTotal">Food Total: ${peso(p.line)}</div></div>`;
+    }).join("");
+    return `<div class="customerUnifiedStoreSection"><div class="customerUnifiedStoreName">${esc(g.store)}</div><div class="customerUnifiedCategoryName">${esc(g.category)}</div>${foods}${idx<vals.length-1?'<div class="customerUnifiedStoreDivider"></div>':""}</div>`;
+  }).join("")||"<div>No item details.</div>";
+  const payment=String(o.payment||"Cash on Delivery").toUpperCase()==="GCASH"?`<div class="customerUnifiedPayment"><b>💳 GCASH</b> — ${esc(String(o.paymentStatus||"PENDING").toUpperCase())}</div>`:`<div class="customerUnifiedPayment"><b>💵 CASH ON DELIVERY</b></div>`;
+  const loc=String(c.gps?.display||c.address||"Customer GPS").replace(/^\s*(?:📍\s*)?LOCATION DETECTED:\s*/i,"").trim();
+  return `<div class="customerUnifiedDrawer"><div class="customerUnifiedCustomer"><b>${esc(o.orderNo||o.id)}</b><br><b>${esc(c.name||"")}</b><br>CP #: ${esc(c.contact||"—")}<br>Address Location: 📍 LOCATION DETECTED: ${esc(loc)}</div>${payment}<div class="customerUnifiedTitle">🧾 ORDER BREAKDOWN</div>${sections}<div class="customerUnifiedBill"><div><span>Sub Total</span><b>${peso(f.foodOrder)}</b></div><div><span>Service Fee 10%</span><b>${peso(f.serviceFee)}</b></div>${Number(f.secondStoreFee||0)?`<div><span>Additional Store</span><b>${peso(f.secondStoreFee)}</b></div>`:""}<div><span>Delivery Fee</span><b>${peso(f.deliveryFee)}</b></div><div class="grand"><span>Grand Total</span><b>${peso(f.total)}</b></div></div></div>`;
 }
 
 function startOrders(){
@@ -2466,17 +1689,16 @@ function startOrders(){
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
     $("myOrders").innerHTML=arr.length?arr.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(o=>{
-      const st=String(o.status||"NEW").toUpperCase(),canCancel=(st==="NEW");
+      const st=String(o.status||"NEW").toUpperCase(),canCancel=!["COMPLETED","CANCELLED"].includes(st);
       return `<div class="orderCard">
         <div class="customerOrderPreviewHead"><b>${esc(o.orderNo||o.id)}</b><span class="pill">${esc(o.status||"NEW")}</span></div>
         <h3 class="customerOrderPreviewName">${esc(o.customer?.name||"")}</h3>
         <div id="customer-order-details-${esc(o.id)}" class="hidden customerUnifiedDetailWrap">${customerUnifiedOrderDetailHtml(o)}</div>
         <button type="button" class="customerViewFullOrder" data-customer-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
-        <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
+        ${st==="ACCEPTED"&&o.waitingMinutes?`<div class=field><b data-customer-countdown="${esc(o.id)}">${esc(orderCountdownText(o))}</b></div>`:""}
+        <div class="customerOrderActions">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
       </div>`;
     }).join(""):"No active orders.";
-    refreshCustomerOrderBreakdowns();
-    requestAnimationFrame(()=>refreshCustomerOrderBreakdowns());
     syncCustomerChatWatchers(arr);
   });
 }
@@ -2484,25 +1706,12 @@ $("myOrders").onclick=async e=>{
   const view=e.target.closest("[data-customer-view]");
   if(view){const d=$("customer-order-details-"+view.dataset.customerView);if(d)d.classList.toggle("hidden");return;}
   const b=e.target.closest("[data-cancel-order]");if(!b)return;
-  const id=b.dataset.cancelOrder;
-  const order=(window.__mhacOrders||[]).find(x=>String(x.id)===String(id));
-  if(!order || String(order.status||"NEW").toUpperCase()!=="NEW"){
-    b.remove();
-    return;
-  }
-  b.disabled=true;
-  try{
-    const fresh=await getDoc(doc(db,"orders",id));
-    const latest=fresh.exists()?fresh.data():null;
-    if(!latest || String(latest.status||"NEW").toUpperCase()!=="NEW"){
-      b.remove();
-      return;
-    }
-    await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});
-  }catch(x){b.disabled=false;alert(x.message||x)}
+  const id=b.dataset.cancelOrder;b.disabled=true;
+  try{await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});}
+  catch(x){b.disabled=false;alert(x.message||x)}
 };
-window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;window.openManualRecipientLocation=openManualRecipientLocation;window.closeManualRecipientLocation=closeManualRecipientLocation;window.searchManualRecipientLocation=searchManualRecipientLocation;window.confirmManualRecipientLocation=confirmManualRecipientLocation;
-window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY + ADMIN DRAWER FIX";
+window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
+window.__MHAC_BUILD__="V4.1.64 CUSTOMER MASTER UNIFIED WHITE UI — TIME LIMIT TEST MODE";
 </script>
 
 <script>
@@ -2519,53 +1728,5 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
+</script>
 </body></html>
-
-<style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
-.customerUnifiedDetailWrap .orderDetailPanel{
-  border:3px solid #222!important;
-  border-radius:9px!important;
-  padding:8px!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .orderDetailPayment{
-  margin-top:8px!important;
-  padding:10px 0!important;
-  border-top:1px solid #ddd!important;
-  border-bottom:1px solid #ddd!important;
-  font-size:16px!important;
-  line-height:1.4!important;
-}
-.customerUnifiedDetailWrap .unifiedStoreCard{
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#fff!important;
-}
-.customerUnifiedDetailWrap .unifiedBill{
-  margin:12px 0 0!important;
-  padding-top:8px!important;
-  border-top:1px solid #ddd!important;
-}
-.customerUnifiedDetailWrap .unifiedBillRow{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  padding:8px 0!important;
-}
-.customerUnifiedDetailWrap .unifiedBillAmount{
-  min-width:92px!important;
-  text-align:right!important;
-  white-space:nowrap!important;
-  font-weight:700!important;
-}
-.customerUnifiedDetailWrap .unifiedBillGrand{
-  margin-top:5px!important;
-  padding-top:10px!important;
-  border-top:2px solid #999!important;
-  font-weight:900!important;
-}
-</style>
