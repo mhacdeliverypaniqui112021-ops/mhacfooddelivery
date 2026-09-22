@@ -1299,13 +1299,29 @@ function customize(si,ci,fi){
    <div class="partTotal">Selected flavors: <b id="flavorTotal">0</b> / <b id="flavorNeed">0</b></div></div>`;
  }
  if(f.addOns?.length){
-   h+=`<div class=field><b>➕ ADD-ONS</b>${f.addOns.map((x,i)=>`<div class="choiceRowCustomer"><label><input type=checkbox data-addon="${i}"> ${esc(x.name)}</label><span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span></div>`).join("")}</div>`;
+   h+=`<div class="choiceGroupCustomer" id="addOnGroupCustomer" data-addon-group="true">
+     <div class="choiceGroupTitleCustomer"><b>➕ ADD-ONS</b><span class="choiceGroupNeed" id="addOnNeed">OPTIONAL</span></div>
+     <div class="choiceGroupRows">${f.addOns.map((x,i)=>`<div class="choiceRowCustomer choiceCountRow">
+       <span class="choiceOptionName">${esc(x.name)}</span>
+       <button type="button" class="mini addonMinus" data-addon-index="${i}" data-d="-1">−</button>
+       <b class="choiceSelectedQty" data-addon-count="${i}">0</b>
+       <button type="button" class="mini addonPlus" data-addon-index="${i}" data-d="1">+</button>
+       <span class=choicePrice>${x.price?`+ ${peso(x.price)}`:"Free"}</span>
+     </div>`).join("")}</div>
+   </div>`;
  }
  h+=`<div class=counter><button class=mini id=qminus>−</button><b id=foodQty>1</b><button class=mini id=qplus>+</button></div><button class=add id=addConfigured>ADD TO CART</button>`;
  $("menuBody").innerHTML=h;
- let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0};
+ let qty=1,parts=(f.chickenParts||[]).map(()=>0),styleSel={original:0,spicy:0},addonSelections=(f.addOns||[]).map(()=>0);
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
  const groupSelections=(f.choiceGroups||[]).map(()=>[]);
+ const totalAddonQty=()=>addonSelections.reduce((a,n)=>a+Number(n||0),0);
+ const changeAddon=(i,d)=>{
+   const cur=Number(addonSelections[i]||0);
+   addonSelections[i]=Math.max(0,Math.min(1,cur+d));
+   const c=document.querySelector(`[data-addon-count="${i}"]`);if(c)c.textContent=addonSelections[i];
+   const n=$("addOnNeed");if(n)n.textContent=totalAddonQty()?totalAddonQty()+" selected":"OPTIONAL";
+ };
  const isBucket=String(f.type||'').toLowerCase()==='bucket';
  const drinkGroupIndex=groups.findIndex(g=>String(g?.role||'')==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
  const drinkTriggerGroupIndex=groups.findIndex(g=>{
@@ -1402,6 +1418,7 @@ function customize(si,ci,fi){
  document.querySelectorAll("[data-part-d]").forEach(b=>b.onclick=()=>changePart(Number(b.dataset.partD),Number(b.dataset.d)));
  document.querySelectorAll("[data-part-select]").forEach(b=>b.onclick=ev=>{if(ev.target?.closest("button"))return;const i=Number(b.dataset.partSelect);const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;if(totalPartQty()>=need&&Number(parts[i]||0)===0)return;changePart(i,Number(parts[i]||0)>0?-1:1)});
  document.querySelectorAll(".choicePlus,.choiceMinus").forEach(b=>b.onclick=()=>changeGroupChoice(Number(b.dataset.group),Number(b.dataset.opt),Number(b.dataset.d)));
+ document.querySelectorAll(".addonPlus,.addonMinus").forEach(b=>b.onclick=()=>changeAddon(Number(b.dataset.addonIndex),Number(b.dataset.d)));
  document.querySelectorAll("[data-style]").forEach(b=>b.onclick=()=>{const k=b.dataset.style,d=Number(b.dataset.d),need=isBucket&&bucketPieces>0?qty*bucketPieces:qty,total=Number(styleSel.original||0)+Number(styleSel.spicy||0);if(d>0&&total>=need)return;styleSel[k]=Math.max(0,Number(styleSel[k]||0)+d);update()});
  $("addConfigured").onclick=()=>{
    const legacyPartNeed=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1417,7 +1434,7 @@ function customize(si,ci,fi){
    const ch=document.querySelector('input[name=choice]:checked'); const choice=ch?f.choices[+ch.value]:null;
    const selectedGroups=(groups||[]).map((g,gi)=>({group:g.name,options:(g.options||[]).map((o,oi)=>({name:o.name,price:Number(o.price||0),qty:Number(groupSelections[gi]?.[oi]||0)})).filter(o=>o.qty>0)})).filter(g=>g.options.length);
    const bh=document.querySelector('input[name=bucketChoice]:checked'); const bucketChoice=bh?f.bucketChoices[+bh.value]:null;
-   const adds=[...document.querySelectorAll("[data-addon]:checked")].map(x=>f.addOns[+x.dataset.addon]);
+   const adds=(f.addOns||[]).map((x,i)=>addonSelections[i]>0?x:null).filter(Boolean);
    const spicyExtra=(isBucket?Number(styleSel.spicy||0)*Number(f.spicyPrice||0):0);
    const groupExtra=selectedGroups.reduce((sum,g)=>sum+g.options.reduce((a,n)=>a+Number(n.price||0)*Number(n.qty||1),0),0);
    const extra=Number(choice?.price||0)+Number(bucketChoice?.price||0)+spicyExtra+groupExtra+adds.reduce((a,x)=>a+Number(x.price||0),0);
