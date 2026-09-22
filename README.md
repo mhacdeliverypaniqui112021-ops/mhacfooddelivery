@@ -1,14 +1,13 @@
-# MHAC DELIVERY V4.1.74 — APK READY PROJECT
+# MHAC DELIVERY Customer Share Target V2
 
-Three Android app modules are included:
-- customer — MHAC DELIVERY Customer
-- rider — MHAC DELIVERY Rider
-- admin — MHAC DELIVERY Admin
+This is a native Android Share Target bridge for the existing live Customer website.
 
-The web files are packaged into each app's Android WebView without redesigning the tested UI.
-Build with Android Studio/Gradle:
-- :customer:assembleDebug
-- :rider:assembleDebug
-- :admin:assembleDebug
+Flow:
+Google Maps → Share → MHAC DELIVERY → opens the live Customer website
+`https://mhacdelivery.devs.surf/customer.html`
 
-NOTE: Firebase web authentication behavior inside WebView can require additional OAuth configuration/testing. This project preserves the current web app and does not change the Firebase project.
+The APK receives `ACTION_SEND` text/plain, resolves Google Maps short links when possible,
+extracts latitude/longitude from the resolved Maps URL, and passes the shared data to the
+live Customer website using `mhac_share_*` query parameters.
+
+The APK does not replace the Customer website UI or Firebase/business logic.
