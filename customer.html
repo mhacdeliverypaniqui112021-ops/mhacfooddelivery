@@ -2104,15 +2104,39 @@ function renderManualRecipientResults(arr){
 async function fetchManualRecipientSearch(q,live=false){
   const seq=++manualRecipientSearchSeq;
   if(!q)return;
-  if(live)$("manualLocationStatus").textContent="Finding schools, streets, buildings and establishments…";
+  if(live)$("manualLocationStatus").textContent="Finding nearby schools, streets, buildings and establishments…";
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&extratags=1&dedupe=1&limit=8&countrycodes=ph&q=${encodeURIComponent(q)}`,{headers:{Accept:"application/json"}});
-    const arr=await r.json();
+    const base={format:"jsonv2",addressdetails:1,namedetails:1,extratags:1,dedupe:1,limit:10,countrycodes:"ph",layer:"address,poi,manmade"};
+    const clean=String(q).trim();
+    const lower=clean.toLowerCase();
+    const hasPaniqui=/\bpaniqui\b/i.test(clean);
+    const queries=[clean];
+    if(!hasPaniqui)queries.push(clean+" Paniqui Tarlac Philippines");
+    else if(!/\btarlac\b/i.test(clean))queries.push(clean+" Tarlac Philippines");
+    const all=[];
+    const seen=new Set();
+    for(const query of queries){
+      const params=new URLSearchParams({...base,q:query});
+      if(manualRecipientMap){
+        const c=manualRecipientMap.getCenter(),d=0.12;
+        params.set("viewbox",`${c.lng-d},${c.lat+d},${c.lng+d},${c.lat-d}`);
+      }
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`,{headers:{Accept:"application/json"}});
+      if(!r.ok)continue;
+      const arr=await r.json();
+      for(const x of arr){
+        const key=`${x.osm_type||""}:${x.osm_id||""}:${x.lat||""}:${x.lon||""}`;
+        if(!seen.has(key)){seen.add(key);all.push(x);}
+      }
+      if(all.length>=10)break;
+    }
     if(seq!==manualRecipientSearchSeq)return;
-    if(!arr.length){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="No matching location found. Try a school, street, building, establishment or landmark.";return;}
-    renderManualRecipientResults(arr);
-    $("manualLocationStatus").textContent="Select a result, then move the map if needed.";
-  }catch(e){if(seq===manualRecipientSearchSeq)$("manualLocationStatus").textContent="❌ Address search failed. Check internet connection."}
+    if(!all.length){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="No matching location found. Try the place name + Paniqui, Tarlac.";return;}
+    renderManualRecipientResults(all.slice(0,10));
+    $("manualLocationStatus").textContent="Select a place, then drag the map to the exact recipient location.";
+  }catch(e){
+    if(seq===manualRecipientSearchSeq)$("manualLocationStatus").textContent="❌ Search failed. Please check your internet connection and try again.";
+  }
 }
 async function searchManualRecipientLocation(){
   const q=$("manualLocationSearch").value.trim(); if(!q)return;
@@ -2127,7 +2151,7 @@ function bindManualRecipientSearch(){
     clearTimeout(manualRecipientSearchTimer);
     const q=input.value.trim();
     if(q.length<2){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="Search for a school, street, building, establishment or landmark.";return;}
-    manualRecipientSearchTimer=setTimeout(()=>fetchManualRecipientSearch(q,true),900);
+    manualRecipientSearchTimer=setTimeout(()=>fetchManualRecipientSearch(q,true),650);
   });
 }
 function confirmManualRecipientLocation(){
