@@ -1862,16 +1862,48 @@ function customize(si,ci,fi){
    return qty*(isBucket&&bucketPieces>0?bucketPieces:1);
  };
  const groupTotal=gi=>groupSelections[gi].reduce((a,n)=>a+Number(n||0),0);
+ const isDrinkGroupIndex=(gi)=>{
+   const g=groups[gi];
+   return !!g && (String(g?.role||'').toLowerCase()==='drinks' || /^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
+ };
+ const drinkControllerIndex=()=>{
+   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
+   if(dgi<0)return -1;
+   for(let gi=0;gi<dgi;gi++){
+     const opts=Array.isArray(groups[gi]?.options)?groups[gi].options:[];
+     if(opts.some(o=>/^(?:with\s*drink|no\s*drink)$/i.test(String(o?.name||''))))return gi;
+   }
+   return -1;
+ };
+ const drinkGroupVisible=()=>{
+   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
+   const cgi=drinkControllerIndex();
+   if(dgi<0||cgi<0)return true;
+   const opts=groups[cgi]?.options||[];
+   const selected=opts.map((o,oi)=>({name:String(o?.name||''),qty:Number(groupSelections[cgi]?.[oi]||0)})).filter(x=>x.qty>0);
+   return selected.some(x=>/^with\s*drink$/i.test(x.name));
+ };
+ const syncDrinkDependency=()=>{
+   const dgi=groups.findIndex((_,gi)=>isDrinkGroupIndex(gi));
+   if(dgi<0)return;
+   const box=document.querySelector(`[data-choice-group="${dgi}"]`);
+   const show=drinkGroupVisible();
+   if(box)box.style.display=show?'':'none';
+   if(!show){
+     groupSelections[dgi]=(groupSelections[dgi]||[]).map(()=>0);
+     updateGroup(dgi);
+   }
+ };
  const updateGroup=(gi)=>{
    const need=requiredForGroup(groups[gi]);
    const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
    groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
  };
- const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
+ const updateAllGroups=()=>{groups.forEach((_,gi)=>updateGroup(gi));syncDrinkDependency()};
  const changeGroupChoice=(gi,oi,d)=>{
    const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi); syncDrinkDependency();
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1905,6 +1937,7 @@ function customize(si,ci,fi){
    if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
+     if(isDrinkGroupIndex(gi) && !drinkGroupVisible())continue;
      const need=requiredForGroup(groups[gi]);
      const selected=groupTotal(gi);
      /* CHOICE OPTIONAL: zero selections are allowed. If the customer starts
