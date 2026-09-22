@@ -1405,6 +1405,10 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .locationCalculateBtn:disabled{opacity:.5!important}
 #gpsModePanel,#manualModePanel{margin-top:6px!important}
 </style>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="MHAC DELIVERY">
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1440,7 +1444,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   </div>
   <div id="manualModePanel" style="display:none">
     <div class="field" style="margin:7px 0">🧭 <b>MANUAL LOCATION FOR RECIPIENT</b><br><span class="small">For a recipient in another location. Tap Manual Location to open Google Maps, then search the recipient’s school, home, address or landmark and choose the exact place.</span></div>
-    <button type="button" id="openGoogleMapsBtn" class="locationCalculateBtn" style="width:100%;margin-top:7px">🧭 OPEN GOOGLE MAPS</button>
     <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
     <button type="button" id="manualCalculateFeeBtn" class="locationCalculateBtn" onclick="calculateGPSFee()" disabled>🧭 CALCULATE RECIPIENT DELIVERY FEE</button>
   </div>
@@ -2717,6 +2720,106 @@ window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOG
     syncCalcButtons();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+})();
+</script>
+
+<script id="MHAC_SHARE_TARGET_RECEIVER_V1">
+(function(){
+  "use strict";
+  const SHARE_KEY="mhac_pending_shared_location_v1";
+  const $=id=>document.getElementById(id);
+  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
+  function decodeB64(v){
+    try{return decodeURIComponent(escape(atob(v)));}catch(_){return "";}
+  }
+  function parseCoords(text){
+    const s=String(text||"");
+    const patterns=[
+      /[?&](?:query|destination|center|ll)=(-?\d{1,3}(?:\.\d+)?)[,%20]+(-?\d{1,3}(?:\.\d+)?)/i,
+      /@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/,
+      /!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/,
+      /\b(-?\d{1,3}\.\d{4,}),\s*(-?\d{1,3}\.\d{4,})\b/
+    ];
+    for(const re of patterns){
+      const m=s.match(re); if(!m)continue;
+      const lat=Number(m[1]),lon=Number(m[2]);
+      if(lat>=-90&&lat<=90&&lon>=-180&&lon<=180)return {lat,lon};
+    }
+    return null;
+  }
+  function parseLabel(text){
+    const lines=String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    for(const line of lines){
+      if(/^https?:\/\//i.test(line))continue;
+      if(/^maps(\.app)?\.google/i.test(line))continue;
+      if(/^(share|directions|google maps)$/i.test(line))continue;
+      if(line.length>2)return line.slice(0,180);
+    }
+    return "Google Maps selected location";
+  }
+  function savePending(raw){
+    const text=String(raw||"").trim(); if(!text)return null;
+    const coords=parseCoords(text);
+    const payload={text,label:parseLabel(text),coords,receivedAt:Date.now()};
+    try{localStorage.setItem(SHARE_KEY,JSON.stringify(payload));}catch(_){sessionStorage.setItem(SHARE_KEY,JSON.stringify(payload));}
+    return payload;
+  }
+  function readPending(){
+    try{const x=JSON.parse(localStorage.getItem(SHARE_KEY)||"null");if(x)return x;}catch(_){}
+    try{return JSON.parse(sessionStorage.getItem(SHARE_KEY)||"null");}catch(_){return null;}
+  }
+  function applyPending(p){
+    if(!p||!p.coords)return false;
+    const c=p.coords;
+    if(typeof manualLat!=="undefined"){
+      manualLat=Number(c.lat); manualLon=Number(c.lon);
+      manualLabel=String(p.label||"Google Maps selected location");
+      manualLocationSelected=true;
+      distanceKm=null; deliveryFee=null;
+    }
+    const input=$("manualLocationInput"); if(input)input.value=manualLabel||p.label||"Google Maps selected location";
+    const sel=$("manualLocationSelected");
+    if(sel){
+      sel.innerHTML='<b>📍 RECIPIENT LOCATION RECEIVED</b><br><b>'+esc(manualLabel||p.label)+'</b><br>Latitude: '+Number(c.lat).toFixed(6)+'<br>Longitude: '+Number(c.lon).toFixed(6);
+      sel.style.display="block";
+    }
+    if($("gpsLocationDisplay"))$("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${manualLabel||p.label}`;
+    if($("gpsAccuracy"))$("gpsAccuracy").textContent="Recipient location received from Google Maps. Customer GPS is not used.";
+    if($("locStatus"))$("locStatus").textContent="Recipient location received. Calculate the delivery fee.";
+    if($("manualCalculateFeeBtn"))$("manualCalculateFeeBtn").disabled=false;
+    try{
+      window.__MHAC_LOCATION_MODE__="MANUAL";
+      const gpsChoice=$("locationModeGPSBtn"),manChoice=$("locationModeManualBtn"),gpsPanel=$("gpsModePanel"),manualPanel=$("manualModePanel");
+      if(gpsChoice)gpsChoice.style.display="none";
+      if(manChoice){manChoice.style.display="block";manChoice.textContent="🧭 MANUAL LOCATION FOR RECIPIENT";}
+      if(gpsPanel)gpsPanel.style.display="none";
+      if(manualPanel)manualPanel.style.display="block";
+    }catch(_){ }
+    return true;
+  }
+  function processIncoming(){
+    const u=new URL(location.href);
+    const b64=u.searchParams.get("mhac_shared");
+    if(b64){
+      const payload=savePending(decodeB64(b64));
+      try{history.replaceState({},document.title,u.pathname+u.search.replace(/([?&])mhac_shared=[^&]*(&|$)/,"$1").replace(/[?&]$/,""));}catch(_){ }
+      if(payload&&!payload.coords){
+        setTimeout(()=>{
+          const sel=$("manualLocationSelected");
+          if(sel){sel.innerHTML='<b>📍 LOCATION SHARED</b><br>The Google Maps share link was received, but it did not contain readable coordinates. Please share the exact dropped pin/location from Google Maps.';sel.style.display="block";}
+        },500);
+      }
+    }
+    const p=readPending();
+    if(p){setTimeout(()=>applyPending(p),900);}
+  }
+  function registerSW(){
+    if(!("serviceWorker" in navigator))return;
+    navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{registerSW();processIncoming();},{once:true});
+  else {registerSW();processIncoming();}
+  window.__MHAC_SHARE_TARGET__={savePending,readPending,applyPending,parseCoords};
 })();
 </script>
 </html>

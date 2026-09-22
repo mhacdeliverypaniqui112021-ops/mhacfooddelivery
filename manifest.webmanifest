@@ -1,0 +1,21 @@
+{
+  "name": "MHAC DELIVERY Customer",
+  "short_name": "MHAC DELIVERY",
+  "start_url": "/customer.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "MHAC DELIVERY Customer — receive shared Google Maps recipient locations.",
+  "icons": [] ,
+  "share_target": {
+    "action": "/customer.html?share-target=1",
+    "method": "POST",
+    "enctype": "text/plain",
+    "params": {
+      "text": "text",
+      "title": "title",
+      "url": "url"
+    }
+  }
+}
