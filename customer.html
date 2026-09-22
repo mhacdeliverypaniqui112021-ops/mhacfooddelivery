@@ -1435,7 +1435,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
 <div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div>
-<button type="button" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button type="button" id="manualLocationBtn" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2062,7 +2062,23 @@ function updateTotals(){
  </div>`;
 }
 let manualRecipientMap=null,manualRecipientSearchTimer=null;
+function resetCustomerLocationChoice(){
+  gpsLat=null; gpsLon=null; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
+  $("gpsBtn").style.display="";
+  $("manualLocationBtn").style.display="";
+  $("gpsBtn").disabled=false;
+  $("gpsBtn").textContent="📍 ALLOW GPS LOCATION";
+  $("gpsAccuracy").textContent="";
+  $("gpsLocationDisplay").textContent="";
+  $("locStatus").textContent="Please allow GPS location first.";
+  $("feeView").textContent="";
+  $("calculateFeeBtn").disabled=true;
+  if($("manualLocationStatus")) $("manualLocationStatus").textContent="Search or move the map to the recipient's location.";
+  if($("manualLocationResults")) $("manualLocationResults").innerHTML="";
+}
 function openManualRecipientLocation(){
+  $("gpsBtn").style.display="none";
+  $("manualLocationBtn").style.display="";
   const modal=$("manualLocationModal"); modal.style.display="block";
   setTimeout(()=>{
     if(!manualRecipientMap){
@@ -2095,6 +2111,8 @@ function confirmManualRecipientLocation(){
   if(!manualRecipientMap)return;
   const c=manualRecipientMap.getCenter();
   gpsLat=c.lat; gpsLon=c.lng; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
+  $("gpsBtn").style.display="none";
+  $("manualLocationBtn").style.display="";
   $("gpsAccuracy").textContent="Manual recipient location selected.";
   $("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
   $("locStatus").textContent="Manual recipient location selected. Calculate the delivery fee.";
@@ -2115,6 +2133,8 @@ async function calculateByGPS(e){
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  navigator.geolocation.getCurrentPosition(async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
+   $("gpsBtn").style.display="";
+   $("manualLocationBtn").style.display="none";
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
    $("calculateFeeBtn").disabled=false;
@@ -2128,6 +2148,8 @@ async function calculateByGPS(e){
    }
  },err=>{
    gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
+   $("gpsBtn").style.display="";
+   $("manualLocationBtn").style.display="";
    btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
    const msg={1:"Location permission was denied. Please allow Location for Chrome.",2:"GPS position is unavailable. Turn on phone Location and try again.",3:"GPS request timed out. Move to an open area and try again."}[err.code]||"Unable to get GPS location.";
    $("locStatus").textContent="❌ "+msg;
@@ -2162,7 +2184,8 @@ async function placeOrder(){
    };
    const ref=await addDoc(collection(db,"orders"),o);
    $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
-   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
+   draftCart=[];
+   resetCustomerLocationChoice();
    $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
    renderCart();setTimeout(closeCheckout,1000);
  }catch(e){
