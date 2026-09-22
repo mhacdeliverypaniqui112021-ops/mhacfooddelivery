@@ -19,3 +19,11 @@ Test:
 3. Tap Share.
 4. Look for **MHAC DELIVERY**.
 5. Tap it and confirm the Customer page receives the shared location.
+
+
+## V5 fix
+- Main Customer WebView intercepts `intent://`, `geo:`, `google.navigation:` and `comgooglemaps:` URLs so Android handles external map intents instead of showing `ERR_UNKNOWN_URL_SCHEME`.
+- Share receiver remains dedicated and preserves the Google Maps shared-location handoff.
+- Added a generic `*/*` SEND intent filter as a Samsung/Google Sharesheet fallback.
+- Version code/name bumped to 5 / ShareTarget-V5.
+- Admin/Rider and Customer website source are not modified by this project.
