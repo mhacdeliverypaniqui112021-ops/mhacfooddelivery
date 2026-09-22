@@ -1400,7 +1400,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .manualLocationActions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .manualLocationActions .confirm{background:#111;color:#fff}
 .manualLocationResults{margin-top:7px;max-height:180px;overflow:auto}
-.manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}
+.manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}.manualLocationResult b{display:block;font-size:14px;margin-bottom:3px}.manualLocationResult span{display:block;color:#555;line-height:1.25}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1425,7 +1425,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
     <button type="button" class="close" onclick="closeManualRecipientLocation()">CLOSE</button>
     <h3>🗺️ RECIPIENT MANUAL LOCATION</h3>
     <div class="manualLocationHint">Search the recipient's address, then move the map so the exact recipient location is under the fixed center pin.</div>
-    <div class="manualLocationSearch"><input id="manualLocationSearch" placeholder="Search address / barangay / landmark"><button type="button" onclick="searchManualRecipientLocation()">SEARCH</button></div>
+    <div class="manualLocationSearch"><input id="manualLocationSearch" placeholder="Search school / street / building / establishment / barangay / landmark"><button type="button" onclick="searchManualRecipientLocation()">SEARCH</button></div>
     <div id="manualLocationResults" class="manualLocationResults"></div>
     <div id="manualLocationMap"></div>
     <div class="manualLocationHint">📍 Fixed pin = exact delivery point. Drag the map, then press CONFIRM LOCATION.</div>
@@ -1435,7 +1435,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 </div>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
 <div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div>
-<button type="button" id="manualLocationBtn" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<button type="button" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -2062,24 +2062,8 @@ function updateTotals(){
  </div>`;
 }
 let manualRecipientMap=null,manualRecipientSearchTimer=null;
-function resetCustomerLocationChoice(){
-  gpsLat=null; gpsLon=null; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
-  $("gpsBtn").style.display="";
-  $("manualLocationBtn").style.display="";
-  $("gpsBtn").disabled=false;
-  $("gpsBtn").textContent="📍 ALLOW GPS LOCATION";
-  $("gpsAccuracy").textContent="";
-  $("gpsLocationDisplay").textContent="";
-  $("locStatus").textContent="Please allow GPS location first.";
-  $("feeView").textContent="";
-  $("calculateFeeBtn").disabled=true;
-  if($("manualLocationStatus")) $("manualLocationStatus").textContent="Search or move the map to the recipient's location.";
-  if($("manualLocationResults")) $("manualLocationResults").innerHTML="";
-}
 function openManualRecipientLocation(){
-  $("gpsBtn").style.display="none";
-  $("manualLocationBtn").style.display="";
-  const modal=$("manualLocationModal"); modal.style.display="block";
+  const modal=$("manualLocationModal"); modal.style.display="block"; bindManualRecipientSearch();
   setTimeout(()=>{
     if(!manualRecipientMap){
       const startLat=gpsLat!==null?gpsLat:15.66789, startLon=gpsLon!==null?gpsLon:120.57765;
@@ -2096,23 +2080,60 @@ function updateManualRecipientPreview(){
   const c=manualRecipientMap.getCenter();
   $("manualLocationStatus").textContent=`Selected map point: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
 }
+function renderManualRecipientResults(arr){
+  const box=$("manualLocationResults");
+  if(!box)return;
+  if(!arr.length){box.innerHTML="";return;}
+  box.innerHTML=arr.map((x,i)=>{
+    const title=String(x.name||x.namedetails?.name||"").trim();
+    const kind=[x.type,x.class].filter(Boolean).join(" • ");
+    const display=String(x.display_name||"");
+    const secondary=title && display.toLowerCase().startsWith(title.toLowerCase()) ? display.slice(title.length).replace(/^,\s*/,"") : display;
+    return `<button type="button" class="manualLocationResult" data-manual-index="${i}"><b>${esc(title||display.split(",")[0]||"Location")}</b><span>${esc((kind?kind+" • ":"")+secondary)}</span></button>`;
+  }).join("");
+  arr.forEach((x,i)=>{
+    document.querySelector(`[data-manual-index="${i}"]`)?.addEventListener("click",()=>{
+      if(!manualRecipientMap)return;
+      manualRecipientMap.setView([Number(x.lat),Number(x.lon)],18);
+      box.innerHTML="";
+      $("manualLocationSearch").value=String(x.display_name||x.name||"");
+      $("manualLocationStatus").textContent="Location selected. Move the map if needed, then confirm the exact recipient location.";
+    });
+  });
+}
+async function fetchManualRecipientSearch(q,live=false){
+  const seq=++manualRecipientSearchSeq;
+  if(!q)return;
+  if(live)$("manualLocationStatus").textContent="Finding schools, streets, buildings and establishments…";
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&extratags=1&dedupe=1&limit=8&countrycodes=ph&q=${encodeURIComponent(q)}`,{headers:{Accept:"application/json"}});
+    const arr=await r.json();
+    if(seq!==manualRecipientSearchSeq)return;
+    if(!arr.length){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="No matching location found. Try a school, street, building, establishment or landmark.";return;}
+    renderManualRecipientResults(arr);
+    $("manualLocationStatus").textContent="Select a result, then move the map if needed.";
+  }catch(e){if(seq===manualRecipientSearchSeq)$("manualLocationStatus").textContent="❌ Address search failed. Check internet connection."}
+}
 async function searchManualRecipientLocation(){
   const q=$("manualLocationSearch").value.trim(); if(!q)return;
-  $("manualLocationStatus").textContent="Searching address…"; $("manualLocationResults").innerHTML="";
-  try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&countrycodes=ph&q=${encodeURIComponent(q)}`,{headers:{Accept:"application/json"}});
-    const arr=await r.json();
-    if(!arr.length){$("manualLocationStatus").textContent="No address found. Try a more specific search.";return;}
-    $("manualLocationResults").innerHTML=arr.map((x,i)=>`<button type="button" class="manualLocationResult" data-manual-index="${i}">${esc(x.display_name||"")}</button>`).join("");
-    arr.forEach((x,i)=>{document.querySelector(`[data-manual-index="${i}"]`)?.addEventListener("click",()=>{manualRecipientMap.setView([Number(x.lat),Number(x.lon)],18);$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="Address selected. Move the map if needed, then confirm the exact recipient location.";})});
-  }catch(e){$("manualLocationStatus").textContent="❌ Address search failed. Check internet connection."}
+  clearTimeout(manualRecipientSearchTimer);
+  await fetchManualRecipientSearch(q,false);
+}
+function bindManualRecipientSearch(){
+  const input=$("manualLocationSearch");
+  if(!input || input.dataset.bound==="1")return;
+  input.dataset.bound="1";
+  input.addEventListener("input",()=>{
+    clearTimeout(manualRecipientSearchTimer);
+    const q=input.value.trim();
+    if(q.length<2){$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="Search for a school, street, building, establishment or landmark.";return;}
+    manualRecipientSearchTimer=setTimeout(()=>fetchManualRecipientSearch(q,true),900);
+  });
 }
 function confirmManualRecipientLocation(){
   if(!manualRecipientMap)return;
   const c=manualRecipientMap.getCenter();
   gpsLat=c.lat; gpsLon=c.lng; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
-  $("gpsBtn").style.display="none";
-  $("manualLocationBtn").style.display="";
   $("gpsAccuracy").textContent="Manual recipient location selected.";
   $("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
   $("locStatus").textContent="Manual recipient location selected. Calculate the delivery fee.";
@@ -2133,8 +2154,6 @@ async function calculateByGPS(e){
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  navigator.geolocation.getCurrentPosition(async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
-   $("gpsBtn").style.display="";
-   $("manualLocationBtn").style.display="none";
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
    $("calculateFeeBtn").disabled=false;
@@ -2148,8 +2167,6 @@ async function calculateByGPS(e){
    }
  },err=>{
    gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
-   $("gpsBtn").style.display="";
-   $("manualLocationBtn").style.display="";
    btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
    const msg={1:"Location permission was denied. Please allow Location for Chrome.",2:"GPS position is unavailable. Turn on phone Location and try again.",3:"GPS request timed out. Move to an open area and try again."}[err.code]||"Unable to get GPS location.";
    $("locStatus").textContent="❌ "+msg;
@@ -2184,8 +2201,7 @@ async function placeOrder(){
    };
    const ref=await addDoc(collection(db,"orders"),o);
    $("sendStatus").textContent=isGcash?"⏳ ORDER SENT — GCASH PAYMENT PENDING ADMIN VERIFICATION":"✅ ORDER SENT: "+ref.id;
-   draftCart=[];
-   resetCustomerLocationChoice();
+   draftCart=[];distanceKm=null;deliveryFee=null;gpsLat=null;gpsLon=null;
    $("gcashScreenshot").value="";$("gcashUploadStatus").textContent="";
    renderCart();setTimeout(closeCheckout,1000);
  }catch(e){
