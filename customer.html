@@ -1440,11 +1440,7 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   </div>
   <div id="manualModePanel" style="display:none">
     <div class="field" style="margin:7px 0">🧭 <b>MANUAL LOCATION FOR RECIPIENT</b><br><span class="small">For a recipient in another location. Tap Manual Location to open Google Maps, then search the recipient’s school, home, address or landmark and choose the exact place.</span></div>
-    <input id="manualLocationInput" type="text" placeholder="Example: Anao National High School" autocomplete="off" enterkeyhint="search">
     <button type="button" id="openGoogleMapsBtn" class="locationCalculateBtn" style="width:100%;margin-top:7px">🧭 OPEN GOOGLE MAPS</button>
-    <input id="googleMapsLinkInput" type="text" placeholder="Paste the Google Maps shared link here" autocomplete="off" style="margin-top:7px;display:none">
-    <button type="button" id="applyGoogleMapsLinkBtn" class="locationCalculateBtn" style="width:100%;margin-top:7px;display:none">✅ USE THIS LOCATION</button>
-    <div id="manualLocationSuggestions" class="manualLocationSuggestions"></div>
     <div id="manualLocationSelected" class="manualLocationSelected" style="display:none"></div>
     <button type="button" id="manualCalculateFeeBtn" class="locationCalculateBtn" onclick="calculateGPSFee()" disabled>🧭 CALCULATE RECIPIENT DELIVERY FEE</button>
   </div>
@@ -2436,7 +2432,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
+window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOGLE MAPS";</script>
 <!-- V4.1.96 CUSTOMER NO DRINK CONDITIONAL CHOICE FIX -->
 </body>
 <script id="MHAC_MANUAL_LOCATION_V4_1_101_WAZE_STYLE_UNIVERSAL">
@@ -2630,7 +2626,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
   window.__MHAC_MANUAL_LOCATION_NO_BILLING__={search:searchManual,select:selectResult};
-  window.__MHAC_BUILD__="V4.1.107 CUSTOMER GPS MAIN + MANUAL RECIPIENT TO GOOGLE MAPS";
+  window.__MHAC_BUILD__="V4.1.108 CUSTOMER GPS MAIN + MANUAL RECIPIENT DIRECT GOOGLE MAPS";
 })();
 </script>
 <script id="MHAC_CUSTOMER_GOOGLE_MAPS_MANUAL_V4_1_103">
@@ -2671,9 +2667,7 @@ window.__MHAC_BUILD__="V4.1.97 CUSTOMER DRINK GATE FIX";</script>
     if(box)box.scrollIntoView({block:"nearest",behavior:"smooth"});
   }
   function mapsUrl(){
-    const q=String($("manualLocationInput")?.value||"").trim();
-    const query=q||"Paniqui Tarlac Philippines";
-    return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
+    return "https://www.google.com/maps/";
   }
   function extractCoords(text){
     const s=String(text||"");
