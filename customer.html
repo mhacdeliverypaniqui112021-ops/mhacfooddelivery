@@ -1383,6 +1383,26 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   border-top:1px solid #ddd!important;
 }
 </style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style id="MHAC_MANUAL_RECIPIENT_LOCATION">
+.manualLocationBtn{width:100%;min-height:50px;margin:6px 0;background:#fff;color:#111;border:2px solid #111;border-radius:12px;font-size:16px;font-weight:900}
+.manualLocationModal{display:none;position:fixed;inset:0;background:#0008;z-index:1000;padding:12px;overflow:auto}
+.manualLocationPanel{background:#fff;max-width:700px;margin:auto;border:2px solid #222;border-radius:16px;padding:12px}
+.manualLocationPanel h3{margin:4px 0 8px}
+.manualLocationSearch{display:flex;gap:7px}
+.manualLocationSearch input{flex:1;min-width:0;min-height:46px;padding:9px 11px;font-size:16px}
+.manualLocationSearch button,.manualLocationActions button{min-height:46px;padding:9px 13px;border:2px solid #111;border-radius:9px;background:#fff;font-weight:900}
+#manualLocationMap{height:360px;margin:10px 0;border:2px solid #222;border-radius:12px;overflow:hidden}
+#manualLocationMap{position:relative}
+#manualLocationMap::after{content:"📍";position:absolute;z-index:500;left:50%;top:50%;transform:translate(-50%,-100%);font-size:36px;pointer-events:none;text-shadow:0 1px 3px #fff}
+.manualLocationHint{font-size:13px;color:#555;text-align:center;margin:6px 0}
+.manualLocationActions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.manualLocationActions .confirm{background:#111;color:#fff}
+.manualLocationResults{margin-top:7px;max-height:180px;overflow:auto}
+.manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
@@ -1401,8 +1421,23 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
   <div class="customerChatInput"><input id="customerChatInput" placeholder="Type message…"><button id="customerChatSend" class="add">SEND</button></div>
 </div>
 
+
+<div id="manualLocationModal" class="manualLocationModal">
+  <div class="manualLocationPanel">
+    <button type="button" class="close" onclick="closeManualRecipientLocation()">CLOSE</button>
+    <h3>🗺️ RECIPIENT MANUAL LOCATION</h3>
+    <div class="manualLocationHint">Search the recipient's address, then move the map so the exact recipient location is under the fixed center pin.</div>
+    <div class="manualLocationSearch"><input id="manualLocationSearch" placeholder="Search address / barangay / landmark"><button type="button" onclick="searchManualRecipientLocation()">SEARCH</button></div>
+    <div id="manualLocationResults" class="manualLocationResults"></div>
+    <div id="manualLocationMap"></div>
+    <div class="manualLocationHint">📍 Fixed pin = exact delivery point. Drag the map, then press CONFIRM LOCATION.</div>
+    <div id="manualLocationStatus" class="status">Search or move the map to the recipient's location.</div>
+    <div class="manualLocationActions"><button type="button" onclick="closeManualRecipientLocation()">CANCEL</button><button type="button" class="confirm" onclick="confirmManualRecipientLocation()">CONFIRM LOCATION</button></div>
+  </div>
+</div>
 <div id="menuModal" class="modal"><div class="panel"><button class="close" onclick="closeMenu()">CLOSE</button><div id="menuBody"></div></div></div>
-<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
+<div id="checkout" class="checkout"><div class="checkout-panel"><button type="button" class="close" onclick="closeCheckout()">CLOSE</button><h2>CHECK / REVIEW ORDER</h2><div id="orderSummary"></div><div id="checkoutTotals" class="field"></div><h3 style="font-size:22px;margin:18px 0 8px">👤 CUSTOMER INFORMATION</h3><input id="custName" placeholder="Customer Name" autocomplete="name"><input id="custContact" placeholder="Contact Number" inputmode="tel" autocomplete="tel"><div class="field">📍 <b>GPS DELIVERY LOCATION</b><br>Allow GPS to automatically detect the customer's current location. No manual Municipality, Barangay, Purok, Street or Landmark entry is required.</div><button type="button" id="gpsBtn" onclick="calculateByGPS(event);return false" onmousedown="this.blur()" ontouchstart="this.blur()">📍 ALLOW GPS LOCATION</button><div id="gpsAccuracy" class="status"></div>
+<button type="button" class="manualLocationBtn" onclick="openManualRecipientLocation()">🗺️ MANUAL LOCATION FOR RECIPIENT</button><div id="gpsLocationDisplay" class="status"></div><button type="button" id="calculateFeeBtn" onclick="calculateGPSFee()" disabled>📍 CALCULATE DELIVERY FEE</button><div id="locStatus" class="status">Please allow GPS location first.</div><div id="feeView" class="small"></div><select id="payment"><option>Cash on Delivery</option><option>GCash</option></select>
 <div id="gcashPanel" class="gcashPanel">
   <b>💳 GCASH PAYMENT</b>
   <div id="gcashNumberDisplay" class="gcashNumber">GCash number will appear here.</div>
@@ -1990,6 +2025,51 @@ function updateTotals(){
  <div class="cartTotalRow" style="font-size:20px"><b>Total Amount</b><b>${peso(total)}</b></div>
  </div>`;
 }
+
+let manualRecipientMap=null,manualRecipientSearchTimer=null;
+function openManualRecipientLocation(){
+  const modal=$("manualLocationModal"); modal.style.display="block";
+  setTimeout(()=>{
+    if(!manualRecipientMap){
+      const startLat=gpsLat!==null?gpsLat:15.66789, startLon=gpsLon!==null?gpsLon:120.57765;
+      manualRecipientMap=L.map("manualLocationMap",{zoomControl:true}).setView([startLat,startLon],16);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(manualRecipientMap);
+      manualRecipientMap.on("moveend",()=>updateManualRecipientPreview());
+    }
+    manualRecipientMap.invalidateSize(); updateManualRecipientPreview();
+  },100);
+}
+function closeManualRecipientLocation(){$("manualLocationModal").style.display="none"}
+function updateManualRecipientPreview(){
+  if(!manualRecipientMap)return;
+  const c=manualRecipientMap.getCenter();
+  $("manualLocationStatus").textContent=`Selected map point: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
+}
+async function searchManualRecipientLocation(){
+  const q=$("manualLocationSearch").value.trim(); if(!q)return;
+  $("manualLocationStatus").textContent="Searching address…"; $("manualLocationResults").innerHTML="";
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&countrycodes=ph&q=${encodeURIComponent(q)}`,{headers:{Accept:"application/json"}});
+    const arr=await r.json();
+    if(!arr.length){$("manualLocationStatus").textContent="No address found. Try a more specific search.";return;}
+    $("manualLocationResults").innerHTML=arr.map((x,i)=>`<button type="button" class="manualLocationResult" data-manual-index="${i}">${esc(x.display_name||"")}</button>`).join("");
+    arr.forEach((x,i)=>{document.querySelector(`[data-manual-index="${i}"]`)?.addEventListener("click",()=>{manualRecipientMap.setView([Number(x.lat),Number(x.lon)],18);$("manualLocationResults").innerHTML="";$("manualLocationStatus").textContent="Address selected. Move the map if needed, then confirm the exact recipient location.";})});
+  }catch(e){$("manualLocationStatus").textContent="❌ Address search failed. Check internet connection."}
+}
+function confirmManualRecipientLocation(){
+  if(!manualRecipientMap)return;
+  const c=manualRecipientMap.getCenter();
+  gpsLat=c.lat; gpsLon=c.lng; gpsAccuracy=null; distanceKm=null; deliveryFee=null;
+  $("gpsAccuracy").textContent="Manual recipient location selected.";
+  $("gpsLocationDisplay").textContent=`📍 RECIPIENT LOCATION: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
+  $("locStatus").textContent="Manual recipient location selected. Calculate the delivery fee.";
+  $("calculateFeeBtn").disabled=false;
+  closeManualRecipientLocation();
+  reverseGeocodeManualRecipient(c.lat,c.lng);
+}
+async function reverseGeocodeManualRecipient(lat,lon){
+  try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);const g=await r.json();if(g.display_name)$("gpsLocationDisplay").textContent="📍 RECIPIENT LOCATION: "+g.display_name;}catch(_){}
+}
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
 async function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
@@ -2323,7 +2403,7 @@ $("myOrders").onclick=async e=>{
     await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
-window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;
+window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;window.openManualRecipientLocation=openManualRecipientLocation;window.closeManualRecipientLocation=closeManualRecipientLocation;window.searchManualRecipientLocation=searchManualRecipientLocation;window.confirmManualRecipientLocation=confirmManualRecipientLocation;
 window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY + ADMIN DRAWER FIX";
 </script>
 
