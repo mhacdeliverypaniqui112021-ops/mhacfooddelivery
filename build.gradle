@@ -8,7 +8,7 @@ android {
         applicationId 'com.mhacdelivery.customer'
         minSdk 23
         targetSdk 35
-        versionCode 2
-        versionName 'ShareTarget-V3-MHAC'
+        versionCode 4
+        versionName 'ShareTarget-V4'
     }
 }

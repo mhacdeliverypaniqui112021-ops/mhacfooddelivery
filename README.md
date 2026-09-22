@@ -1,19 +1,21 @@
-# MHAC CUSTOMER SHARE BRIDGE V3
+# MHAC CUSTOMER SHARE BRIDGE V4
 
-Purpose: make **MHAC DELIVERY** appear as a Google Maps/Android Share Sheet target and pass the recipient's shared Maps location to the live Customer page.
+Purpose: make **MHAC DELIVERY** a dedicated Android Share Sheet target for Google Maps recipient-location sharing.
+
+Flow:
+Google Maps exact recipient pin -> Share -> MHAC DELIVERY -> receive Maps text/URL -> resolve/extract coordinates -> open the existing MHAC Customer page with `mhac_share_lat`, `mhac_share_lon`, `mhac_share_label`, and `mhac_share_url` query parameters.
 
 Locked scope:
-- Admin is NOT modified.
-- Rider is NOT modified.
-- Customer GPS/Manual Location UI is NOT modified by this bridge source.
-- This bridge only receives a shared Maps target and forwards coordinates/label/URL to `customer.html`.
+- Admin untouched.
+- Rider untouched.
+- Customer GPS/Manual UI untouched.
+- Existing order/choice/backend behavior untouched.
 
-Share flow:
-Google Maps -> Share -> MHAC DELIVERY -> customer.html -> recipient lat/lon -> distance/delivery-fee calculation.
+Version: ShareTarget-V4 / versionCode 4.
 
-Changes from V2:
-- Explicit activity label `MHAC DELIVERY`.
-- Added MHAC DELIVERY share icon.
-- Accepts `text/plain`, `text/*`, and `text/uri-list` SEND shares.
-- VersionCode 2 / ShareTarget-V3-MHAC.
-- Existing coordinate extraction and customer URL handoff preserved.
+Test:
+1. Uninstall the previous Share Bridge package first (or install V4 as an upgrade if Android accepts the signature).
+2. Open Google Maps and select an exact recipient location.
+3. Tap Share.
+4. Look for **MHAC DELIVERY**.
+5. Tap it and confirm the Customer page receives the shared location.
