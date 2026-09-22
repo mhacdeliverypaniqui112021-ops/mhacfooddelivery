@@ -1037,8 +1037,10 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerUnifiedBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
 .customerUnifiedBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important;line-height:1.25!important}
 .customerUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
-.customerOrderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+.customerOrderActions{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important}
 .customerOrderActions button{margin:0!important;width:100%!important}
+.customerOrderActions .orderCancelBtn{order:1!important;text-align:center!important}
+.customerOrderActions .orderChatBtn{order:2!important;text-align:center!important}
 </style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -1256,7 +1258,7 @@ function customize(si,ci,fi){
  if(groups.length){
    h+=groups.map((g,gi)=>{
      const opts=Array.isArray(g.options)?g.options:[];
-     return `<div class="choiceGroupCustomer" data-choice-group="${gi}">
+     return `<div class="choiceGroupCustomer" id="choiceGroupCustomer-${gi}" data-choice-group="${gi}">
        <div class="choiceGroupTitleCustomer"><b>${esc(g.name||"CHOICES")}</b><span class="choiceGroupNeed" id="choiceNeed-${gi}">0 / 0</span></div>
        <div class="choiceGroupRows">${opts.map((x,oi)=>`<div class="choiceRowCustomer choiceCountRow">
          <span class="choiceOptionName">${esc(x.name)}</span>
@@ -1305,6 +1307,12 @@ function customize(si,ci,fi){
  const totalPartQty=()=>parts.reduce((a,n)=>a+Number(n||0),0);
  const groupSelections=(f.choiceGroups||[]).map(()=>[]);
  const isBucket=String(f.type||'').toLowerCase()==='bucket';
+ const drinkGroupIndex=groups.findIndex(g=>String(g?.role||'')==='drinks'||/^(?:drink|drinks|beverage|beverages)$/i.test(String(g?.name||'')));
+ const drinkTriggerGroupIndex=groups.findIndex(g=>{
+   const n=String(g?.name||'').toLowerCase();
+   if(drinkGroupIndex<0||groups.indexOf(g)===drinkGroupIndex)return false;
+   return (g?.options||[]).some(o=>/^(?:no\s*drink|with\s*drink)$/i.test(String(o?.name||'')));
+ });
  const bucketPieces=Math.max(0,Number(f.bucketPieces||0));
  const requiredForGroup=(g)=>{
    /* Read the count rule saved by Admin for THIS FOOD and THIS CHOICE GROUP. */
@@ -1328,16 +1336,45 @@ function customize(si,ci,fi){
    return qty*(isBucket&&bucketPieces>0?bucketPieces:1);
  };
  const groupTotal=gi=>groupSelections[gi].reduce((a,n)=>a+Number(n||0),0);
+ const isDrinkGroupVisible=()=>{
+   if(drinkGroupIndex<0)return true;
+   if(drinkTriggerGroupIndex<0)return true;
+   const opts=groups[drinkTriggerGroupIndex]?.options||[];
+   let selected='';
+   opts.forEach((o,oi)=>{if(Number(groupSelections[drinkTriggerGroupIndex]?.[oi]||0)>0)selected=String(o?.name||'').trim().toLowerCase()});
+   if(/^(?:no\s*drink)$/i.test(selected))return false;
+   if(/^(?:with\s*drink)$/i.test(selected))return true;
+   return false;
+ };
+ const updateDrinkGroupVisibility=()=>{
+   if(drinkGroupIndex<0)return;
+   const box=$(`choiceGroupCustomer-${drinkGroupIndex}`);
+   const show=isDrinkGroupVisible();
+   if(box)box.style.display=show?'':'none';
+   if(!show && groupSelections[drinkGroupIndex]?.some(n=>Number(n||0)>0)){
+     groupSelections[drinkGroupIndex]=[];
+     updateGroup(drinkGroupIndex);
+   }
+ };
  const updateGroup=(gi)=>{
-   const need=requiredForGroup(groups[gi]);
+   const need=(gi===drinkGroupIndex&&!isDrinkGroupVisible())?0:requiredForGroup(groups[gi]);
    const el=$("choiceNeed-"+gi); if(el)el.textContent=groupTotal(gi)+" / "+need;
    groupSelections[gi].forEach((n,oi)=>{const c=document.querySelector(`[data-choice-count="${gi}-${oi}"]`);if(c)c.textContent=Number(n||0)});
  };
- const updateAllGroups=()=>groups.forEach((_,gi)=>updateGroup(gi));
+ const updateAllGroups=()=>{groups.forEach((_,gi)=>updateGroup(gi));updateDrinkGroupVisibility()};
  const changeGroupChoice=(gi,oi,d)=>{
-   const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0); const total=groupTotal(gi),need=requiredForGroup(groups[gi]);
+   const arr=groupSelections[gi]||[]; const cur=Number(arr[oi]||0);
+   if(gi===drinkGroupIndex&&!isDrinkGroupVisible()&&d>0)return;
+   const total=groupTotal(gi),need=(gi===drinkGroupIndex&&!isDrinkGroupVisible())?0:requiredForGroup(groups[gi]);
    if(d>0 && total>=need)return;
-   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr; updateGroup(gi);
+   arr[oi]=Math.max(0,cur+d); groupSelections[gi]=arr;
+   if(gi===drinkTriggerGroupIndex){
+     const selectedName=String(groups[gi]?.options?.[oi]?.name||'').trim().toLowerCase();
+     if(/^no\s*drink$/i.test(selectedName) && d>0){
+       groupSelections[drinkGroupIndex]=[];
+     }
+   }
+   updateAllGroups();
  };
  const syncLegacyPart=()=>{
    const need=isBucket&&bucketPieces>0?qty*bucketPieces:qty;
@@ -1371,6 +1408,8 @@ function customize(si,ci,fi){
    if(!hasPartGroup&&f.chickenParts?.length&&totalPartQty()!==legacyPartNeed)return alert("Please select exactly "+legacyPartNeed+" chicken part piece"+(legacyPartNeed===1?"":"s")+" before adding to cart.");
    if(hasPartGroup){const gi=groups.findIndex(g=>String(g?.role||'')==='chickenParts'||/^(?:part|parts|chicken parts)$/i.test(String(g?.name||'')));if(gi>=0&&groupTotal(gi)!==requiredForGroup(groups[gi]))return alert("Please select exactly "+requiredForGroup(groups[gi])+" PART selection"+(requiredForGroup(groups[gi])===1?"":"s")+".");}
    for(let gi=0;gi<groups.length;gi++){
+     const hiddenDrink=(gi===drinkGroupIndex&&!isDrinkGroupVisible());
+     if(hiddenDrink)continue;
      const need=requiredForGroup(groups[gi]);
      if(groupTotal(gi)!==need)return alert("Please select exactly "+need+" choice"+(need===1?"":"s")+" for "+(groups[gi].name||"this group")+".");
    }
