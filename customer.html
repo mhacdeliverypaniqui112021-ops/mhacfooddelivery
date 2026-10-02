@@ -1279,6 +1279,23 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .manualLocationResults{margin-top:7px;max-height:180px;overflow:auto}
 .manualLocationResult{display:block;width:100%;text-align:left;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;margin:4px 0;font-size:13px}.manualLocationResult b{display:block;font-size:14px;margin-bottom:3px}.manualLocationResult span{display:block;color:#555;line-height:1.25}
 </style>
+<style id="MHAC_GPS_CALCULATE_WHITE_FIX">
+/* FINAL: GPS + delivery-fee controls match the locked white UI */
+#gpsBtn,#calculateFeeBtn{
+  background:#fff!important;
+  color:#111!important;
+  border:2px solid #111!important;
+  border-radius:12px!important;
+  box-sizing:border-box!important;
+  font-weight:900!important;
+}
+#gpsBtn:disabled,#calculateFeeBtn:disabled{
+  background:#fff!important;
+  color:#777!important;
+  border-color:#999!important;
+  opacity:.55!important;
+}
+</style>
 </head><body>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
 <div id="authGate" class="authGate"><div class="authBox"><h1>🔐 MHAC DELIVERY</h1><h2>Customer Login</h2><button id="googleLogin" class="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="authStatus" class="status">Google sign-in required.</p></div></div>
