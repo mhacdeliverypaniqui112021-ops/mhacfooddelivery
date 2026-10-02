@@ -2528,8 +2528,30 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 </style>
 <style id="MHAC_ADMIN_CANCEL_ONLY">
 /* ADMIN ONLY: restore visible CANCEL ORDER. No customer/rider changes. */
-#orders .orderActions .cancelOrderBtn{display:block!important;grid-column:1/-1!important;width:100%!important;min-height:40px!important;height:40px!important;margin:0!important;padding:6px 10px!important;font-size:13px!important;}
+#orders .orderActions .cancelOrderBtn,
+#orders .orderActions [data-rider-toggle]{
+  grid-column:1 / -1 !important;
+  width:70% !important;
+  max-width:360px !important;
+  min-height:40px !important;
+  height:40px !important;
+  margin:0 auto !important;
+  padding:6px 10px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  box-sizing:border-box !important;
+}
 #orders .orderActions .moreWrap{display:none!important;}
+@media(max-width:700px){
+  #orders .orderActions .cancelOrderBtn,
+  #orders .orderActions [data-rider-toggle]{
+    width:70% !important;
+    max-width:360px !important;
+    margin:0 auto !important;
+  }
+}
 </style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
