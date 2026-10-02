@@ -28,38 +28,10 @@
 .choiceRowCustomer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #eee}
 .choiceRowCustomer label{display:flex;align-items:center;gap:9px;flex:1}
 .choicePrice{white-space:nowrap;font-weight:700}
-</style>
-
-<style>
-/* V4.1.4 CHAT UI — compact, centered, keyboard-safe */
-.customerChatPanel{
-  position:fixed;left:50%;right:auto;
-  bottom:max(10px, var(--chat-bottom, 10px));
-  transform:translateX(-50%);
-  width:min(360px,calc(100vw - 28px));
-  max-height:min(68vh,520px);
-  display:flex;flex-direction:column;
-  background:#fff;border:3px solid #1976d2;border-radius:18px;
-  z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
-}
-.customerChatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;align-items:center}
-.customerChatMessages{height:190px;min-height:120px;max-height:35vh;overflow:auto;padding:8px;background:#f5f7fa}
-.customerChatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
-.customerChatMsg.customer{margin-left:auto;background:#d8f5df}
-.customerChatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
-.customerChatInput{flex:0 0 auto;display:flex;gap:6px;padding:7px;border-top:1px solid #ddd;background:#fff}
-.customerChatInput input{margin:0;flex:1;min-width:0;height:44px;padding:9px 10px!important}
-.customerChatInput button{width:auto!important;min-width:82px;height:44px!important;margin:0!important;padding:8px 12px!important}
 @media(max-width:600px){
-  .customerChatPanel{width:min(360px,calc(100vw - 28px));max-height:60vh}
-  .customerChatMessages{height:175px;max-height:28vh}
 }
 @media(max-width:380px){
-  .customerChatPanel{width:calc(100vw - 20px)}
-  .customerChatMessages{height:160px}
 }
-
-.orderChatBtn{width:100%;margin-top:8px!important;background:#1976d2!important;color:#fff!important;border:0!important;border-radius:9px!important;padding:10px!important;font-weight:900}
 .orderCancelBtn{width:100%;margin-top:8px!important;background:#b00000!important;color:#fff!important;border:0!important;border-radius:9px!important;padding:10px!important;font-weight:900}
 .bucketSelectBox{border:2px solid #ddd;border-radius:12px;background:#fff;padding:8px;margin:8px 0}
 .bucketSelectRow{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 38px;gap:5px;align-items:center;padding:5px 0}
@@ -236,7 +208,6 @@ header{border-bottom:3px solid #111!important}
 .rate h2{color:#111!important}
 .add,.close,.productPlus,.orderCancelBtn{background:#fff!important;color:#111!important;border:2px solid #111!important}
 .productPlus{font-size:24px!important}
-.orderChatBtn{background:#fff!important;color:#111!important;border:2px solid #111!important}
 .catTab.active{border-bottom-color:#111!important;color:#111!important}
 .checkout{padding:7px!important}
 .checkout-panel{padding:14px 12px!important;border:2px solid #111!important;border-radius:16px!important}
@@ -278,12 +249,6 @@ header{
 header h1,header p{
   color:#111!important;
   text-align:center!important;
-}
-.card,.metric,.order,.item,.riderCompact,.foodCard,.editorBox,
-.soundBox,.gcSettings,.storeBox,.panel,.section,.chatPanel{
-  background:#fff!important;
-  color:#111!important;
-  box-shadow:none!important;
 }
 .card{
   border:1px solid #d8d8d8!important;
@@ -513,27 +478,6 @@ header .tag{
   margin:0!important;
 }
 
-button,
-.add,
-.close,
-.back,
-.mini,
-.qty button,
-.choice button,
-.productPlus,
-.orderChatBtn,
-#checkoutBtn,
-#sendOrderBtn,
-#gpsBtn,
-#calculateFeeBtn{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-  border-radius:9px!important;
-  box-shadow:none!important;
-  font-weight:800!important;
-}
-
 button{
   min-height:34px!important;
   padding:6px 10px!important;
@@ -729,66 +673,6 @@ input::placeholder,textarea::placeholder{color:#777!important;opacity:1!importan
   opacity:.5!important;
 }
 
-.customerChatPanel{
-  left:50%!important;
-  right:auto!important;
-  top:50%!important;
-  bottom:auto!important;
-  transform:translate(-50%,-50%)!important;
-  width:min(360px,calc(100vw - 24px))!important;
-  max-width:calc(100vw - 24px)!important;
-  max-height:min(520px,calc(100vh - 60px))!important;
-  background:#fff!important;
-  color:#111!important;
-  border:2px solid #222!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;
-}
-.customerChatHead{
-  background:#fff!important;
-  color:#111!important;
-  border-bottom:1px solid #ddd!important;
-  padding:10px 12px!important;
-}
-.customerChatHead .mini{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-.customerChatMessages{
-  background:#fff!important;
-  color:#111!important;
-}
-.customerChatMsg{
-  color:#111!important;
-  background:#fff!important;
-  border:1px solid #ddd!important;
-}
-.customerChatMsg.admin{
-  background:#f1f1f1!important;
-  color:#111!important;
-  border:1px solid #ccc!important;
-}
-.customerChatMsg.customer{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #ddd!important;
-}
-.customerChatInput{
-  background:#fff!important;
-  border-top:1px solid #ddd!important;
-}
-.customerChatInput input{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #bbb!important;
-}
-.customerChatInput button{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-
 .authGate{
   background:#fff!important;
 }
@@ -875,10 +759,6 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 .productName{font-weight:800!important;}
 .cartItemWithPhoto{display:flex!important;align-items:center!important;gap:8px!important;}
 .cartPhoto{border-radius:6px!important;}
-.orderChatBtn,.customerChatPanel,.customerChatMessages,.chatOpenBtn{background:#fff!important;color:#111!important;}
-.customerChatHead{background:#fff!important;color:#111!important;border-bottom:1px solid #ddd!important;}
-.customerChatMessages{background:#fff!important;}
-.customerChatMsg.customer,.customerChatMsg.admin{background:#fff!important;color:#111!important;border:1px solid #ddd!important;}
 .activeOrderItemPhoto{width:30px!important;height:30px!important;object-fit:cover!important;border-radius:6px!important;border:1px solid #222!important;vertical-align:middle!important;margin-right:6px!important;}
 .choiceGroupCustomer{background:#fff!important;border:1px solid #ddd!important;border-radius:10px!important;padding:8px!important;margin:8px 0!important;}
 .choiceGroupCustomer h4{margin:0 0 4px!important;}
@@ -891,7 +771,6 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 .activeOrderLine:last-child{border-bottom:0!important}
 .activeOrderLine b{font-size:18px!important;font-weight:800!important}
 .activeOrderItemPhoto{display:none!important}
-.orderChatBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
 @media(max-width:600px){.store{min-height:54px!important;padding:8px!important}.storeBtnContent span:last-child{font-size:16px!important}.activeOrderDetails{font-size:16px!important}.activeOrderLine b{font-size:17px!important}}
 </style>
 
@@ -907,7 +786,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .cart h2{font-size:23px!important}
 .orderCard,.activeOrderDetails{font-size:18px!important;line-height:1.4!important}
 .activeOrderLine b{font-size:19px!important}
-.orderChatBtn{font-size:16px!important}
 .orderCard .small{font-size:16px!important}
 .orderCard>b,.orderCard .pill{font-size:17px!important}
 .partBox{font-size:17px!important}
@@ -1038,7 +916,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .customerUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
 .customerOrderActions{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;width:100%!important}
 .customerOrderActions button{margin:0!important;width:100%!important;max-width:100%!important;display:block!important;text-align:center!important}
-.customerOrderActions.single .orderChatBtn{width:100%!important;max-width:100%!important;display:block!important;}
 </style>
 <style id="MHAC_CUSTOMER_UNIFIED_FINAL_V4_1_84">
 .customerViewFullOrder{
@@ -1408,17 +1285,11 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 <div id="closedScreen" class="closed"><div class="box"><h1>🔒 MHAC DELIVERY CLOSED</h1><h2>No orders are being accepted right now.</h2><p id="closedText"></p></div></div>
 <header><div class="logo">MHAC DELIVERY</div><div class="appName">CUSTOMER APP</div><div class="tag">FAST • SAFE • ON TIME</div></header>
 <section class="rate"><h2>DELIVERY RATE</h2><p>1 KM = ₱40 • SUCCEEDING KM +₱10</p><p>10% SERVICE FEE • MAXIMUM 2 STORES • 2ND STORE +₱5</p><div class="reminder">⚠️ <b>PRICE REMINDER:</b> Food prices may change without prior notice. If a displayed food price is outdated, the order total will be manually recalculated based on the store’s current price.</div></section>
-<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><div class="account" style="text-align:center"><button id="customerChatSoundBtn" class="add" style="max-width:320px;display:none">🔔 ENABLE CHAT SOUND</button><div id="customerChatSoundState" class="status">🔊 AUTOMATIC CHAT SOUND — preparing…</div></div>
-<main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
+<div class="area">📍 PANIQUI • MONCADA • RAMOS • GERONA • PURA • ANAO • NAMPICUAN</div><div id="scheduleBar" class="schedule">Checking ordering hours…</div><div id="customerAccount" class="account"></div><main class="wrap"><div class="title">CHOOSE FOOD STORE</div><div id="menuStatus" class="status">Loading published menu…</div><div class="area">Maximum 2 stores per order.</div><div id="stores" class="stores"></div>
 <section class="cart"><div class="cartHeader"><h2>🛒 YOUR CART <span id="count" style="font-size:14px">0</span></h2><button id="addMoreOrderBtn" class="addOrderBtn" onclick="window.scrollTo({top:document.querySelector('.title')?.offsetTop||0,behavior:'smooth'})">＋ ADD ORDER</button></div><div id="storeCount" class="small"></div><div id="cart">No items yet.</div><div id="totals"></div><button id="checkoutBtn" class="add" onclick="openCheckout()" disabled>CHECKOUT / PLACE ORDER</button></section>
 <section class="cart"><h2 style="text-align:center">📦 MY ACTIVE ORDERS</h2><div id="myOrders">No active orders.</div></section></main>
 
-<audio id="chatAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio>
-<div id="customerChatPanel" class="customerChatPanel" style="display:none">
-  <div class="customerChatHead"><span id="customerChatTitle">💬 MHAC ADMIN CHAT</span><button id="customerChatClose" class="mini">✕</button></div>
-  <div id="customerChatMessages" class="customerChatMessages"></div>
-  <div class="customerChatInput"><input id="customerChatInput" placeholder="Type message…"><button id="customerChatSend" class="add">SEND</button></div>
-</div>
+
 
 <div id="manualLocationModal" class="manualLocationModal">
   <div class="manualLocationPanel">
@@ -1767,7 +1638,7 @@ $("payment").onchange=()=>{
   if(isG)renderGcashSettings();
 };
 
-onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopCustomerChatWatchers();stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch();await autoEnableCustomerChatSound()});
+onAuthStateChanged(auth,async u=>{currentUser=u||null;if(!u){stopGcashSettingsWatch();showLogin();if(ordersUnsub){ordersUnsub();ordersUnsub=null}if(menuUnsub){menuUnsub();menuUnsub=null}return}$("customerAccount").innerHTML=`🔐 ${esc(u.email||"")} <button id=logout style="padding:5px 8px;width:auto">LOG OUT</button>`;$("logout").onclick=()=>signOut(auth);await boot();startOrders();startGcashSettingsWatch()});
 function photoSvgData(name,type="food"){
  const n=String(name||type||"Photo").trim().slice(0,18),emoji=type==="store"?"🏪":"🍗",bg=type==="store"?"#f5f5f5":"#fff7e8";
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><rect width="30" height="30" rx="14" fill="${bg}"/><text x="45" y="43" text-anchor="middle" font-size="18">${emoji}</text><text x="45" y="52" text-anchor="middle" font-family="Arial" font-size="6" font-weight="700">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text></svg>`;
@@ -2233,81 +2104,6 @@ async function placeOrder(){
  }finally{$("sendOrderBtn").disabled=false}
 }
 
-let customerChatUnsub=null,customerChatOrderId="";
-let customerChatSoundReady=false,customerChatSoundCtx=null,customerChatSoundSource=null,customerChatSoundGain=null;
-async function prepareCustomerChatSound(){
-  const AC=window.AudioContext||window.webkitAudioContext;
-  if(!AC) throw new Error("Web Audio is not supported.");
-  if(!customerChatSoundCtx) customerChatSoundCtx=new AC();
-  if(customerChatSoundCtx.state==="suspended") await customerChatSoundCtx.resume();
-  customerChatSoundReady=true;
-  $("customerChatSoundState").textContent="🔊 AUTOMATIC CHAT SOUND — READY";
-}
-function playCustomerChatAlert(){
-  if(!customerChatSoundReady||!customerChatSoundCtx)return;
-  try{
-    const ctx=customerChatSoundCtx;
-    if(ctx.state==="suspended") ctx.resume();
-    const now=ctx.currentTime;
-    [880,660,880].forEach((freq,i)=>{
-      const o=ctx.createOscillator(), g=ctx.createGain();
-      o.type="sine"; o.frequency.value=freq;
-      const t=now+i*0.18;
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.exponentialRampToValueAtTime(0.45,t+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
-      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.17);
-    });
-  }catch(e){console.warn("Customer chat ringtone failed",e)}
-}
-$("customerChatSoundBtn").onclick=async()=>{const b=$("customerChatSoundBtn");b.disabled=true;try{await prepareCustomerChatSound()}catch(e){}finally{b.disabled=false}};
-let customerChatSnapshotReady=false;
-async function autoEnableCustomerChatSound(){try{await prepareCustomerChatSound()}catch(e){}}
-let customerChatUnlockInstalled=false;
-function installCustomerChatAudioUnlock(){
-  if(customerChatUnlockInstalled)return; customerChatUnlockInstalled=true;
-  const unlock=async()=>{try{await prepareCustomerChatSound();document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchstart",unlock,true)}catch(_){} };
-  document.addEventListener("pointerdown",unlock,true);
-  document.addEventListener("touchstart",unlock,true);
-}
-installCustomerChatAudioUnlock();
-
-function openCustomerChat(orderId){
- customerChatOrderId=orderId; customerChatSnapshotReady=false;
- $("customerChatPanel").style.display="block";
- if(customerChatUnsub)customerChatUnsub();
- customerChatUnsub=onSnapshot(collection(db,"orders",orderId,"messages"),snap=>{
-   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
-   $("customerChatMessages").innerHTML=arr.map(m=>`<div class="customerChatMsg ${m.senderRole==="customer"?"customer":"admin"}"><b>${esc(m.senderRole==="customer"?"YOU":"MHAC ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
-   $("customerChatMessages").scrollTop=$("customerChatMessages").scrollHeight;
-   if(customerChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="customer"))playCustomerChatAlert();
-   customerChatSnapshotReady=true;
- });
-}
-function closeCustomerChat(){if(customerChatUnsub){customerChatUnsub();customerChatUnsub=null}customerChatOrderId="";$("customerChatPanel").style.display="none"}
-$("customerChatClose").onclick=closeCustomerChat;
-$("customerChatSend").onclick=async()=>{
- const text=$("customerChatInput").value.trim();if(!text||!customerChatOrderId)return;
- try{await addDoc(collection(db,"orders",customerChatOrderId,"messages"),{text,senderRole:"customer",senderUid:currentUser.uid,senderName:currentUser.displayName||currentUser.email||"CUSTOMER",createdAt:serverTimestamp()});$("customerChatInput").value=""}catch(e){$("customerChatInput").value=text;alert(e.message||e)}
-};
-$("customerChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("customerChatSend").click()}});
-
-// V4.1.4: keep compact customer chat centered and above the Android keyboard.
-(function setupCustomerChatKeyboard(){
-  const panel=$("customerChatPanel"), input=$("customerChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
-})();
-
 function orderCountdownText(o){
  const mins=Number(o.waitingMinutes||0);
  const ts=o.waitingStartedAt?.seconds?o.waitingStartedAt.seconds*1000:(o.waitingStartedAt?Date.parse(o.waitingStartedAt):0);
@@ -2318,28 +2114,6 @@ function orderCountdownText(o){
  return `⏱️ WAITING TIME: ${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 setInterval(()=>document.querySelectorAll('[data-customer-countdown]').forEach(el=>{const o=window.__mhacOrders?.find(x=>x.id===el.dataset.customerCountdown);if(o)el.textContent=orderCountdownText(o)}),1000);
-
-const customerChatWatchers=new Map();
-function syncCustomerChatWatchers(active){
-  const ids=new Set(active.map(o=>o.id));
-  for(const [id,unsub] of customerChatWatchers){
-    if(!ids.has(id)){try{unsub()}catch(_){}customerChatWatchers.delete(id);}
-  }
-  for(const o of active){
-    if(customerChatWatchers.has(o.id))continue;
-    let primed=false;
-    const unsub=onSnapshot(collection(db,"orders",o.id,"messages"),snap=>{
-      const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="customer");
-      if(!primed){primed=true;return;}
-      if(!incoming.length)return;
-      openCustomerChat(o.id);
-      playCustomerChatAlert();
-    },e=>console.warn("Customer global chat watcher:",e));
-    customerChatWatchers.set(o.id,unsub);
-  }
-}
-function stopCustomerChatWatchers(){for(const unsub of customerChatWatchers.values()){try{unsub()}catch(_){}}customerChatWatchers.clear();}
-
 
 function refreshCustomerOrderBreakdowns(){
  const orders=Array.isArray(window.__mhacOrders)?window.__mhacOrders:[];
@@ -2461,7 +2235,7 @@ function customerUnifiedOrderDetailHtml(o){
 
 function startOrders(){
   if(ordersUnsub)ordersUnsub();
-  stopCustomerChatWatchers();
+  
   ordersUnsub=onSnapshot(query(collection(db,"orders"),where("customer.uid","==",currentUser.uid)),snap=>{
     const arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.customer?.uid===currentUser?.uid&&String(o.status||"").toUpperCase()!=="COMPLETED"&&String(o.status||"").toUpperCase()!=="CANCELLED");
     window.__mhacOrders=arr;
@@ -2472,12 +2246,12 @@ function startOrders(){
         <h3 class="customerOrderPreviewName">${esc(o.customer?.name||"")}</h3>
         <div id="customer-order-details-${esc(o.id)}" class="hidden customerUnifiedDetailWrap">${customerUnifiedOrderDetailHtml(o)}</div>
         <button type="button" class="customerViewFullOrder" data-customer-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
-        <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}<button class="orderChatBtn" onclick="openCustomerChat('${esc(o.id)}')">💬 CHAT MHAC ADMIN</button></div>
+        <div class="customerOrderActions ${canCancel?"":"single"}">${canCancel?`<button class="orderCancelBtn" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}</div>
       </div>`;
     }).join(""):"No active orders.";
     refreshCustomerOrderBreakdowns();
     requestAnimationFrame(()=>refreshCustomerOrderBreakdowns());
-    syncCustomerChatWatchers(arr);
+    
   });
 }
 $("myOrders").onclick=async e=>{
@@ -2501,7 +2275,7 @@ $("myOrders").onclick=async e=>{
     await updateDoc(doc(db,"orders",id),{status:"CANCELLED",cancelledAt:serverTimestamp(),cancelledBy:"customer",updatedAt:serverTimestamp()});
   }catch(x){b.disabled=false;alert(x.message||x)}
 };
-window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.openCustomerChat=openCustomerChat;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;window.openManualRecipientLocation=openManualRecipientLocation;window.closeManualRecipientLocation=closeManualRecipientLocation;window.searchManualRecipientLocation=searchManualRecipientLocation;window.confirmManualRecipientLocation=confirmManualRecipientLocation;
+window.openStore=openStore;window.openCat=openCat;window.customize=customize;window.changeQty=changeQty;window.closeMenu=closeMenu;window.openCheckout=openCheckout;window.closeCheckout=closeCheckout;window.calculateByGPS=calculateByGPS;window.calculateGPSFee=calculateGPSFee;window.placeOrder=placeOrder;window.openManualRecipientLocation=openManualRecipientLocation;window.closeManualRecipientLocation=closeManualRecipientLocation;window.searchManualRecipientLocation=searchManualRecipientLocation;window.confirmManualRecipientLocation=confirmManualRecipientLocation;
 window.__MHAC_BUILD__="V4.1.88 CUSTOMER CATEGORY + ADMIN DRAWER FIX";
 </script>
 

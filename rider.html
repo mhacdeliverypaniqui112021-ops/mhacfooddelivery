@@ -58,33 +58,7 @@ header h1 .appName{font-size:30px}
 .riderChoice,.riderParts{margin-top:4px;font-size:16px;font-weight:700}
 .riderParts{padding:2px 0;display:block;border:0;background:#fff;font-size:18px;font-weight:700}
 </style>
-<style>
-/* V4.1.8 compact Admin ↔ Rider chat */
-.chatPanel{
-  position:fixed!important;
-  left:50%!important;
-  right:auto!important;
-  top:auto!important;
-  bottom:max(10px, var(--chat-bottom, 10px))!important;
-  transform:translateX(-50%)!important;
-  margin:0!important;
-  width:min(360px,calc(100vw - 28px));
-  max-height:min(46vh,390px);
-  display:flex;flex-direction:column;
-  background:#fff;border:3px solid #1976d2;border-radius:18px;
-  z-index:1000;box-shadow:0 8px 30px #0004;overflow:hidden;
-}
-.chatHead{flex:0 0 auto;background:#1976d2;color:#fff;padding:10px 12px;font-weight:900;display:flex;justify-content:space-between;gap:8px;align-items:center}
-.chatHead button{width:auto!important;margin:0!important;padding:8px 12px!important;background:#666!important}
-.chatMessages{height:105px;min-height:80px;max-height:22vh;overflow:auto;padding:8px;background:#f5f7fa}
-.chatMsg{max-width:82%;padding:7px 9px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
-.chatMsg.rider{margin-left:auto;background:#d8f5df}
-.chatMsg.admin{margin-right:auto;background:#fff;border:1px solid #ddd}
-.chatInput{flex:0 0 auto;display:flex;gap:5px;padding:5px;border-top:1px solid #ddd;background:#fff}
-.chatInput input{margin:0!important;flex:1!important;min-width:0!important;height:40px;padding:7px 9px!important}
-.chatInput button{width:auto!important;min-width:76px;height:40px!important;margin:0!important;padding:7px 10px!important}
-.riderChatBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
-</style>
+
 <style>
 /* V4.1.15 RIDER compact dashboard + order controls */
 #app>.card{padding:12px!important;margin:8px 0!important}
@@ -137,12 +111,6 @@ header{
 header h1,header p{
   color:#111!important;
   text-align:center!important;
-}
-.card,.metric,.order,.item,.riderCompact,.foodCard,.editorBox,
-.soundBox,.gcSettings,.storeBox,.panel,.section,.chatPanel{
-  background:#fff!important;
-  color:#111!important;
-  box-shadow:none!important;
 }
 .card{
   border:1px solid #d8d8d8!important;
@@ -444,45 +412,6 @@ button:disabled{opacity:.5!important}
   color:#111!important;
 }
 
-.chatPanel{
-  background:#fff!important;
-  color:#111!important;
-  border:2px solid #222!important;
-  border-radius:16px!important;
-  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;
-}
-.chatHead{
-  background:#fff!important;
-  color:#111!important;
-  border-bottom:1px solid #ddd!important;
-}
-.chatHead .miniBtn{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-.chatMessages{
-  background:#fff!important;
-  color:#111!important;
-}
-.chatMsg{
-  color:#111!important;
-}
-.chatInput{
-  background:#fff!important;
-  border-top:1px solid #ddd!important;
-}
-.chatInput input{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #bbb!important;
-}
-.chatInput button{
-  background:#fff!important;
-  color:#111!important;
-  border:1px solid #222!important;
-}
-
 .mhacRiderSplash{
   background:#000!important;
 }
@@ -498,21 +427,7 @@ button:disabled{opacity:.5!important}
   #logout{min-width:105px!important}
 }
 </style>
-<style>
-/* V4.1.64 CENTERED RIDER CHAT LOCK */
-#riderChatPanel.chatPanel{
-  position:fixed!important;
-  left:50%!important;
-  right:auto!important;
-  top:auto!important;
-  bottom:max(10px, var(--chat-bottom, 10px))!important;
-  transform:translate3d(-50%,0,0)!important;
-  margin:0!important;
-  width:min(360px,calc(100vw - 28px))!important;
-  max-width:calc(100vw - 28px)!important;
-  z-index:2147483000!important;
-}
-</style>
+
 
 
 <style id="MHAC_CLEAN_UI_HEADER_V1">
@@ -578,10 +493,6 @@ input,textarea,select{font-size:18px!important;min-height:50px!important}
 .riderUnifiedBill{margin-top:12px!important;border-top:1px solid #ddd!important;padding-top:10px!important}
 .riderUnifiedBill>div{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:6px 0!important;font-size:16px!important}
 .riderUnifiedBill .grand{border-top:1px solid #222!important;margin-top:4px!important;padding-top:10px!important;font-size:19px!important;font-weight:900!important}
-</style>
-
-<style id="MHAC_RIDER_CHAT_CENTER_COMPACT">
-.riderActionTop .riderChatBtn{grid-column:1 / -1!important;width:100%!important;text-align:center!important;display:block!important}
 #riderBuild{display:none!important}
 </style>
 <style id="MHAC_RIDER_HIDE_BUILD_LINE">
@@ -793,12 +704,8 @@ window.addEventListener("load",function(){
 <div id="login" class="card"><h2>🔐 RIDER LOGIN</h2><p><b>New rider?</b> Sign in using your Google account. MHAC Admin must approve your rider account before you can receive orders.</p><button id="googleBtn" class="google">🔵 CONTINUE WITH GOOGLE</button><p id="googleStatus" class="status">Google sign-in is required for new riders.</p><hr><details><summary><b>Legacy rider login</b></summary><input id="email" type="email" placeholder="Rider Email" autocomplete="email"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="loginBtn" class="red">LOGIN</button><p id="loginStatus" class="status">Use the rider account created in Firebase Authentication.</p></details></div>
 <div id="closed" class="card hidden"><h2>🔒 MHAC DELIVERY CLOSED</h2><p id="closedText">The rider app is outside business hours.</p><p class="status">Business hours: <b>9:00 AM – 7:30 PM</b></p><button id="retryBtn" class="blue">🔄 CHECK AGAIN</button></div>
 <div id="pending" class="card hidden"><h2>⏳ RIDER ACCOUNT PENDING</h2><p>Your Google account is signed in, but your rider account has not been approved by MHAC Admin yet.</p><p class="status">Ask MHAC Admin to approve your rider account in Firestore.</p><button id="pendingLogout" class="red">LOG OUT</button></div>
-<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.67 • LIVE RIDER SYNC ACTIVE • AUTH SESSION PERSISTENT</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>ASSIGNMENT + CHAT RINGTONE</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
-<div id="riderChatPanel" class="chatPanel hidden">
-  <div class="chatHead"><span id="riderChatTitle">💬 ADMIN CHAT</span><button id="riderChatClose" class="miniBtn">✕</button></div>
-  <div id="riderChatMessages" class="chatMessages"></div>
-  <div class="chatInput"><input id="riderChatInput" placeholder="Message admin…"><button id="riderChatSend" class="blue">SEND</button></div>
-</div>
+<div id="app" class="hidden"><div class="card"><div class="row"><h2 style="margin:0">🏍️ <span id="nickname">RIDER</span></h2><button id="logout">LOG OUT</button></div><p id="conn" class="status">Connecting…</p><p id="riderBuild" class="status" style="font-size:10px">BUILD V4.1.67 • LIVE RIDER SYNC ACTIVE • AUTH SESSION PERSISTENT</p><div id="riderAccounting" class="sound" style="margin-top:10px">💰 <b>MY EARNINGS DASHBOARD</b><br>Today's Completed Deliveries: <b id="doneCount">0</b><br>Today's Delivery Earnings: <b id="myEarnings">₱0.00</b><br>Today's Admin 10% Service Fees to Remit: <b id="toRemit">₱0.00</b></div><div class="sound">🔔 <b>NEW ASSIGNMENT ALERT</b><br><span id="soundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><span style="display:none!important">Automatic sound enabled</span></div></div><div id="orders"></div></div>
+
 </main>
 <script>window.MHAC_RIDER_BUILD="V4.1.64";</script>
 <script>
@@ -873,24 +780,7 @@ async function prepareRiderAlertSound(){
     throw e;
   }
 }
-// V4.1.21 CHAT AUDIO UNLOCK: keep a user-gesture listener installed so
-// incoming Admin messages can ring automatically after the first tap.
-let riderChatUnlockInstalled=false;
-function installRiderChatAudioUnlock(){
-  if(riderChatUnlockInstalled)return;
-  riderChatUnlockInstalled=true;
-  const unlock=async()=>{
-    if(soundReady){document.removeEventListener("pointerdown",unlock,true);document.removeEventListener("touchstart",unlock,true);return;}
-    try{
-      await prepareRiderAlertSound();
-      document.removeEventListener("pointerdown",unlock,true);
-      document.removeEventListener("touchstart",unlock,true);
-    }catch(_){ /* wait for another gesture */ }
-  };
-  document.addEventListener("pointerdown",unlock,true);
-  document.addEventListener("touchstart",unlock,true);
-}
-installRiderChatAudioUnlock();
+
 
 async function playAlert(){
   if(!soundReady)return;
@@ -1100,101 +990,18 @@ function render(arr){
    <div class="riderActionTop">
      <a class="nav" target="_blank" rel="noopener" href="${maps(o)}">🧭 NAVIGATE</a>
      <a class="nav callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
-     <button class="riderChatBtn" data-rider-chat="${esc(o.id)}">💬 CHAT ADMIN</button>
    </div>
    <div class="riderActionBottom"><button data-status="PICKED UP" data-id="${esc(o.id)}">📦 PICK UP</button><button data-status="ON THE WAY" data-id="${esc(o.id)}">🏍️ ON THE WAY</button><button class="green" data-status="DELIVERED" data-id="${esc(o.id)}">✅ DELIVERED</button></div>
  </div>`).join("")
 }
-let riderChatUnsub=null,riderChatOrderId="",riderChatSnapshotReady=false;
 let authFlowBusy=false,authFlowUid="";
-async function playRiderChatAlert(){
-  if(!soundReady||!soundCtx)return;
-  try{
-    const ctx=soundCtx;
-    if(ctx.state==="suspended") ctx.resume();
-    const now=ctx.currentTime;
-    [880,660,880].forEach((freq,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type="sine"; o.frequency.value=freq;
-      const t=now+i*0.18;
-      g.gain.setValueAtTime(0.0001,t);
-      g.gain.exponentialRampToValueAtTime(0.45,t+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
-      o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+0.17);
-    });
-  }catch(e){console.warn("Rider chat ringtone failed",e)}
-}
-function openRiderChat(orderId){
-  riderChatOrderId=orderId; riderChatSnapshotReady=false;
-  $("riderChatTitle").textContent="💬 ADMIN CHAT";
-  $("riderChatPanel").classList.remove("hidden");
-  if(riderChatUnsub)riderChatUnsub();
-  riderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
-    const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
-    $("riderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="rider"?"rider":"admin"}"><b>${esc(m.senderRole==="rider"?"YOU":"ADMIN")}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
-    $("riderChatMessages").scrollTop=$("riderChatMessages").scrollHeight;
-    if(riderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider"))playRiderChatAlert();
-    riderChatSnapshotReady=true;
-  },e=>{alert("Unable to open rider chat:\n\n"+e.message)});
-}
-function closeRiderChat(){if(riderChatUnsub){riderChatUnsub();riderChatUnsub=null}riderChatOrderId="";$("riderChatPanel").classList.add("hidden")}
-$("riderChatClose").onclick=closeRiderChat;
-$("riderChatSend").onclick=async()=>{
-  const text=$("riderChatInput").value.trim();if(!text||!riderChatOrderId)return;
-  try{
-    await addDoc(collection(db,"orders",riderChatOrderId,"riderMessages"),{
-      text,senderRole:"rider",senderUid:auth.currentUser.uid,senderName:$("nickname").textContent||"RIDER",createdAt:serverTimestamp()
-    });
-    $("riderChatInput").value="";
-  }catch(e){alert("Unable to send message:\n\n"+e.message)}
-};
-$("riderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("riderChatSend").click()}});
-
-(function setupRiderChatKeyboard(){
-  const panel=$("riderChatPanel"), input=$("riderChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
-})();
-
 $("orders").addEventListener("click",async e=>{
  const view=e.target.closest("[data-rider-view]");
  if(view){const d=$("rider-order-details-"+view.dataset.riderView);if(d)d.classList.toggle("hidden");return;}
- const chat=e.target.closest("[data-rider-chat]");
- if(chat){openRiderChat(chat.dataset.riderChat);return;}
  const b=e.target.closest("[data-status]");if(!b)return;b.disabled=true;const id=b.dataset.id,status=b.dataset.status;try{const patch={status,updatedAt:serverTimestamp()};await updateDoc(doc(db,"orders",id),patch);try{await updateDoc(doc(db,"riderInbox",uid,"orders",id),{"order.status":status,"order.updatedAt":serverTimestamp(),})}catch(inboxErr){console.warn("Rider inbox status mirror failed",inboxErr)}}catch(x){alert("Unable to update order:\n\n"+x.message)}finally{b.disabled=false}})
-const riderChatWatchers=new Map();
-function syncRiderChatWatchers(active){
-  const ids=new Set(active.map(o=>o.id));
-  for(const [id,unsub] of riderChatWatchers){
-    if(!ids.has(id)){try{unsub()}catch(_){}riderChatWatchers.delete(id);}
-  }
-  for(const o of active){
-    if(riderChatWatchers.has(o.id))continue;
-    let primed=false;
-    const unsub=onSnapshot(collection(db,"orders",o.id,"riderMessages"),snap=>{
-      const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="rider");
-      if(!primed){primed=true;return;}
-      if(!incoming.length)return;
-      openRiderChat(o.id);
-      playRiderChatAlert();
-    },e=>console.warn("Rider global chat watcher:",e));
-    riderChatWatchers.set(o.id,unsub);
-  }
-}
-function stopRiderChatWatchers(){for(const unsub of riderChatWatchers.values()){try{unsub()}catch(_){}}riderChatWatchers.clear();}
-
 function startOrdersListener(){
  if(unsub){try{unsub()}catch(_){ }unsub=null}
- stopRiderChatWatchers();
+ 
  const riderEmail=(auth.currentUser?.email||"").trim().toLowerCase();
  const riderUidForSync=uid;
  const buckets=new Map(),orderWatchers=new Map(),listeners=[];
@@ -1217,7 +1024,7 @@ function startOrdersListener(){
    const df=done.reduce((a,o)=>a+Number(o.fees?.deliveryFee||0),0),sf=done.reduce((a,o)=>a+Number(o.fees?.serviceFee||0),0);
    $("doneCount").textContent=done.length;$("myEarnings").textContent=peso(df);$("toRemit").textContent=peso(sf);
    for(const o of active)if(!seenAssigned.has(o.id)){seenAssigned.add(o.id);playAlert()}
-   render(active);syncRiderChatWatchers(active);$("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
+   render(active);$("conn").textContent="🟢 LIVE — "+active.length+" active order"+(active.length===1?"":"s");
  }
  // PRIMARY: complete order snapshot under rider UID. No /orders query is required.
  listeners.push(onSnapshot(collection(db,"riderInbox",uid,"orders"),snap=>{
@@ -1244,7 +1051,7 @@ function startOrdersListener(){
 }
 
 function startHoursTimer(){if(hoursTimer)clearInterval(hoursTimer);hoursTimer=setInterval(updateRiderBusinessStatus,30000)}function updateRiderBusinessStatus(){const closed=!riderOpen();const app=document.getElementById("app");if(app&&!app.classList.contains("hidden")){const c=$("closed");if(c)c.classList.add("hidden");const conn=$("conn");if(conn&&closed)conn.textContent="🟡 BUSINESS CLOSED — no new assignments; existing orders remain accessible";else if(conn&&conn.textContent.includes("BUSINESS CLOSED"))conn.textContent="🟢 LIVE — waiting for assigned orders"}}async function lockRider(){updateRiderBusinessStatus()}
-async function logout(){if(unsub){unsub();unsub=null}stopRiderChatWatchers();if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}uid="";seenAssigned.clear();try{await signOut(auth)}catch(_){}showLogin()}
+async function logout(){if(unsub){unsub();unsub=null}if(hoursTimer){clearInterval(hoursTimer);hoursTimer=null}uid="";seenAssigned.clear();try{await signOut(auth)}catch(_){}showLogin()}
 $("googleBtn").onclick=googleLogin;$("loginBtn").onclick=legacyLogin;$("logout").onclick=logout;$("pendingLogout").onclick=logout;$("retryBtn").onclick=async()=>{await loadHours();if(riderOpen())showLogin();else showClosed()};
 getRedirectResult(auth).then(async result=>{
   if(result?.user){
