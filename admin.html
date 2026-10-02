@@ -1872,18 +1872,13 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
 }
 </style>
 <style id="MHAC_FINAL_ORDER_ACTION_LAYOUT">
-/* Final requested order layout: CANCEL ORDER replaces the three dots; ACCEPT ORDER is centered on the bottom row. */
-#orders .orderActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;align-items:stretch!important;}
-#orders .orderActions [data-view]{grid-column:1/-1!important;}
-#orders .orderActions .cancelOrderBtn{grid-column:2!important;width:100%!important;min-height:38px!important;height:38px!important;margin:0!important;padding:5px 7px!important;font-size:12px!important;}
-#orders .orderActions [data-accept]{grid-column:1/-1!important;width:70%!important;max-width:360px!important;justify-self:center!important;min-height:40px!important;height:40px!important;margin:0!important;font-size:13px!important;}
-#orders .orderActions .moreWrap{display:none!important;}
-@media(max-width:700px){
-  #orders .orderActions{grid-template-columns:1fr 1fr!important;gap:6px!important;}
-  #orders .orderActions [data-view]{grid-column:1/-1!important;}
-  #orders .orderActions .cancelOrderBtn{grid-column:2!important;}
-  #orders .orderActions [data-accept]{grid-column:1/-1!important;width:70%!important;justify-self:center!important;}
-}
+/* FINAL MHAC ORDER ACTIONS — centered six-action layout. */
+#orders .orderActions{display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;}
+#orders .orderActions>button,#orders .orderActions>.callCustomerBtn,#orders .orderActions>select{width:100%!important;max-width:360px!important;margin:0 auto!important;text-align:center!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;}
+#orders .orderActions .callCustomerBtn{min-height:40px!important;height:40px!important;text-decoration:none!important;border:1px solid #222!important;border-radius:9px!important;color:#111!important;background:#fff!important;font-weight:700!important;}
+#orders .orderActions [data-view],#orders .orderActions [data-accept],#orders .orderActions .cancelOrderBtn,#orders .orderActions [data-c],#orders .orderActions [data-rider-toggle]{min-height:40px!important;height:40px!important;}
+#orders .orderActions .riderPicker{min-height:40px!important;height:40px!important;}
+#orders .orderActions .riderPicker.hidden,#orders .orderActions [data-a]{display:none!important;}
 </style>
 
 <style id="MHAC_FOOD_EDITOR_ACCORDION_20260831">
@@ -2531,6 +2526,11 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   }
 }
 </style>
+<style id="MHAC_ADMIN_CANCEL_ONLY">
+/* ADMIN ONLY: restore visible CANCEL ORDER. No customer/rider changes. */
+#orders .orderActions .cancelOrderBtn{display:block!important;grid-column:1/-1!important;width:100%!important;min-height:40px!important;height:40px!important;margin:0!important;padding:6px 10px!important;font-size:13px!important;}
+#orders .orderActions .moreWrap{display:none!important;}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -3090,12 +3090,13 @@ function renderOrders(){
     <div class="orderActions">
       <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
       <a class="callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
-      ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class="chatOpenBtn cancelOrderBtn" type="button" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
-      ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
-      <select id="r-${esc(o.id)}">${opts}</select>
-      <button class=red data-a="${esc(o.id)}">ASSIGN RIDER</button>
+      ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class="cancelOrderBtn" type="button" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       <button class=green data-c="${esc(o.id)}">✅ COMPLETE</button>
+      <button class=red data-rider-toggle="${esc(o.id)}">ASSIGN RIDER</button>
+      <select id="r-${esc(o.id)}" class="riderPicker hidden">${opts}</select>
+      <button class=red data-a="${esc(o.id)}" style="display:none!important">ASSIGN RIDER</button>
+      ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
     </div>
    </div>`;
  }).join("");
@@ -3108,6 +3109,10 @@ $("orders").onclick=async e=>{
    if(menu)menu.classList.toggle("hidden");
    return;
  }
+ const riderToggle=e.target.closest("[data-rider-toggle]");
+ if(riderToggle){const picker=$("r-"+riderToggle.dataset.riderToggle);if(picker){picker.classList.toggle("hidden");if(!picker.classList.contains("hidden"))picker.focus();}return;}
+ const riderPicker=e.target.closest(".riderPicker");
+ if(riderPicker && riderPicker.value){const assignBtn=riderPicker.parentElement.querySelector(`[data-a="${CSS.escape(riderPicker.id.slice(2))}"]`);if(assignBtn)assignBtn.click();return;}
  const v=e.target.closest("[data-view]");
  if(v){const d=$("details-"+v.dataset.view);if(d)d.classList.toggle("hidden");return;}
  const accept=e.target.closest("[data-accept]");
