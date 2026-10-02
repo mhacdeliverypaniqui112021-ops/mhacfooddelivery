@@ -810,6 +810,15 @@ header p{font-size:14px!important;margin:8px auto 0!important;color:#222!importa
 
 
 
+<style id="MHAC_ADMIN_COLLAPSIBLE_SECTIONS">
+/* Compact Admin dashboard: GCash, Riders, and Store/Menu Manager are closed until tapped. */
+.adminCollapsibleCard > .adminSectionToggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;cursor:pointer!important;user-select:none!important;margin:0!important;padding:3px 0!important;}
+.adminCollapsibleCard > .adminSectionToggle:focus{outline:2px solid #222!important;outline-offset:2px!important;border-radius:6px!important;}
+.adminSectionArrow{font-size:15px!important;line-height:1!important;min-width:22px!important;text-align:center!important;}
+.adminCollapsibleCard .adminSectionBody.hidden{display:none!important;}
+.adminCollapsibleCard.adminSectionOpen > .adminSectionToggle{margin-bottom:7px!important;}
+</style>
+
 <style id="MHAC_FINAL_UNIFIED_UI_V4_1_26">
 /* FINAL BASE DESIGN: ADMIN + CUSTOMER + RIDER */
 html,body{
@@ -1404,13 +1413,13 @@ header h1,header p,header .brandName,header .appName,header .logo,header .tag{
 
 /* FINAL COMPACT PHOTOS / WHITE CHAT */
 .photoThumb,.storePhotoPreview{width:30px!important;height:30px!important;object-fit:cover!important;border-radius:6px!important;}
-.chatOpenBtn,.riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important;}
+.callCustomerBtn{background:#fff!important;color:#111!important;border:1px solid #222!important;}
 .chatPanel,.chatHead,.chatMessages,.chatInput{background:#fff!important;color:#111!important;}
 .chatHead{border-bottom:1px solid #ddd!important;}
 .chatMsg.admin,.chatMsg.customer,.chatMsg.rider{background:#fff!important;color:#111!important;border:1px solid #ddd!important;}
 .orderInfo h3,.order h3{font-weight:600!important;font-size:22px!important;}
 /* FINAL V2 ORDER / EDITOR / CHAT */
-.chatOpenBtn,.riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
+.callCustomerBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
 .orderInfo h3,.order h3{font-weight:600!important;font-size:22px!important}
 .adminOrderPreview,.orderInfo{font-size:17px!important;line-height:1.4!important}
 .adminOrderPreview b{font-size:18px!important}
@@ -2471,6 +2480,12 @@ input,textarea,select{font-size:16px!important;min-height:46px!important;padding
   #stores .storeHeaderActions .storeDelete{width:80px!important;min-width:80px!important;font-size:9px!important}
 }
 </style>
+
+<style id="MHAC_ADMIN_CHAT_REMOVED">
+/* Admin chat UI removed; keep legacy selectors inert. */
+.chatPanel,.chatOpenBtn,.riderChatOpenBtn,[data-chat],[data-rider-chat]{display:none!important}
+.callCustomerBtn{display:block!important;width:100%!important;text-align:center!important;text-decoration:none!important;background:#fff!important;color:#111!important;border:1px solid #222!important;font-weight:900!important;border-radius:9px!important;padding:10px!important;margin:3px 0!important}
+</style>
 </head><body>
 <div id="appToast" aria-live="polite"></div>
 <div id="mhacSplash" class="mhacSplash"><div><img src="mhac-logo.png" alt="MHAC DELIVERY"><h1>MHAC DELIVERY</h1><p>FAST • SAFE • ON TIME</p><div class="mhacLoader"><i></i></div></div></div>
@@ -2486,9 +2501,11 @@ window.setTimeout(function(){
 <header><h1><span class="brandName">MHAC DELIVERY</span><span class="appName">ADMIN APP</span></h1><p>ORDERS • MENU PUBLISH • RIDER ASSIGNMENT • ACCOUNTING</p></header><audio id="orderAlertAudio" src="assets/mhac-order-alert.mp3" preload="auto"></audio><main>
 <div id="login" class="card"><h2>🔐 ADMIN LOGIN</h2><button id="googleBtn">🔵 CONTINUE WITH GOOGLE</button><p id="loginStatus" class="status">Authorized admin account required.</p></div>
 <div id="app" class="hidden">
-<div class="card"><div id="logoutRow" class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER + CHAT ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
+<div class="card"><div id="logoutRow" class="row"><h2>👑 MHAC ADMIN</h2><button id="logout" class="gray">LOG OUT</button></div><p id="adminInfo" class="status"></p><div class="soundBox"><b>🔔 NEW ORDER ALERT</b><span id="adminSoundState" class="status">🔊 AUTOMATIC SOUND — preparing…</span><button id="adminSoundBtn" class="blue" style="display:none">🔊 ENABLE SOUND</button></div></div>
 <div class="card"><h2>📊 DELIVERY & EARNINGS</h2><div id="metrics" class="grid"></div><div id="riderAccounting"></div></div>
-<div class="card"><h2>💳 GCASH PAYMENT</h2>
+<div class="card adminCollapsibleCard" data-admin-collapse="gcash">
+<h2 class="adminSectionToggle" role="button" tabindex="0" aria-expanded="false">💳 GCASH PAYMENT <span class="adminSectionArrow">▶</span></h2>
+<div class="adminSectionBody hidden">
 <p class="status">Set the GCash number and optional QR code customers will see when they choose GCash.</p>
 <div class="gcSettings">
 <label class="label">GCash Number</label>
@@ -2499,7 +2516,9 @@ window.setTimeout(function(){
 <img id="adminGcashQrPreview" class="hidden" alt="GCash QR preview">
 <div class="row"><button id="saveGcashSettings" class="blue">SAVE GCASH SETTINGS</button><button id="removeGcashQr" class="gray">HIDE QR</button></div>
 <p id="gcashSettingsStatus" class="status"></p>
-</div></div>
+</div>
+</div>
+</div>
 <div class="card" id="businessTimeCard">
 <h2>⏰ BUSINESS TIME CONTROL</h2>
 <p class="status">Set the customer ordering hours. Admin stays OPEN and accessible even when the business is closed.</p>
@@ -2514,20 +2533,18 @@ window.setTimeout(function(){
 <p id="businessHoursStatus" class="status">Loading business schedule…</p>
 </div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
-<div class="card"><h2>🏍️ RIDERS</h2><div id="riders">Loading…</div></div>
-<div class="card"><h2>🏪 STORE / MENU MANAGER</h2><p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish. Unpublish hides a store from customers; it does NOT delete your foods.</p>
+<div class="card adminCollapsibleCard" data-admin-collapse="riders">
+<h2 class="adminSectionToggle" role="button" tabindex="0" aria-expanded="false">🏍️ RIDERS <span class="adminSectionArrow">▶</span></h2>
+<div class="adminSectionBody hidden"><div id="riders">Loading…</div></div>
+</div>
+<div class="card adminCollapsibleCard" data-admin-collapse="storeMenu">
+<h2 class="adminSectionToggle" role="button" tabindex="0" aria-expanded="false">🏪 STORE / MENU MANAGER <span class="adminSectionArrow">▶</span></h2>
+<div class="adminSectionBody hidden">
+<p class="status">Edit stores and menus here. Changes stay in DRAFT until you publish. Unpublish hides a store from customers; it does NOT delete your foods.</p>
 <div class="row"><input id="newStore" placeholder="New store name"><button id="addStore" class="red">ADD STORE</button></div>
-<div id="stores"></div><hr><div id="editor" class="hidden"></div></div>
+<div id="stores"></div><hr><div id="editor" class="hidden"></div>
 </div>
-<div id="adminChatPanel" class="chatPanel hidden">
-  <div class="chatHead"><span id="adminChatTitle">💬 CUSTOMER CHAT</span><button id="adminChatClose" class="gray miniBtn">✕</button></div>
-  <div id="adminChatMessages" class="chatMessages"></div>
-  <div class="chatInput"><input id="adminChatInput" placeholder="Type message…"><button id="adminChatSend" class="blue">SEND</button></div>
 </div>
-<div id="adminRiderChatPanel" class="chatPanel hidden">
-  <div class="chatHead"><span id="adminRiderChatTitle">🏍️ RIDER CHAT</span><button id="adminRiderChatClose" class="gray miniBtn">✕</button></div>
-  <div id="adminRiderChatMessages" class="chatMessages"></div>
-  <div class="chatInput"><input id="adminRiderChatInput" placeholder="Message rider…"><button id="adminRiderChatSend" class="blue">SEND</button></div>
 </div>
 </main>
 <script>
@@ -2715,10 +2732,6 @@ async function playAdminAlert(){
     if(!makeAdminFallbackSound())$("adminSoundState").textContent="❌ Alert playback failed — tap ENABLE SOUND again";
   }
 }
-async function playAdminChatAlert(){
-  if(!adminSoundReady)return;
-  try{const a=$("orderAlertAudio");if(adminAudioCtx)await adminAudioCtx.resume();a.pause();a.currentTime=0;a.muted=false;a.volume=1;const p=a.play();if(p)await p;}catch(e){if(!makeAdminFallbackSound())console.warn("Admin chat ringtone failed",e)}
-}
 $("adminSoundBtn").onclick=async()=>{
   const b=$("adminSoundBtn");b.disabled=true;
   try{await prepareAdminAlertSound()}
@@ -2746,6 +2759,24 @@ function loginView(){$("login").classList.remove("hidden");$("app").classList.ad
 $("googleBtn").onclick=async()=>{try{await setPersistence(auth,browserLocalPersistence);const r=await signInWithPopup(auth,gp);if(r.user.email.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){await signOut(auth);throw Error("Unauthorized admin account.")}}catch(e){if(["auth/popup-blocked","auth/popup-timeout","auth/cancelled-popup-request"].includes(e?.code)){try{await signInWithRedirect(auth,gp);return}catch(x){e=x}}$("loginStatus").textContent="❌ "+err(e)}};
 $("logout").onclick=()=>signOut(auth);
 
+function setupAdminSectionCollapsibles(){
+  document.querySelectorAll("[data-admin-collapse]").forEach(card=>{
+    const toggle=card.querySelector(".adminSectionToggle");
+    const body=card.querySelector(".adminSectionBody");
+    const arrow=card.querySelector(".adminSectionArrow");
+    if(!toggle||!body)return;
+    const setOpen=(open)=>{
+      body.classList.toggle("hidden",!open);
+      card.classList.toggle("adminSectionOpen",open);
+      toggle.setAttribute("aria-expanded",open?"true":"false");
+      if(arrow)arrow.textContent=open?"▼":"▶";
+    };
+    setOpen(false);
+    toggle.onclick=()=>setOpen(body.classList.contains("hidden"));
+    toggle.onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle.click();}};
+  });
+}
+setupAdminSectionCollapsibles();
 
 let adminGcash={number:"",qrUrl:"",qrHidden:false};
 const GCASH_LOCAL_KEY="mhac_gcash_settings_v432";
@@ -3009,9 +3040,7 @@ function renderOrders(){
     </div>
     <div class="orderActions">
       <button class=blue data-view="${esc(o.id)}">👁️ VIEW FULL ORDER</button>
-      <a class="chatOpenBtn callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
-      <button class=chatOpenBtn data-chat="${esc(o.id)}">💬 CHAT CUSTOMER</button>
-      <button class="chatOpenBtn riderChatOpenBtn" data-rider-chat="${esc(o.id)}">🏍️ CHAT RIDER</button>
+      <a class="callCustomerBtn" href="tel:${esc(String(o.customer?.contact||"").replace(/[^0-9+]/g,""))}" ${o.customer?.contact?"":"aria-disabled=true"}>📞 CALL CUSTOMER</a>
       ${!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())?`<button class="chatOpenBtn cancelOrderBtn" type="button" data-cancel-order="${esc(o.id)}">❌ CANCEL ORDER</button>`:""}
       ${String(o.status||"NEW").toUpperCase()==="NEW"?`<button class=green data-accept="${esc(o.id)}">✅ ACCEPT ORDER</button>`:""}
       ${String(o.status||"").toUpperCase()==="ACCEPTED"?`<div class=item style="background:#fff8d9"><b data-countdown="${esc(o.id)}">${esc(countdownText(o))}</b><div style="display:flex;gap:6px;align-items:center;margin-top:6px"><input data-wait-input="${esc(o.id)}" type="number" min="1" step="1" value="${Number(o.waitingMinutes||30)}" style="width:82px;padding:8px;border:1px solid #ccc;border-radius:8px"><button class=blue data-time="${esc(o.id)}">⏱️ SET TIME</button></div></div>`:""}
@@ -3030,10 +3059,6 @@ $("orders").onclick=async e=>{
    if(menu)menu.classList.toggle("hidden");
    return;
  }
- const chat=e.target.closest("[data-chat]");
- if(chat){openAdminChat(chat.dataset.chat);return;}
- const riderChat=e.target.closest("[data-rider-chat]");
- if(riderChat){openAdminRiderChat(riderChat.dataset.riderChat);return;}
  const v=e.target.closest("[data-view]");
  if(v){const d=$("details-"+v.dataset.view);if(d)d.classList.toggle("hidden");return;}
  const accept=e.target.closest("[data-accept]");
@@ -4021,94 +4046,6 @@ function renderDirectFoodEditor(si,ci,fi,ed,list){
  ed.querySelector('.deleteDirectFood').onclick=()=>{c.items.splice(fi,1);renderDirectFoodList(ci,list);saveDraftMenu();};
 }
 
-let adminChatUnsub=null,adminChatOrderId="",adminChatSnapshotReady=false;
-function openAdminChat(orderId){
- adminChatOrderId=orderId;
- adminChatSnapshotReady=false;
- const o=orders.find(x=>x.id===orderId);
- $("adminChatTitle").textContent="💬 "+(o?.customer?.name||"CUSTOMER")+" — CHAT";
- $("adminChatPanel").classList.remove("hidden");
- if(adminChatUnsub)adminChatUnsub();
- adminChatUnsub=onSnapshot(collection(db,"orders",orderId,"messages"),snap=>{
-   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
-   $("adminChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"customer"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"CUSTOMER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
-   $("adminChatMessages").scrollTop=$("adminChatMessages").scrollHeight;
-   if(adminChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin")){playAdminChatAlert();}
-   adminChatSnapshotReady=true;
- });
-}
-function closeAdminChat(){if(adminChatUnsub){adminChatUnsub();adminChatUnsub=null}adminChatOrderId="";$("adminChatPanel").classList.add("hidden")}
-$("adminChatClose").onclick=closeAdminChat;
-$("adminChatSend").onclick=async()=>{
- const text=$("adminChatInput").value.trim();if(!text||!adminChatOrderId)return;
- try{await addDoc(collection(db,"orders",adminChatOrderId,"messages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminChatInput").value=""}catch(e){toast(err(e))}
-};
-$("adminChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminChatSend").click()}});
-
-// V4.1.4: keep compact admin chat centered and above the Android keyboard.
-(function setupAdminChatKeyboard(){
-  const panel=$("adminChatPanel"), input=$("adminChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-keyboard",keyboard+"px");
-    if(keyboard>80){
-      panel.style.top=Math.max(12, (vv.height-keyboard)/2)+"px";
-      panel.style.transform="translate(-50%,-50%)";
-    }else{
-      panel.style.top="50%";
-      panel.style.transform="translate(-50%,-50%)";
-    }
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
-})();
-// V4.1.8: separate Admin ↔ Rider chat, isolated from Customer ↔ Admin chat.
-let adminRiderChatUnsub=null,adminRiderChatOrderId="",adminRiderChatSnapshotReady=false;
-function openAdminRiderChat(orderId){
- const o=orders.find(x=>x.id===orderId);
- if(!o?.assignedRiderUid){toast("Assign a rider to this order first.");return}
- adminRiderChatOrderId=orderId;
- adminRiderChatSnapshotReady=false;
- const rider=riders.find(r=>(r.uid||r.id)===o.assignedRiderUid);
- $("adminRiderChatTitle").textContent="🏍️ "+(rider?.nickname||rider?.name||"RIDER")+" — CHAT";
- $("adminRiderChatPanel").classList.remove("hidden");
- if(adminRiderChatUnsub)adminRiderChatUnsub();
- adminRiderChatUnsub=onSnapshot(collection(db,"orders",orderId,"riderMessages"),snap=>{
-   const arr=snap.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>(x.createdAt?.seconds||0)-(y.createdAt?.seconds||0));
-   $("adminRiderChatMessages").innerHTML=arr.map(m=>`<div class="chatMsg ${m.senderRole==="admin"?"admin":"rider"}"><b>${esc(m.senderRole==="admin"?"ADMIN":(m.senderName||"RIDER"))}</b><br>${esc(m.text||"")}</div>`).join("")||"<div class=small>No messages yet.</div>";
-   $("adminRiderChatMessages").scrollTop=$("adminRiderChatMessages").scrollHeight;
-   if(adminRiderChatSnapshotReady && snap.docChanges().some(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin")){playAdminChatAlert();}
-   adminRiderChatSnapshotReady=true;
- },e=>{toast(err(e))});
-}
-function closeAdminRiderChat(){if(adminRiderChatUnsub){adminRiderChatUnsub();adminRiderChatUnsub=null}adminRiderChatOrderId="";$("adminRiderChatPanel").classList.add("hidden")}
-$("adminRiderChatClose").onclick=closeAdminRiderChat;
-$("adminRiderChatSend").onclick=async()=>{
- const text=$("adminRiderChatInput").value.trim();if(!text||!adminRiderChatOrderId)return;
- try{await addDoc(collection(db,"orders",adminRiderChatOrderId,"riderMessages"),{text,senderRole:"admin",senderUid:auth.currentUser.uid,senderName:"MHAC ADMIN",createdAt:serverTimestamp()});$("adminRiderChatInput").value=""}catch(e){toast(err(e))}
-};
-$("adminRiderChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("adminRiderChatSend").click()}});
-
-(function setupRiderChatKeyboard(){
-  const panel=$("adminRiderChatPanel"), input=$("adminRiderChatInput");
-  if(!panel||!input||!window.visualViewport)return;
-  const adjust=()=>{
-    const vv=window.visualViewport;
-    const keyboard=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.setProperty("--chat-bottom",Math.max(10,keyboard+10)+"px");
-  };
-  window.visualViewport.addEventListener("resize",adjust);
-  window.visualViewport.addEventListener("scroll",adjust);
-  input.addEventListener("focus",()=>setTimeout(adjust,80));
-  input.addEventListener("blur",()=>setTimeout(adjust,120));
-  adjust();
-})();
-
 function withTimeout(promise, ms, label){
   return Promise.race([
     promise,
@@ -4269,34 +4206,6 @@ async function loadMenu(){
 }
 let seenAdminOrders=new Set();let adminOrdersPrimed=false;
 
-// V4.1.21 GLOBAL CHAT POPUP: incoming messages are watched even when
-// no chat button/panel is open. The correct chat opens automatically.
-const adminChatWatchers=new Map();
-function syncAdminChatWatchers(){
-  const active=new Map(orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).map(o=>[o.id,o]));
-  for(const [key,unsub] of adminChatWatchers){
-    const id=key.split("::")[1];
-    if(!active.has(id)){try{unsub()}catch(_){}adminChatWatchers.delete(key);}
-  }
-  for(const [id,o] of active){
-    const specs=[["customer",collection(db,"orders",id,"messages")],["rider",collection(db,"orders",id,"riderMessages")]];
-    for(const [kind,ref] of specs){
-      const key=kind+"::"+id;
-      if(adminChatWatchers.has(key))continue;
-      let primed=false;
-      const unsub=onSnapshot(ref,snap=>{
-        const incoming=snap.docChanges().filter(c=>c.type==="added" && c.doc.data()?.senderRole!=="admin");
-        if(!primed){primed=true;return;}
-        if(!incoming.length)return;
-        if(kind==="customer")openAdminChat(id);else openAdminRiderChat(id);
-        playAdminChatAlert();
-      },e=>console.warn("Admin global chat watcher:",e));
-      adminChatWatchers.set(key,unsub);
-    }
-  }
-}
-function stopAdminChatWatchers(){for(const unsub of adminChatWatchers.values()){try{unsub()}catch(_){}}adminChatWatchers.clear();}
-
 function start(){
   if(ru)ru();
   ru=onSnapshot(collection(db,"riders"),s=>{
@@ -4318,39 +4227,18 @@ function start(){
       orders=incoming;
       orders.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
       $("orderStatus").textContent="🟢 LIVE — "+orders.filter(o=>!["COMPLETED","CANCELLED"].includes(String(o.status||"").toUpperCase())).length+" active orders";
-      renderOrders();calcStats();syncAdminChatWatchers();
+      renderOrders();calcStats();
     });
   });
 }
 
 getRedirectResult(auth).catch(e=>{$("loginStatus").textContent="❌ "+err(e)});
 onAuthStateChanged(auth,u=>{
- if(!u){stopAdminChatWatchers();if(ou){ou();ou=null}if(ru){ru();ru=null}loginView();return}
- if((u.email||"").toLowerCase()!==ADMIN_EMAIL){stopAdminChatWatchers();signOut(auth);loginView();return}
+ if(!u){if(ou){ou();ou=null}if(ru){ru();ru=null}loginView();return}
+ if((u.email||"").toLowerCase()!==ADMIN_EMAIL){signOut(auth);loginView();return}
  appView();$("adminInfo").textContent="Signed in as "+u.email;autoEnableAdminSound();startBusinessHoursAdmin();loadAdminGcash();loadMenu();start();
 });
 
-
-// V4.1.32 — force both chat windows to stay centered on the phone.
-(function forceCenteredChats(){
-  const panels=[$("adminChatPanel"),$("adminRiderChatPanel")].filter(Boolean);
-  const center=()=>{
-    const vv=window.visualViewport;
-    panels.forEach(p=>{
-      if(!p.classList.contains("hidden")){
-        p.style.setProperty("left","50%","important");
-        p.style.setProperty("right","auto","important");
-        p.style.setProperty("bottom","auto","important");
-        p.style.setProperty("top",vv?Math.max(12, vv.height/2 + vv.offsetTop):"50%","important");
-        p.style.setProperty("transform","translate(-50%,-50%)","important");
-      }
-    });
-  };
-  window.addEventListener("resize",center);
-  window.visualViewport?.addEventListener("resize",center);
-  window.visualViewport?.addEventListener("scroll",center);
-  setInterval(center,500);
-})();
 
 window.__MHAC_BUILD__="V4.1.76 MENU MANAGER PRESERVED + CUSTOMER MATCHED ORDER BREAKDOWN";
 </script>
@@ -4403,7 +4291,7 @@ body{font-size:15px!important;line-height:1.35!important}
 .gcSettings .row button{min-height:38px!important;font-size:12px!important;padding:6px 8px!important}
 .gcSettings img,#adminGcashQrPreview{width:90px!important;height:90px!important;max-width:90px!important;max-height:90px!important;margin:5px auto!important;object-fit:contain!important}
 /* Chat action buttons are white; chat window may retain its existing behavior */
-.orderActions .chatOpenBtn,.orderActions .riderChatOpenBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
+.orderActions .callCustomerBtn{background:#fff!important;color:#111!important;border:1px solid #222!important}
 /* Order text readable but not oversized */
 #orders .orderInfo,.adminOrderPreview,.orderInfo{font-size:15px!important;line-height:1.35!important}
 #orders .orderInfo h3{font-size:21px!important;font-weight:800!important;margin:7px 0!important}
