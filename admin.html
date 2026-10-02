@@ -2519,8 +2519,10 @@ window.setTimeout(function(){
 </div>
 </div>
 </div>
-<div class="card" id="businessTimeCard">
-<h2>⏰ BUSINESS TIME CONTROL</h2>
+<div class="card adminCollapsibleCard" data-admin-collapse="businessTime">
+<h2 class="adminSectionToggle" role="button" tabindex="0" aria-expanded="false">⏰ BUSINESS TIME CONTROL <span class="adminSectionArrow">▶</span></h2>
+<div class="adminSectionBody hidden">
+<div id="businessTimeCard">
 <p class="status">Set the customer ordering hours. Admin stays OPEN and accessible even when the business is closed.</p>
 <div class="businessTimeGrid">
   <div><label class="label">OPEN TIME</label><input id="businessOpenTime" type="time" value="09:00"></div>
@@ -2531,6 +2533,8 @@ window.setTimeout(function(){
   <button id="toggleDayOff" class="red">🔴 CLOSED / DAY OFF</button>
 </div>
 <p id="businessHoursStatus" class="status">Loading business schedule…</p>
+</div>
+</div>
 </div>
 <div class="card"><h2>📥 INCOMING ORDERS</h2><p id="orderStatus" class="status">Connecting…</p><div id="orders">No active orders.</div></div>
 <div class="card adminCollapsibleCard" data-admin-collapse="riders">
