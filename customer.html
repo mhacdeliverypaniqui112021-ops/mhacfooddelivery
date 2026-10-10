@@ -2067,7 +2067,14 @@ async function calculateByGPS(e){
  if(!window.isSecureContext){$("locStatus").textContent="❌ GPS requires HTTPS. Please open the GitHub Pages HTTPS link.";return}
  if(!navigator.geolocation){$("locStatus").textContent="❌ This browser/device does not support GPS.";return}
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";$("locStatus").textContent="Requesting GPS permission…";$("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
- navigator.geolocation.getCurrentPosition(async p=>{
+ const showGpsError=err=>{
+   gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
+   btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
+   const msg={1:"Location permission was denied. Check Location permission for Facebook and this site, then try again.",2:"GPS position is unavailable. Turn ON phone Location and try again in an open area.",3:"GPS request timed out after retry. Turn ON phone Location and try again."}[err.code]||"Unable to get GPS location. Check phone Location and browser permission, then try again.";
+   $("locStatus").textContent="❌ "+msg;
+   $("gpsLocationDisplay").textContent="";
+ };
+ const onGpsSuccess=async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
    $("gpsAccuracy").textContent=`GPS accuracy: ${Math.round(gpsAccuracy)} meters`;
    $("locStatus").textContent="GPS location detected. You can now calculate the delivery fee.";
@@ -2080,13 +2087,15 @@ async function calculateByGPS(e){
    }catch(e){
      $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
    }
- },err=>{
-   gpsLat=null;gpsLon=null;distanceKm=null;deliveryFee=null;$("calculateFeeBtn").disabled=true;
-   btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION";
-   const msg={1:"Location permission was denied. Open this page in Google Chrome (not Facebook/in-app browser), tap the site settings icon > Permissions > Location > Allow, then turn ON phone Location and try again.",2:"GPS position is unavailable. Turn ON phone Location, move near a window/open area, and try again.",3:"GPS request timed out. Turn ON phone Location and try again in an open area."}[err.code]||"Unable to get GPS location. Open this page in Google Chrome and allow Location permission.";
-   $("locStatus").textContent="❌ "+msg;
-   $("gpsLocationDisplay").textContent="";
- },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+ };
+ // First try a browser-friendly, lower-power request; if it times out or position is unavailable,
+ // retry once with high accuracy. This cannot override a permission block imposed by Facebook.
+ navigator.geolocation.getCurrentPosition(onGpsSuccess,err=>{
+   if(err.code===1){showGpsError(err);return}
+   $("locStatus").textContent="GPS not ready yet. Retrying location…";
+   navigator.geolocation.getCurrentPosition(onGpsSuccess,showGpsError,
+     {enableHighAccuracy:true,timeout:45000,maximumAge:60000});
+ },{enableHighAccuracy:false,timeout:25000,maximumAge:60000});
 }
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){
