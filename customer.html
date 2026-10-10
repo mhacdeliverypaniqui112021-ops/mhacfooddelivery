@@ -2073,20 +2073,6 @@ async function calculateByGPS(e){
    const msg={1:"Location permission was denied. Check Location permission for Facebook and this site, then try again.",2:"GPS position is unavailable. Turn ON phone Location and try again in an open area.",3:"GPS request timed out after retry. Turn ON phone Location and try again."}[err.code]||"Unable to get GPS location. Check phone Location and browser permission, then try again.";
    $("locStatus").textContent="❌ "+msg;
    $("gpsLocationDisplay").textContent="";
-   // Facebook in-app browser can deny website geolocation even when Android Location is allowed.
-   // Do not fake coordinates or alter checkout/pricing; offer a direct Chrome handoff only after denial.
-   if(err.code===1){
-     const openBtn=document.createElement("button");
-     openBtn.type="button";
-     openBtn.textContent="🌐 OPEN GPS IN CHROME";
-     openBtn.style.cssText="display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #222;border-radius:9px;background:#fff;color:#111;font-weight:900;";
-     openBtn.addEventListener("click",()=>{
-       const url="intent://mhacdelivery.devs.surf/customer.html#Intent;scheme=https;package=com.android.chrome;end";
-       window.location.href=url;
-     });
-     $("locStatus").appendChild(document.createElement("br"));
-     $("locStatus").appendChild(openBtn);
-   }
  };
  const onGpsSuccess=async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
@@ -2102,14 +2088,15 @@ async function calculateByGPS(e){
      $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
    }
  };
- // First try a browser-friendly, lower-power request; if it times out or position is unavailable,
- // retry once with high accuracy. This cannot override a permission block imposed by Facebook.
+ // Facebook in-app browser may fail the low-accuracy first request. Try precise GPS first,
+ // then fall back to a cached/low-power position if the device provider cannot return a fix.
+ // A browser/host permission denial (code 1) cannot be bypassed by page JavaScript.
  navigator.geolocation.getCurrentPosition(onGpsSuccess,err=>{
    if(err.code===1){showGpsError(err);return}
-   $("locStatus").textContent="GPS not ready yet. Retrying location…";
+   $("locStatus").textContent="GPS is taking longer than expected. Trying the alternate location method…";
    navigator.geolocation.getCurrentPosition(onGpsSuccess,showGpsError,
-     {enableHighAccuracy:true,timeout:45000,maximumAge:60000});
- },{enableHighAccuracy:false,timeout:25000,maximumAge:60000});
+     {enableHighAccuracy:false,timeout:60000,maximumAge:120000});
+ },{enableHighAccuracy:true,timeout:60000,maximumAge:0});
 }
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){
