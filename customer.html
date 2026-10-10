@@ -2073,6 +2073,20 @@ async function calculateByGPS(e){
    const msg={1:"Location permission was denied. Check Location permission for Facebook and this site, then try again.",2:"GPS position is unavailable. Turn ON phone Location and try again in an open area.",3:"GPS request timed out after retry. Turn ON phone Location and try again."}[err.code]||"Unable to get GPS location. Check phone Location and browser permission, then try again.";
    $("locStatus").textContent="❌ "+msg;
    $("gpsLocationDisplay").textContent="";
+   // Facebook in-app browser can deny website geolocation even when Android Location is allowed.
+   // Do not fake coordinates or alter checkout/pricing; offer a direct Chrome handoff only after denial.
+   if(err.code===1){
+     const openBtn=document.createElement("button");
+     openBtn.type="button";
+     openBtn.textContent="🌐 OPEN GPS IN CHROME";
+     openBtn.style.cssText="display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #222;border-radius:9px;background:#fff;color:#111;font-weight:900;";
+     openBtn.addEventListener("click",()=>{
+       const url="intent://mhacdelivery.devs.surf/customer.html#Intent;scheme=https;package=com.android.chrome;end";
+       window.location.href=url;
+     });
+     $("locStatus").appendChild(document.createElement("br"));
+     $("locStatus").appendChild(openBtn);
+   }
  };
  const onGpsSuccess=async p=>{
    gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
