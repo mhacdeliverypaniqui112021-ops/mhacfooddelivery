@@ -2060,70 +2060,56 @@ async function reverseGeocodeManualRecipient(lat,lon){
   try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);const g=await r.json();if(g.display_name)$("gpsLocationDisplay").textContent="📍 RECIPIENT LOCATION: "+g.display_name;}catch(_){}
 }
 function closeMenu(){$("menuModal").style.display="none"}function closeCheckout(){$("checkout").style.display="none"}function feeForKm(k){return 40+Math.max(0,Math.ceil(k)-1)*10}
-async function calculateByGPS(e){
+function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
  const btn=$("gpsBtn"), status=$("locStatus");
  if(!window.isSecureContext){status.textContent="❌ GPS requires a secure HTTPS page.";return}
- if(!navigator.geolocation){status.textContent="❌ This Facebook browser does not expose the Geolocation API.";return}
+ if(!navigator.geolocation){status.textContent="❌ This browser does not expose the Geolocation API.";return}
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";
- status.textContent="Requesting a quick GPS location from Facebook…";
+ status.textContent="Requesting GPS directly from this browser…";
  $("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  gpsLat=null;gpsLon=null;gpsAccuracy=null;distanceKm=null;deliveryFee=null;
  $("calculateFeeBtn").disabled=true;
- let watchId=null, finished=false, permissionState="unavailable", timer=null;
+ let watchId=null, finished=false, timer=null;
  const stop=()=>{if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(_){}watchId=null}if(timer!==null){clearTimeout(timer);timer=null}};
  const resetButton=()=>{btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION"};
  const fail=(code,message)=>{
    if(finished)return;finished=true;stop();resetButton();
-   const details={
-    1:"PERMISSION_DENIED (code 1): Facebook browser or Android denied this page's location request.",
-    2:"POSITION_UNAVAILABLE (code 2): Facebook/Android could not obtain a location fix.",
-    3:"TIMEOUT (code 3): no location fix arrived before the deadline."
-   };
-   status.textContent="❌ "+(details[code]||("UNKNOWN GPS ERROR (code "+String(code)+")"))+" Permission API state: "+permissionState+". "+(message||"");
+   const details={1:"PERMISSION_DENIED (code 1): the browser rejected this page's location request.",2:"POSITION_UNAVAILABLE (code 2): the browser could not obtain a location fix.",3:"TIMEOUT (code 3): no location fix arrived before the deadline."};
+   status.textContent="❌ "+(details[code]||("GPS ERROR (code "+String(code)+")"))+" "+(message||"");
  };
- const succeed=async p=>{
-   if(finished)return;finished=true;stop();
-   gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
-   $("gpsAccuracy").textContent="GPS accuracy: "+Math.round(gpsAccuracy)+" meters";
-   status.textContent="GPS location detected. You can now calculate the delivery fee.";
-   $("calculateFeeBtn").disabled=false;btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
-   try{
-     const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`);
-     if(!r.ok)throw new Error("Reverse geocoding HTTP "+r.status);
-     const g=await r.json();
-     $("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+(g.display_name||`${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`);
-   }catch(_){$("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;}
- };
- const startWatchFallback=()=>{
+ const succeed=p=>{
    if(finished)return;
-   status.textContent="Quick GPS request did not return yet. Trying live GPS updates…";
+   if(!p||!p.coords||!Number.isFinite(p.coords.latitude)||!Number.isFinite(p.coords.longitude))return fail(2,"The browser returned invalid coordinates.");
+   finished=true;stop();gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
+   $("gpsAccuracy").textContent="GPS accuracy: "+Math.round(gpsAccuracy)+" meters";
+   status.textContent="✅ GPS location detected. You can now calculate the delivery fee.";
+   $("calculateFeeBtn").disabled=false;btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
+   $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
+   fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gpsLat}&lon=${gpsLon}&zoom=18&addressdetails=1`).then(r=>{if(!r.ok)throw new Error("Reverse geocoding failed");return r.json()}).then(g=>{if(g&&g.display_name)$("gpsLocationDisplay").textContent="📍 LOCATION DETECTED: "+g.display_name}).catch(()=>{});
+ };
+ const startWatch=()=>{
+   if(finished)return;
+   status.textContent="Waiting for a live GPS update from the browser…";
    try{
      watchId=navigator.geolocation.watchPosition(succeed,err=>{
-       if(err.code===1){fail(err.code,err.message);return}
-       // A watch may emit a transient unavailable/timeout error before a later fix.
-       status.textContent="Waiting for Facebook's next GPS update…";
+       if(finished)return;
+       if(err&&err.code===1){fail(1,err.message);return}
+       status.textContent="Waiting for a live GPS update from the browser…";
      },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
-     timer=setTimeout(()=>fail(3,"Quick request plus live GPS retry exceeded about 25 seconds."),16000);
+     timer=setTimeout(()=>fail(3,"The direct request and live GPS update both timed out. This browser may not be passing location to the page."),16000);
    }catch(err){fail(0,err&&err.message?err.message:"Could not start live GPS updates.")}
  };
+ // Important for Facebook's in-app browser: start geolocation synchronously in the button click.
+ // Do not await Permissions API before calling getCurrentPosition; that can lose the user gesture.
  try{
-   if(navigator.permissions&&navigator.permissions.query){
-     try{const p=await navigator.permissions.query({name:"geolocation"});permissionState=p.state||"unknown"}
-     catch(_){permissionState="unsupported in this browser"}
-   }
-   // Do not stop based only on Permissions API state: some in-app browsers report
-   // "denied" here without giving the page a usable permission prompt. Let the
-   // actual Geolocation request run and report its real result.
-   // Quick one-shot attempt first: reuse a very recent location if the browser has one.
-   // Only if that request times out/unavailable do we listen for live GPS updates.
    navigator.geolocation.getCurrentPosition(succeed,err=>{
      if(finished)return;
-     if(err.code===1){fail(err.code,err.message);return;}
-     startWatchFallback();
+     if(err&&err.code===1){fail(1,err.message);return}
+     startWatch();
    },{enableHighAccuracy:true,timeout:10000,maximumAge:15000});
- }catch(err){fail(0,err&&err.message?err.message:"Could not start the location request.")}
+ }catch(err){fail(0,err&&err.message?err.message:"Could not start GPS request.")}
 }
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
 async function placeOrder(){
@@ -2339,7 +2325,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.96 FACEBOOK GPS PERMISSION TEST";</script>
+window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
 </body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
