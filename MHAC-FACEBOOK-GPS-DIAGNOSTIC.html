@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache"><title>MHAC Facebook GPS Diagnostic</title>
+<style>body{font:16px Arial,sans-serif;max-width:680px;margin:24px auto;padding:0 16px;color:#111}h1{font-size:24px}button{width:100%;padding:14px;margin:8px 0;border:2px solid #111;border-radius:10px;background:white;font-weight:bold;font-size:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f4f4;border:1px solid #ccc;border-radius:10px;padding:12px;min-height:120px}small{color:#555}</style></head><body>
+<h1>MHAC DELIVERY — Facebook GPS Diagnostic</h1><p>Open this page inside Facebook, then tap the button once. It does not place orders or change customer data.</p>
+<button id="test">TEST GPS NOW</button><button id="clear">CLEAR RESULTS</button><pre id="out">Ready. Waiting for your test.</pre><small>Run the same test in Facebook and Chrome on the same phone and location. Share the displayed result.</small>
+<script>
+const out=document.getElementById('out');function log(s){out.textContent += '\n'+s;}function stamp(){return new Date().toLocaleTimeString();}
+document.getElementById('clear').onclick=()=>out.textContent='Ready. Waiting for your test.';
+document.getElementById('test').onclick=()=>{
+ out.textContent='Started: '+stamp();
+ log('URL: '+location.href);log('Secure context: '+window.isSecureContext);log('Geolocation API: '+!!navigator.geolocation);log('User agent: '+navigator.userAgent);
+ if(!window.isSecureContext){log('STOP: page is not a secure context (HTTPS).');return;}
+ if(!navigator.geolocation){log('STOP: navigator.geolocation is unavailable.');return;}
+ let done=false;const start=Date.now();
+ const finish=(s)=>{if(done)return;done=true;log('Elapsed: '+((Date.now()-start)/1000).toFixed(1)+' seconds');log(s);};
+ if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:'geolocation'}).then(p=>log('Permission API state: '+p.state)).catch(e=>log('Permission query unsupported/error: '+e.name+' '+e.message));}else log('Permission API: unavailable');
+ log('Calling getCurrentPosition(enableHighAccuracy=false, timeout=12000, maximumAge=120000)…');
+ navigator.geolocation.getCurrentPosition(p=>finish('SUCCESS: latitude='+p.coords.latitude+' longitude='+p.coords.longitude+' accuracy='+Math.round(p.coords.accuracy)+'m timestamp='+new Date(p.timestamp).toLocaleTimeString()),e=>finish('ERROR: code='+e.code+' message='+e.message+' (1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT)'),{enableHighAccuracy:false,timeout:12000,maximumAge:120000});
+};
+</script></body></html>
