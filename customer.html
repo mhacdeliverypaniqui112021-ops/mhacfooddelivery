@@ -2113,10 +2113,9 @@ async function calculateByGPS(e){
      try{const p=await navigator.permissions.query({name:"geolocation"});permissionState=p.state||"unknown"}
      catch(_){permissionState="unsupported in this browser"}
    }
-   if(permissionState==="denied"){
-     fail(1,"The browser reports geolocation permission denied. The page cannot override Facebook/Android permission.");
-     return;
-   }
+   // Do not stop based only on Permissions API state: some in-app browsers report
+   // "denied" here without giving the page a usable permission prompt. Let the
+   // actual Geolocation request run and report its real result.
    // Quick one-shot attempt first: reuse a very recent location if the browser has one.
    // Only if that request times out/unavailable do we listen for live GPS updates.
    navigator.geolocation.getCurrentPosition(succeed,err=>{
@@ -2340,7 +2339,7 @@ setTimeout(function(){
     }
   }catch(_){}
 },4500);
-window.__MHAC_BUILD__="V4.1.95 CUSTOMER ADD TO CART ROOT FIX";</script>
+window.__MHAC_BUILD__="V4.1.96 FACEBOOK GPS PERMISSION TEST";</script>
 </body></html>
 
 <style id="MHAC_CUSTOMER_ADMIN_EXACT_FLOW_FINAL">
