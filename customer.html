@@ -2064,26 +2064,30 @@ function calculateByGPS(e){
  if(e&&e.preventDefault)e.preventDefault();
  try{document.activeElement?.blur()}catch(_){}
  const btn=$("gpsBtn"), status=$("locStatus");
- if(!window.isSecureContext){status.textContent="❌ GPS requires a secure HTTPS page.";return}
- if(!navigator.geolocation){status.textContent="❌ This browser does not expose the Geolocation API.";return}
+ if(!window.isSecureContext){status.textContent="❌ GPS requires a secure HTTPS page. Open the HTTPS customer link.";return}
+ if(!navigator.geolocation){status.textContent="❌ This browser does not expose GPS. Open this page in Chrome or allow location in Facebook app settings.";return}
  btn.disabled=true;btn.textContent="📍 GETTING GPS LOCATION…";
- status.textContent="Requesting GPS directly from this browser…";
+ status.textContent="Requesting location permission. If Facebook asks, tap ALLOW and choose precise location.";
  $("gpsLocationDisplay").textContent="";$("gpsAccuracy").textContent="";
  gpsLat=null;gpsLon=null;gpsAccuracy=null;distanceKm=null;deliveryFee=null;
  $("calculateFeeBtn").disabled=true;
- let watchId=null, finished=false, timer=null;
+ let watchId=null, finished=false, timer=null, fallbackStarted=false;
  const stop=()=>{if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(_){}watchId=null}if(timer!==null){clearTimeout(timer);timer=null}};
  const resetButton=()=>{btn.disabled=false;btn.textContent="📍 ALLOW GPS LOCATION"};
  const fail=(code,message)=>{
    if(finished)return;finished=true;stop();resetButton();
-   const details={1:"PERMISSION_DENIED (code 1): the browser rejected this page's location request.",2:"POSITION_UNAVAILABLE (code 2): the browser could not obtain a location fix.",3:"TIMEOUT (code 3): no location fix arrived before the deadline."};
-   status.textContent="❌ "+(details[code]||("GPS ERROR (code "+String(code)+")"))+" "+(message||"");
+   const details={
+     1:"PERMISSION DENIED: allow Location permission for Facebook (or the browser opening this link), and enable Precise location.",
+     2:"LOCATION UNAVAILABLE: turn on phone Location/GPS, then try again outdoors or near a window.",
+     3:"GPS TIMEOUT: Facebook did not return a location in time. Try Open in Chrome, or use Manual Location for Recipient."
+   };
+   status.textContent="❌ "+(details[code]||("GPS ERROR (code "+String(code)+")"))+(message?" ("+message+")":"");
  };
  const succeed=p=>{
    if(finished)return;
    if(!p||!p.coords||!Number.isFinite(p.coords.latitude)||!Number.isFinite(p.coords.longitude))return fail(2,"The browser returned invalid coordinates.");
-   finished=true;stop();gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=p.coords.accuracy;
-   $("gpsAccuracy").textContent="GPS accuracy: "+Math.round(gpsAccuracy)+" meters";
+   finished=true;stop();gpsLat=p.coords.latitude;gpsLon=p.coords.longitude;gpsAccuracy=Number.isFinite(p.coords.accuracy)?p.coords.accuracy:null;
+   $("gpsAccuracy").textContent=gpsAccuracy===null?"GPS accuracy not provided.":"GPS accuracy: "+Math.round(gpsAccuracy)+" meters";
    status.textContent="✅ GPS location detected. You can now calculate the delivery fee.";
    $("calculateFeeBtn").disabled=false;btn.disabled=false;btn.textContent="📍 GPS LOCATION DETECTED";
    $("gpsLocationDisplay").textContent=`📍 LOCATION DETECTED: ${gpsLat.toFixed(6)}, ${gpsLon.toFixed(6)}`;
@@ -2091,24 +2095,34 @@ function calculateByGPS(e){
  };
  const startWatch=()=>{
    if(finished)return;
-   status.textContent="Waiting for a live GPS update from the browser…";
+   status.textContent="Waiting for a live location update. Keep this checkout open and allow location access…";
    try{
      watchId=navigator.geolocation.watchPosition(succeed,err=>{
        if(finished)return;
        if(err&&err.code===1){fail(1,err.message);return}
-       status.textContent="Waiting for a live GPS update from the browser…";
-     },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
-     timer=setTimeout(()=>fail(3,"The direct request and live GPS update both timed out. This browser may not be passing location to the page."),16000);
-   }catch(err){fail(0,err&&err.message?err.message:"Could not start live GPS updates.")}
+     },{enableHighAccuracy:false,timeout:20000,maximumAge:0});
+     timer=setTimeout(()=>fail(3,"No location was returned after high-accuracy and standard-location requests."),22000);
+   }catch(err){fail(0,err&&err.message?err.message:"Could not start live location updates.")}
  };
- // Important for Facebook's in-app browser: start geolocation synchronously in the button click.
- // Do not await Permissions API before calling getCurrentPosition; that can lose the user gesture.
+ const startFallback=()=>{
+   if(finished||fallbackStarted)return;
+   fallbackStarted=true;
+   status.textContent="High-accuracy GPS did not respond. Trying standard device location…";
+   try{
+     navigator.geolocation.getCurrentPosition(succeed,err=>{
+       if(finished)return;
+       if(err&&err.code===1){fail(1,err.message);return}
+       startWatch();
+     },{enableHighAccuracy:false,timeout:18000,maximumAge:0});
+   }catch(err){startWatch()}
+ };
+ // Keep the first geolocation call synchronous inside the tap handler for Facebook's in-app browser.
  try{
    navigator.geolocation.getCurrentPosition(succeed,err=>{
      if(finished)return;
      if(err&&err.code===1){fail(1,err.message);return}
-     startWatch();
-   },{enableHighAccuracy:true,timeout:10000,maximumAge:15000});
+     startFallback();
+   },{enableHighAccuracy:true,timeout:18000,maximumAge:0});
  }catch(err){fail(0,err&&err.message?err.message:"Could not start GPS request.")}
 }
 async function calculateGPSFee(){if(gpsLat===null)return;$("locStatus").textContent="Calculating driving distance…";try{const r=await fetch(`https://router.project-osrm.org/route/v1/driving/120.57765,15.66789;${gpsLon},${gpsLat}?overview=false`),j=await r.json();distanceKm=j.routes[0].distance/1000;deliveryFee=feeForKm(distanceKm);$("feeView").textContent=`${distanceKm.toFixed(2)} km • ${peso(deliveryFee)}`;renderCart();updateTotals()}catch(e){$("locStatus").textContent="❌ Route calculation failed."}finally{$("calculateFeeBtn").disabled=false}}
